@@ -1,0 +1,28 @@
+.searchModalListItemText,
+.searchModalListItemIcon,
+.createModalListItemText,
+.createModalListItemIcon,
+.searchModalListText,
+.searchModalListEmail,
+.followModalListText,
+.followModalListEmail {
+  color: white;
+}
+
+.searchModalListUsername,
+.followModalListUsername {
+  color: gray;
+}
+
+.searchModalListItemText:hover,
+.searchModalListItemIcon:hover,
+.createModalListItemText:hover,
+.createModalListItemIcon:hover,
+.searchModalListText:hover,
+.searchModalListEmail:hover,
+.searchModalListUsername:hover,
+.followModalListText:hover,
+.followModalListEmail:hover,
+.followModalListUsername:hover {
+  color: #a0ff1f;
+}

@@ -1,0 +1,81 @@
+import { useEffect } from 'react';
+import { usePostContext } from '@/context/post-context';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/router';
+import EventCard from '@/components/community/card/eventCard';
+import Sidebar from '@/components/community/sidebar/sidebar';
+import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import styles from './page.module.css';
+import PageTitle from '@/components/page-title';
+
+export default function Events({ onPageChange }) {
+  const pageTitle = '社群媒體';
+  const router = useRouter();
+  useEffect(() => {
+    onPageChange(pageTitle);
+    if (!router.isReady) return;
+  }, [router.query]);
+
+  const { auth } = useAuth();
+
+  const { events, eventHasMore, getCommunityEvents } = usePostContext();
+
+  useEffect(() => {
+    if (auth.id !== undefined && auth.id !== null) {
+      getCommunityEvents();
+    }
+  }, [auth.id]);
+
+  return (
+    <>
+      <title>{'Community - Taipei Date'}</title>
+      <PageTitle pageTitle={pageTitle} />
+
+      <div className="flex md:hidden">
+        <TabbarMobile />
+      </div>
+      <div className="flex pt-28 items-center justify-center">
+        <div className="flex flex-row items-center justify-center min-h-screen">
+          <div className="hidden md:flex md:w-2/12">
+            <Sidebar />
+          </div>
+          <div className="flex md:w-10/12 flex-wrap gap-5 justify-center">
+            <InfiniteScroll
+              dataLength={events.length}
+              next={getCommunityEvents}
+              hasMore={eventHasMore}
+              loader={
+                <div
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    textAlign: 'center',
+                    minHeight: '100vh',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div className={`${styles[`lds-heart`]}`}>
+                    <div></div>
+                  </div>
+                </div>
+              }
+              // endMessage={<p>No more events</p>}
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: '1.25rem',
+              }}
+            >
+              {events.map((event, i) => (
+                <EventCard event={event} key={i} />
+              ))}
+            </InfiniteScroll>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
