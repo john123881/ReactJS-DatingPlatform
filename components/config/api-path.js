@@ -1,4 +1,5 @@
 //export const API_SERVER = `http://192.168.0.15:3001`;
+// export const API_SERVER = `http://119.14.42.80:3443`;
 export const API_SERVER = `http://119.14.42.80:3001`;
 //const API_SERVER = `http://localhost:3001`;
 

@@ -22,7 +22,7 @@ function truncateChinese(title, maxChineseChars = 7) {
 }
 
 export default function TripSidebar2({ tripName, trip_plan_id }) {
-  console.log('TripSidebar2 received tripName:', tripName);
+  // console.log('TripSidebar2 received tripName:', tripName);
   const [trip, setTrip] = useState({}); //用於儲存從trip_plans中獲取的值
   const router = useRouter();
   // const [tripDraft, setTripDraft] = useState(tripName.trip_draft);
@@ -248,13 +248,13 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   }, [trip]);
 
   return (
-    <div className=" sm:ml-20 sm:mr-20 pt-16 border-b-2 border-white pb-3 ">
-      <div className="trip-sidebar2 hidden sm:block">
-        <p className="text-5xl mb-2 ">行程規劃</p>
+    <div className="pt-16 pb-3 border-b-2 border-white  sm:ml-20 sm:mr-20">
+      <div className="hidden trip-sidebar2 sm:block">
+        <p className="mb-2 text-5xl ">行程規劃</p>
         <div className=" justify-between items-center pr-2.5 flex">
-          <div className="grid grid-cols-2 sm:block ml-5 sm:ml-0 gap-2">
+          <div className="grid grid-cols-2 gap-2 ml-5 sm:block sm:ml-0">
             <span
-              className="text-xs sm:text-2xl mr-8 tooltip"
+              className="mr-8 text-xs sm:text-2xl tooltip"
               data-tip={tripName.trip_title}
             >
               {tripName && tripName.trip_title
@@ -262,7 +262,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                 : 'Loading...'}
             </span>
 
-            <span className="text-xs sm:text-2xl mr-8 ">
+            <span className="mr-8 text-xs sm:text-2xl ">
               {tripName && tripName.trip_date
                 ? new Date(tripName.trip_date).toLocaleDateString('en-CA') // 格式化日期為 YYYY-MM-DD
                 : 'Loading...'}
@@ -274,8 +274,8 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             {isShareTripModalOpen && (
               <dialog open className="modal">
                 <form>
-                  <div className="modal-box w-96 flex flex-col justify-center items-center">
-                    <h3 className="font-bold text-lg mb-4 text-white text-center">
+                  <div className="flex flex-col items-center justify-center modal-box w-96">
+                    <h3 className="mb-4 text-lg font-bold text-center text-white">
                       確定要分享{' '}
                       <span className="text-[#a0ff1f]">
                         {tripName.trip_title}
@@ -311,7 +311,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
               <dialog open className="modal">
                 <form>
                   {/* 之後要跟後端路由連結 */}
-                  <div className="modal-box w-96 flex flex-col justify-center items-center">
+                  <div className="flex flex-col items-center justify-center modal-box w-96">
                     <h3 className="font-bold text-lg mb-4 text-[#a0ff1f] text-center">
                       確定要取消分享 {tripName.trip_title} 嗎？
                     </h3>
@@ -345,7 +345,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             {isNewTripNoteModalOpen && (
               <dialog open className="modal">
                 <form onSubmit={handleSubmit} className="modal-box w-96">
-                  <h3 className="font-bold text-lg mb-4 text-white">
+                  <h3 className="mb-4 text-lg font-bold text-white">
                     行程筆記
                   </h3>
 
@@ -353,14 +353,14 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                   {trip.trip_description ? (
                     <input
                       type="text"
-                      className="mt-4 mb-4 px-2 py-1 w-full"
+                      className="w-full px-2 py-1 mt-4 mb-4"
                       value={trip.trip_description || tripDescription}
                       onChange={(e) => setTripDescription(e.target.value)}
                     />
                   ) : (
                     <input
                       type="text"
-                      className="mt-4 mb-4 px-2 py-1 w-full"
+                      className="w-full px-2 py-1 mt-4 mb-4"
                       placeholder="請輸入您的行程描述"
                       value={tripDescription}
                       onChange={(e) => setTripDescription(e.target.value)}
@@ -370,13 +370,13 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                   <p className="text-white">行程筆記</p>
                   {trip.trip_notes ? (
                     <textarea
-                      className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                      className="w-full h-32 px-2 py-1 mt-4 mb-4"
                       value={tripNote || trip.trip_notes}
                       onChange={(e) => setTripNote(e.target.value)}
                     />
                   ) : (
                     <textarea
-                      className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                      className="w-full h-32 px-2 py-1 mt-4 mb-4"
                       value={tripNote}
                       onChange={(e) => setTripNote(e.target.value)}
                       placeholder="請輸入您的行程筆記"
@@ -424,14 +424,14 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                   enctype="multipart/form-data"
                 >
                   <div className="modal-box w-96">
-                    <h3 className="font-bold text-lg mb-4 text-white">
+                    <h3 className="mb-4 text-lg font-bold text-white">
                       新增行程封面
                     </h3>
                     <p className="text-white">請選擇封面圖片</p>
                     <input
                       type="file"
                       name="tripPic"
-                      className="mt-4 mb-4 px-2 py-1 w-full"
+                      className="w-full px-2 py-1 mt-4 mb-4"
                       accept="image/*"
                       onChange={handleFileChange}
                     />
@@ -474,18 +474,18 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
       </div>
       <div className="mx-5 flex flex-col justify-start items-start gap-2.5 sm:hidden">
         <div className="flex flex-col justify-start items-start gap-2.5">
-          <div className="text-white text-base font-normal">
+          <div className="text-base font-normal text-white">
             {tripName && tripName.trip_title
               ? tripName.trip_title
               : 'Loading...'}
           </div>
-          <div className="text-white text-base font-normal">
+          <div className="text-base font-normal text-white">
             {tripName && tripName.trip_date
               ? new Date(tripName.trip_date).toLocaleDateString('en-CA') // 格式化日期為 YYYY-MM-DD
               : 'Loading...'}
           </div>
         </div>
-        <div className="flex justify-start items-start gap-1">
+        <div className="flex items-start justify-start gap-1">
           {actionButton}
 
           {/* 以 useState 來控制<dialog> */}
@@ -493,8 +493,8 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             <dialog open className="modal">
               <form action="#" method="post">
                 {/* 之後要跟後端路由連結 */}
-                <div className="modal-box w-96 flex flex-col justify-center items-center">
-                  <h3 className="font-bold text-lg mb-4 text-white text-center">
+                <div className="flex flex-col items-center justify-center modal-box w-96">
+                  <h3 className="mb-4 text-lg font-bold text-center text-white">
                     確定要分享{' '}
                     <span className="text-[#a0ff1f]">
                       {tripName.trip_title}
@@ -529,7 +529,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             <dialog open className="modal">
               <form action="#" method="post">
                 {/* 之後要跟後端路由連結 */}
-                <div className="modal-box w-96 flex flex-col justify-center items-center">
+                <div className="flex flex-col items-center justify-center modal-box w-96">
                   <h3 className="font-bold text-lg mb-4 text-[#a0ff1f] text-center">
                     確定要取消分享 {tripName.trip_title} 嗎？
                   </h3>
@@ -544,7 +544,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                     </button>
                     <button
                       type="submit"
-                      className="btn ml-4"
+                      className="ml-4 btn"
                       onClick={() => {
                         UnShareTrip();
                       }}
@@ -561,20 +561,20 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
           {isNewTripNoteModalOpen && (
             <dialog open className="modal">
               <form onSubmit={handleSubmit} className="modal-box w-96">
-                <h3 className="font-bold text-lg mb-4 text-white">行程筆記</h3>
+                <h3 className="mb-4 text-lg font-bold text-white">行程筆記</h3>
 
                 <p className="text-white">行程描述</p>
                 {trip.trip_description ? (
                   <input
                     type="text"
-                    className="mt-4 mb-4 px-2 py-1 w-full"
+                    className="w-full px-2 py-1 mt-4 mb-4"
                     value={trip.trip_description || tripDescription}
                     onChange={(e) => setTripDescription(e.target.value)}
                   />
                 ) : (
                   <input
                     type="text"
-                    className="mt-4 mb-4 px-2 py-1 w-full"
+                    className="w-full px-2 py-1 mt-4 mb-4"
                     placeholder="請輸入您的行程描述"
                     value={tripDescription}
                     onChange={(e) => setTripDescription(e.target.value)}
@@ -584,13 +584,13 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                 <p className="text-white">行程筆記</p>
                 {trip.trip_notes ? (
                   <textarea
-                    className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                    className="w-full h-32 px-2 py-1 mt-4 mb-4"
                     value={tripNote || trip.trip_notes}
                     onChange={(e) => setTripNote(e.target.value)}
                   />
                 ) : (
                   <textarea
-                    className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                    className="w-full h-32 px-2 py-1 mt-4 mb-4"
                     value={tripNote}
                     onChange={(e) => setTripNote(e.target.value)}
                     placeholder="請輸入您的行程筆記"
@@ -629,14 +629,14 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                 enctype="multipart/form-data"
               >
                 <div className="modal-box w-96">
-                  <h3 className="font-bold text-lg mb-4 text-white">
+                  <h3 className="mb-4 text-lg font-bold text-white">
                     新增行程封面
                   </h3>
                   <p className="text-white">請選擇封面圖片</p>
                   <input
                     type="file"
                     name="tripPic"
-                    className="mt-4 mb-4 px-2 py-1 w-full"
+                    className="w-full px-2 py-1 mt-4 mb-4"
                     accept="image/*"
                     onChange={handleFileChange}
                   />
@@ -661,7 +661,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             </dialog>
           )}
         </div>
-        <div className="flex self-stretch justify-end items-center gap-2">
+        <div className="flex items-center self-stretch justify-end gap-2">
           <Link
             href="/trip/my-trip"
             className="text-xs sm:text-base hover:text-[#a0ff1f]"

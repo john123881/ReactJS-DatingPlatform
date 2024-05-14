@@ -18,7 +18,7 @@ export default function MoviePhotoOther({ trip_plan_id, tripDetails }) {
   const [movieDetails, setMovieDetails] = useState({}); //用於保存取得的電影資訊
   const [showDetails, setShowDetails] = useState(false); // 控制顯示電影細節的狀態
   const { open, close, isLoading } = useLoader();
-  console.log(movieDetails);
+  // console.log(movieDetails);
 
   useEffect(() => {
     const fetchMovieImage = async () => {
@@ -43,16 +43,16 @@ export default function MoviePhotoOther({ trip_plan_id, tripDetails }) {
         );
         if (imageData && imageData.movie_img && imageData.movie_img.data) {
           const base64String = bufferToBase64(imageData.movie_img.data);
-          console.log(
-            'Generated Base64 Image URL:',
-            `data:image/jpeg;base64,${base64String}`
-          );
+          // console.log(
+          //   'Generated Base64 Image URL:',
+          //   `data:image/jpeg;base64,${base64String}`
+          // );
           setImageSrc2(`data:image/jpeg;base64,${base64String}`);
           setMovieDetails({
             title: imageData.title,
             description: imageData.movie_description,
           });
-          console.log(movieDetails);
+          // console.log(movieDetails);
         } else {
           console.log('No movie_img found or data is incorrect');
         }

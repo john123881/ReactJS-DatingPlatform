@@ -1,4 +1,5 @@
 import Footer from '@/components/ui/footer/footer';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import Navbar from '@/components/ui/navbar/navbar';
 import '@/styles/globals.css';
 import { useState } from 'react';
@@ -28,6 +29,7 @@ export default function App({ Component, pageProps }) {
                   <Navbar currentPageTitle={currentPageTitle} />
                   <LoginModal />
                   <Component {...pageProps} onPageChange={handlePageChange} />
+                  <SpeedInsights />
                   <Footer />
                 </PostProvider>
               </DateProvider>

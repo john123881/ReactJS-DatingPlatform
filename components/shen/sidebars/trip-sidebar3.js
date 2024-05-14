@@ -26,7 +26,7 @@ function truncateChinese(title, maxChineseChars = 7) {
 
 export default function TripSidebar3({ tripName }) {
   const router = useRouter();
-  console.log(tripName);
+  // console.log(tripName);
 
   // const handleBackClick = () => {
   //   router.back();
@@ -39,11 +39,11 @@ export default function TripSidebar3({ tripName }) {
   const closeReadNoteModal = () => setIsReadNoteModalOpen(false);
 
   return (
-    <div className="sm:ml-20 sm:mr-20 pt-16 border-b-2 border-white pb-3">
-      <div className="trip-sidebar2 hidden sm:block">
-        <p className="text-5xl mb-2">行程規劃</p>
+    <div className="pt-16 pb-3 border-b-2 border-white sm:ml-20 sm:mr-20">
+      <div className="hidden trip-sidebar2 sm:block">
+        <p className="mb-2 text-5xl">行程規劃</p>
         <div className="flex justify-between items-center pr-2.5">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h3
               className="mr-8 sm:text-2xl tooltip"
               data-tip={tripName.trip_title}
@@ -68,21 +68,21 @@ export default function TripSidebar3({ tripName }) {
                 <form action="#" method="post">
                   {/* 之後要跟後端路由連結 */}
                   <div className="modal-box w-96 ">
-                    <h3 className="font-bold text-lg mb-4 text-white ">
+                    <h3 className="mb-4 text-lg font-bold text-white ">
                       行程筆記
                     </h3>
                     <p className="text-white">行程描述</p>
                     {tripName.trip_description ? (
                       <input
                         type="text"
-                        className="mt-4 mb-4 px-2 py-1 w-full"
+                        className="w-full px-2 py-1 mt-4 mb-4"
                         placeholder={tripName.trip_description}
                         readOnly
                       />
                     ) : (
                       <input
                         type="text"
-                        className="mt-4 mb-4 px-2 py-1 w-full"
+                        className="w-full px-2 py-1 mt-4 mb-4"
                         placeholder="此行程並沒有添加描述"
                         readOnly
                       />
@@ -90,13 +90,13 @@ export default function TripSidebar3({ tripName }) {
                     <p className="text-white">行程筆記</p>
                     {tripName.trip_notes ? (
                       <textarea
-                        className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                        className="w-full h-32 px-2 py-1 mt-4 mb-4"
                         value={tripName.trip_notes}
                         readOnly
                       />
                     ) : (
                       <textarea
-                        className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                        className="w-full h-32 px-2 py-1 mt-4 mb-4"
                         value="此行程並沒有任何行程筆記"
                         readOnly
                       />
@@ -128,19 +128,19 @@ export default function TripSidebar3({ tripName }) {
       </div>
       <div className="flex flex-col justify-start items-start gap-2.5 mx-5 sm:hidden">
         <div className="flex flex-col justify-start items-start gap-2.5">
-          <div className="text-white text-base font-normal">
+          <div className="text-base font-normal text-white">
             {tripName.trip_title}
           </div>
-          <div className="text-white text-base font-normal">
+          <div className="text-base font-normal text-white">
             {tripName && tripName.trip_date
               ? new Date(tripName.trip_date).toLocaleDateString('en-CA') // 格式化日期為 YYYY-MM-DD
               : 'Loading...'}
           </div>
         </div>
-        <div className="text-white text-base font-normal">
+        <div className="text-base font-normal text-white">
           分享者：{tripName.username}
         </div>
-        <div className="flex justify-start items-start gap-5">
+        <div className="flex items-start justify-start gap-5">
           <button
             onClick={openReadNoteModal}
             className=" text-xs sm:text-base bg-black px-2 py-1 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
@@ -154,21 +154,21 @@ export default function TripSidebar3({ tripName }) {
               <form action="#" method="post">
                 {/* 之後要跟後端路由連結 */}
                 <div className="modal-box w-96 ">
-                  <h3 className="font-bold text-lg mb-4 text-white ">
+                  <h3 className="mb-4 text-lg font-bold text-white ">
                     行程筆記
                   </h3>
                   <p className="text-white">行程描述</p>
                   {tripName.trip_description ? (
                     <input
                       type="text"
-                      className="mt-4 mb-4 px-2 py-1 w-full"
+                      className="w-full px-2 py-1 mt-4 mb-4"
                       placeholder={tripName.trip_description}
                       readOnly
                     />
                   ) : (
                     <input
                       type="text"
-                      className="mt-4 mb-4 px-2 py-1 w-full"
+                      className="w-full px-2 py-1 mt-4 mb-4"
                       placeholder="此行程並沒有添加描述"
                       readOnly
                     />
@@ -176,13 +176,13 @@ export default function TripSidebar3({ tripName }) {
                   <p className="text-white">行程筆記</p>
                   {tripName.trip_notes ? (
                     <textarea
-                      className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                      className="w-full h-32 px-2 py-1 mt-4 mb-4"
                       value={tripName.trip_notes}
                       readOnly
                     />
                   ) : (
                     <textarea
-                      className="mt-4 mb-4 px-2 py-1 w-full h-32"
+                      className="w-full h-32 px-2 py-1 mt-4 mb-4"
                       value="此行程並沒有任何行程筆記"
                       readOnly
                     />
@@ -202,7 +202,7 @@ export default function TripSidebar3({ tripName }) {
             </dialog>
           )}
         </div>
-        <div className="flex self-stretch justify-end items-center">
+        <div className="flex items-center self-stretch justify-end">
           <Link className="hover:text-[#a0ff1f]" href="../../other-trip">
             回到其他人的分享
           </Link>

@@ -25,8 +25,15 @@ export default function AccountEdit({ onPageChange }) {
   const router = useRouter();
   const fileInputRef = useRef(null);
   const { notifyPromise, notifySuccess, notifyError } = useNotify();
-  const { userAvatar, setUserAvatar, getAuthHeader, checkAuth, auth } =
-    useAuth();
+  const {
+    userAvatar,
+    setUserAvatar,
+    getAuthHeader,
+    checkAuth,
+    auth,
+    rerender,
+    setRerender,
+  } = useAuth();
 
   const [currentDate, setCurrentDate] = useState('');
   const [userInf, setUserInf] = useState({
@@ -41,7 +48,7 @@ export default function AccountEdit({ onPageChange }) {
   });
   const [favBarList, setFavBarList] = useState([]);
   const [favMovieList, setFavMovieList] = useState([]);
-  const { close, isLoading } = useLoader();
+  const { open, close, isLoading } = useLoader();
 
   const handleImageClick = () => {
     fileInputRef.current.click();
@@ -57,16 +64,18 @@ export default function AccountEdit({ onPageChange }) {
         headers: { ...getAuthHeader() },
       });
       const result = await r.json();
-
+      console.log('大頭照上傳:result為', result);
       notifySuccess(result.msg);
+      setRerender(!rerender);
     } catch (e) {
       console.log(e);
-      notifyError(result.msg);
+      notifyError(e);
     }
   };
 
   const handleFileChange = async (e) => {
     const file = await e.target.files[0];
+
     if (file) {
       // 檢查文件大小是否超過1MB
       if (file.size > 1024 * 1024) {
@@ -94,7 +103,7 @@ export default function AccountEdit({ onPageChange }) {
       // for (let pair of formData1.entries()) {
       //   console.log(pair[0] + ', ' + pair[1]);
       // }
-
+      open();
       handleAvatar(formData);
     }
   };
@@ -223,7 +232,7 @@ export default function AccountEdit({ onPageChange }) {
       close(1.5);
     };
     fetchCheck();
-  }, [router.query]);
+  }, [router.query, rerender]);
 
   //日期格式
   useEffect(() => {

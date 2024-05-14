@@ -63,7 +63,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
           throw new Error('fetch 酒吧名稱失败');
         }
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         const filteredData = data.filter(
           (trip) => trip.block == tripDetails.block
         );

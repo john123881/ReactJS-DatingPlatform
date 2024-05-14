@@ -4,7 +4,7 @@ import MoviePhotoOther from './movie-photo-other';
 import BarPhotoOther from './bar-photo-other';
 
 export default function OtherContentMorning({ trip_plan_id }) {
-  console.log('Received trip_plan_id in OtherContentMorning:', trip_plan_id);
+  // console.log('Received trip_plan_id in OtherContentMorning:', trip_plan_id);
   const [tripDetails, setTripDetails] = useState({});
 
   useEffect(() => {
