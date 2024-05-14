@@ -49,10 +49,10 @@ export default function BarPhotoMy({
         );
         if (imageData && imageData.bar_img && imageData.bar_img.data) {
           const base64String = bufferToBase64(imageData.bar_img.data);
-          console.log(
-            'Generated Base64 Image URL:',
-            `data:image/jpeg;base64,${base64String}`
-          );
+          // console.log(
+          //   'Generated Base64 Image URL:',
+          //   `data:image/jpeg;base64,${base64String}`
+          // );
           setImageSrc1(`data:image/jpeg;base64,${base64String}`);
         } else {
           console.log('No bar_img found or data is incorrect');
