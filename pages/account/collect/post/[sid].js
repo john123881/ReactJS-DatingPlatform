@@ -159,12 +159,12 @@ export default function AccountCollect({ onPageChange }) {
         return;
       }
       getSavePostData();
+      close(2);
       // console.log('fecth後post為:', posts);
     };
 
     open();
     fetchCheck();
-    close(2);
   }, [router.query, auth.id, radio, rerender]);
 
   //當modal中做收藏的動作

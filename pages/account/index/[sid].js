@@ -18,7 +18,7 @@ export default function AccountIndex({ onPageChange }) {
   const router = useRouter();
   const { auth, userAvatar, setUserAvatar, getAuthHeader, checkAuth } =
     useAuth();
-  const { close, isLoading } = useLoader();
+  const { open, close, isLoading } = useLoader();
 
   const [userInf, setUserInf] = useState({
     email: '',
@@ -105,6 +105,7 @@ export default function AccountIndex({ onPageChange }) {
       getUserInf();
       close(1.5);
     };
+    open();
     fetchCheck();
 
     //進頁面做授權確認，授權通過，接收user的資料
