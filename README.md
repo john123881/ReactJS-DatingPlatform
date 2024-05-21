@@ -1,6 +1,8 @@
 # Taipei Date (會員中心)
-[DEMO1 (http)](http://119.14.42.80:3000/)<br><br>
-[DEMO2 (Vercel, Heroku and JawsDB, upload avatar by AWS)](https://taipei-date.vercel.app/)<br>
+
+
+[DEMO](https://taipei-date.vercel.app/)<br>
+開發後，將前端作品部屬於Vercel，後端部屬於Heroku，資料庫連線於自家MySQL伺服器，圖片存儲空間為AWS。<br>
 
 >測試帳號:test@gmail.com<br>
 >測試密碼:aA!123456<br>
