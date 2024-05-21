@@ -2,7 +2,7 @@
 // export const API_SERVER = `http://119.14.42.80:3443`;
 // export const API_SERVER = `http://119.14.42.80:3001`;
 // export const API_SERVER = `https://taipei-date-283c8aead8a3.herokuapp.com`;
-export const API_SERVER = `https://taipei-date-node.onrender.com/`;
+export const API_SERVER = `https://taipei-date-node.onrender.com`;
 //const API_SERVER = `http://localhost:3001`;
 
 //account路徑:登入授權確認路徑 方法:GET
