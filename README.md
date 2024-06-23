@@ -2,7 +2,6 @@
 
 
 [DEMO](http://119.14.42.80:3000/)<br>
-開發後，將前端作品部屬於Vercel，後端部屬於Heroku，資料庫連線於自家MySQL伺服器，圖片存儲空間為AWS。<br>
 
 >測試帳號:test@gmail.com<br>
 >測試密碼:aA!123456<br>
