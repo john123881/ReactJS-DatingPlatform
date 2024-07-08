@@ -102,6 +102,13 @@ Back-end
 ![favorites-center](imgs/favorites-center.png)
 ![](imgs//favorites.gif)
 
+<br>
+
+![SiteMap](imgs/SiteMap.png)
+
+<br>
+
+![database](imgs/database.png)
 
 ## 👤 Author
 
