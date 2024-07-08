@@ -21,7 +21,7 @@ export default function Home({ onPageChange }) {
         {/* <KeyView and Login  /> */}
         <RegisterAcc />
         {/* Data */}
-        <div className="carousel carousel-center rounded-box max-w-full overflow-x-auto scrollbar-hide md:gap-[120px] p-[80px] ">
+        {/* <div className="carousel carousel-center rounded-box max-w-full overflow-x-auto scrollbar-hide md:gap-[120px] p-[80px] ">
           <div className="p-4 carousel-item">
             <DateCard
               title="Taipei Date浪漫啟程"
@@ -46,17 +46,17 @@ export default function Home({ onPageChange }) {
               altText="約會"
             />
           </div>
-        </div>
+        </div> */}
 
-        <Link href="/date">
+        {/* <Link href="/date">
           <button className="w-40 py-1 my-2 text-black border-2 rounded-full md:w-80 h-[55px] md:py-2 btn-primary bg-primary border-primary hover:shadow-xl3">
             開始配對
           </button>
-        </Link>
+        </Link> */}
 
         {/* Other Theme */}
 
-        <div className="carousel carousel-center rounded-box w-full overflow-x-auto scrollbar-hide object-center md:gap-[120px] p-[120px]">
+        {/* <div className="carousel carousel-center rounded-box w-full overflow-x-auto scrollbar-hide object-center md:gap-[120px] p-[120px]">
           <div className="px-4 carousel-item ">
             <ThemeCard
               imagePic="/community_index.jpg"
@@ -89,7 +89,7 @@ export default function Home({ onPageChange }) {
               link="/booking"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );
