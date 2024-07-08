@@ -60,9 +60,37 @@ Back-end
 
 ## 💻 Demo Screenshot
 
-![homepage](https://i.imgur.com/HiN6Zui.png)
-![login](https://i.imgur.com/lpMFlz9.png)
-![signin](https://i.imgur.com/5B6Gust.png)
+![homepage](imgs//index.png)
+![login](imgs//index-login.png)
+![signin](imgs//index-sign.png)
+![passwordforget](imgs//index-passf.png)
+![member-profile](imgs//member-profile.png)
+<div style="display: flex; justify-content: space-between;">
+  <img src="imgs/member-profile.png" alt="member-profile" style="width: 750px;">
+  <img src="imgs/profile-rwd.jpg" alt="profile-rwd" style="width: 250px;">
+</div>
+<br>
+
+![member-edit](imgs/member-edit.png)
+![change-pw](imgs/change-pw.png)
+
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="imgs/game-play.png" alt="game-play" style="width: 750px;">
+  <img src="imgs/game-rwd.jpg" alt="game-rwd" style="width: 250px;">
+</div>
+<br>
+
+![record](imgs/record.png)
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="imgs/favorites-list.png" alt="favorites-list" style="width: 750px;">
+  <img src="imgs/favorites-rwd.jpg" alt="favorites-rwd" style="width: 250px;">
+</div>
+<br>
+
+![favorites-center](imgs/favorites-center.png)
+
 
 ## 👤 Author
 
