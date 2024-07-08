@@ -60,6 +60,8 @@ Back-end
 
 ## 💻 Demo Screenshot
 
+![](imgs//login.gif)
+<br>
 ![homepage](imgs//index.png)
 ![login](imgs//index-login.png)
 ![signin](imgs//index-sign.png)
@@ -81,7 +83,15 @@ Back-end
 </div>
 <br>
 
+![](imgs//gmae.gif)
+
 ![record](imgs/record.png)
+
+<br>
+
+![](imgs//record.gif)
+
+<br>
 
 <div style="display: flex; justify-content: space-between;">
   <img src="imgs/favorites-list.png" alt="favorites-list" style="width: 750px;">
@@ -90,6 +100,7 @@ Back-end
 <br>
 
 ![favorites-center](imgs/favorites-center.png)
+![](imgs//favorites.gif)
 
 
 ## 👤 Author
