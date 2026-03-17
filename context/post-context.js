@@ -997,7 +997,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const url = wasLiked ? 'unlike-post' : 'like-post';
-      const res = await fetch(`http://localhost:3001/community/${url}`, {
+      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
         method: wasLiked ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1028,7 +1028,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const url = wasAttended ? 'notattend-event' : 'attend-event';
-      const res = await fetch(`http://localhost:3001/community/${url}`, {
+      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
         method: wasAttended ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1062,7 +1062,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const url = wasSaved ? 'unsave-post' : 'save-post';
-      const res = await fetch(`http://localhost:3001/community/${url}`, {
+      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
         method: wasSaved ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1091,7 +1091,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const url = isFollowing ? 'unfollow' : 'follow';
-      const res = await fetch(`http://localhost:3001/community/${url}`, {
+      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
         method: isFollowing ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json',
