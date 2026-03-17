@@ -8,6 +8,7 @@ import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -35,7 +36,7 @@ export default function Detail({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -82,7 +83,7 @@ export default function Detail({ onPageChange }) {
     try {
       const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
       const method = wasSaved ? 'DELETE' : 'POST';
-      const res = await fetch(`http://localhost:3001/bar${url}`, {
+      const res = await fetch(`${API_BASE_URL}/bar${url}`, {
         method: method,
         headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ barId, userId }),
@@ -103,7 +104,7 @@ export default function Detail({ onPageChange }) {
 
   //FETCH GET 酒吧資料
   const getBarDetailById = async (bar_id) => {
-    const url = `http://localhost:3001/bar/bar-detail/${bar_id}`;
+    const url = `${API_BASE_URL}/bar/bar-detail/${bar_id}`;
     const response = await fetch(url);
     const data = await response.json();
     // // console.log('getBarListDynamicById 的 data:', data);

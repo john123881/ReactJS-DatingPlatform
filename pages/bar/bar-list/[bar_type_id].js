@@ -6,6 +6,7 @@ import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function List({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -77,7 +78,7 @@ export default function List({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -109,7 +110,7 @@ export default function List({ onPageChange }) {
   const getBarListDynamicById = async (bar_type_id) => {
     if (!bar_type_id) return; // 確保 bar_type_id 存在
 
-    const url = `http://localhost:3001/bar/bar-list/${bar_type_id}`;
+    const url = `${API_BASE_URL}/bar/bar-list/${bar_type_id}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
@@ -142,7 +143,7 @@ export default function List({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/bar/search-bars?searchTerm=${value}`
+          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);

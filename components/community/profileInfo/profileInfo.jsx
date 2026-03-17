@@ -41,7 +41,7 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-follows/${uid}`
+        `${API_BASE_URL}/community/get-follows/${uid}`
       );
       const data = await res.json();
       data.forEach((item) => {
@@ -60,7 +60,7 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-count-posts/${uid}`
+        `${API_BASE_URL}/community/get-count-posts/${uid}`
       );
       const data = await res.json();
       setPostsCount(data[0].PostCount);
@@ -73,7 +73,7 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-userInfo/${uid}`
+        `${API_BASE_URL}/community/get-userInfo/${uid}`
       );
       const data = await res.json();
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
@@ -88,7 +88,7 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-followers/${uid}`
+        `${API_BASE_URL}/community/get-followers/${uid}`
       );
       const data = await res.json();
       setUserFollowers(data); // 更新 userFollowers 狀態
@@ -102,7 +102,7 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-followings/${uid}`
+        `${API_BASE_URL}/community/get-followings/${uid}`
       );
       const data = await res.json();
       setUserFollowings(data); // 更新 userFollowings 狀態

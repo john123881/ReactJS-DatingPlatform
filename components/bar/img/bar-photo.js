@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WithContent from './with-content';
+import { API_BASE_URL } from '@/configs/api-config';
 
 // 輔助函式：將Buffer轉換成base64
 function bufferToBase64(buffer) {
@@ -23,7 +24,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
     const fetchBarImage = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/trip/my-details/bar-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧圖片失敗');
@@ -58,7 +59,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
     const fetchBarName = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/trip/my-details/bar-name/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧名稱失败');

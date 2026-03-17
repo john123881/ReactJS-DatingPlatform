@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WithContent from './with-content';
+import { API_BASE_URL } from '@/configs/api-config';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 
@@ -31,7 +32,7 @@ export default function BarPhotoMy({
       open();
       try {
         const response = await fetch(
-          `http://localhost:3001/trip/my-details/bar-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧圖片失敗');
@@ -71,7 +72,7 @@ export default function BarPhotoMy({
     const fetchBarName = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/trip/my-details/bar-name/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧名稱失败');

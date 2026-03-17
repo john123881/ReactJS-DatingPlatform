@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Booking({ onPageChange }) {
   const pageTitle = '酒吧訂位';
@@ -39,7 +40,7 @@ export default function Booking({ onPageChange }) {
   //FETCH GET 酒吧資料
   const getBarBookingById = async (bar_id) => {
     // console.log('func barId:', bar_id);
-    const url = `http://localhost:3001/bar/bar-list/id/${bar_id}`;
+    const url = `${API_BASE_URL}/bar/bar-list/id/${bar_id}`;
     const response = await fetch(url);
     const data = await response.json();
     // console.log('fetch data', data);
@@ -81,7 +82,7 @@ export default function Booking({ onPageChange }) {
 
     try {
       const response = await fetch(
-        'http://localhost:3001/bar/create-bar-booking',
+        `${API_BASE_URL}/bar/create-bar-booking`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function CarouselContentMovie2({
   movies,
@@ -28,7 +29,7 @@ export default function CarouselContentMovie2({
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/add-movie/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/add-movie/${trip_plan_id}`,
         {
           method: 'POST',
           headers: {

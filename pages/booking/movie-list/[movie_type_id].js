@@ -2,6 +2,7 @@ import MovieCard from '@/components/booking/card/movieCard';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 // const mockData1 = [
 //   { movieName: '奧本海默' },
@@ -57,7 +58,7 @@ export default function Index({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/booking/search-movies?searchTerm=${value}`
+          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);
@@ -89,7 +90,7 @@ export default function Index({ onPageChange }) {
   const getMovieListType = async (movie_type_id) => {
     if (!movie_type_id) return; // 確保 bar_type_id 存在
 
-    const url = `http://localhost:3001/booking/movie-list/${movie_type_id}`;
+    const url = `${API_BASE_URL}/booking/movie-list/${movie_type_id}`;
     try {
       const res = await fetch(url);
       const data = await res.json();

@@ -1,6 +1,7 @@
 import { useState, createContext, useContext, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
+import { API_BASE_URL } from '@/configs/api-config';
 
 // 1. 建立context
 const BarContext = createContext();
@@ -29,7 +30,7 @@ export const BarProvider = ({ children }) => {
       try {
         const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
         const method = wasSaved ? 'DELETE' : 'POST';
-        const res = await fetch(`http://localhost:3001/bar${url}`, {
+        const res = await fetch(`${API_BASE_URL}/bar${url}`, {
           method: method,
           headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ barId, userId }),
@@ -57,7 +58,7 @@ export const BarProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
         {
           headers: {
             ...getAuthHeader(),

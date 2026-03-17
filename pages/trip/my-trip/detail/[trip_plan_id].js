@@ -7,6 +7,7 @@ import ContentNight from '@/components/shen/my-content/contentNight';
 import BarPhotoCarousel from '@/components/shen/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/shen/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function MyTripDetail({ onPageChange }) {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function MyTripDetail({ onPageChange }) {
       const fetchTripDetails = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3001/trip/my-details/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/${trip_plan_id}`
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -49,7 +50,7 @@ export default function MyTripDetail({ onPageChange }) {
       const fetchTripName = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3001/trip/my-details/trip-plan/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -75,7 +76,7 @@ export default function MyTripDetail({ onPageChange }) {
     console.log('Calling refreshAllDetails');
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/allday-content/${trip_plan_id}`
+        `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`
       );
       if (!response.ok) {
         throw new Error('Network response was not ok');

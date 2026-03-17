@@ -5,6 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
+import { API_BASE_URL } from '@/configs/api-config';
 import PageTitle from '@/components/page-title';
 
 export default function OtherTrip({ onPageChange }) {
@@ -27,7 +28,7 @@ export default function OtherTrip({ onPageChange }) {
   const fetchTrips = async () => {
     open();
     try {
-      const response = await fetch('http://localhost:3001/trip/other-plans', {
+      const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
         headers: { ...getAuthHeader() },
       });
       if (!response.ok) {

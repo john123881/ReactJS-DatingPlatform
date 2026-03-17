@@ -2,6 +2,7 @@ import AddBar from '@/components/shen/add-trip/add-bar';
 import AddMovie from '@/components/shen/add-trip/add-movie';
 import Recomendbar from '@/components/shen/sidebars/recomendbar';
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function TripRecomendModal({
   trip_detail_id,
@@ -31,7 +32,7 @@ export default function TripRecomendModal({
   const recomendModalRef = useRef(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/trip/my-details/recommend/bar')
+    fetch(`${API_BASE_URL}/trip/my-details/recommend/bar`)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
@@ -51,7 +52,7 @@ export default function TripRecomendModal({
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:3001/trip/my-details/recommend/movie')
+    fetch(`${API_BASE_URL}/trip/my-details/recommend/movie`)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();

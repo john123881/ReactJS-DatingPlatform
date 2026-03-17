@@ -9,6 +9,7 @@ import ProfileInfo from '@/components/community/profileInfo/profileInfo';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from '../page.module.css';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Profile({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -39,7 +40,7 @@ export default function Profile({ onPageChange }) {
     if (!userProfileHasMore) return; // 防止重複請求
     try {
       const res = await fetch(
-        `http://localhost:3001/community/posts/${uid}?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`
       );
       const data = await res.json();
 

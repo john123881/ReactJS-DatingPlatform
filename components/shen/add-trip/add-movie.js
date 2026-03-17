@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '@/configs/api-config';
+
 export default function AddMovie({
   movie,
   trip_detail_id,
@@ -7,7 +9,7 @@ export default function AddMovie({
   const updateMovieInTrip = async () => {
     try {
       const response = await fetch(
-        'http://localhost:3001/trip/my-details/addmovie',
+        `${API_BASE_URL}/trip/my-details/addmovie`,
         {
           method: 'POST',
           headers: {

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { IoTicketOutline } from 'react-icons/io5';
 import { useRouter } from 'next/router';
+import { API_BASE_URL } from '@/configs/api-config';
 import PageTitle from '@/components/page-title';
 import Link from 'next/link';
 
@@ -34,7 +35,7 @@ export default function Index({ onPageChange }) {
 
   const getBookingMovieCard = async () => {
     try {
-      const res = await fetch('http://localhost:3001/booking/movie-list');
+      const res = await fetch(`${API_BASE_URL}/booking/movie-list`);
       const data = await res.json();
 
       const movieIds = data.map((movie) => movie.movie_id).join(',');
@@ -54,7 +55,7 @@ export default function Index({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/booking/check-movie-status?userId=${userId}&movieIds=${movieIds}`
+        `${API_BASE_URL}/booking/check-movie-status?userId=${userId}&movieIds=${movieIds}`
       );
       const data = await response.json();
 
@@ -93,7 +94,7 @@ export default function Index({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/booking/search-movies?searchTerm=${value}`
+          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);

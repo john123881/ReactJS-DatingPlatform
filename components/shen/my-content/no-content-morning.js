@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
 import TripRecomendModal from '@/components/shen/add-trip/trip-recomend-modal';
 import { useRouter } from 'next/router';
@@ -26,7 +27,7 @@ export default function NoContentMorning({
 
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/add-morning/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/add-morning/${trip_plan_id}`,
         {
           method: 'POST',
           headers: {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import { useAuth } from '@/context/auth-context';
 import TabBar from '@/components/bar/bar/tab-bar';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
@@ -20,7 +21,7 @@ export default function BarBookingList({ onPageChange }) {
   const [bookingsPerPage] = useState(4); // 每頁顯示的訂位紀錄數量
 
   const getBarBookingList = async () => {
-    const url = `http://localhost:3001/bar/bar-booking-list`;
+    const url = `${API_BASE_URL}/bar/bar-booking-list`;
     const response = await fetch(url);
     const data = await response.json();
     setBookings(data);

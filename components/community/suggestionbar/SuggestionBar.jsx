@@ -13,7 +13,7 @@ export default function SuggestionBar() {
   const getSuggestUsers = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3001/community/getSuggestUsers`
+        `${API_BASE_URL}/community/getSuggestUsers`
       );
       const data = await res.json();
       setUsers(data);

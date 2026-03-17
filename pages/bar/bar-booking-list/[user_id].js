@@ -3,6 +3,7 @@ import TabBar from '@/components/bar/bar/tab-bar';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Booking({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -23,7 +24,7 @@ export default function Booking({ onPageChange }) {
       if (!router.query.user_id) return;
 
       // 構建 API 請求 URL
-      const url = `http://localhost:3001/bar/bar-booking-list/${router.query.user_id}`;
+      const url = `${API_BASE_URL}/bar/bar-booking-list/${router.query.user_id}`;
       try {
         // 發送 GET 請求並等待回應
         const response = await fetch(url);

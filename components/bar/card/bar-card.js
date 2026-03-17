@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { FiHeart } from 'react-icons/fi';
@@ -36,7 +37,7 @@ export default function BarCard({
     try {
       const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
       const method = wasSaved ? 'DELETE' : 'POST';
-      const res = await fetch(`http://localhost:3001/bar${url}`, {
+      const res = await fetch(`${API_BASE_URL}/bar${url}`, {
         method: method,
         headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ barId, userId }),

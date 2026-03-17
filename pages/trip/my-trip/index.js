@@ -9,6 +9,7 @@ import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function MyTrip({ onPageChange }) {
   const pageTitle = '行程規劃';
@@ -50,7 +51,7 @@ export default function MyTrip({ onPageChange }) {
   const fetchTrips = async () => {
     open();
     try {
-      const response = await fetch('http://localhost:3001/trip/trip-plans', {
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
         headers: { ...getAuthHeader() },
       });
       if (!response.ok) {
@@ -73,7 +74,7 @@ export default function MyTrip({ onPageChange }) {
   const fetchOtherTrips = async () => {
     open();
     try {
-      const response = await fetch('http://localhost:3001/trip/other-plans', {
+      const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
         headers: { ...getAuthHeader() },
       });
       if (!response.ok) {
@@ -111,7 +112,7 @@ export default function MyTrip({ onPageChange }) {
     // console.log('tripTitle:', tripTitle);
     try {
       const response = await fetch(
-        'http://localhost:3001/trip/trip-plans/add',
+        `${API_BASE_URL}/trip/trip-plans/add`,
         {
           method: 'POST',
           headers: {

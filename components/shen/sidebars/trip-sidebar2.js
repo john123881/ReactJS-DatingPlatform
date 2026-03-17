@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { AiFillPicture } from 'react-icons/ai';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '@/configs/api-config';
 
 function truncateChinese(title, maxChineseChars = 7) {
   let chineseCharCount = 0;
@@ -68,7 +69,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
       const fetchTrip = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3001/trip/my-details/trip-plan/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -90,7 +91,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   const shareTrip = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/share/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/share/${trip_plan_id}`,
         { method: 'POST' }
       );
       if (response.ok) {
@@ -106,7 +107,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   const UnShareTrip = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/unshare/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/unshare/${trip_plan_id}`,
         { method: 'POST' }
       );
       if (response.ok) {
@@ -138,7 +139,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/photo/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/photo/${trip_plan_id}`,
         {
           method: 'POST',
           body: formData,
@@ -175,7 +176,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const url = `http://localhost:3001/trip/my-details/DnN/${trip_plan_id}`;
+    const url = `${API_BASE_URL}/trip/my-details/DnN/${trip_plan_id}`;
     try {
       const response = await fetch(url, {
         method: 'POST',

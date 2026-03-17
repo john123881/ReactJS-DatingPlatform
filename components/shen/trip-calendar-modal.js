@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import _ from 'lodash';
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
 import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
@@ -12,7 +13,7 @@ export default function TripCalendarModal({ tripName }) {
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch('http://localhost:3001/trip/trip-plans', {
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
         headers: { ...getAuthHeader() },
       });
       if (!response.ok) {
@@ -162,7 +163,7 @@ export default function TripCalendarModal({ tripName }) {
     // console.log('tripTitle:', tripTitle);
     try {
       const response = await fetch(
-        'http://localhost:3001/trip/trip-plans/add',
+        `${API_BASE_URL}/trip/trip-plans/add`,
         {
           method: 'POST',
           headers: {

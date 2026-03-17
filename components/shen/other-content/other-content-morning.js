@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import OtherNoContentMorning from './other-no-content-morning';
 import MoviePhotoOther from './movie-photo-other';
 import BarPhotoOther from './bar-photo-other';
@@ -12,7 +13,7 @@ export default function OtherContentMorning({ trip_plan_id }) {
       const fetchTripDetails = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3001/trip/my-details/morning-content/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/morning-content/${trip_plan_id}`
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');

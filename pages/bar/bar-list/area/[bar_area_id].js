@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
@@ -46,7 +47,7 @@ export default function List({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -78,7 +79,7 @@ export default function List({ onPageChange }) {
   const getBarListType = async (bar_area_id) => {
     if (!bar_area_id) return; // 確保 bar_area_id 存在
 
-    const url = `http://localhost:3001/bar/bar-list/area/${bar_area_id}`;
+    const url = `${API_BASE_URL}/bar/bar-list/area/${bar_area_id}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
@@ -110,7 +111,7 @@ export default function List({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/bar/search-bars?searchTerm=${value}`
+          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);

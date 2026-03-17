@@ -5,6 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 import YouTube from 'react-youtube';
 import dynamic from 'next/dynamic';
@@ -49,7 +50,7 @@ export default function MovieDetail({ onPageChange }) {
   const getMovieDetail = async (mid) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/booking/get-movie-detail/${mid}`
+        `${API_BASE_URL}/booking/get-movie-detail/${mid}`
       );
       const data = await res.json();
       setMovie(data);

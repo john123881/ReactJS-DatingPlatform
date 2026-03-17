@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import Image from 'next/image';
 import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
 import { BsTelephone } from 'react-icons/bs';
@@ -11,7 +12,7 @@ export default function BarDetailCard({ bar }) {
 
   const getBarList = async () => {
     try {
-      const res = await fetch('http://localhost:3001/bar/bar-list');
+      const res = await fetch(`${API_BASE_URL}/bar/bar-list`);
       const data = await res.json();
       // console.log(data);
       setBars(data);

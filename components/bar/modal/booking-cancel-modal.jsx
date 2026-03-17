@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRef } from 'react';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BookingCancelModal({ booking, modalId, setBookings }) {
   const bookingCancelModalRef = useRef(null);
@@ -18,7 +19,7 @@ export default function BookingCancelModal({ booking, modalId, setBookings }) {
 
   const handleBookingDelete = async (barBookingId) => {
     try {
-      const url = `http://localhost:3001/bar/delete-bar`;
+      const url = `${API_BASE_URL}/bar/delete-bar`;
       const r = await fetch(url, {
         method: 'DELETE',
         body: JSON.stringify({ barBookingId }),

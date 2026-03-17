@@ -6,6 +6,7 @@ import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mob
 // import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BarListOthers({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -35,7 +36,7 @@ export default function BarListOthers({ onPageChange }) {
     // console.log('Token:', auth);
 
     try {
-      const res = await fetch('http://localhost:3001/bar/bar-list-others', {
+      const res = await fetch(`${API_BASE_URL}/bar/bar-list-others`, {
         // headers: { Authorization: 'Bearer ' + auth.token },
       });
       const data = await res.json();

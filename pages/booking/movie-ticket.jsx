@@ -3,6 +3,7 @@ import { FiHeart } from 'react-icons/fi';
 import MovieTicketCard from '@/components/booking/card/movieTicketCard';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
@@ -20,7 +21,7 @@ export default function Index({ onPageChange }) {
   const getBookingSystemMovieCard = async () => {
     try {
       const res = await fetch(
-        'http://localhost:3001/booking/get-booking-system'
+        `${API_BASE_URL}/booking/get-booking-system`
       );
       const data = await res.json();
       setMovieCards(data);

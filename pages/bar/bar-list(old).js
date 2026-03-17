@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListSidebar from '@/components/bar/bar/bar-list-sidebar(1)';
@@ -20,7 +21,7 @@ export default function BarList({ onPageChange }) {
 
   const getBarList = async () => {
     try {
-      const res = await fetch('http://localhost:3001/bar/bar-list');
+      const res = await fetch(`${API_BASE_URL}/bar/bar-list`);
       const data = await res.json();
       // console.log(data);
       setBars(data);

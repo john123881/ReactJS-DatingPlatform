@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
+import { API_BASE_URL } from '@/configs/api-config';
 import Link from 'next/link';
 import io from 'socket.io-client';
 
@@ -13,7 +14,7 @@ export default function Friends({ searchQuery }) {
 
   const getFriend = async () => {
     try {
-      const url = `http://localhost:3001/date/friends-list/accepted/${auth.id}`;
+      const url = `${API_BASE_URL}/date/friends-list/accepted/${auth.id}`;
       const res = await fetch(url, { headers: { ...getAuthHeader() } });
       const data = await res.json();
       console.log(data);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import WithContent from './with-content';
 import { useLoader } from '@/context/use-loader';
 
@@ -29,7 +30,7 @@ export default function MoviePhotoMy({
       open();
       try {
         const response = await fetch(
-          `http://localhost:3001/trip/my-details/movie-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/movie-photo/${trip_plan_id}`
         );
         if (!response.ok) {
           throw new Error('fetch 電影圖片失敗');

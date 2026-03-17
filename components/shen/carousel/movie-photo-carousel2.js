@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CarouselContentMovie2 from './carousel-content-movie2';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function MoviePhotoCarousel2({
   trip_plan_id,
@@ -19,7 +20,7 @@ export default function MoviePhotoCarousel2({
     const fetchMovie = async () => {
       try {
         const response = await fetch(
-          'http://localhost:3001/trip/my-details/recommend/movie'
+          `${API_BASE_URL}/trip/my-details/recommend/movie`
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');

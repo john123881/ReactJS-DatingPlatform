@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '@/configs/api-config';
 
 function truncateChinese(title, maxChineseChars = 7) {
   let chineseCharCount = 0;
@@ -36,7 +37,7 @@ export default function TripCardMy({ trip, onDeleteSuccess }) {
   const onConfirmDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/trip-plans/delete/${trip.trip_plan_id}`,
+        `${API_BASE_URL}/trip/trip-plans/delete/${trip.trip_plan_id}`,
         {
           method: 'DELETE',
         }

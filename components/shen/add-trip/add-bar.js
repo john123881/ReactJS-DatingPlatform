@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '@/configs/api-config';
+
 export default function AddBar({
   bar,
   trip_detail_id,
@@ -8,7 +10,7 @@ export default function AddBar({
   const updateBarInTrip = async () => {
     try {
       const response = await fetch(
-        'http://localhost:3001/trip/my-details/addbar',
+        `${API_BASE_URL}/trip/my-details/addbar`,
         {
           method: 'POST',
           headers: {

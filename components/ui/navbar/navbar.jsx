@@ -16,6 +16,7 @@ import { useCollect } from '@/context/use-collect';
 import { usePostContext } from '@/context/post-context';
 import PostModal from '@/components/community/modal/postModal';
 import MovieModal from '@/components/account-center/modal/movieModal';
+import { API_BASE_URL } from '@/configs/api-config';
 
 import {
   API_SERVER,
@@ -155,7 +156,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   const getNotifications = async () => {
     const response = await fetch(
-      `http://localhost:3001/community/get-noti/${userInfo.user_id}`
+      `${API_BASE_URL}/community/get-noti/${userInfo.user_id}`
     );
     const data = await response.json();
     setNotifications(data.noti);
@@ -166,7 +167,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     const userId = userInfo.user_id;
     try {
       const response = await fetch(
-        `http://localhost:3001/community/mark-noti-as-read/${notiId}`,
+        `${API_BASE_URL}/community/mark-noti-as-read/${notiId}`,
         {
           method: 'POST',
           headers: {

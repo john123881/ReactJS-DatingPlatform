@@ -6,6 +6,7 @@ import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mob
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BarList({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -45,7 +46,7 @@ export default function BarList({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -78,7 +79,7 @@ export default function BarList({ onPageChange }) {
     // console.log('Token:', auth);
 
     try {
-      const res = await fetch('http://localhost:3001/bar/bar-list/', {
+      const res = await fetch(`${API_BASE_URL}/bar/bar-list/`, {
         // headers: { Authorization: 'Bearer ' + auth.token },
       });
       const data = await res.json();
@@ -146,7 +147,7 @@ export default function BarList({ onPageChange }) {
 
       try {
         const response = await fetch(
-          `http://localhost:3001/bar/bar-list?${barAreaId}`
+          `${API_BASE_URL}/bar/bar-list?${barAreaId}`
         );
         const data = await response.json();
         setBars(data);
@@ -156,7 +157,7 @@ export default function BarList({ onPageChange }) {
     };
     try {
       const response = await fetch(
-        `http://localhost:3001/bar/bar-list?${barAreaId}`
+        `${API_BASE_URL}/bar/bar-list?${barAreaId}`
       );
       const data = await response.json();
       setBars(data);
@@ -198,7 +199,7 @@ export default function BarList({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/bar/search-bars?searchTerm=${value}`
+          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);

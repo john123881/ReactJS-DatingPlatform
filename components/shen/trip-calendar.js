@@ -5,6 +5,7 @@ import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
+import { API_BASE_URL } from '@/configs/api-config';
 
 function truncateChinese(title, maxChineseChars = 7) {
   let chineseCharCount = 0;
@@ -35,7 +36,7 @@ export default function TripCalendar() {
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch('http://localhost:3001/trip/trip-plans', {
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
         headers: { ...getAuthHeader() },
       });
       if (!response.ok) {
@@ -186,7 +187,7 @@ export default function TripCalendar() {
     // console.log('tripTitle:', tripTitle);
     try {
       const response = await fetch(
-        'http://localhost:3001/trip/trip-plans/add',
+        `${API_BASE_URL}/trip/trip-plans/add`,
         {
           method: 'POST',
           headers: {

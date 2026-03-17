@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/auth-context';
+import { API_BASE_URL } from '@/configs/api-config';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { FaRegHeart } from 'react-icons/fa';
@@ -35,7 +36,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
 
     try {
       const url = wasSaved ? 'unsave-movie' : 'save-movie';
-      const res = await fetch(`http://localhost:3001/booking/${url}`, {
+      const res = await fetch(`${API_BASE_URL}/booking/${url}`, {
         method: wasSaved ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json',

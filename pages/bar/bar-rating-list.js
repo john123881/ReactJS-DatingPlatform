@@ -4,6 +4,7 @@ import BarReviewCard from '@/components/bar/card/bar-review-card';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BarRatingList({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -38,7 +39,7 @@ export default function BarRatingList({ onPageChange }) {
   };
 
   const getBarRating = async () => {
-    const url = `http://localhost:3001/bar/bar-rating`;
+    const url = `${API_BASE_URL}/bar/bar-rating`;
     const response = await fetch(url);
     const data = await response.json();
     setRatings(data);

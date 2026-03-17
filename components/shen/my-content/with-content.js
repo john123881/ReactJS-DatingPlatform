@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 import { FaTrash } from 'react-icons/fa';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
@@ -51,7 +52,7 @@ export default function WithContent({
   const onConfirmDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/trip/my-details/delete/${tripDetails.trip_detail_id}`,
+        `${API_BASE_URL}/trip/my-details/delete/${tripDetails.trip_detail_id}`,
         { method: 'DELETE' }
       );
       if (!response.ok) {

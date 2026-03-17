@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
   const [areas, setAreas] = useState([]); // 存儲從API獲取的地區數據
@@ -8,8 +9,8 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
   useEffect(() => {
     // 使用 Promise.all 來並行加載地區和類型數據
     Promise.all([
-      fetch('http://localhost:3001/bar/bar-area'),
-      fetch('http://localhost:3001/bar/bar-type'),
+      fetch(`${API_BASE_URL}/bar/bar-area`),
+      fetch(`${API_BASE_URL}/bar/bar-type`),
     ])
       .then(([areaResponse, typeResponse]) => {
         if (!areaResponse.ok) throw new Error('Failed to load areas');

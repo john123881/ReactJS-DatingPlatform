@@ -3,6 +3,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '@/configs/api-config';
 
 const PostContext = createContext();
 
@@ -91,7 +92,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-userInfo/${auth.id}`
+        `${API_BASE_URL}/community/get-userInfo/${auth.id}`
       );
       const data = await res.json();
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
@@ -108,7 +109,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/community/posts?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts?page=${page}&limit=12`
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -135,7 +136,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-posts-by-keyword?keyword=${keyword}&page=${filteredPage}&limit=12`
+        `${API_BASE_URL}/community/get-posts-by-keyword?keyword=${keyword}&page=${filteredPage}&limit=12`
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -163,7 +164,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-random-posts?page=${randomPage}&limit=12`
+        `${API_BASE_URL}/community/get-random-posts?page=${randomPage}&limit=12`
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -189,7 +190,7 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
     try {
       const res = await fetch(
-        `http://localhost:3001/community/posts?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts?page=${page}&limit=12`
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -213,7 +214,7 @@ export const PostProvider = ({ children }) => {
   const getPostPage = async (pid) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-post-page/${pid}`
+        `${API_BASE_URL}/community/get-post-page/${pid}`
       );
       const data = await res.json();
       if (data.length !== 0) {
@@ -231,7 +232,7 @@ export const PostProvider = ({ children }) => {
   const getEventPage = async (eid) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-event-page/${eid}`
+        `${API_BASE_URL}/community/get-event-page/${eid}`
       );
       const data = await res.json();
       if (data.length !== 0) {
@@ -251,7 +252,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/community/events?page=${eventPage}&limit=12`
+        `${API_BASE_URL}/community/events?page=${eventPage}&limit=12`
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -274,7 +275,7 @@ export const PostProvider = ({ children }) => {
   const getPostComments = async (postIds) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/community/get-comments?postIds=${postIds}`
+        `${API_BASE_URL}/community/get-comments?postIds=${postIds}`
       );
       const data = await res.json();
 
@@ -326,7 +327,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       // 用fetch送出檔案
-      const res = await fetch('http://localhost:3001/community/add-comment', {
+      const res = await fetch(`${API_BASE_URL}/community/add-comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify({
@@ -381,7 +382,7 @@ export const PostProvider = ({ children }) => {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `http://localhost:3001/community/search-users?searchTerm=${value}`
+          `${API_BASE_URL}/community/search-users?searchTerm=${value}`
         );
         const data = await response.json();
         setSearchResults(data);
@@ -496,7 +497,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       // 用fetch送出檔案
-      const res = await fetch('http://localhost:3001/community/create-post', {
+      const res = await fetch(`${API_BASE_URL}/community/create-post`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify({ context: postContent, userId }),
@@ -550,7 +551,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       // 用fetch送出檔案
-      const res = await fetch('http://localhost:3001/community/upload-photo', {
+      const res = await fetch(`${API_BASE_URL}/community/upload-photo`, {
         method: 'POST',
         body: fd,
         headers: { ...getAuthHeader() },
@@ -628,7 +629,7 @@ export const PostProvider = ({ children }) => {
     // }
 
     try {
-      const res = await fetch('http://localhost:3001/community/edit-post', {
+      const res = await fetch(`${API_BASE_URL}/community/edit-post`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -730,7 +731,7 @@ export const PostProvider = ({ children }) => {
       fd.append('postId', postId);
 
       const res = await fetch(
-        'http://localhost:3001/community/edit-post-photo',
+        `${API_BASE_URL}/community/edit-post-photo`,
         {
           method: 'PUT',
           body: fd,
@@ -843,7 +844,7 @@ export const PostProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/community/edit-event', {
+      const res = await fetch(`${API_BASE_URL}/community/edit-event`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -885,7 +886,7 @@ export const PostProvider = ({ children }) => {
           fd.append('eventId', eventId);
 
           const res = await fetch(
-            'http://localhost:3001/community/edit-event-photo',
+            `${API_BASE_URL}/community/edit-event-photo`,
             {
               method: 'PUT',
               body: fd,
@@ -1129,7 +1130,7 @@ export const PostProvider = ({ children }) => {
       if (result.isConfirmed) {
         try {
           const res = await fetch(
-            `http://localhost:3001/community/delete-post`,
+            `${API_BASE_URL}/community/delete-post`,
             {
               method: 'DELETE',
               headers: {
@@ -1210,7 +1211,7 @@ export const PostProvider = ({ children }) => {
       if (result.isConfirmed) {
         try {
           const res = await fetch(
-            `http://localhost:3001/community/delete-event`,
+            `${API_BASE_URL}/community/delete-event`,
             {
               method: 'DELETE',
               headers: {
@@ -1277,7 +1278,7 @@ export const PostProvider = ({ children }) => {
     if (result.isConfirmed) {
       try {
         const res = await fetch(
-          `http://localhost:3001/community/delete-comment`,
+          `${API_BASE_URL}/community/delete-comment`,
           {
             method: 'DELETE',
             headers: {
@@ -1343,7 +1344,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/community/check-post-status?userId=${userId}&postIds=${postIds}`,
+        `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -1381,7 +1382,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
+        `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -1413,7 +1414,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
+        `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
         {
           headers: {
             ...getAuthHeader(),
@@ -1459,7 +1460,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       // 用fetch送出檔案
-      const res = await fetch('http://localhost:3001/community/create-event', {
+      const res = await fetch(`${API_BASE_URL}/community/create-event`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify({
@@ -1518,7 +1519,7 @@ export const PostProvider = ({ children }) => {
     try {
       // 用fetch送出檔案
       const res = await fetch(
-        'http://localhost:3001/community/upload-event-photo',
+        `${API_BASE_URL}/community/upload-event-photo`,
         {
           method: 'POST',
           body: fd,

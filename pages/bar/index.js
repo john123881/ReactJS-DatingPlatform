@@ -12,6 +12,7 @@ import {
   MdOutlineArrowForwardIos,
 } from 'react-icons/md';
 import PageTitle from '@/components/page-title';
+import { API_BASE_URL } from '@/configs/api-config';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -29,7 +30,7 @@ export default function Index({ onPageChange }) {
   // random bar
   const getBarListRandom = async () => {
     try {
-      const res = await fetch('http://localhost:3001/bar/bar-list-random');
+      const res = await fetch(`${API_BASE_URL}/bar/bar-list-random`);
       const data = await res.json();
       // console.log(data);
       setRandomBars(data);
