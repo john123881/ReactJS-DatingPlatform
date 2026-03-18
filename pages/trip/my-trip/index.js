@@ -92,7 +92,7 @@ export default function MyTrip({ onPageChange }) {
   const onDeleteSuccess = (tripPlanId) => {
     // 過濾掉被刪除的行程
     const updatedTrips = trips.filter(
-      (trip) => trip.trip_plan_id !== tripPlanId
+      (trip) => trip.trip_plan_id !== tripPlanId,
     );
     setTrips(updatedTrips);
   };
@@ -111,21 +111,18 @@ export default function MyTrip({ onPageChange }) {
     // console.log('tripDate:', tripDate);
     // console.log('tripTitle:', tripTitle);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/trip-plans/add`,
-        {
-          method: 'POST',
-          headers: {
-            ...getAuthHeader(),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: auth.id,
-            trip_date: tripDate,
-            trip_title: tripTitle,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: auth.id,
+          trip_date: tripDate,
+          trip_title: tripTitle,
+        }),
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.msg || 'Network response was not ok');

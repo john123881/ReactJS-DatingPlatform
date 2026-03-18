@@ -84,7 +84,7 @@ export default function OtherTripdetail({ onPageChange }) {
       const fetchTripDetails = async () => {
         try {
           const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`,
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -112,7 +112,7 @@ export default function OtherTripdetail({ onPageChange }) {
       const fetchTripName = async () => {
         try {
           const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`,
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');

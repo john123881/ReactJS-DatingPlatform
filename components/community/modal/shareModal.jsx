@@ -5,7 +5,10 @@ import Swal from 'sweetalert2';
 export default function ShareModal({ post, postId, modalId }) {
   const shareModalRef = useRef(null);
 
-  const shareUrl = post ? `http://localhost:3000/community/post/${postId}` : '';
+  const shareUrl =
+    typeof window !== 'undefined' && post
+      ? `${window.location.origin}/community/post/${postId}`
+      : '';
 
   // console.log(shareUrl);
 

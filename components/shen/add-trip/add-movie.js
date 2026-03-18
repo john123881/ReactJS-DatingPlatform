@@ -8,25 +8,22 @@ export default function AddMovie({
 }) {
   const updateMovieInTrip = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/addmovie`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            trip_detail_id: trip_detail_id,
-            movie_id: movie.movie_id,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/trip/my-details/addmovie`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          trip_detail_id: trip_detail_id,
+          movie_id: movie.movie_id,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          `Failed to update the trip detail: ${data.message || ''}`
+          `Failed to update the trip detail: ${data.message || ''}`,
         );
       }
       refreshTripDetails();

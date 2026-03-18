@@ -84,7 +84,7 @@ export default function NewFriends() {
       try {
         const res = await fetch(
           `${DATE_GET_FRIENDS_LIST}/${userId}/${selectedBarTypeId}/${selectedMovieTypeId}`,
-          { headers: { ...getAuthHeader() } }
+          { headers: { ...getAuthHeader() } },
         );
         const data = await res.json();
         if (data.success && data.data.length > 0) {

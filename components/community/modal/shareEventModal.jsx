@@ -5,9 +5,10 @@ import Swal from 'sweetalert2';
 export default function ShareEventModal({ event, eventId, modalId }) {
   const shareEventModalRef = useRef(null);
 
-  const shareUrl = event
-    ? `http://localhost:3000/community/event/${eventId}`
-    : '';
+  const shareUrl =
+    typeof window !== 'undefined' && event
+      ? `${window.location.origin}/community/event/${eventId}`
+      : '';
 
   // React 複製連結到剪貼板的函數
   const copyToClipboard = () => {

@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { registerSchema } from '../../schemas';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
@@ -51,7 +51,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
             values.email,
             values.validCode,
             values.name,
-            values.password
+            values.password,
           ),
           {
             loading: '註冊中',
@@ -66,7 +66,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
             error: (e) => {
               return `${e}`;
             },
-          }
+          },
         );
       } catch (e) {
         console.log('error:', e);

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { FaRegHeart } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa6";
-
+import { useState } from 'react';
+import { FaRegHeart } from 'react-icons/fa';
+import { FaHeart } from 'react-icons/fa6';
 
 export default function MovieCard({ movie, index }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -21,8 +20,6 @@ export default function MovieCard({ movie, index }) {
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-
-
         <figure>
           <div className="card w-96 bg-base-100 shadow-xl">
             <figure>
@@ -32,7 +29,7 @@ export default function MovieCard({ movie, index }) {
                 // src="https://upload.wikimedia.org/wikipedia/zh/7/7a/Oppenheimer_%28film%29_poster.jpg"
                 alt={movie.title} // 使用動態的 movieName
                 style={{
-                  height:' 400px ',
+                  height: ' 400px ',
                   objectFit: 'cover',
                   filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
                   transition: 'filter 0.3s',
@@ -89,7 +86,7 @@ export default function MovieCard({ movie, index }) {
           className="absolute top-2 right-2 cursor-pointer"
           onClick={handleHeartClick}
           style={{
-            backgroundColor:'white', // 根据点击状态改变背景色
+            backgroundColor: 'white', // 根据点击状态改变背景色
             borderRadius: '50%', // 圆形背景
             width: '32px',
             height: '32px',
@@ -111,10 +108,12 @@ export default function MovieCard({ movie, index }) {
           )}
         </div>
 
-        <div className="card-body" style={{ height:'50px' }}>
-          <h2 className="card-title flex justify-start" style={{ fontSize: '1rem' }}>
+        <div className="card-body" style={{ height: '50px' }}>
+          <h2
+            className="card-title flex justify-start"
+            style={{ fontSize: '1rem' }}
+          >
             {movie.title} {/* 使用動態的 movieName */}
-
             <div
               className="badge badge-secondary"
               style={{

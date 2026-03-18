@@ -40,7 +40,7 @@ export default function Profile({ onPageChange }) {
     if (!userProfileHasMore) return; // 防止重複請求
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`,
       );
       const data = await res.json();
 

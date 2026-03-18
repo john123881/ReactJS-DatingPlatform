@@ -1,4 +1,3 @@
-import React from 'react';
 import { FaCirclePlus } from 'react-icons/fa6';
 import Link from 'next/link';
 

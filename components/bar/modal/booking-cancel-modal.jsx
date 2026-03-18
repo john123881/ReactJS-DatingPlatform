@@ -32,8 +32,8 @@ export default function BookingCancelModal({ booking, modalId, setBookings }) {
         // 檢查是否成功刪除
         setBookings((prevBookings) =>
           prevBookings.filter(
-            (booking) => booking.bar_booking_id !== barBookingId
-          )
+            (booking) => booking.bar_booking_id !== barBookingId,
+          ),
         );
         console.log(result);
 

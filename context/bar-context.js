@@ -10,44 +10,44 @@ const BarContext = createContext();
 export const BarProvider = ({ children }) => {
   const { auth, getAuthHeader } = useAuth();
   const [savedBars, setSavedBars] = useState({});
-  
+
   //收藏酒吧
-    // const isSaved = !!savedBars[bar.bar_id];
+  // const isSaved = !!savedBars[bar.bar_id];
 
-    const handleSavedClick = async () => {
-      if (auth.id == 0) return;
-      const barId = bar.bar_id;
-      const userId = auth.id; // Ensure user is defined and has an id
+  const handleSavedClick = async () => {
+    if (auth.id == 0) return;
+    const barId = bar.bar_id;
+    const userId = auth.id; // Ensure user is defined and has an id
 
-      if (!userId) {
-        console.error('User ID is undefined or not set');
-        return;
+    if (!userId) {
+      console.error('User ID is undefined or not set');
+      return;
+    }
+
+    const wasSaved = isSaved;
+    const newSavedState = !wasSaved;
+
+    try {
+      const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
+      const method = wasSaved ? 'DELETE' : 'POST';
+      const res = await fetch(`${API_BASE_URL}/bar${url}`, {
+        method: method,
+        headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ barId, userId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+        console.log('Save status updated:', data);
+      } else {
+        throw new Error(data.message || 'Failed to update save status');
       }
+    } catch (error) {
+      console.error('Error updating save status:', error);
+      setError(error.message);
+    }
+  };
 
-      const wasSaved = isSaved;
-      const newSavedState = !wasSaved;
-
-      try {
-        const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
-        const method = wasSaved ? 'DELETE' : 'POST';
-        const res = await fetch(`${API_BASE_URL}/bar${url}`, {
-          method: method,
-          headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-          body: JSON.stringify({ barId, userId }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-          console.log('Save status updated:', data);
-        } else {
-          throw new Error(data.message || 'Failed to update save status');
-        }
-      } catch (error) {
-        console.error('Error updating save status:', error);
-        setError(error.message);
-      }
-    };
-  
   // 確認收藏狀態
   const checkBarsStatus = async (barIds) => {
     const userId = auth.id;
@@ -63,7 +63,7 @@ export const BarProvider = ({ children }) => {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
 
@@ -83,10 +83,9 @@ export const BarProvider = ({ children }) => {
     }
   };
   return (
-    <BarContext.Provider value={{ handleSavedClick,checkBarsStatus }}>
+    <BarContext.Provider value={{ handleSavedClick, checkBarsStatus }}>
       {children}
     </BarContext.Provider>
   );
-}
+};
 export const useBarContext = () => useContext(BarContext);
-

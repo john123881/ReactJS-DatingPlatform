@@ -58,7 +58,7 @@ export default function Index({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`
+          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`,
         );
         const data = await response.json();
         setSearchResults(data);

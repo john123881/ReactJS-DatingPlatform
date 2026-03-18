@@ -9,25 +9,22 @@ export default function AddBar({
   // console.log(bar.bar_pic_name);
   const updateBarInTrip = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/addbar`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            trip_detail_id: trip_detail_id,
-            bar_id: bar.bar_id,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/trip/my-details/addbar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          trip_detail_id: trip_detail_id,
+          bar_id: bar.bar_id,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          `Failed to update the trip detail: ${data.message || ''}`
+          `Failed to update the trip detail: ${data.message || ''}`,
         );
       }
       refreshTripDetails();

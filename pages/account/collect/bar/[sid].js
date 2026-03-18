@@ -33,9 +33,9 @@ export default function AccountCollect({ onPageChange }) {
   });
   const { bars, setBars } = useCollect();
   // const [bars, setBars] = useState([]);
-  const [radio, setRadio] = useState('酒吧');
+  const [radio] = useState('酒吧');
   const [arrowHovered, setArrowHovered] = useState(
-    Array(posts.length).fill(false)
+    Array(posts.length).fill(false),
   );
 
   //詳細箭頭動畫
@@ -63,7 +63,7 @@ export default function AccountCollect({ onPageChange }) {
         {
           pathname: router.pathname, // 將 pathname 設置到 url 中
           query: nweQuery, // 將 query 設置到 url 中
-        }
+        },
         // undefined,
         // { scroll: false }
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
@@ -86,7 +86,7 @@ export default function AccountCollect({ onPageChange }) {
         {
           pathname: router.pathname, // 將 pathname 設置到 url 中
           query: nweQuery, // 將 query 設置到 url 中
-        }
+        },
         // undefined,
         // { scroll: false }
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
@@ -104,7 +104,7 @@ export default function AccountCollect({ onPageChange }) {
           `${ACCOUNT_COLLECT_BAR}/${router.query.sid}${location.search}`,
           {
             headers: { ...getAuthHeader() },
-          }
+          },
         );
         const result = await res.json();
         // console.log('fetch BAR data:', result);
@@ -139,11 +139,11 @@ export default function AccountCollect({ onPageChange }) {
     open();
     fetchCheck();
     close(1);
-  }, [router.query, auth.id]);
+  }, [router, auth.id, checkAuth, close, getAuthHeader, open, setBars]);
 
   useEffect(() => {
     onPageChange(pageTitle);
-  }, []);
+  }, [onPageChange, pageTitle]);
 
   return (
     <>
@@ -317,7 +317,7 @@ export default function AccountCollect({ onPageChange }) {
                                     {
                                       method: 'DELETE',
                                       headers: { ...getAuthHeader() },
-                                    }
+                                    },
                                   );
                                   const result = await r.json();
                                   if (
@@ -407,7 +407,7 @@ export default function AccountCollect({ onPageChange }) {
                                 {
                                   pathname: router.pathname,
                                   query: nweQuery,
-                                }
+                                },
                                 // undefined,
                                 // { scroll: false }
                               );

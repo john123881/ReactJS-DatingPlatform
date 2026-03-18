@@ -1,5 +1,5 @@
 import './index';
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import YouTube from 'react-youtube';
@@ -39,7 +39,7 @@ export default function Index({ onPageChange }) {
 
   const BookingConfirmModal = dynamic(
     () => import('@/components/bar/modal/booking-confirm-modal'),
-    { ssr: false }
+    { ssr: false },
   );
   const [selectedTime, setSelectedTime] = useState('');
 
@@ -76,8 +76,8 @@ export default function Index({ onPageChange }) {
                       color: clickedButton
                         ? 'black'
                         : hovered
-                        ? '#A0FF1F'
-                        : '#FFFFFF',
+                          ? '#A0FF1F'
+                          : '#FFFFFF',
                       backgroundColor: clickedButton
                         ? '#A0FF1F'
                         : 'transparent',
@@ -94,14 +94,14 @@ export default function Index({ onPageChange }) {
                         color: clickedButton
                           ? 'red'
                           : hovered
-                          ? '#A0FF1F'
-                          : 'white',
+                            ? '#A0FF1F'
+                            : 'white',
                         cursor: 'pointer',
                       }}
                       onClick={() => {
                         // 切換按鈕點擊狀態
                         setClickedButton(
-                          clickedButton === 'heart' ? null : 'heart'
+                          clickedButton === 'heart' ? null : 'heart',
                         );
                       }}
                     />

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const SnakeHead = () => (
   <svg
     version="1.0"

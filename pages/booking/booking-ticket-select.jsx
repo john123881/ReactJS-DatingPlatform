@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LuPopcorn } from 'react-icons/lu';
 import { RiDrinks2Line } from 'react-icons/ri';
 import { useRouter } from 'next/router';
@@ -94,7 +94,7 @@ export default function MovieSeatSelection({ onPageChange }) {
     setSelectedTicketQuantity(ticketQuantity + ticketQuantitySec); // 更新已选张数
     const totalTicketQuantity = ticketQuantity + ticketQuantitySec;
     setSelectedTicketQuantity(
-      totalTicketQuantity > 0 ? totalTicketQuantity : 0
+      totalTicketQuantity > 0 ? totalTicketQuantity : 0,
     ); // 更新已选张数，确保不小于零
   };
 

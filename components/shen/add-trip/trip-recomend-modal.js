@@ -40,10 +40,10 @@ export default function TripRecomendModal({
       .then((data) => {
         setBarSaved(data);
         const uniqueAreas = Array.from(
-          new Set(data.map((bar) => bar.bar_area_name))
+          new Set(data.map((bar) => bar.bar_area_name)),
         ).sort();
         const uniqueBarTypes = Array.from(
-          new Set(data.map((bar) => bar.bar_type_name))
+          new Set(data.map((bar) => bar.bar_type_name)),
         ).sort();
         setAreas(uniqueAreas);
         setBarTypes(uniqueBarTypes);
@@ -67,14 +67,14 @@ export default function TripRecomendModal({
     (bar) =>
       (bar.bar_area_name === selectedArea || selectedArea === '') &&
       (bar.bar_type_name === selectedBarType || selectedBarType === '') &&
-      bar.bar_name.toLowerCase().includes(searchTerm.toLowerCase())
+      bar.bar_name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const filteredMovies = movie.filter(
     (m) =>
       (String(m.movie_type_id) === selectedMovieType ||
         selectedMovieType === '') &&
-      m.title.toLowerCase().includes(searchMovieTerm.toLowerCase())
+      m.title.toLowerCase().includes(searchMovieTerm.toLowerCase()),
   );
 
   return (

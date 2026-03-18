@@ -1,1 +1,3 @@
-export const API_BASE_URL = 'http://35.212.204.78';
+import { API_SERVER } from '../components/config/api-path';
+
+export const API_BASE_URL = API_SERVER;

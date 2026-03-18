@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/account-center/sidebar/sidebar';
 import PageTitle from '@/components/page-title';
 import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
@@ -41,9 +41,9 @@ export default function AccountCollect({ onPageChange }) {
     page: 0,
     totalPages: 0,
   });
-  const [radio, setRadio] = useState('貼文');
+  const [radio] = useState('貼文');
   const [arrowHovered, setArrowHovered] = useState(
-    Array(posts.length).fill(false)
+    Array(posts.length).fill(false),
   );
 
   //處理 post.map 把裡面的post.id 及 post.data 導出來傳遞給Modal
@@ -78,7 +78,7 @@ export default function AccountCollect({ onPageChange }) {
         {
           pathname: router.pathname, // 將 pathname 設置到 url 中
           query: nweQuery, // 將 query 設置到 url 中
-        }
+        },
         // undefined,
         // { scroll: false }
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
@@ -101,7 +101,7 @@ export default function AccountCollect({ onPageChange }) {
         {
           pathname: router.pathname, // 將 pathname 設置到 url 中
           query: nweQuery, // 將 query 設置到 url 中
-        }
+        },
         // undefined,
         // { scroll: false }
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
@@ -117,12 +117,12 @@ export default function AccountCollect({ onPageChange }) {
         `${ACCOUNT_COLLECT_POST}/${router.query.sid}${location.search}`,
         {
           headers: { ...getAuthHeader() },
-        }
+        },
       );
       const result = await res.json();
       console.log(
         'getSavePostData() fetch data 中的result:',
-        result.output.data
+        result.output.data,
       );
       if (result.output.error === '無收藏') {
         setPosts([]);
@@ -165,7 +165,16 @@ export default function AccountCollect({ onPageChange }) {
 
     open();
     fetchCheck();
-  }, [router.query, auth.id, radio, rerender]);
+  }, [
+    router,
+    auth.id,
+    radio,
+    rerender,
+    checkAuth,
+    close,
+    getSavePostData,
+    open,
+  ]);
 
   //當modal中做收藏的動作
   // useEffect(() => {
@@ -204,7 +213,7 @@ export default function AccountCollect({ onPageChange }) {
 
   useEffect(() => {
     onPageChange(pageTitle);
-  }, []);
+  }, [onPageChange, pageTitle]);
 
   return (
     <>
@@ -354,7 +363,7 @@ export default function AccountCollect({ onPageChange }) {
                                   {
                                     method: 'DELETE',
                                     headers: { ...getAuthHeader() },
-                                  }
+                                  },
                                 );
                                 const result = await r.json();
                                 if (
@@ -452,7 +461,7 @@ export default function AccountCollect({ onPageChange }) {
                                 {
                                   pathname: router.pathname,
                                   query: nweQuery,
-                                }
+                                },
                                 // undefined,
                                 // { scroll: false }
                               );

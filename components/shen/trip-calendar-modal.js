@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import _ from 'lodash';
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
@@ -138,7 +138,7 @@ export default function TripCalendarModal({ tripName }) {
     const selected = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      day
+      day,
     );
     setSelectedDate(selected);
 
@@ -162,21 +162,18 @@ export default function TripCalendarModal({ tripName }) {
     // console.log('tripDate:', tripDate);
     // console.log('tripTitle:', tripTitle);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/trip-plans/add`,
-        {
-          method: 'POST',
-          headers: {
-            ...getAuthHeader(),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: auth.id,
-            trip_date: modalDate,
-            trip_title: tripTitle,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: auth.id,
+          trip_date: modalDate,
+          trip_title: tripTitle,
+        }),
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.msg || 'Network response was not ok');
@@ -201,7 +198,7 @@ export default function TripCalendarModal({ tripName }) {
             className="text-3xl hover:text-[#a0ff1f]"
             onClick={() =>
               setCurrentDate(
-                new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+                new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
               )
             }
           >
@@ -214,7 +211,7 @@ export default function TripCalendarModal({ tripName }) {
             className="text-3xl hover:text-[#a0ff1f]"
             onClick={() =>
               setCurrentDate(
-                new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+                new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
               )
             }
           >

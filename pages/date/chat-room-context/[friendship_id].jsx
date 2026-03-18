@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PageTitle from '@/components/page-title';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
@@ -18,6 +18,7 @@ import {
   DATE_FRIENDSHIPS_MESSAGE,
   DATE_FRIENDSHIPS_MESSAGE_NEW_MSG,
   DATE_FRIENDSHIPS_MESSAGE_NEW_IMG,
+  SOCKET_SERVER,
 } from '@/components/config/api-path';
 
 //DATA
@@ -145,7 +146,7 @@ export default function ChatRoomContext() {
     console.log('header', getAuthHeader());
 
     // 當下無連接時，建立連結
-    socket.current = io(`http://localhost:${socketPort}`, {
+    socket.current = io(SOCKET_SERVER, {
       auth: {
         headers: { ...getAuthHeader() },
       },
@@ -368,7 +369,7 @@ export default function ChatRoomContext() {
 
         socket.current.emit('send_image', { roomName, messageData });
         console.log(
-          `使用者：${auth.username}，傳送內容：${messageData.content}`
+          `使用者：${auth.username}，傳送內容：${messageData.content}`,
         );
 
         // setMessages((prevMessages) => [...prevMessages, messageData]);

@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/auth-context';
 import { API_BASE_URL } from '@/configs/api-config';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
@@ -90,14 +90,15 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           isHovered || isClicked ? ' bg-white' : ''
         }`}
         style={{
-        width: '280px',
-        height: '500px',
-        '@media (min-width: 768px)': {  // 响应式媒体查询
-          width: '50%',
-          height: '20px',
-          backgroundColor: 'red',
-        },
-      }}
+          width: '280px',
+          height: '500px',
+          '@media (min-width: 768px)': {
+            // 响应式媒体查询
+            width: '50%',
+            height: '20px',
+            backgroundColor: 'red',
+          },
+        }}
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
@@ -160,7 +161,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
 
                       onClick={() =>
                         router.push(
-                          `../../../booking/movie-booking-detail/${movie.movie_id}`
+                          `../../../booking/movie-booking-detail/${movie.movie_id}`,
                         )
                       }
                     >

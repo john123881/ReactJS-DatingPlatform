@@ -1,4 +1,3 @@
-import React from 'react';
 import NewFriendsModule from '@/components/date/new-friend-module';
 import SideBar from '@/components/date/side-bar';
 import PageTitle from '@/components/page-title';

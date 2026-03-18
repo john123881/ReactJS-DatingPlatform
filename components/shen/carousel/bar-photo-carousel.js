@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CarouselContentBar from './carousel-content-bar';
 import { API_BASE_URL } from '@/configs/api-config';
 
@@ -13,7 +13,7 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
     const fetchBarSaved = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/recommend/bar`
+          `${API_BASE_URL}/trip/my-details/recommend/bar`,
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -41,8 +41,8 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
     .concat(
       barSaved.slice(
         0,
-        Math.max(0, displayCount - (barSaved.length - currentIndex))
-      )
+        Math.max(0, displayCount - (barSaved.length - currentIndex)),
+      ),
     );
 
   return (

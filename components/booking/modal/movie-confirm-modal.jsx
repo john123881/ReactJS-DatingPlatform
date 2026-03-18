@@ -16,7 +16,7 @@ export default function MovieConfirmModal() {
               <div className="">旺卡</div>
               <hr />
               <div className="text-h6 items-center space-y-4">
-              <div className="grid grid-cols-2">
+                <div className="grid grid-cols-2">
                   <div className="col-span-1">全票：2人</div>
                   <div className="col-span-1">優待票：1人</div>
                 </div>
@@ -31,17 +31,15 @@ export default function MovieConfirmModal() {
               </div>
             </div>
             <div className="col-span-1 pt-10">
-            <button
-          className="btn btn-outline btn-accent mx-20 h-[0.5rem] border-[]"
-          style={{
-            height: '0.5rem',
-            borderColor: '#A0FF1F',
-     
-          }}
-        >
-          我的電影票
-        </button>
-          
+              <button
+                className="btn btn-outline btn-accent mx-20 h-[0.5rem] border-[]"
+                style={{
+                  height: '0.5rem',
+                  borderColor: '#A0FF1F',
+                }}
+              >
+                我的電影票
+              </button>
             </div>
           </div>
         </div>

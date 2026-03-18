@@ -42,7 +42,7 @@ export default function BarBookingList({ onPageChange }) {
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
   const currentBookings = bookings.slice(
     indexOfFirstBooking,
-    indexOfLastBooking
+    indexOfLastBooking,
   );
 
   // 分頁變更處理函數

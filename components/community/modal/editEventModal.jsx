@@ -62,13 +62,13 @@ export default function EditEventModal({ event, modalId }) {
       // 將後端送來呈現在卡片的資料再轉換成前端可讀取的資料
       const formattedStartDate = dayjs(
         event.start_date,
-        'YYYY年 MM月DD日'
+        'YYYY年 MM月DD日',
       ).isValid()
         ? dayjs(event.start_date, 'YYYY年 MM月DD日').format('YYYY-MM-DD')
         : '';
       const formattedEndDate = dayjs(
         event.end_date,
-        'YYYY年 MM月DD日'
+        'YYYY年 MM月DD日',
       ).isValid()
         ? dayjs(event.end_date, 'YYYY年 MM月DD日').format('YYYY-MM-DD')
         : '';

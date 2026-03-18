@@ -20,9 +20,7 @@ export default function Index({ onPageChange }) {
 
   const getBookingSystemMovieCard = async () => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/booking/get-booking-system`
-      );
+      const res = await fetch(`${API_BASE_URL}/booking/get-booking-system`);
       const data = await res.json();
       setMovieCards(data);
     } catch (error) {

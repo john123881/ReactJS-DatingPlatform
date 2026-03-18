@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaCircle } from 'react-icons/fa'; // 导入 Font Awesome 的圆圈图标
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';

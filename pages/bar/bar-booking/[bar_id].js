@@ -81,14 +81,11 @@ export default function Booking({ onPageChange }) {
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/bar/create-bar-booking`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bookingData),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/bar/create-bar-booking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok: ' + response.status);
       }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CarouselContentMovie2 from './carousel-content-movie2';
 import { API_BASE_URL } from '@/configs/api-config';
 
@@ -20,7 +20,7 @@ export default function MoviePhotoCarousel2({
     const fetchMovie = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/recommend/movie`
+          `${API_BASE_URL}/trip/my-details/recommend/movie`,
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -49,8 +49,8 @@ export default function MoviePhotoCarousel2({
     .concat(
       movies.slice(
         0,
-        Math.max(0, displayCount - (movies.length - currentIndex))
-      )
+        Math.max(0, displayCount - (movies.length - currentIndex)),
+      ),
     );
 
   return (

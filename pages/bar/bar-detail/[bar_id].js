@@ -41,7 +41,7 @@ export default function Detail({ onPageChange }) {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
       // console.log('checkBarsStatus 的 data:', data);
@@ -275,7 +275,7 @@ export default function Detail({ onPageChange }) {
             <div className="flex my-4 google-map md:hidden">
               <iframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  bar?.bar_addr
+                  bar?.bar_addr,
                 )}&output=embed`}
                 width="100%"
                 height="300"
@@ -295,7 +295,7 @@ export default function Detail({ onPageChange }) {
               /> */}
               <iframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  bar?.bar_addr
+                  bar?.bar_addr,
                 )}&output=embed`}
                 width="100%"
                 height="700"

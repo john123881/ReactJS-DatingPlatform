@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
 import { API_BASE_URL } from '@/configs/api-config';
+import { SOCKET_SERVER } from '@/components/config/api-path';
 
 const PostContext = createContext();
 
@@ -92,7 +93,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/get-userInfo/${auth.id}`
+        `${API_BASE_URL}/community/get-userInfo/${auth.id}`,
       );
       const data = await res.json();
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
@@ -109,7 +110,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/posts?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts?page=${page}&limit=12`,
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -136,7 +137,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/get-posts-by-keyword?keyword=${keyword}&page=${filteredPage}&limit=12`
+        `${API_BASE_URL}/community/get-posts-by-keyword?keyword=${keyword}&page=${filteredPage}&limit=12`,
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -164,7 +165,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/get-random-posts?page=${randomPage}&limit=12`
+        `${API_BASE_URL}/community/get-random-posts?page=${randomPage}&limit=12`,
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -190,7 +191,7 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/posts?page=${page}&limit=12`
+        `${API_BASE_URL}/community/posts?page=${page}&limit=12`,
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -213,9 +214,7 @@ export const PostProvider = ({ children }) => {
 
   const getPostPage = async (pid) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-post-page/${pid}`
-      );
+      const res = await fetch(`${API_BASE_URL}/community/get-post-page/${pid}`);
       const data = await res.json();
       if (data.length !== 0) {
         await checkPostsStatus(pid); // 檢查貼文狀態
@@ -232,7 +231,7 @@ export const PostProvider = ({ children }) => {
   const getEventPage = async (eid) => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/get-event-page/${eid}`
+        `${API_BASE_URL}/community/get-event-page/${eid}`,
       );
       const data = await res.json();
       if (data.length !== 0) {
@@ -252,7 +251,7 @@ export const PostProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/events?page=${eventPage}&limit=12`
+        `${API_BASE_URL}/community/events?page=${eventPage}&limit=12`,
       );
       const data = await res.json();
       if (data.length === 0) {
@@ -275,7 +274,7 @@ export const PostProvider = ({ children }) => {
   const getPostComments = async (postIds) => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/community/get-comments?postIds=${postIds}`
+        `${API_BASE_URL}/community/get-comments?postIds=${postIds}`,
       );
       const data = await res.json();
 
@@ -382,7 +381,7 @@ export const PostProvider = ({ children }) => {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/community/search-users?searchTerm=${value}`
+          `${API_BASE_URL}/community/search-users?searchTerm=${value}`,
         );
         const data = await response.json();
         setSearchResults(data);
@@ -648,7 +647,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setFilteredPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -656,7 +655,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setProfilePosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -664,7 +663,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setRandomPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -672,7 +671,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
 
         // 更新 post page 單筆資料
@@ -730,16 +729,13 @@ export const PostProvider = ({ children }) => {
       fd.append('photo', selectedFile);
       fd.append('postId', postId);
 
-      const res = await fetch(
-        `${API_BASE_URL}/community/edit-post-photo`,
-        {
-          method: 'PUT',
-          body: fd,
-          headers: {
-            ...getAuthHeader(),
-          },
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/community/edit-post-photo`, {
+        method: 'PUT',
+        body: fd,
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
       const data = await res.json();
 
@@ -751,7 +747,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setFilteredPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -759,7 +755,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setProfilePosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -767,7 +763,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
         setRandomPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -775,7 +771,7 @@ export const PostProvider = ({ children }) => {
               return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return p;
-          })
+          }),
         );
 
         // 更新 post page 單筆資料
@@ -823,7 +819,7 @@ export const PostProvider = ({ children }) => {
   const handleEventUpdate = async (
     event,
     localEventDetails,
-    editEventModalRef
+    editEventModalRef,
   ) => {
     const eventId = event.comm_event_id;
     const userId = auth.id;
@@ -866,7 +862,7 @@ export const PostProvider = ({ children }) => {
               return { ...e, ...data.event }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
             }
             return e;
-          })
+          }),
         );
 
         // 更新 event page card 單筆資料
@@ -893,7 +889,7 @@ export const PostProvider = ({ children }) => {
               headers: {
                 ...getAuthHeader(),
               },
-            }
+            },
           );
 
           const data = await res.json();
@@ -907,7 +903,7 @@ export const PostProvider = ({ children }) => {
                   return { ...e, ...data.event }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
                 }
                 return e;
-              })
+              }),
             );
 
             // 更新 event page card 單筆資料
@@ -1129,17 +1125,14 @@ export const PostProvider = ({ children }) => {
       // 如果點擊確認刪除才執行
       if (result.isConfirmed) {
         try {
-          const res = await fetch(
-            `${API_BASE_URL}/community/delete-post`,
-            {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader(),
-              },
-              body: JSON.stringify({ postId }),
-            }
-          );
+          const res = await fetch(`${API_BASE_URL}/community/delete-post`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ postId }),
+          });
 
           if (res.ok) {
             // 更新 posts, randomPosts 狀態以移除已刪除的貼文
@@ -1210,23 +1203,20 @@ export const PostProvider = ({ children }) => {
       // 如果點擊確認刪除才執行
       if (result.isConfirmed) {
         try {
-          const res = await fetch(
-            `${API_BASE_URL}/community/delete-event`,
-            {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader(),
-              },
-              body: JSON.stringify({ eventId }),
-            }
-          );
+          const res = await fetch(`${API_BASE_URL}/community/delete-event`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ eventId }),
+          });
 
           if (res.ok) {
             // 更新 events 狀態以移除已刪除的貼文
             setEvents((prevEvents) => {
               return prevEvents.filter(
-                (event) => event.comm_event_id !== eventId
+                (event) => event.comm_event_id !== eventId,
               );
             });
 
@@ -1277,17 +1267,14 @@ export const PostProvider = ({ children }) => {
     // 如果點擊確認刪除才執行
     if (result.isConfirmed) {
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/community/delete-comment`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeader(),
-            },
-            body: JSON.stringify({ commentId }),
-          }
-        );
+        const res = await fetch(`${API_BASE_URL}/community/delete-comment`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+          },
+          body: JSON.stringify({ commentId }),
+        });
 
         if (res.ok) {
           // 更新 comments 狀態以移除已刪除的回覆
@@ -1298,7 +1285,7 @@ export const PostProvider = ({ children }) => {
             for (const postId in updatedComments) {
               // 過濾出除了要刪除的那個評論外的所有評論
               updatedComments[postId] = updatedComments[postId].filter(
-                (comment) => comment.comm_comment_id !== commentId
+                (comment) => comment.comm_comment_id !== commentId,
               );
             }
 
@@ -1349,7 +1336,7 @@ export const PostProvider = ({ children }) => {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
 
@@ -1387,7 +1374,7 @@ export const PostProvider = ({ children }) => {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
 
@@ -1419,7 +1406,7 @@ export const PostProvider = ({ children }) => {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
 
@@ -1518,14 +1505,11 @@ export const PostProvider = ({ children }) => {
 
     try {
       // 用fetch送出檔案
-      const res = await fetch(
-        `${API_BASE_URL}/community/upload-event-photo`,
-        {
-          method: 'POST',
-          body: fd,
-          headers: { ...getAuthHeader() },
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/community/upload-event-photo`, {
+        method: 'POST',
+        body: fd,
+        headers: { ...getAuthHeader() },
+      });
 
       const data = await res.json();
 
@@ -1599,7 +1583,7 @@ export const PostProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3008');
+    const newSocket = io(SOCKET_SERVER);
     setSocket(newSocket);
   }, []);
 

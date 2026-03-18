@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';

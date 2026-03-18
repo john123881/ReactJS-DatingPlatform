@@ -33,7 +33,7 @@ export default function NoContentMorning({
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
       const data = await response.json();
       if (response.ok) {

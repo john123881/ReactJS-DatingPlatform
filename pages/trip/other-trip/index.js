@@ -44,7 +44,7 @@ export default function OtherTrip({ onPageChange }) {
 
   // 以 filter 的方式過濾，只顯示標題之中包含關鍵字的行程
   const filteredTrips = otherTrips.filter((trip) =>
-    trip.trip_title.toLowerCase().includes(searchTerm.toLowerCase())
+    trip.trip_title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (

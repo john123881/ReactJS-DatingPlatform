@@ -65,7 +65,7 @@ export default function AccountRecord({ onPageChange }) {
           query: nweQuery, // 將 query 設置到 url 中
         },
         undefined,
-        { scroll: false }
+        { scroll: false },
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     }
   };
@@ -90,7 +90,7 @@ export default function AccountRecord({ onPageChange }) {
           query: nweQuery, // 將 query 設置到 url 中
         },
         undefined,
-        { scroll: false }
+        { scroll: false },
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     }
   };
@@ -117,7 +117,7 @@ export default function AccountRecord({ onPageChange }) {
           query: nweQuery, // 將 query 設置到 url 中
         },
         undefined,
-        { scroll: false }
+        { scroll: false },
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     }
   };
@@ -142,7 +142,7 @@ export default function AccountRecord({ onPageChange }) {
           query: nweQuery, // 將 query 設置到 url 中
         },
         undefined,
-        { scroll: false }
+        { scroll: false },
       ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     }
   };
@@ -162,7 +162,7 @@ export default function AccountRecord({ onPageChange }) {
         query: { ...router.query, selectedValue, page: 1 }, // 將 query 設置到 url 中,選擇來源時，頁面要回到第一頁
       },
       undefined,
-      { scroll: false }
+      { scroll: false },
     ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
   };
 
@@ -176,7 +176,7 @@ export default function AccountRecord({ onPageChange }) {
         query: { ...router.query, date_begin: newValueDateBegin, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
       },
       undefined,
-      { scroll: false }
+      { scroll: false },
     ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
   };
 
@@ -190,7 +190,7 @@ export default function AccountRecord({ onPageChange }) {
         query: { ...router.query, date_end: newValueDateEnd, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
       },
       undefined,
-      { scroll: false }
+      { scroll: false },
     ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
   };
 
@@ -205,7 +205,7 @@ export default function AccountRecord({ onPageChange }) {
         query: { ...router.query, sortDate: sort, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
       },
       undefined,
-      { scroll: false }
+      { scroll: false },
     ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     setDateSortToggle(newDateSortToggle);
   };
@@ -238,7 +238,7 @@ export default function AccountRecord({ onPageChange }) {
         }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
       },
       undefined,
-      { scroll: false }
+      { scroll: false },
     ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
     // console.log('點擊後router.push.query是:', router.query);
     setSortDirection(newSortDirection);
@@ -296,7 +296,7 @@ export default function AccountRecord({ onPageChange }) {
         `${ACCOUNT_RECORD_POINT_GET}/${router.query.sid}${location.search}`,
         {
           headers: { ...getAuthHeader() },
-        }
+        },
       );
       const result = await r.json();
       console.log('積分紀錄資料:', result);
@@ -344,7 +344,7 @@ export default function AccountRecord({ onPageChange }) {
           `${ACCOUNT_RECORD_GAME}/${router.query.sid}${location.search}`,
           {
             headers: { ...getAuthHeader() },
-          }
+          },
         );
         const result = await r.json();
         console.log('遊戲紀錄資料:', result);
@@ -612,7 +612,7 @@ export default function AccountRecord({ onPageChange }) {
                                 query: nweQuery,
                               },
                               undefined,
-                              { scroll: false }
+                              { scroll: false },
                             );
                           }}
                         >
@@ -807,7 +807,7 @@ export default function AccountRecord({ onPageChange }) {
                                 query: nweQuery,
                               },
                               undefined,
-                              { scroll: false }
+                              { scroll: false },
                             );
                           }}
                         >

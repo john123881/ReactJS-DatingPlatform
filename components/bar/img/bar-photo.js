@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import WithContent from './with-content';
 import { API_BASE_URL } from '@/configs/api-config';
 
@@ -24,7 +24,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
     const fetchBarImage = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`,
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧圖片失敗');
@@ -34,13 +34,13 @@ export default function BarPhotoMy({ trip_plan_id }) {
 
         // 檢查所有獲得的 data ，至多3個，找到第一個包含 bar_img的項目
         const imageData = data.find(
-          (item) => item.bar_img && item.bar_img.data
+          (item) => item.bar_img && item.bar_img.data,
         );
         if (imageData && imageData.bar_img && imageData.bar_img.data) {
           const base64String = bufferToBase64(imageData.bar_img.data);
           console.log(
             'Generated Base64 Image URL:',
-            `data:image/jpeg;base64,${base64String}`
+            `data:image/jpeg;base64,${base64String}`,
           );
           setImageSrc1(`data:image/jpeg;base64,${base64String}`);
         } else {
@@ -59,7 +59,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
     const fetchBarName = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`,
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧名稱失败');

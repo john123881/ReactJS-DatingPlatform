@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-
 function Popup({ movie, time, date, onClose }) {
-
-
   return (
     <div className="popup">
       <div className="popup-content">

@@ -2,7 +2,7 @@ import DateCard from '@/components/index/date_card';
 import ThemeCard from '@/components/index/theme_card';
 import RegisterAcc from '@/components/index/register_acc';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 

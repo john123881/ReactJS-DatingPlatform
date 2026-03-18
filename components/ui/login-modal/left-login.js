@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 // import Link from 'next/link';
 import PasswordForget from './password-forget';
 import { useFormik } from 'formik';
@@ -133,7 +133,7 @@ export default function LeftLogin({ switchHandler }) {
                 pathname: router.pathname, // 使用當前頁面作為 pathname
               },
               undefined,
-              { scroll: false }
+              { scroll: false },
             );
             return '登入成功';
           },

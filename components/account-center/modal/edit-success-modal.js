@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function EditSuccessModal({ modalState, sid, msg }) {
+export default function EditSuccessModal({ sid, msg }) {
   // // const result = true;
   // const result = false;
   return (

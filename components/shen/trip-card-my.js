@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
@@ -40,7 +40,7 @@ export default function TripCardMy({ trip, onDeleteSuccess }) {
         `${API_BASE_URL}/trip/trip-plans/delete/${trip.trip_plan_id}`,
         {
           method: 'DELETE',
-        }
+        },
       );
       const data = await response.json();
       if (data.success) {

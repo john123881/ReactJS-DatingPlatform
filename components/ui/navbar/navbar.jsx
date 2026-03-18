@@ -63,9 +63,9 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   const {
     posts,
     postModalToggle,
-    setPostModalToggle,
-    checkPostsStatus,
-    getPostComments,
+    // setPostModalToggle,
+    // checkPostsStatus,
+    // getPostComments,
   } = usePostContext();
   const {
     auth,
@@ -75,7 +75,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     setUserAvatar,
     getAuthHeader,
     rerender,
-    setRerender,
+    // setRerender,
   } = useAuth();
 
   const {
@@ -84,9 +84,9 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     bars,
     movies,
     movieV,
-    setMovieV,
+    // setMovieV,
     movieModalToggle,
-    setMovieModalToggle,
+    // setMovieModalToggle,
     dropDownCollectOpen,
     setDropDownCollectOpen,
   } = useCollect();
@@ -116,7 +116,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   // const [dropDownCollectOpen, setDropDownCollectOpen] = useState(false);
   const [showContent, setShowContent] = useState(
-    Array(Array(10).fill.length).fill(false)
+    Array(Array(10).fill.length).fill(false),
   );
 
   // //返回與 page 變量相對應的中文名稱
@@ -142,21 +142,21 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   const handleTitleEnter = (title, isHovered) => {
     const currentPageIndex = getPageChineseName(title);
     const newTitleHovered = titleHovered.map((v, i) =>
-      i === currentPageIndex ? isHovered : false
+      i === currentPageIndex ? isHovered : false,
     );
     setTitleHovered(newTitleHovered);
   };
   const handleTitleLeave = (title, f) => {
     const currentPageIndex = getPageChineseName(title);
     const newTitleHovered = titleHovered.map((v, i) =>
-      i === currentPageIndex ? f : v
+      i === currentPageIndex ? f : v,
     );
     setTitleHovered(newTitleHovered);
   };
 
   const getNotifications = async () => {
     const response = await fetch(
-      `${API_BASE_URL}/community/get-noti/${userInfo.user_id}`
+      `${API_BASE_URL}/community/get-noti/${userInfo.user_id}`,
     );
     const data = await response.json();
     setNotifications(data.noti);
@@ -174,13 +174,13 @@ export default function Header({ currentPageTitle, handlePageChange }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ userId }),
-        }
+        },
       );
       if (response.ok) {
         setNotifications((prev) =>
           prev.map((noti) =>
-            noti.comm_noti_id === notiId ? { ...noti, isRead: true } : noti
-          )
+            noti.comm_noti_id === notiId ? { ...noti, isRead: true } : noti,
+          ),
         );
         // 更新未讀計數
         setUnreadCount((prevCount) => prevCount - 1);
@@ -208,15 +208,15 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     switch (type) {
       case 'like':
         message = `${senderName}  喜愛你的貼文`;
-        url = `http://localhost:3000/community/post/${postId}`;
+        url = `/community/post/${postId}`;
         break;
       case 'comment':
         message = `${senderName}  回覆你的貼文`;
-        url = `http://localhost:3000/community/post/${postId}`;
+        url = `/community/post/${postId}`;
         break;
       case 'follow':
         message = `${senderName}  開始追蹤你`;
-        url = `http://localhost:3000/community/profile/${senderId}`;
+        url = `/community/profile/${senderId}`;
         break;
       default:
         message = '你有一則新通知';
@@ -285,7 +285,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       return;
     }
     const controller = new AbortController(); //建立一個新的控制器
-    const signal = controller.signal; //取得訊號 塞到fetch後面
+    // const signal = controller.signal; //取得訊號 塞到fetch後面
     const getUserAvatar = async () => {
       try {
         const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
@@ -323,7 +323,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     }
 
     const controller = new AbortController(); //建立一個新的控制器
-    const signal = controller.signal; //取得訊號 塞到fetch後面
+    // const signal = controller.signal; //取得訊號 塞到fetch後面
     const fetchAllCollectList = async () => {
       try {
         const r = await fetch(`${ACCOUNT_COLLECT_LIST_GET}/${auth.id}`, {
@@ -468,7 +468,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
               {notifications
                 ?.slice(0, 10)
                 .map((noti, index) =>
-                  displayNotification({ ...noti, key: index })
+                  displayNotification({ ...noti, key: index }),
                 )}
             </ul>
           </div>

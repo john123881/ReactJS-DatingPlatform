@@ -56,7 +56,7 @@ export default function Booking({ onPageChange }) {
   // 根據索引切割當前頁的訂位紀錄
   const currentBookings = bookings.slice(
     indexOfFirstBooking,
-    indexOfLastBooking
+    indexOfLastBooking,
   );
 
   // 處理頁碼變更事件的函數

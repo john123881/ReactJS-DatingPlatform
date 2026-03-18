@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { DATE_FRIENDSHIPS_MESSAGE_SENDER } from '../config/api-path';
+import {
+  DATE_FRIENDSHIPS_MESSAGE_SENDER,
+  SOCKET_SERVER,
+} from '../config/api-path';
 import io from 'socket.io-client';
 
 export default function ChatMsg({ searchQuery }) {
@@ -23,7 +26,7 @@ export default function ChatMsg({ searchQuery }) {
   //   },
   // ];
 
-  //TODO: `http://localhost:3001/date/friendships_message/sender_id/${userid1}`，依照登入使用者變動
+  //TODO: URL 依照登入使用者變動
   const [msg, setMsg] = useState([]);
   const { auth, getAuthHeader, rerender } = useAuth();
   const socket = useRef(null);
@@ -50,7 +53,7 @@ export default function ChatMsg({ searchQuery }) {
   }, [rerender]);
   // 過濾消息列表
   const filteredMsgs = msg.filter((msg) =>
-    msg.content.toLowerCase().includes(searchQuery.toLowerCase())
+    msg.content.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const [socketId, setSocketId] = useState(null);
@@ -59,7 +62,7 @@ export default function ChatMsg({ searchQuery }) {
   useEffect(() => {
     if (!socket.current) {
       // 當下無連接時，建立連結
-      socket.current = io(`http://localhost:${socketPort}`, {
+      socket.current = io(SOCKET_SERVER, {
         auth: {
           headers: { ...getAuthHeader() },
         },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import TabBar from '@/components/bar/bar/tab-bar';
@@ -47,7 +47,7 @@ export default function Index({ onPageChange }) {
   // 按一下在生成隨機三筆
   const prevBars = () => {
     setCurrentIndex(
-      (prev) => (prev - displayCount + randomBars.length) % randomBars.length
+      (prev) => (prev - displayCount + randomBars.length) % randomBars.length,
     );
     setBarRender(!barRender);
   };
@@ -58,8 +58,8 @@ export default function Index({ onPageChange }) {
     .concat(
       randomBars.slice(
         0,
-        Math.max(displayCount - (randomBars.length - currentIndex), 0)
-      )
+        Math.max(displayCount - (randomBars.length - currentIndex), 0),
+      ),
     );
 
   const initialTabs = [

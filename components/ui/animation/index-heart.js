@@ -1,6 +1,6 @@
 import { useLottie } from 'lottie-react';
 import heartAnima from './index-heart.json';
-import React from 'react';
+
 import Lottie from 'react-lottie';
 
 export default function IndexHeart() {

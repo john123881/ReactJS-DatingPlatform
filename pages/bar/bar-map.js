@@ -1,5 +1,5 @@
 import BarListSidebar from '@/components/bar/bar/bar-list-sidebar(1)';
-import React from 'react';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';

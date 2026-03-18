@@ -1,6 +1,6 @@
 import { useLottie } from 'lottie-react';
 import loginBackgroundAnima from './login-background.json';
-import React from 'react';
+
 import Lottie from 'react-lottie';
 
 export default function LoginBackgroundAnimation({ isOnLogin }) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 
 export default function CarouselContentMovie2({
@@ -39,7 +39,7 @@ export default function CarouselContentMovie2({
             movie_id: movies.movie_id,
             block: timeOfDay,
           }),
-        }
+        },
       );
 
       const result = await response.json();

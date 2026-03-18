@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import OtherTripContent from './other-tripcontent';
 import { useLoader } from '@/context/use-loader';
@@ -25,17 +25,17 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
       open();
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`,
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧圖片失敗');
         }
         const data = await response.json();
         const filteredData = data.filter(
-          (trip) => trip.block == tripDetails.block
+          (trip) => trip.block == tripDetails.block,
         );
         const imageData = filteredData.find(
-          (item) => item.bar_img && item.bar_img.data
+          (item) => item.bar_img && item.bar_img.data,
         );
         if (imageData) {
           const base64String = bufferToBase64(imageData.bar_img.data);
@@ -58,7 +58,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
     const fetchBarName = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`,
         );
         if (!response.ok) {
           throw new Error('fetch 酒吧名稱失败');
@@ -66,7 +66,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
         const data = await response.json();
         // console.log(data);
         const filteredData = data.filter(
-          (trip) => trip.block == tripDetails.block
+          (trip) => trip.block == tripDetails.block,
         );
         if (filteredData.length > 0) {
           setBarDetails({

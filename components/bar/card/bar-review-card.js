@@ -70,7 +70,7 @@ export default function BarReviewCard({ rating, id }) {
           <div
             type="submit"
             onClick={() =>
-            document.getElementById('bar-rating-delete-modal').showModal()
+              document.getElementById('bar-rating-delete-modal').showModal()
             }
           >
             <button className="cursor-pointer badge badge-outline border-white text-[10px] lg:text-[12px] text-white h-[20px] lg:h-[24px] hover:bg-[#FF03FF] hover:text-black">

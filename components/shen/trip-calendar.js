@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
 import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
@@ -162,7 +162,7 @@ export default function TripCalendar() {
     const selected = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      day
+      day,
     );
     setSelectedDate(selected);
 
@@ -186,21 +186,18 @@ export default function TripCalendar() {
     // console.log('tripDate:', tripDate);
     // console.log('tripTitle:', tripTitle);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/trip-plans/add`,
-        {
-          method: 'POST',
-          headers: {
-            ...getAuthHeader(),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: auth.id,
-            trip_date: modalDate,
-            trip_title: tripTitle,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: auth.id,
+          trip_date: modalDate,
+          trip_title: tripTitle,
+        }),
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.msg || 'Network response was not ok');
@@ -225,7 +222,7 @@ export default function TripCalendar() {
             className="text-3xl sm:text-5xl hover:text-[#a0ff1f]"
             onClick={() =>
               setCurrentDate(
-                new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+                new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
               )
             }
           >
@@ -238,7 +235,7 @@ export default function TripCalendar() {
             className="text-3xl sm:text-5xl hover:text-[#a0ff1f]"
             onClick={() =>
               setCurrentDate(
-                new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+                new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
               )
             }
           >

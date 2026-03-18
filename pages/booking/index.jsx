@@ -46,7 +46,6 @@ export default function Index({ onPageChange }) {
     getBookingMovieCard(); // 點擊標籤時重新 fetch 電影卡片數據
   };
 
-
   const [clickedButton, setClickedButton] = useState(null);
   const [hovered, setHovered] = useState(false);
 
@@ -259,7 +258,6 @@ export default function Index({ onPageChange }) {
       <div className="flex justify-end w-full mt-5 ml-[-20px] sm:ml-[-70px]">
         <Link
           className="btn btn-outline bg-transparent mt-[10px] w-[150px] mb-[30px] rounded-[30px] hover:bg-[#A0FF1F]"
-          
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           href={'booking/movie-ticket'}

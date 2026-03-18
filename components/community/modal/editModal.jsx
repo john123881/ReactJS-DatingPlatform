@@ -104,7 +104,7 @@ export default function EditModal({ post, modalId }) {
               onKeyDown={(e) =>
                 // 使用 onKeyDown 並檢查是否按下 Enter 鍵
                 handleKeyPress(e, () =>
-                  handlePostUpdate(post, localPostContext, editModalRef)
+                  handlePostUpdate(post, localPostContext, editModalRef),
                 )
               }
             />

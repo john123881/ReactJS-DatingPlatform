@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 
 export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
@@ -24,13 +24,13 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
       .catch((error) => console.error('Error loading data:', error));
   }, []);
 
-  const handleAreaChange = (event) => {
-    onAreaSelected(event.target.value);
-  };
+  // const handleAreaChange = (event) => {
+  //   onAreaSelected(event.target.value);
+  // };
 
-  const handleTypeChange = (event) => {
-    onTypeSelected(event.target.value);
-  };
+  // const handleTypeChange = (event) => {
+  //   onTypeSelected(event.target.value);
+  // };
 
   return (
     <div className="lg:basis-2/12 flex flex-col gap-4">
@@ -57,8 +57,10 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
           酒吧種類
         </option>
         {types.map((type) => (
-        <option key={type.bar_type_id} value={type.bar_type_id}>{type.bar_type_name}</option>
-    ))}
+          <option key={type.bar_type_id} value={type.bar_type_id}>
+            {type.bar_type_name}
+          </option>
+        ))}
       </select>
     </div>
   );

@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 export default function BarBookingListCard({
   booking,
-  bookingId,
-  onDelete,
+  // bookingId,
+  // onDelete,
   setBookings,
 }) {
   console.log(booking);

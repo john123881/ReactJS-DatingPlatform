@@ -77,8 +77,8 @@ export default function PostModal({ post, modalId, isOpen }) {
           type === 'like'
             ? '喜愛你的貼文'
             : type === 'comment'
-            ? '回覆你的貼文'
-            : '開始追蹤你'
+              ? '回覆你的貼文'
+              : '開始追蹤你'
         }`,
       };
       socket.emit('sendNotification', notificationData);

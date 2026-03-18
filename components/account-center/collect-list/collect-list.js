@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
 import { FaHeart } from 'react-icons/fa';
@@ -33,8 +33,8 @@ export default function CollectList({
     setP,
     setModalId,
     setMovieModalToggle,
-    movies,
-    setMovies,
+    // movies,
+    // setMovies,
     movieV,
     setMovieV,
   } = useCollect();
@@ -181,8 +181,8 @@ export default function CollectList({
             {data.content == 'null'
               ? (data.content = 'null')
               : data.content.length > 50
-              ? data.content.substring(0, 50) + '...'
-              : data.content}
+                ? data.content.substring(0, 50) + '...'
+                : data.content}
           </div>
         </div>
       </li>

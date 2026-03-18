@@ -16,7 +16,7 @@ export default function BarBooking({ onPageChange }) {
   const currentPage = '訂位';
   const BookingConfirmModal = dynamic(
     () => import('@/components/bar/modal/booking-confirm-modal'),
-    { ssr: false }
+    { ssr: false },
   );
   const [selectedTime, setSelectedTime] = useState('');
 

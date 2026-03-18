@@ -1,6 +1,6 @@
 import { useLottie } from 'lottie-react';
 import fireworkAnimaRight from './firework-right.json';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function FireworkAnimationRight() {
   const animationRef = useRef(null);

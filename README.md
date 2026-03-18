@@ -2,8 +2,9 @@
 
 Click to [DEMO](http://119.14.29.65:3000/)<br>
 Account For Test : <br>
->Email: test@gmail.com<br>
->Password: aA!123456<br>
+
+> Email: test@gmail.com<br>
+> Password: aA!123456<br>
 
 ## 📋 Description
 
@@ -33,7 +34,7 @@ Member Profile
 
 - Modify member information/photos, select interests, record searches
 - Upload images to be stored in an AWS S3 bucket
-  
+
 Game
 
 - Earn points for daily gameplay
@@ -67,6 +68,7 @@ Back-end
 ![signin](imgs//index-sign.png)
 ![passwordforget](imgs//index-passf.png)
 ![member-profile](imgs//member-profile.png)
+
 <div style="display: flex; justify-content: space-between;">
   <img src="imgs/member-profile.png" alt="member-profile" style="width: 750px;">
   <img src="imgs/profile-rwd.jpg" alt="profile-rwd" style="width: 250px;">
@@ -75,7 +77,6 @@ Back-end
 
 ![member-edit](imgs/member-edit.png)
 ![change-pw](imgs/change-pw.png)
-
 
 <div style="display: flex; justify-content: space-between;">
   <img src="imgs/game-play.png" alt="game-play" style="width: 750px;">
@@ -117,4 +118,3 @@ Email:a123881@gmail.com
 ## ⭕️ Warning
 
 The pictures used are purely for practice and homework purposes and have no commercial purpose or profit-making effect.Thanks!
-

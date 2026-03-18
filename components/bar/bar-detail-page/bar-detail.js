@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import TabBar from '@/components/bar/bar/tab-bar';
+// import { useEffect, useState } from 'react';
+// import TabBar from '@/components/bar/bar/tab-bar';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarDetailCard from '@/components/bar/card/bar-detail-card';
 
 export default function BarDetail({ bar }) {
-  const initialTabs = [
-    { title: '酒吧地圖', path: '/bar/bar-map', active: false },
-    { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false },
-  ];
+  // const initialTabs = [
+  //   { title: '酒吧地圖', path: '/bar/bar-map', active: false },
+  //   { title: '酒吧首頁', path: '/bar', active: true },
+  //   { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false },
+  // ];
   const currentPage = 'Fake Sober';
 
   return (

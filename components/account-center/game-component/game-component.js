@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import styles from './game-page.module.css';
 import { ACCOUNT_GAME_RECORD_POST } from '@/components/config/api-path';
 import { useRouter } from 'next/router';
@@ -33,7 +33,7 @@ const GameComponent = () => {
   const [isTiming, setIsTiming] = useState(false);
   const [endTime, setEndTime] = useState(0);
   const router = useRouter();
-  const { auth, getAuthHeader } = useAuth();
+  const { getAuthHeader } = useAuth();
   const [btnDisabled, setBtnDisabled] = useState(false);
   const startTimeRef = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -252,7 +252,7 @@ const GameComponent = () => {
     // 計算蛇頭當前的旋轉角度
     let currentRotation = 0;
     if (snake.length > 0) {
-      const head = snake[0];
+      // const head = snake[0];
       switch (currentDirection) {
         case 'UP':
           currentRotation = 180;
@@ -354,7 +354,7 @@ const GameComponent = () => {
     while (
       snake.some(
         (segment) =>
-          segment.x === newFoodPosition.x && segment.y === newFoodPosition.y
+          segment.x === newFoodPosition.x && segment.y === newFoodPosition.y,
       )
     ) {
       newFoodPosition = generateFoodPosition();

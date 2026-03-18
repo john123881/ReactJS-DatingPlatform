@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ChatMsgLeftContext({ messages, children }) {
   return (
     <div>

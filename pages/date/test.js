@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import { SOCKET_SERVER } from '../../components/config/api-path';
 
 // 連接到 Socket.IO 伺服器
-const socket = io('http://localhost:3003');
+const socket = io(SOCKET_SERVER);
 
 const Chat = () => {
   // 狀態：訊息列表

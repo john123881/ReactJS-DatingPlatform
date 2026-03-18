@@ -55,7 +55,7 @@ export default function Index({ onPageChange }) {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/booking/check-movie-status?userId=${userId}&movieIds=${movieIds}`
+        `${API_BASE_URL}/booking/check-movie-status?userId=${userId}&movieIds=${movieIds}`,
       );
       const data = await response.json();
 
@@ -94,7 +94,7 @@ export default function Index({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`
+          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`,
         );
         const data = await response.json();
         setSearchResults(data);
@@ -160,8 +160,6 @@ export default function Index({ onPageChange }) {
             />
           </svg>
         </label>
-
-        
       </div>
 
       <div className="flex flex-wrap justify-center sm:justify-between gap-6 mx-10">

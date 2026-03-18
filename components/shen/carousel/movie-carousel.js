@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MoviePhotoCarousel from './movie-photo-carousel';
 
 export default function MovieCarousel({ trip_plan_id }) {

@@ -132,7 +132,7 @@ export default function BarListOthers({ onPageChange }) {
                 >
                   {minPageNumberLimit + index}
                 </button>
-              )
+              ),
             )}
             <button
               className="btn btn-sm"

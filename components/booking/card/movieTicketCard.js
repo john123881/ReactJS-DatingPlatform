@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
@@ -20,7 +20,7 @@ export default function MovieCard({ movie, index }) {
 
   // 轉換電影時間為 hh:mm 格式
   const formattedMovieTime = dayjs(movie.movie_time, 'HH:mm:ss').format(
-    'HH:mm'
+    'HH:mm',
   );
 
   // 轉換訂票時間為 YYYY-MM-DD 格式

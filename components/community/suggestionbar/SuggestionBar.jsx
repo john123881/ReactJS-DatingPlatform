@@ -12,9 +12,7 @@ export default function SuggestionBar() {
 
   const getSuggestUsers = async () => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/getSuggestUsers`
-      );
+      const res = await fetch(`${API_BASE_URL}/community/getSuggestUsers`);
       const data = await res.json();
       setUsers(data);
     } catch (error) {

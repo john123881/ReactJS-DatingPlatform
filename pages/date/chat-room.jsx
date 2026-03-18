@@ -1,4 +1,3 @@
-import React from 'react';
 import SearchBar from '@/components/date/search-bar';
 import ChatMsg from '@/components/date/chat-msg';
 import SideBar from '@/components/date/side-bar';

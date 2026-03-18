@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { forgetPasswordSchema } from '@/components/schemas';
 import {

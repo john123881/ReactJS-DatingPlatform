@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
@@ -50,7 +50,7 @@ export default function MovieDetail({ onPageChange }) {
   const getMovieDetail = async (mid) => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/booking/get-movie-detail/${mid}`
+        `${API_BASE_URL}/booking/get-movie-detail/${mid}`,
       );
       const data = await res.json();
       setMovie(data);
@@ -100,7 +100,10 @@ export default function MovieDetail({ onPageChange }) {
                 />
               </figure>
               <div className="card-body">
-                <h2 className="card-title pt-2 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:pb-0" style={{ fontSize: '2rem' }}>
+                <h2
+                  className="card-title pt-2 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:pb-0"
+                  style={{ fontSize: '2rem' }}
+                >
                   {movie[0]?.title}
                   <button
                     className={`btn btn-outline btn-accent w-[130px] mx-24 mt-2`}
@@ -108,7 +111,7 @@ export default function MovieDetail({ onPageChange }) {
                       height: '0.5rem',
                       borderColor: '#A0FF1F',
                       color: 'black',
-                      backgroundColor:'#A0FF1F'
+                      backgroundColor: '#A0FF1F',
                     }}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
@@ -125,7 +128,7 @@ export default function MovieDetail({ onPageChange }) {
                       onClick={() => {
                         // 切換按鈕點擊狀態
                         setClickedButton(
-                          clickedButton === 'heart' ? null : 'heart'
+                          clickedButton === 'heart' ? null : 'heart',
                         );
                       }}
                     />

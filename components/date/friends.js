@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { API_BASE_URL } from '@/configs/api-config';
+import { SOCKET_SERVER } from '@/components/config/api-path';
 import Link from 'next/link';
 import io from 'socket.io-client';
 
@@ -47,7 +48,7 @@ export default function Friends({ searchQuery }) {
   useEffect(() => {
     if (!socket.current) {
       // 當下無連接時，建立連結
-      socket.current = io(`http://localhost:${socketPort}`, {
+      socket.current = io(SOCKET_SERVER, {
         auth: {
           headers: { ...getAuthHeader() },
         },

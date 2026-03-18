@@ -1,4 +1,3 @@
-import React from 'react';
 import SideBar from '@/components/date/side-bar';
 import InterestCard from '@/components/date/interest-card';
 import PageTitle from '@/components/page-title';

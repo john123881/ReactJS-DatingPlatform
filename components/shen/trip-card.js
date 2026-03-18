@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { FaCircleInfo } from 'react-icons/fa6';
 import Link from 'next/link';

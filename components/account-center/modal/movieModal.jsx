@@ -1,25 +1,24 @@
-import { useEffect, useRef } from 'react';
+// import { useEffect, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { usePostContext } from '@/context/post-context';
 import { useCollect } from '@/context/use-collect';
 import { useRouter } from 'next/router';
 import { IoMdStar } from 'react-icons/io';
-import Router from 'next/router';
+// import Router from 'next/router';
 // import ShareModal from '../modal/shareModal';
 // import EditModal from '../modal/editModal';
-import { FiSend, FiMessageCircle, FiMoreHorizontal } from 'react-icons/fi';
-import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
+// import { FiSend, FiMessageCircle, FiMoreHorizontal } from 'react-icons/fi';
+// import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
 export default function MovieModal({ movie, modalId, isOpen }) {
   const { auth } = useAuth();
   const {
-    movies,
-    setMovies,
-    setModalId,
-    movieModalToggle,
+    // movies,
+    // setMovies,
+    // setModalId,
+    // movieModalToggle,
     setMovieModalToggle,
   } = useCollect();
-  const router = useRouter();
+  // const router = useRouter();
 
   // const postModalRef = useRef(null);
 

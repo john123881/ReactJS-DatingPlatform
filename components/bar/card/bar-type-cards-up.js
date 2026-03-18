@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function BarTypeCards(bar , key) {
+export default function BarTypeCards(bar, key) {
   return (
     <>
       {/* others https://bartendersbusiness.com/en/articles/images/w/1200/BartendersBusiness-01222019060923000000-5c46b393188eb.jpg */}

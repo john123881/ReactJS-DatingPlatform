@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import BarPhotoCarousel from './bar-photo-carousel';
 
 export default function BarCarousel({ trip_plan_id }) {

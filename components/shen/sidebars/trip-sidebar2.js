@@ -69,7 +69,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
       const fetchTrip = async () => {
         try {
           const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`
+            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`,
           );
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -92,7 +92,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     try {
       const response = await fetch(
         `${API_BASE_URL}/trip/my-details/share/${trip_plan_id}`,
-        { method: 'POST' }
+        { method: 'POST' },
       );
       if (response.ok) {
         const newTrip = { ...trip, trip_draft: 1 };
@@ -108,7 +108,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     try {
       const response = await fetch(
         `${API_BASE_URL}/trip/my-details/unshare/${trip_plan_id}`,
-        { method: 'POST' }
+        { method: 'POST' },
       );
       if (response.ok) {
         const newTrip = { ...trip, trip_draft: 0 };
@@ -143,7 +143,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         {
           method: 'POST',
           body: formData,
-        }
+        },
       );
 
       const result = await response.json();
@@ -219,7 +219,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         >
           分享行程
         </button>
-      )
+      ),
     );
   }, [trip]);
   // 更新 noteButton 按鈕的 useEffect (for note)
@@ -227,7 +227,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     console.log(
       'Checking trip details:',
       trip.trip_description,
-      trip.trip_notes
+      trip.trip_notes,
     );
     setNoteButton(
       trip.trip_description || trip.trip_notes ? (
@@ -244,7 +244,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         >
           新增行程筆記
         </button>
-      )
+      ),
     );
   }, [trip]);
 

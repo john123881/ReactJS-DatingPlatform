@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import WithContent from './with-content';
 import { useLoader } from '@/context/use-loader';
@@ -30,7 +30,7 @@ export default function MoviePhotoMy({
       open();
       try {
         const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/movie-photo/${trip_plan_id}`
+          `${API_BASE_URL}/trip/my-details/movie-photo/${trip_plan_id}`,
         );
         if (!response.ok) {
           throw new Error('fetch 電影圖片失敗');
@@ -39,18 +39,18 @@ export default function MoviePhotoMy({
         // console.log('Received JSON:', data);
         ////用以區分每個block所顯示的內容////////
         const filteredData = data.filter(
-          (trip) => trip.block == tripDetails.block
+          (trip) => trip.block == tripDetails.block,
         );
 
         // 檢查所有獲得的 data ，至多3個，找到第一個包含 bar_img的項目
         const imageData = filteredData.find(
-          (item) => item.movie_img && item.movie_img.data
+          (item) => item.movie_img && item.movie_img.data,
         );
         if (imageData && imageData.movie_img && imageData.movie_img.data) {
           const base64String = bufferToBase64(imageData.movie_img.data);
           console.log(
             'Generated Base64 Image URL:',
-            `data:image/jpeg;base64,${base64String}`
+            `data:image/jpeg;base64,${base64String}`,
           );
           setImageSrc2(`data:image/jpeg;base64,${base64String}`);
           setMovieDetails({

@@ -73,8 +73,8 @@ export default function Post({ onPageChange }) {
           type === 'like'
             ? '喜愛你的貼文'
             : type === 'comment'
-            ? '回覆你的貼文'
-            : '開始追蹤你'
+              ? '回覆你的貼文'
+              : '開始追蹤你'
         }`,
       };
       socket.emit('sendNotification', notificationData);
@@ -267,7 +267,7 @@ export default function Post({ onPageChange }) {
                                           // 使用 async 等待確認刪除再刪除 noti
                                           const result =
                                             await handleDeleteCommentClick(
-                                              comment
+                                              comment,
                                             );
                                           if (result) {
                                             handleRemoveNotification('comment');

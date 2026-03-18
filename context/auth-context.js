@@ -22,7 +22,7 @@ export function AuthContextProvider({ children }) {
   const router = useRouter();
   const [loginModalToggle, setLoginModalToggle] = useState(false);
   const [userAvatar, setUserAvatar] = useState(
-    `${API_SERVER}/avatar/defaultAvatar.jpg`
+    `${API_SERVER}/avatar/defaultAvatar.jpg`,
   );
   const [isOnLogin, setIsOnLogin] = useState(true);
 

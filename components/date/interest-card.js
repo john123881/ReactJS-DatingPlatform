@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import SelectBarModal from './modal/select-bar-modal';
 import SelectMovieModal from './modal/select-movie-modal';
 import PairingModal from './modal/pairing-modal';

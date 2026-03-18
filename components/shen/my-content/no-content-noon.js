@@ -31,7 +31,7 @@ export default function NoContentNoon({ refreshTripDetails }) {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
       const data = await response.json();
       if (response.ok) {

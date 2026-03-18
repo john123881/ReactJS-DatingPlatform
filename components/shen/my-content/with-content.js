@@ -28,7 +28,7 @@ export default function WithContent({
     setDeleteContent(true);
     // 調用 showModal 方法以開啟對話框
     const dialog = document.getElementById(
-      `delete-dialog-${tripDetails.trip_detail_id}`
+      `delete-dialog-${tripDetails.trip_detail_id}`,
     );
     if (dialog) {
       dialog.showModal();
@@ -38,7 +38,7 @@ export default function WithContent({
   const closeDeleteModal = () => {
     setDeleteContent(false);
     const dialog = document.getElementById(
-      `delete-dialog-${tripDetails.trip_detail_id}`
+      `delete-dialog-${tripDetails.trip_detail_id}`,
     );
     if (dialog && typeof dialog.close === 'function') {
       dialog.close();
@@ -53,7 +53,7 @@ export default function WithContent({
     try {
       const response = await fetch(
         `${API_BASE_URL}/trip/my-details/delete/${tripDetails.trip_detail_id}`,
-        { method: 'DELETE' }
+        { method: 'DELETE' },
       );
       if (!response.ok) {
         throw new Error('Network response was not ok.');
@@ -114,10 +114,10 @@ export default function WithContent({
                 {tripDetails.block === 1
                   ? '早上'
                   : tripDetails.block === 2
-                  ? '下午'
-                  : tripDetails.block === 3
-                  ? '晚上'
-                  : ''}
+                    ? '下午'
+                    : tripDetails.block === 3
+                      ? '晚上'
+                      : ''}
               </h3>
 
               <div className="modal-action">

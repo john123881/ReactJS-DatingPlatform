@@ -1,7 +1,5 @@
-import React from 'react';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { FaTrash } from 'react-icons/fa';
-import Image from 'next/image';
 
 export default function MyTripContent2() {
   return (

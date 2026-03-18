@@ -52,7 +52,7 @@ export default function List({ onPageChange }) {
           headers: {
             ...getAuthHeader(),
           },
-        }
+        },
       );
       const data = await response.json();
       // console.log('checkBarsStatus 的 data:', data);
@@ -111,7 +111,7 @@ export default function List({ onPageChange }) {
     if (value.trim()) {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`
+          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`,
         );
         const data = await response.json();
         setSearchResults(data);
@@ -217,7 +217,7 @@ export default function List({ onPageChange }) {
               bars
                 .slice(
                   (currentPage - 1) * barsPerPage,
-                  currentPage * barsPerPage
+                  currentPage * barsPerPage,
                 )
                 .map((bar, i) => (
                   <BarCard
@@ -254,7 +254,7 @@ export default function List({ onPageChange }) {
                 >
                   {minPageNumberLimit + index}
                 </button>
-              )
+              ),
             )}
             <button
               className="btn btn-sm"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 
 export default function CarouselContentBar({
@@ -37,7 +37,7 @@ export default function CarouselContentBar({
             bar_id: barSaved.bar_id,
             block: timeOfDay,
           }),
-        }
+        },
       );
 
       const result = await response.json();

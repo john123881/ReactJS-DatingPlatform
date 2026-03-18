@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function SelectBtn({ onAcceptClick, onRejectClick }) {
   return (
     <div className="flex justify-center">
