@@ -77,7 +77,7 @@ export default function ChatMsg({ searchQuery }) {
         console.log(auth.id);
       });
     }
-  }, [socketPort]);
+  }, []);
 
   // 監控對方是否在線
   const [onlineUsers, setOnlineUsers] = useState([]);

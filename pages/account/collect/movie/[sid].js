@@ -158,7 +158,7 @@ export default function AccountCollect({ onPageChange }) {
     open();
     fetchCheck();
     close(1);
-  }, [router, auth.id, checkAuth, close, getSaveMovieData, open]);
+  }, [router, auth.id, checkAuth, close, open]);
 
   useEffect(() => {
     onPageChange(pageTitle);

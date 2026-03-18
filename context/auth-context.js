@@ -1,11 +1,7 @@
 import { useContext, createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import {
-  LOGIN_POST,
-  REGISTER_POST,
-  API_SERVER,
-  CHECK_AUTH,
-} from '@/configs/api-config';
+import { API_SERVER } from '@/configs/api-config';
+import { AuthService } from '@/services/auth-service';
 
 const AuthContext = createContext();
 const emptyAuth = {
@@ -34,12 +30,12 @@ export function AuthContextProvider({ children }) {
 
   const register = async (email, validCode, username, password) => {
     try {
-      const r = await fetch(REGISTER_POST, {
-        method: 'POST',
-        body: JSON.stringify({ email, validCode, username, password }),
-        headers: { 'Content-Type': 'application/json' },
+      const result = await AuthService.register({
+        email,
+        validCode,
+        username,
+        password,
       });
-      const result = await r.json();
       console.log('register:', result);
       return result;
     } catch (error) {
@@ -53,24 +49,20 @@ export function AuthContextProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    const r = await fetch(LOGIN_POST, {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const result = await r.json();
+    try {
+      const result = await AuthService.login({ email, password });
 
-    if (result.success) {
-      localStorage.setItem(storageKey, JSON.stringify(result.data));
-      setAuth(result.data);
+      if (result.success) {
+        localStorage.setItem(storageKey, JSON.stringify(result.data));
+        setAuth(result.data);
+      }
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error('登入時發生錯誤', error);
+      return { success: false, error: '登入時發生錯誤' };
     }
-
-    console.log(result);
-    return result;
-    // } else {
-    //   console.error(result.error);
-    //   throw new Error(result.error);
-    // }
   };
 
   const logout = async () => {
@@ -94,12 +86,12 @@ export function AuthContextProvider({ children }) {
   // }
   // 2.授權成功:{success: true, msg:'確認成功，有Token，UserID也符合'}
   const checkAuth = async (sid) => {
-    const r = await fetch(`${CHECK_AUTH}/?sid=${sid}`, {
-      method: 'GET',
-      headers: { ...getAuthHeader(), 'content-type': 'application/json' },
-    });
-    const result = await r.json();
-    return result;
+    try {
+      return await AuthService.checkAuth(sid);
+    } catch (error) {
+      console.error('CheckAuth error:', error);
+      return { success: false, error: '驗證失敗' };
+    }
   };
 
   useEffect(() => {

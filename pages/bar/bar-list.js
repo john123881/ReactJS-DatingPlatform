@@ -6,7 +6,7 @@ import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mob
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function BarList({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -45,16 +45,7 @@ export default function BarList({ onPageChange }) {
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-        },
-      );
-      const data = await response.json();
-      // console.log('checkBarsStatus 的 data:', data);
+      const data = await BarService.checkBarStatus(userId, barIds);
 
       // 初始化來存儲所有酒吧的收藏狀態
       const newSavedBars = { ...savedBars };
@@ -79,10 +70,7 @@ export default function BarList({ onPageChange }) {
     // console.log('Token:', auth);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/bar/bar-list/`, {
-        // headers: { Authorization: 'Bearer ' + auth.token },
-      });
-      const data = await res.json();
+      const data = await BarService.getBars();
       // if (!data.success) {
       //   // alert('error');
       //   return;
@@ -134,30 +122,11 @@ export default function BarList({ onPageChange }) {
   // try bar_type_id 篩選
   // 更新酒吧列表
   const updateBarsList = async (barAreaId, barTypeId) => {
-    const query = new URLSearchParams({
-      ...(barAreaId && { bar_area_id: barAreaId }),
-      ...(barTypeId && { bar_type_id: barTypeId }),
-    }).toString();
-
-    const updateBarsList = async (barAreaId, barTypeId) => {
-      const query = new URLSearchParams({
-        ...(barAreaId && { bar_area_id: barAreaId }),
-        ...(barTypeId && { bar_type_id: barTypeId }),
-      }).toString();
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/bar/bar-list?${barAreaId}`,
-        );
-        const data = await response.json();
-        setBars(data);
-      } catch (error) {
-        console.error('Failed to fetch filtered bar list:', error);
-      }
-    };
     try {
-      const response = await fetch(`${API_BASE_URL}/bar/bar-list?${barAreaId}`);
-      const data = await response.json();
+      const data = await BarService.getBars({
+        bar_area_id: barAreaId,
+        bar_type_id: barTypeId,
+      });
       setBars(data);
     } catch (error) {
       console.error('Failed to fetch filtered bar list:', error);
@@ -196,10 +165,7 @@ export default function BarList({ onPageChange }) {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`,
-        );
-        const data = await response.json();
+        const data = await BarService.searchBars(value);
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {

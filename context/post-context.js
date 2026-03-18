@@ -3,8 +3,8 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
-import { API_BASE_URL } from '@/configs/api-config';
-import { SOCKET_SERVER } from '@/configs/api-config';
+import { API_BASE_URL, SOCKET_SERVER } from '@/configs/api-config';
+import { CommunityService } from '@/services/community-service';
 
 const PostContext = createContext();
 
@@ -92,10 +92,7 @@ export const PostProvider = ({ children }) => {
     if (!auth.id) return;
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-userInfo/${auth.id}`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getUserInfo(auth.id);
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
       setUserInfo(data[0] || {});
     } catch (error) {
@@ -109,10 +106,7 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/posts?page=${page}&limit=12`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getPosts(page, 12);
       if (data.length === 0) {
         setIndexHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -136,10 +130,11 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-posts-by-keyword?keyword=${keyword}&page=${filteredPage}&limit=12`,
+      const data = await CommunityService.getPostsByKeyword(
+        keyword,
+        filteredPage,
+        12,
       );
-      const data = await res.json();
       if (data.length === 0) {
         setIndexFilteredHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -164,10 +159,7 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-random-posts?page=${randomPage}&limit=12`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getRandomPosts(randomPage, 12);
       if (data.length === 0) {
         setExploreHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -190,10 +182,7 @@ export const PostProvider = ({ children }) => {
     if (!profileHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/posts?page=${page}&limit=12`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getPosts(page, 12);
       if (data.length === 0) {
         setProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -214,8 +203,7 @@ export const PostProvider = ({ children }) => {
 
   const getPostPage = async (pid) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/community/get-post-page/${pid}`);
-      const data = await res.json();
+      const data = await CommunityService.getPostDetail(pid);
       if (data.length !== 0) {
         await checkPostsStatus(pid); // 檢查貼文狀態
         await getPostComments(pid);
@@ -230,10 +218,7 @@ export const PostProvider = ({ children }) => {
 
   const getEventPage = async (eid) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-event-page/${eid}`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getEventDetail(eid);
       if (data.length !== 0) {
         await checkEventsStatus(eid); // 檢查活動狀態
 
@@ -250,10 +235,7 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/events?page=${eventPage}&limit=12`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getEvents(eventPage, 12);
       if (data.length === 0) {
         setEventHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -273,10 +255,7 @@ export const PostProvider = ({ children }) => {
 
   const getPostComments = async (postIds) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-comments?postIds=${postIds}`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getComments(postIds);
 
       // 將評論數據按 post_id 分類
       const commentsByPostId = data.reduce((accumulator, comment) => {
@@ -325,18 +304,12 @@ export const PostProvider = ({ children }) => {
     }
 
     try {
-      // 用fetch送出檔案
-      const res = await fetch(`${API_BASE_URL}/community/add-comment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          context: newComment,
-          status: 'posted',
-          postId,
-          userId,
-        }),
+      const data = await CommunityService.addComment({
+        context: newComment,
+        status: 'posted',
+        postId,
+        userId,
       });
-      const data = await res.json();
 
       if (res.ok) {
         setComments((prevComments) => {
@@ -380,10 +353,7 @@ export const PostProvider = ({ children }) => {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/search-users?searchTerm=${value}`,
-        );
-        const data = await response.json();
+        const data = await CommunityService.searchUsers(value);
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {
@@ -495,14 +465,11 @@ export const PostProvider = ({ children }) => {
     // }
 
     try {
-      // 用fetch送出檔案
-      const res = await fetch(`${API_BASE_URL}/community/create-post`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({ context: postContent, userId }),
+      const data = await CommunityService.createPost({
+        context: postContent,
+        userId,
       });
-      const data = await res.json();
-      if (res.ok) {
+      if (data.success) {
         setPostId(data.post.post_id);
         setPostCreated(true);
         return data.post.post_id; // 返回 postId 給 handleFileUpload
@@ -542,23 +509,15 @@ export const PostProvider = ({ children }) => {
       setPostCreated(true);
     }
 
-    const fd = new FormData();
-
-    // 對照server上要獲取的檔案名稱(req.files.photo)
-    fd.append('photo', selectedFile);
-    fd.append('postId', currentPostId);
-
     try {
       // 用fetch送出檔案
-      const res = await fetch(`${API_BASE_URL}/community/upload-photo`, {
-        method: 'POST',
-        body: fd,
-        headers: { ...getAuthHeader() },
-      });
+      const fd = new FormData();
+      fd.append('photo', selectedFile);
+      fd.append('postId', currentPostId);
 
-      const data = await res.json();
+      const data = await CommunityService.uploadPostPhoto(fd);
 
-      if (res.ok) {
+      if (data.success) {
         // 更新貼文以觸發刷新頁面 !!!Important!!!
         setPosts((prevPosts) => [data.post, ...prevPosts]);
         setProfilePosts((prevPosts) => [data.post, ...prevPosts]);
@@ -628,18 +587,12 @@ export const PostProvider = ({ children }) => {
     // }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/community/edit-post`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({ context: localPostContext, postId }), // 將對象轉換為JSON字符串
+      const data = await CommunityService.updatePost({
+        context: localPostContext,
+        postId,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.success) {
         // 更新狀態中的貼文 !!!Important
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -725,21 +678,12 @@ export const PostProvider = ({ children }) => {
   const updatePostPhotoUpdate = async (postId, editModalRef) => {
     try {
       const fd = new FormData();
-
       fd.append('photo', selectedFile);
       fd.append('postId', postId);
 
-      const res = await fetch(`${API_BASE_URL}/community/edit-post-photo`, {
-        method: 'PUT',
-        body: fd,
-        headers: {
-          ...getAuthHeader(),
-        },
-      });
+      const data = await CommunityService.updatePostPhoto(fd);
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.success) {
         // 更新狀態中的貼文 !!!Important
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -840,22 +784,13 @@ export const PostProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/community/edit-event`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({
-          ...localEventDetails,
-          status: 'upcoming',
-          eventId,
-        }), // 將對象轉換為JSON字符串
+      const data = await CommunityService.updateEvent({
+        ...localEventDetails,
+        status: 'upcoming',
+        eventId,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.success) {
         setEvents((prevEvents) =>
           prevEvents.map((e) => {
             if (e.comm_event_id === eventId) {
@@ -877,24 +812,12 @@ export const PostProvider = ({ children }) => {
       if (selectedFile) {
         try {
           const fd = new FormData();
-
           fd.append('photo', selectedFile);
           fd.append('eventId', eventId);
 
-          const res = await fetch(
-            `${API_BASE_URL}/community/edit-event-photo`,
-            {
-              method: 'PUT',
-              body: fd,
-              headers: {
-                ...getAuthHeader(),
-              },
-            },
-          );
+          const data = await CommunityService.updateEventPhoto(fd);
 
-          const data = await res.json();
-
-          if (res.ok) {
+          if (data.success) {
             // 更新活動以觸發刷新頁面 !!!Important!!!
             // setEvents((prevEvents) => [data.event, ...prevEvents]);
             setEvents((prevEvents) =>
@@ -992,16 +915,11 @@ export const PostProvider = ({ children }) => {
     const newLikedState = !wasLiked;
 
     try {
-      const url = wasLiked ? 'unlike-post' : 'like-post';
-      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
-        method: wasLiked ? 'DELETE' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({ postId, userId }),
-      });
-      if (res.ok) {
+      const result = wasLiked
+        ? await CommunityService.unlikePost(userId, postId)
+        : await CommunityService.likePost(userId, postId);
+
+      if (result.success) {
         setLikedPosts((prev) => ({ ...prev, [postId]: newLikedState }));
       } else {
         throw new Error('Failed to update like status');
@@ -1023,16 +941,11 @@ export const PostProvider = ({ children }) => {
     const newAttendedState = !wasAttended;
 
     try {
-      const url = wasAttended ? 'notattend-event' : 'attend-event';
-      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
-        method: wasAttended ? 'DELETE' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({ eventId, userId }),
-      });
-      if (res.ok) {
+      const result = wasAttended
+        ? await CommunityService.notAttendEvent(userId, eventId)
+        : await CommunityService.attendEvent(userId, eventId);
+
+      if (result.success) {
         setAttendedEvents((prev) => ({
           ...prev,
           [eventId]: newAttendedState,
@@ -1057,16 +970,11 @@ export const PostProvider = ({ children }) => {
     const newSavedState = !wasSaved;
 
     try {
-      const url = wasSaved ? 'unsave-post' : 'save-post';
-      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
-        method: wasSaved ? 'DELETE' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({ postId, userId }),
-      });
-      if (res.ok) {
+      const result = wasSaved
+        ? await CommunityService.unsavePost(userId, postId)
+        : await CommunityService.savePost(userId, postId);
+
+      if (result.success) {
         setRerender(!rerender);
         setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
       } else {
@@ -1086,17 +994,11 @@ export const PostProvider = ({ children }) => {
     const newFollowingState = !isFollowing; // 新的追蹤狀態為當前狀態的反向值
 
     try {
-      const url = isFollowing ? 'unfollow' : 'follow';
-      const res = await fetch(`${API_BASE_URL}/community/${url}`, {
-        method: isFollowing ? 'DELETE' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-        },
-        body: JSON.stringify({ userId, FollowingId }),
-      });
+      const result = isFollowing
+        ? await CommunityService.unfollowUser(userId, FollowingId)
+        : await CommunityService.followUser(userId, FollowingId);
 
-      if (res.ok) {
+      if (result.success) {
         setFollowing((prev) => ({
           ...prev,
           [FollowingId]: newFollowingState,

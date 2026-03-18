@@ -6,12 +6,8 @@ import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useNotify } from '@/context/use-notify';
-import {
-  API_SERVER,
-  ACCOUNT_EDIT_GET,
-  ACCOUNT_EDIT_PUT,
-  ACCOUNT_EDIT_AVATAR_PUT,
-} from '@/configs/api-config';
+import { API_SERVER } from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
@@ -58,12 +54,10 @@ export default function AccountEdit({ onPageChange }) {
   const handleAvatar = async (formData) => {
     console.log('handleAvatar 中的 formData:', formData);
     try {
-      const r = await fetch(`${ACCOUNT_EDIT_AVATAR_PUT}/${router.query.sid}`, {
-        method: 'POST',
-        body: formData,
-        headers: { ...getAuthHeader() },
-      });
-      const result = await r.json();
+      const result = await AccountService.uploadAvatar(
+        router.query.sid,
+        formData,
+      );
       console.log('大頭照上傳:result為', result);
       notifySuccess(result.msg);
       setRerender(!rerender);
@@ -134,12 +128,7 @@ export default function AccountEdit({ onPageChange }) {
     enableReinitialize: true,
     onSubmit: async (values) => {
       const fetchData = async () => {
-        const r = await fetch(`${ACCOUNT_EDIT_PUT}/${router.query.sid}`, {
-          method: 'PUT',
-          body: JSON.stringify(values),
-          headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-        });
-        return await r.json();
+        return await AccountService.updateProfile(router.query.sid, values);
       };
 
       notifyPromise(fetchData, {
@@ -161,10 +150,7 @@ export default function AccountEdit({ onPageChange }) {
     if (!router.isReady) return;
     const fetchEditData = async () => {
       try {
-        const r = await fetch(`${ACCOUNT_EDIT_GET}/${router.query.sid}`, {
-          headers: { ...getAuthHeader() },
-        });
-        const result = await r.json();
+        const result = await AccountService.getEditProfile(router.query.sid);
 
         if (result.success) {
           //fetch成功後 將DATA解構

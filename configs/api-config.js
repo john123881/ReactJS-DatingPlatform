@@ -2,7 +2,7 @@ export const API_SERVER =
   process.env.NEXT_PUBLIC_API_URL || 'http://35.212.204.78';
 export const API_BASE_URL = API_SERVER;
 export const SOCKET_SERVER =
-  process.env.NEXT_PUBLIC_SOCKET_URL || 'http://35.212.204.78:3003';
+  process.env.NEXT_PUBLIC_SOCKET_URL || 'http://35.212.204.78';
 
 //account路徑:登入授權確認路徑 方法:GET
 export const CHECK_AUTH = `${API_SERVER}/login-check`;

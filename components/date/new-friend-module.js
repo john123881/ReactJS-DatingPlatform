@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import SelectBtn from '@/components/date/select-btn';
-import { DATE_GET_FRIENDS_LIST, ACCOUNT_GET } from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
+import { DateService } from '@/services/date-service';
 import toast from 'react-hot-toast';
 import { useDate } from '@/context/date-context';
 import Link from 'next/link';
@@ -53,10 +54,7 @@ export default function NewFriends() {
     const fetchUserPreferences = async () => {
       open();
       try {
-        const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
-          headers: { ...getAuthHeader() },
-        });
-        const data = await res.json();
+        const data = await AccountService.getProfile(auth.id);
 
         if (data.success) {
           setSelectedBarTypeId(data.data.bar_type_id);
@@ -81,11 +79,11 @@ export default function NewFriends() {
     const getBio = async () => {
       open(); // 開啟 loader
       try {
-        const res = await fetch(
-          `${DATE_GET_FRIENDS_LIST}/${userId}/${selectedBarTypeId}/${selectedMovieTypeId}`,
-          { headers: { ...getAuthHeader() } },
+        const data = await DateService.getRecommendedFriends(
+          userId,
+          selectedBarTypeId,
+          selectedMovieTypeId,
         );
-        const data = await res.json();
         if (data.success && data.data.length > 0) {
           setBio(data.data[0]);
           setBios(data.data);
@@ -138,30 +136,16 @@ export default function NewFriends() {
       console.log('Selected user id is not available yet');
       return;
     }
-    const response = await fetch(`${DATE_GET_FRIENDS_LIST}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify({
-        user_id1: auth.id,
-        user_id2: selectedUserId,
-        friendship_status: 'accepted',
-      }),
+    const result = await DateService.sendFriendRequest({
+      user_id1: auth.id,
+      user_id2: selectedUserId,
+      friendship_status: 'accepted',
     });
+
     // 在成功更新後重新獲取資料
-    if (response.ok) {
-      const data = await response.json();
-      //if (data.success && data.data.length > 0) {
-      // setBio(data.data[0]);
+    if (result.success) {
       toast.success('好友已送出！', { duration: 1500 });
       setBioIndex(bioIndex + 1);
-
-      // setSelectedUserId(data.data[0].user_id);
-      //} else {
-      //console.log(data.msg);
-      // }
     } else {
       console.error('Failed to update data');
     }
@@ -172,30 +156,16 @@ export default function NewFriends() {
       console.log('Selected user id is not available yet');
       return;
     }
-    const response = await fetch(`${DATE_GET_FRIENDS_LIST}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify({
-        user_id1: auth.id,
-        user_id2: selectedUserId,
-        friendship_status: 'rejected',
-      }),
+    const result = await DateService.sendFriendRequest({
+      user_id1: auth.id,
+      user_id2: selectedUserId,
+      friendship_status: 'rejected',
     });
+
     // 在成功更新後重新獲取資料
-    if (response.ok) {
-      const data = await response.json();
-      //if (data.success && data.data.length > 0) {
-      // setBio(data.data[0]);
+    if (result.success) {
       toast.success('好友已拒絕！', { duration: 1500 });
       setBioIndex(bioIndex + 1);
-
-      // setSelectedUserId(data.data[0].user_id);
-      //} else {
-      //console.log(data.msg);
-      // }
     } else {
       console.error('Failed to update data');
     }

@@ -8,7 +8,7 @@ import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -35,15 +35,7 @@ export default function Detail({ onPageChange }) {
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-        },
-      );
-      const data = await response.json();
+      const data = await BarService.checkBarStatus(userId, barIds);
       // console.log('checkBarsStatus 的 data:', data);
 
       // 初始化來存儲所有酒吧的收藏狀態
@@ -81,20 +73,16 @@ export default function Detail({ onPageChange }) {
     const newSavedState = !wasSaved;
 
     try {
-      const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
-      const method = wasSaved ? 'DELETE' : 'POST';
-      const res = await fetch(`${API_BASE_URL}/bar${url}`, {
-        method: method,
-        headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ barId, userId }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+      const result = wasSaved
+        ? await BarService.unsaveBar(userId, barId)
+        : await BarService.saveBar(userId, barId);
+
+      if (result.success) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
         setRerender(!rerender);
-        console.log('Save status updated:', data);
+        console.log('Save status updated:', result);
       } else {
-        throw new Error(data.message || 'Failed to update save status');
+        throw new Error(result.message || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
@@ -104,15 +92,12 @@ export default function Detail({ onPageChange }) {
 
   //FETCH GET 酒吧資料
   const getBarDetailById = async (bar_id) => {
-    const url = `${API_BASE_URL}/bar/bar-detail/${bar_id}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    // // console.log('getBarListDynamicById 的 data:', data);
-
-    // const barIds = data.map((bar) => bar.bar_id).join(',');
-    // checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
-    setBar(data);
-    // setBar({ bar_name :'fake data', aaaa: '', xxxx:''});
+    try {
+      const data = await BarService.getBarDetail(bar_id);
+      setBar(data);
+    } catch (error) {
+      console.error('Failed to fetch bar detail:', error);
+    }
   };
 
   useEffect(() => {
