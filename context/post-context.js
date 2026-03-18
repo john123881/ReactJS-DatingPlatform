@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useRef, useEffect } from 'react';
+import { useState, createContext, useContext, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
@@ -253,7 +253,7 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  const getPostComments = async (postIds) => {
+  const getPostComments = useCallback(async (postIds) => {
     try {
       const data = await CommunityService.getComments(postIds);
 
@@ -292,7 +292,7 @@ export const PostProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     }
-  };
+  }, []);
 
   // 上傳回覆
   const handleCommentUpload = async (post, newComment) => {
@@ -1224,43 +1224,46 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  const checkPostsStatus = async (postIds) => {
-    const userId = auth.id;
+  const checkPostsStatus = useCallback(
+    async (postIds) => {
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
+      if (userId === 0) {
+        return;
+      }
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
           },
-        },
-      );
-      const data = await response.json();
+        );
+        const data = await response.json();
 
-      // 初始化兩個對象來存儲所有貼文的喜愛和收藏狀態
-      const newLikedPosts = { ...likedPosts };
-      const newSavedPosts = { ...savedPosts };
+        // 初始化兩個對象來存儲所有貼文的喜愛和收藏狀態
+        const newLikedPosts = { ...likedPosts };
+        const newSavedPosts = { ...savedPosts };
 
-      // 遍歷從後端獲取的每個貼文的狀態數據
-      data.forEach((status) => {
-        // 將每個貼文的點讚狀態存儲到 newLikedPosts 對象中
-        newLikedPosts[status.postId] = status.isLiked;
-        // 將每個貼文的收藏狀態存儲到 newSavedPosts 對象中
-        newSavedPosts[status.postId] = status.isSaved;
-      });
+        // 遍歷從後端獲取的每個貼文的狀態數據
+        data.forEach((status) => {
+          // 將每個貼文的點讚狀態存儲到 newLikedPosts 對象中
+          newLikedPosts[status.postId] = status.isLiked;
+          // 將每個貼文的收藏狀態存儲到 newSavedPosts 對象中
+          newSavedPosts[status.postId] = status.isSaved;
+        });
 
-      // 更新 React 狀態以觸發界面更新，以顯示最新的點讚和收藏狀態
-      setLikedPosts(newLikedPosts);
-      setSavedPosts(newSavedPosts);
-    } catch (error) {
-      console.error('無法獲取貼文狀態:', error);
-    }
-  };
+        // 更新 React 狀態以觸發界面更新，以顯示最新的點讚和收藏狀態
+        setLikedPosts(newLikedPosts);
+        setSavedPosts(newSavedPosts);
+      } catch (error) {
+        console.error('無法獲取貼文狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader, likedPosts, savedPosts],
+  );
 
   const checkEventsStatus = async (eventIds) => {
     const userId = auth.id;

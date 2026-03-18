@@ -1,4 +1,10 @@
-import { useContext, createContext, useState, useEffect } from 'react';
+import {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/router';
 import { API_SERVER } from '@/configs/api-config';
 import { AuthService } from '@/services/auth-service';
@@ -28,7 +34,7 @@ export function AuthContextProvider({ children }) {
     setIsOnLogin(!isOnLogin);
   };
 
-  const register = async (email, validCode, username, password) => {
+  const register = useCallback(async (email, validCode, username, password) => {
     try {
       const result = await AuthService.register({
         email,
@@ -42,13 +48,13 @@ export function AuthContextProvider({ children }) {
       console.error('註冊時發生錯誤', error);
       return { success: false, error: '註冊時發生錯誤' };
     }
-  };
+  }, []);
 
   const tryClick = async () => {
     console.log('click!');
   };
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
       const result = await AuthService.login({ email, password });
 
@@ -63,19 +69,19 @@ export function AuthContextProvider({ children }) {
       console.error('登入時發生錯誤', error);
       return { success: false, error: '登入時發生錯誤' };
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     router.push('/');
     localStorage.removeItem(storageKey);
     setAuth(emptyAuth);
-  };
+  }, [router]);
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     if (auth.token) {
       return { Authorization: 'Bearer ' + auth.token };
     }
-  };
+  }, [auth.token]);
 
   //做授權測試，返回值:
   //1.沒此ID {
@@ -85,14 +91,14 @@ export function AuthContextProvider({ children }) {
   //     msg: '無授權token，請進行登入',
   // }
   // 2.授權成功:{success: true, msg:'確認成功，有Token，UserID也符合'}
-  const checkAuth = async (sid) => {
+  const checkAuth = useCallback(async (sid) => {
     try {
       return await AuthService.checkAuth(sid);
     } catch (error) {
       console.error('CheckAuth error:', error);
       return { success: false, error: '驗證失敗' };
     }
-  };
+  }, []);
 
   useEffect(() => {
     const str = localStorage.getItem(storageKey);

@@ -165,16 +165,7 @@ export default function AccountCollect({ onPageChange }) {
 
     open();
     fetchCheck();
-  }, [
-    router,
-    auth.id,
-    radio,
-    rerender,
-    checkAuth,
-    close,
-    getSavePostData,
-    open,
-  ]);
+  }, [router, auth.id, radio, rerender, checkAuth, close, open]);
 
   //當modal中做收藏的動作
   // useEffect(() => {
