@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 
-export default function barMap({ onPageChange }) {
+export default function BarMap({ onPageChange }) {
   const router = useRouter();
 
   useEffect(() => {

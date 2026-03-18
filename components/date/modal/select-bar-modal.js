@@ -1,10 +1,7 @@
 import { useDate } from '@/context/date-context';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import {
-  DATE_GET_BAR_TYPE,
-  DATE_EDIT_BAR_TYPE,
-} from '@/components/config/api-path';
+import { DATE_GET_BAR_TYPE, DATE_EDIT_BAR_TYPE } from '@/configs/api-config';
 
 export default function SelectBarModal() {
   const { toggleBar, setToggleBar } = useDate();

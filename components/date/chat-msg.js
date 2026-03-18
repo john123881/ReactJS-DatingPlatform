@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   DATE_FRIENDSHIPS_MESSAGE_SENDER,
   SOCKET_SERVER,
-} from '../config/api-path';
+} from '@/configs/api-config';
 import io from 'socket.io-client';
 
 export default function ChatMsg({ searchQuery }) {
@@ -30,7 +30,6 @@ export default function ChatMsg({ searchQuery }) {
   const [msg, setMsg] = useState([]);
   const { auth, getAuthHeader, rerender } = useAuth();
   const socket = useRef(null);
-  const socketPort = 3003;
 
   const getMsg = async () => {
     const url = `${DATE_FRIENDSHIPS_MESSAGE_SENDER}/${auth.id}`;

@@ -10,7 +10,7 @@ import { useAuth } from '@/context/auth-context';
 import { changePasswordSchema } from '@/components/schemas';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
-import { ACCOUNT_CHANGE_PWD_PUT } from '@/components/config/api-path';
+import { ACCOUNT_CHANGE_PWD_PUT } from '@/configs/api-config';
 import { useNotify } from '@/context/use-notify';
 import { useLoader } from '@/context/use-loader';
 import CPLoader from '@/components/account-center/loader/ch-pwd-loader';
@@ -59,17 +59,13 @@ export default function AccountPasswordChange({ onPageChange }) {
     validationSchema: changePasswordSchema,
     onSubmit: async (values) => {
       const fetchChangePWD = async () => {
-        try {
-          const r = await fetch(`${ACCOUNT_CHANGE_PWD_PUT}/${auth.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(values),
-            headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-          });
-          const result = await r.json();
-          return result;
-        } catch (error) {
-          throw error;
-        }
+        const r = await fetch(`${ACCOUNT_CHANGE_PWD_PUT}/${auth.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(values),
+          headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+        });
+        const result = await r.json();
+        return result;
       };
 
       notifyPromise(fetchChangePWD, {

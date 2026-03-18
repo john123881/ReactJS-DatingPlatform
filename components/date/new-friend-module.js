@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import SelectBtn from '@/components/date/select-btn';
-import { DATE_GET_FRIENDS_LIST } from '../config/api-path';
+import { DATE_GET_FRIENDS_LIST, ACCOUNT_GET } from '@/configs/api-config';
 import toast from 'react-hot-toast';
 import { useDate } from '@/context/date-context';
 import Link from 'next/link';
 import { useLoader } from '@/context/use-loader';
 import NewFriendModuleLoader from './loader/new-friend-module-loader';
-import { ACCOUNT_GET } from '../config/api-path';
 
 export default function NewFriends() {
   // // 假資料
@@ -107,17 +106,10 @@ export default function NewFriends() {
     if (bioIndex < bios.length) {
       setSelectedUserId(bios[bioIndex].user_id);
       setBio(bios[bioIndex]);
-    }
-  }, [bioIndex]);
-
-  useEffect(() => {
-    if (bioIndex < bios.length) {
-      setSelectedUserId(bios[bioIndex].user_id);
-      setBio(bios[bioIndex]);
     } else {
       setBio(null); // 沒有資料
     }
-  }, [bioIndex]);
+  }, [bioIndex, bios]);
 
   if (!bio) {
     return (
@@ -208,10 +200,6 @@ export default function NewFriends() {
       console.error('Failed to update data');
     }
   };
-
-  if (!bio) {
-    return null;
-  }
 
   return (
     <>

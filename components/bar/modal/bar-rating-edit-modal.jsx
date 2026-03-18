@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function BarRatingEditModal() {
   return (
     <>
@@ -50,9 +52,9 @@ export default function BarRatingEditModal() {
           </div>
           <div className="flex justify-center">
             <button className="btn w-[320px] text-black text-[15px] border-[#A0FF1F] rounded-[20px]">
-              <a href="/bar/bar-rating-list" className="text-white">
+              <Link href="/bar/bar-rating-list" className="text-white">
                 確定更改
-              </a>
+              </Link>
             </button>
             <br />
           </div>

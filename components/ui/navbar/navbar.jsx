@@ -16,13 +16,12 @@ import { useCollect } from '@/context/use-collect';
 import { usePostContext } from '@/context/post-context';
 import PostModal from '@/components/community/modal/postModal';
 import MovieModal from '@/components/account-center/modal/movieModal';
-import { API_BASE_URL } from '@/configs/api-config';
 
 import {
   API_SERVER,
   ACCOUNT_GET,
   ACCOUNT_COLLECT_LIST_GET,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
@@ -156,7 +155,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   const getNotifications = async () => {
     const response = await fetch(
-      `${API_BASE_URL}/community/get-noti/${userInfo.user_id}`,
+      `${API_SERVER}/community/get-noti/${userInfo.user_id}`,
     );
     const data = await response.json();
     setNotifications(data.noti);
@@ -167,7 +166,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     const userId = userInfo.user_id;
     try {
       const response = await fetch(
-        `${API_BASE_URL}/community/mark-noti-as-read/${notiId}`,
+        `${API_SERVER}/community/mark-noti-as-read/${notiId}`,
         {
           method: 'POST',
           headers: {
@@ -242,6 +241,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
             width={24}
             height={24}
             src={avatar || '/unknown-user-image.jpg'}
+            alt="使用者頭像"
           />
         </div>
         <Link href={url}>{message}</Link>

@@ -5,7 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
-import { SENDOTP_POST } from '@/components/config/api-path';
+import { SENDOTP_POST } from '@/configs/api-config';
 import toast from 'react-hot-toast';
 
 import Link from 'next/link';

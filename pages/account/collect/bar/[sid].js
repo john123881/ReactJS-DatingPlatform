@@ -12,7 +12,7 @@ import Link from 'next/link';
 import {
   ACCOUNT_COLLECT_BAR,
   ACCOUNT_COLLECT_BAR_DELETE,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';

@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import { getAuthGoogle } from '@/context/firebase-config';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { GOOGLE_LOGIN } from '@/components/config/api-path';
+import { GOOGLE_LOGIN } from '@/configs/api-config';
 
 export default function LeftLogin({ switchHandler }) {
   const [googleUser, setgoogleUser] = useAuthState(getAuthGoogle);

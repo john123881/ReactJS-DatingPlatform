@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import Image from 'next/image';
+import Link from 'next/link';
 import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
 import { BsTelephone } from 'react-icons/bs';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
@@ -96,7 +97,7 @@ export default function BarDetailCard({ bar }) {
                 </div>
               </div>
               <div className="text-white text-[13px] md:text-h6 text-justify md:w-full">
-                Fake Sober 位在信義威秀後方，
+                Fake Sober, 位在信義威秀後方，
                 許多人說他有美國又或是韓國感的咖啡館，半開放式的空間到了夜晚還有
                 DJ 表演，甚至供應雞尾酒、啤酒與披薩，不趕時間的話可以很 Chill
                 的在這裡從白天待到晚間時刻，雖然那日是下午到訪，不過我們也舒服待上幾小時呢！
@@ -127,13 +128,14 @@ export default function BarDetailCard({ bar }) {
               </div>
             </div>
             <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
-              <a href="/bar/bar-booking">立即訂位</a>
+              <Link href="/bar/bar-booking">立即訂位</Link>
             </button>
           </div>
           <div className="bar-detail-img">
             <img
               className="object-cover rounded-[10px] w-[328px] h-[300px] md:w-[440px] md:h-[400px]"
               src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
+              alt="酒吧封面照"
             />
             {/* <iframe
               src={`https://maps.google.com/maps?q=${encodeURIComponent(

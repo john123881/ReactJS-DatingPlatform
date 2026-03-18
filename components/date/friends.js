@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { API_BASE_URL } from '@/configs/api-config';
-import { SOCKET_SERVER } from '@/components/config/api-path';
+import { SOCKET_SERVER } from '@/configs/api-config';
 import Link from 'next/link';
 import io from 'socket.io-client';
 

@@ -19,7 +19,7 @@ import {
   DATE_FRIENDSHIPS_MESSAGE_NEW_MSG,
   DATE_FRIENDSHIPS_MESSAGE_NEW_IMG,
   SOCKET_SERVER,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 
 //DATA
 // "data": [
@@ -33,7 +33,6 @@ import {
 //     },]
 
 export default function ChatRoomContext() {
-  const socketPort = 3003; // SOCKET_PORT
   const pageTitle = '聊天室';
   const initialTabs = [
     { title: '找新興趣', path: '/date/select-interests', active: false },

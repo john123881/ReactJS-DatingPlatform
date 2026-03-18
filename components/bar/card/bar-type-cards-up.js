@@ -21,9 +21,7 @@ export default function BarTypeCards(bar, key) {
                 <img
                   className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
                   src="https://www.themagnificentmile.com/assets/Uploads/_resampled/CroppedFocusedImageWzE0MDAsNjAwLCJ5IiwxNjZd/Right-Field-Booth2.jpg"
-                  // className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
-                  // src="https://www.themagnificentmile.com/assets/Uploads/_resampled/CroppedFocusedImageWzE0MDAsNjAwLCJ5IiwxNjZd/Right-Field-Booth2.jpg"
-                  // width={253}
+                  alt="運動酒吧"
                 />
               </div>
               <div className="absolute items-center justify-center top-20 left-20">
@@ -48,6 +46,7 @@ export default function BarTypeCards(bar, key) {
                   className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
                   src="https://hongkongcheapo.com/wp-content/uploads/sites/7/2020/03/Hong-Kong-music-venue_Peel-Fresco_by-Peel-Fresco.jpg"
                   width={253}
+                  alt="音樂酒吧"
                 />
               </div>
               <div className="absolute items-center justify-center top-20 left-20">
@@ -72,6 +71,7 @@ export default function BarTypeCards(bar, key) {
                   className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
                   src="https://images.squarespace-cdn.com/content/v1/5ffdc197eebe5c34a6cacb49/1611940806525-ARLGJC62G4CGG1VD0MHK/international+front.jpg"
                   width={253}
+                  alt="異國酒吧"
                 />
               </div>
               <div className="absolute items-center justify-center top-20 left-20">

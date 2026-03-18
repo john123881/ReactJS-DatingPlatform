@@ -221,7 +221,7 @@ export default function Detail({ onPageChange }) {
                     </div>
                   </div>
                   <div className="text-white text-[13px] md:text-h6 text-justify md:w-full">
-                    {/* Fake Sober 位在信義威秀後方，
+                    {/* Fake_Sober, 位在信義威秀後方，
                     許多人說他有美國又或是韓國感的咖啡館，半開放式的空間到了夜晚還有
                     DJ 表演，甚至供應雞尾酒、啤酒與披薩，不趕時間的話可以很
                     Chill

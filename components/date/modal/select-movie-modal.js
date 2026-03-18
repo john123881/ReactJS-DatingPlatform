@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth-context';
 import {
   DATE_GET_MOVIE_TYPE,
   DATE_EDIT_MOVIE_TYPE,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 
 export default function SelectMovieModal() {
   // // 來自資料庫

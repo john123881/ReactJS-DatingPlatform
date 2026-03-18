@@ -63,7 +63,7 @@ export default function Index({ onPageChange }) {
             {/* 電影資訊 */}
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
               <figure>
-                <img src="/movie_img/movie_2.jpg" />
+                <img src="/movie_img/movie_2.jpg" alt="旺卡電影海報" />
               </figure>
               <div className="card-body" style={{ width: '200px' }}>
                 <h2 className="card-title pb-2" style={{ fontSize: '2rem' }}>
@@ -441,7 +441,7 @@ export default function Index({ onPageChange }) {
                       故事尾聲和片尾彩蛋交代了眾人的後續：旺卡幫助小麵和她的親生母親重逢，然後還清了他欠洛夫蒂的債務；旺卡還和洛夫蒂買下一座廢棄的城堡並開始建造一家工廠；阿巴庫斯如願和家人團圓；派柏回歸他喜歡的工作；回歸喜劇演員本職的賴瑞則在某場演出中和前妻破鏡重圓；洛蒂則回歸電話接線員的工作。至於史瓜比夫人和布里區，則因為被警方查獲先前故意在旺卡製造的巧克力投毒的證據而被移送法辦。
                       演員
                       提摩西·夏勒梅飾演威利·旺卡：電影主角，巧克力製造師、魔術師，為了實現開店夢想前往小鎮。
-                      柯林·歐布萊恩（Colin O'Brien）飾演年幼的威利·旺卡
+                      柯林·歐布萊恩 飾演年幼的威利·旺卡
                       卡拉·蓮恩飾演小麵（Noodle）：被史瓜比夫人收養的孤兒，在史瓜比夫人經營的旅館工作，之後成為威利·旺卡的夥伴。實際上是亞瑟·斯拉華斯的侄女。
                       基根-麥可·奇飾演警察局長：熱愛吃巧克力。
                       派特森·約瑟夫飾演亞瑟·斯洛華斯（Arthur

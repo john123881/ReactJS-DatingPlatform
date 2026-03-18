@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import styles from './game-page.module.css';
-import { ACCOUNT_GAME_RECORD_POST } from '@/components/config/api-path';
+import { ACCOUNT_GAME_RECORD_POST } from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
@@ -309,6 +309,7 @@ const GameComponent = () => {
               width: '100%',
               height: '155%',
             }}
+            alt="蛇頭"
           />
         )}
       </div>

@@ -11,7 +11,7 @@ import {
   ACCOUNT_EDIT_GET,
   ACCOUNT_EDIT_PUT,
   ACCOUNT_EDIT_AVATAR_PUT,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
@@ -134,16 +134,12 @@ export default function AccountEdit({ onPageChange }) {
     enableReinitialize: true,
     onSubmit: async (values) => {
       const fetchData = async () => {
-        try {
-          const r = await fetch(`${ACCOUNT_EDIT_PUT}/${router.query.sid}`, {
-            method: 'PUT',
-            body: JSON.stringify(values),
-            headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-          });
-          return await r.json();
-        } catch (error) {
-          throw error;
-        }
+        const r = await fetch(`${ACCOUNT_EDIT_PUT}/${router.query.sid}`, {
+          method: 'PUT',
+          body: JSON.stringify(values),
+          headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+        });
+        return await r.json();
       };
 
       notifyPromise(fetchData, {

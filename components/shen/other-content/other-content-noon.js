@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import OtherNoContentNoon from './other-no-content-noon';
+import NoContentNoon from '../my-content/no-content-noon';
 import MoviePhotoOther from './movie-photo-other';
 import BarPhotoOther from './bar-photo-other';
 

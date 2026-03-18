@@ -5,7 +5,7 @@ import { BsEmojiHeartEyes } from 'react-icons/bs';
 import PageTitle from '@/components/page-title';
 import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
 import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
-import { ACCOUNT_GET, API_SERVER } from '@/components/config/api-path';
+import { ACCOUNT_GET, API_SERVER } from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';

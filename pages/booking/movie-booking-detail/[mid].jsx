@@ -97,6 +97,7 @@ export default function MovieDetail({ onPageChange }) {
                 <img
                   className="lg:w-[300px] lg:h-[480px]"
                   src={movie[0]?.movie_img || '/unavailable-image.jpg'}
+                  alt="電影海報"
                 />
               </figure>
               <div className="card-body">

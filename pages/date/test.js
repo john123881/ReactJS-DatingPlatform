@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { SOCKET_SERVER } from '../../components/config/api-path';
+import { SOCKET_SERVER } from '@/configs/api-config';
 
 // 連接到 Socket.IO 伺服器
 const socket = io(SOCKET_SERVER);

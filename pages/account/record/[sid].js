@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import {
   ACCOUNT_RECORD_POINT_GET,
   ACCOUNT_RECORD_GAME,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 import toast from 'react-hot-toast';
 import { useLoader } from '@/context/use-loader';
 import RecordLoader2 from '@/components/account-center/loader/record-loader2';

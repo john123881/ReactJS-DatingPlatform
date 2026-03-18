@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
 import { API_BASE_URL } from '@/configs/api-config';
-import { SOCKET_SERVER } from '@/components/config/api-path';
+import { SOCKET_SERVER } from '@/configs/api-config';
 
 const PostContext = createContext();
 

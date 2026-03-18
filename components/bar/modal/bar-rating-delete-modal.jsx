@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function BarRatingDeleteModal() {
   return (
     <>
@@ -23,9 +25,9 @@ export default function BarRatingDeleteModal() {
           </div>
           <div className="flex justify-center">
             <button className="btn w-[320px] text-black text-[15px] border-[#FF03FF] rounded-[20px]">
-              <a href="/bar/bar-rating-list" className="text-white">
+              <Link href="/bar/bar-rating-list" className="text-white">
                 確定刪除
-              </a>
+              </Link>
             </button>
           </div>
         </div>

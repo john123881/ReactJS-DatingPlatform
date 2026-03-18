@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { forgetPasswordSchema } from '@/components/schemas';
-import {
-  SENDOTP_FORGETPWD_POST,
-  FORGETPWD_PUT,
-} from '@/components/config/api-path';
+import { SENDOTP_FORGETPWD_POST, FORGETPWD_PUT } from '@/configs/api-config';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
 import { useNotify } from '@/context/use-notify';
@@ -86,18 +83,14 @@ export default function PasswordForget({
     validationSchema: forgetPasswordSchema,
     onSubmit: async (values) => {
       const fetchChangeForgetPWD = async () => {
-        try {
-          const r = await fetch(FORGETPWD_PUT, {
-            method: 'PUT',
-            body: JSON.stringify(values),
-            headers: { 'Content-Type': 'application/json' },
-          });
-          const result = await r.json();
-          console.log('返回來的Result:', result);
-          return result;
-        } catch (error) {
-          throw error;
-        }
+        const r = await fetch(FORGETPWD_PUT, {
+          method: 'PUT',
+          body: JSON.stringify(values),
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const result = await r.json();
+        console.log('返回來的Result:', result);
+        return result;
       };
 
       notifyPromise(fetchChangeForgetPWD, {
@@ -113,11 +106,6 @@ export default function PasswordForget({
         },
         error: (error) => `${error.toString()}`,
       });
-
-      // try {
-      // } catch (e) {
-      //   console.log('error:', e);
-      // }
     },
   });
 
@@ -362,15 +350,7 @@ export default function PasswordForget({
             送出
           </button>
         </form>
-
-        <button
-          onClick={switchHandler}
-          className="w-full px-4 py-2 mx-auto font-bold border-2 rounded-xl mt-14 text-primary btn-primary bg-dark border-dark hover:shadow-xl3 md:hidden"
-        >
-          會員註冊
-        </button>
       </div>
-      s
     </>
   );
 }

@@ -67,6 +67,7 @@ export default function Index({ onPageChange }) {
               src="/00000.jpeg"
               className="w-full"
               style={{ objectFit: 'cover' }}
+              alt="電影海報 1"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a
@@ -97,7 +98,7 @@ export default function Index({ onPageChange }) {
             id="slide2"
             className="carousel-item relative w-full mt-20 h-[550px]"
           >
-            <img src="/1111.jpeg" className="w-full" />
+            <img src="/1111.jpeg" className="w-full" alt="電影海報 2" />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a
                 href="#slide1"
@@ -127,6 +128,7 @@ export default function Index({ onPageChange }) {
             <img
               src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg"
               className="w-full"
+              alt="電影海報 3"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a
@@ -157,6 +159,7 @@ export default function Index({ onPageChange }) {
             <img
               src="https://daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg"
               className="w-full"
+              alt="電影海報 4"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a

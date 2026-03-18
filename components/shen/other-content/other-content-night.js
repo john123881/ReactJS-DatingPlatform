@@ -3,6 +3,7 @@ import { API_BASE_URL } from '@/configs/api-config';
 import OtherNoContentNight from './other-no-content-night';
 import MoviePhotoOther from './movie-photo-other';
 import BarPhotoOther from './bar-photo-other';
+import NoContentNoon from '../my-content/no-content-noon';
 
 export default function OtherContentNight({ trip_plan_id }) {
   // console.log('Received trip_plan_id in OtherContentNight:', trip_plan_id);

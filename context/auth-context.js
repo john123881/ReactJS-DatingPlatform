@@ -5,7 +5,7 @@ import {
   REGISTER_POST,
   API_SERVER,
   CHECK_AUTH,
-} from '@/components/config/api-path';
+} from '@/configs/api-config';
 
 const AuthContext = createContext();
 const emptyAuth = {
