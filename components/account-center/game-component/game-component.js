@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import Image from 'next/image';
 import styles from './game-page.module.css';
 import { ACCOUNT_GAME_RECORD_POST } from '@/configs/api-config';
 import { useRouter } from 'next/router';
@@ -30,7 +31,7 @@ const GameComponent = () => {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [timer, setTimer] = useState(null);
-  const [isTiming, setIsTiming] = useState(false);
+  // const [isTiming, setIsTiming] = useState(false);
   const [endTime, setEndTime] = useState(0);
   const router = useRouter();
   const { getAuthHeader } = useAuth();
@@ -103,7 +104,7 @@ const GameComponent = () => {
 
       return () => clearInterval(interval);
     }
-  }, [canMove, snake]);
+  }, [canMove, snake, moveSnake, speed]);
 
   //監聽鍵盤操作
   useEffect(() => {
@@ -149,7 +150,7 @@ const GameComponent = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [gameStarted, gameOver]); // 監聽 gameStarted 和 gameOver 狀態變化
+  }, [gameStarted, gameOver, handleRestart, handleStartGame]); // 監聽 gameStarted 和 gameOver 狀態變化
 
   //按下遊戲開始後 紀錄時間
   useEffect(() => {
@@ -169,7 +170,7 @@ const GameComponent = () => {
       setIsTiming(false); // 遊戲結束停止計時
       setTimer(null); // 將計時器狀態設為null
     }
-  }, [gameStarted]);
+  }, [gameStarted, elapsedTime, timer]);
 
   //控制蛇的移動
   const moveSnake = () => {
@@ -300,7 +301,7 @@ const GameComponent = () => {
         }}
       >
         {index === 0 && (
-          <img
+          <Image
             src="/snakeHead.png"
             style={{
               position: 'absolute',
@@ -310,11 +311,13 @@ const GameComponent = () => {
               height: '155%',
             }}
             alt="蛇頭"
+            width={20}
+            height={31}
           />
         )}
       </div>
     ));
-  }, [gameStarted, gameOver, snake, direction]);
+  }, [gameStarted, gameOver, snake, direction, calculateRotation]);
 
   //渲染食物
   const renderFood = useMemo(() => {

@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-
+import { useState } from 'react';
 function Popup({ movie, time, date, onClose }) {
   return (
     <div className="popup">
@@ -15,19 +13,8 @@ function Popup({ movie, time, date, onClose }) {
   );
 }
 
-export default function MyComponent({ onPageChange }) {
+export default function MyComponent() {
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-
-  const handleConfirm = () => {
-    // 在這裡處理確認訂票的邏輯
-    // 例如，發送訂票請求等
-    // 這只是一個示例，你可以根據自己的需求進行調整
-    alert('訂票成功！');
-    setShowPopup(false);
-  };
 
   return (
     <>
@@ -38,9 +25,9 @@ export default function MyComponent({ onPageChange }) {
         {/* 彈跳視窗 */}
         {showPopup && (
           <Popup
-            movie={selectedMovie}
-            time={selectedTime}
-            date={selectedDate}
+            movie={''}
+            time={''}
+            date={''}
             onClose={() => setShowPopup(false)}
           />
         )}

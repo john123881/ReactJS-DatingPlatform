@@ -7,22 +7,8 @@ export default function MovieSeatSelection({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
-  // 假设这是您的电影座位数据
-  const [selectedSeats, setSelectedSeats] = useState([]);
-
-  // 处理座位点击事件
-  const handleSeatClick = (seatNumber) => {
-    // 在这里可以编写逻辑来处理座位的选择和取消选择
-    // 这个示例只是简单地将座位号添加到已选择的座位列表中，或从中移除
-    if (selectedSeats.includes(seatNumber)) {
-      setSelectedSeats(selectedSeats.filter((seat) => seat !== seatNumber));
-    } else {
-      setSelectedSeats([...selectedSeats, seatNumber]);
-    }
-  };
 
   return (
     <>

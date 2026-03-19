@@ -19,8 +19,7 @@ export default function MyTripDetail({ onPageChange }) {
   const pageTitle = '行程規劃';
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   //trip_calendar 的資料
   useEffect(() => {
@@ -71,7 +70,7 @@ export default function MyTripDetail({ onPageChange }) {
   }, [trip_plan_id]);
 
   //傳遞給子元件的函數 用於重新渲染頁面 針對三個時段的行程細節
-  const refreshAllDetails = async () => {
+  const refreshAllDetails = useCallback(async () => {
     if (!trip_plan_id) return;
     console.log('Calling refreshAllDetails');
     try {
@@ -92,7 +91,7 @@ export default function MyTripDetail({ onPageChange }) {
       console.error('Fetching trip details error:', error);
       setNewDetail({ block: null });
     }
-  };
+  }, [trip_plan_id]);
 
   useEffect(() => {
     console.log('refreshAllDetails in parent:', refreshAllDetails);

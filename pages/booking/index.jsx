@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FiHeart } from 'react-icons/fi';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import IndexMovieCard from '@/components/booking/card/indexMovieCard';
 import PageTitle from '@/components/page-title';
 import { API_BASE_URL } from '@/configs/api-config';
@@ -21,14 +21,6 @@ import { IoTicketOutline } from 'react-icons/io5';
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
-  useEffect(() => {
-    onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
-
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
   const [movieCards, setMovieCards] = useState([]);
 
   const getBookingMovieCard = async () => {
@@ -50,8 +42,12 @@ export default function Index({ onPageChange }) {
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
+    onPageChange(pageTitle);
+  }, [onPageChange, pageTitle]);
+
+  useEffect(() => {
     getBookingMovieCard();
-  }, []);
+  }, [getBookingMovieCard]);
 
   return (
     <>
@@ -63,9 +59,11 @@ export default function Index({ onPageChange }) {
           style={{ height: '530px' }}
         >
           <div id="slide1" className="relative w-full mt-20 carousel-item">
-            <img
+            <Image
               src="/00000.jpeg"
               className="w-full"
+              width={1920}
+              height={530}
               style={{ objectFit: 'cover' }}
               alt="電影海報 1"
             />
@@ -98,7 +96,7 @@ export default function Index({ onPageChange }) {
             id="slide2"
             className="carousel-item relative w-full mt-20 h-[550px]"
           >
-            <img src="/1111.jpeg" className="w-full" alt="電影海報 2" />
+            <Image src="/1111.jpeg" className="w-full" width={1920} height={530} alt="電影海報 2" />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a
                 href="#slide1"
@@ -125,9 +123,11 @@ export default function Index({ onPageChange }) {
             </div>
           </div>
           <div id="slide3" className="relative w-full carousel-item">
-            <img
+            <Image
               src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg"
               className="w-full"
+              width={1920}
+              height={530}
               alt="電影海報 3"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -156,9 +156,11 @@ export default function Index({ onPageChange }) {
             </div>
           </div>
           <div id="slide4" className="relative w-full carousel-item">
-            <img
+            <Image
               src="https://daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg"
               className="w-full"
+              width={1920}
+              height={530}
               alt="電影海報 4"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -264,10 +266,6 @@ export default function Index({ onPageChange }) {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           href={'booking/movie-ticket'}
-          // onClick={() => {
-          //   setClickedButton(!clickedButton);
-          //   window.location.href = '../..//booking/movie-ticket';
-          // }}
         >
           {/* 愛心圖標 */}
           <IoTicketOutline
@@ -286,12 +284,8 @@ export default function Index({ onPageChange }) {
         <Link
           className="btn btn-outline bg-transparent mt-[10px] w-[80px] mb-[30px] rounded-[30px] hover:bg-[#A0FF1F] mx-3"
           href={'booking/movie-list'}
-          onMouseEnter={() => setIsHovered1(true)}
-          onMouseLeave={() => setIsHovered1(false)}
-          // onClick={() => {
-          //   // 點擊按鈕後執行瀏覽器重定向
-          //   window.location.href = '/booking/movie-list'; // 替換 '/movies' 為您電影列表頁面的實際路徑
-          // }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
           看更多
         </Link>

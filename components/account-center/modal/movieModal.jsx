@@ -1,43 +1,12 @@
-// import { useEffect, useRef } from 'react';
-import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
-import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { IoMdStar } from 'react-icons/io';
-// import Router from 'next/router';
-// import ShareModal from '../modal/shareModal';
-// import EditModal from '../modal/editModal';
-// import { FiSend, FiMessageCircle, FiMoreHorizontal } from 'react-icons/fi';
-// import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
 export default function MovieModal({ movie, modalId, isOpen }) {
-  const { auth } = useAuth();
   const {
-    // movies,
-    // setMovies,
-    // setModalId,
-    // movieModalToggle,
     setMovieModalToggle,
   } = useCollect();
-  // const router = useRouter();
 
-  // const postModalRef = useRef(null);
-
-  // const textareaRef = useRef(null);
-
-  // useEffect(() => {
-  //   // 定義路由變化完成後要執行的函數，這個函數將會關閉 modal
-  //   const handleRouteChange = () => {
-  //     setPostModalToggle(false); // 關閉 modal
-  //   };
-
-  //   // 監聽路由變化完成事件
-  //   Router.events.on('routeChangeComplete', handleRouteChange);
-
-  //   // 在組件卸載或重新渲染前，移除監聽器，這是為了避免記憶體洩漏和重複註冊監聽器
-  //   return () => {
-  //     Router.events.off('routeChangeComplete', handleRouteChange);
-  //   };
-  // }, []);
 
   return (
     <>
@@ -61,11 +30,12 @@ export default function MovieModal({ movie, modalId, isOpen }) {
           </div>
 
           <div className="container flex flex-col md:flex-row">
-            <figure className="flex flex-col w-full mx-3 md:w-1/2 card-photo">
-              <img
+            <figure className="relative flex flex-col w-full mx-3 md:w-1/2 card-photo h-[300px] md:h-auto">
+              <Image
                 src={movie.img || '/unavailable-image.jpg'}
                 alt={movie.img_name || 'No Image Available'}
-                className="object-contain w-full h-full"
+                fill
+                className="object-contain"
               />
             </figure>
 

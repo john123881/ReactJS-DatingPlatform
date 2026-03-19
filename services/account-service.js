@@ -26,9 +26,7 @@ export const AccountService = {
    * @param {FormData} formData
    */
   uploadAvatar: (sid, formData) => {
-    return apiClient.post(`/account/try-upload/${sid}`, formData, {
-      headers: { 'Content-Type': undefined },
-    });
+    return apiClient.post(`/account/try-upload/${sid}`, formData);
   },
 
   /**

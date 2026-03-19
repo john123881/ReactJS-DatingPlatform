@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
@@ -15,8 +15,7 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -43,7 +42,14 @@ export default function Index({ onPageChange }) {
         getCommunityIndexFilteredPost(currentKeyword);
       }
     }
-  }, [auth.id, filteredPage, isFilterActive, currentKeyword]);
+  }, [
+    auth.id,
+    filteredPage,
+    isFilterActive,
+    currentKeyword,
+    getCommunityIndexPost,
+    getCommunityIndexFilteredPost,
+  ]);
 
   return (
     <>

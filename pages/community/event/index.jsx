@@ -6,5 +6,5 @@ export default function Event() {
 
   useEffect(() => {
     router.back();
-  }, []);
+  }, [router]);
 }

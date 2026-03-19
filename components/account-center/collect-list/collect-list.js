@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
 import { FaHeart } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { usePostContext } from '@/context/post-context';
 
 export default function CollectList({
@@ -38,7 +39,7 @@ export default function CollectList({
     movieV,
     setMovieV,
   } = useCollect();
-  const { setPostModalToggle, savedPosts, checkPostsStatus, getPostComments } =
+  const { setPostModalToggle, checkPostsStatus, getPostComments } =
     usePostContext();
   //依 type 分不同處理方式
   const handleBarLink = (e) => {
@@ -140,10 +141,12 @@ export default function CollectList({
           className="relative flex items-center space-x-3 rtl:space-x-reverse"
         >
           <div className="flex-shrink-0">
-            <img
+            <Image
               className="w-8 h-8 rounded-full"
               src={data.img || '/unavailable-image.jpg'}
               alt={data.img_name || 'No Image Available'}
+              width={32}
+              height={32}
             />
           </div>
           <div className="flex-1 min-w-0">

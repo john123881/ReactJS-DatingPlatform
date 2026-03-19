@@ -1,4 +1,5 @@
-import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
+import { IoMdStar } from 'react-icons/io';
+import Image from 'next/image';
 
 export default function BarCardMobile() {
   return (
@@ -6,10 +7,12 @@ export default function BarCardMobile() {
       <div className="bar-card-mobile card rounded-none w-[159px] h-[238px]">
         <figure>
           <button>
-            <img
+            <Image
               className="w-[159px] h-[151px] object-cover"
               src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
-              alt=""
+              alt="酒吧示意圖"
+              width={159}
+              height={151}
             />
           </button>
         </figure>

@@ -24,14 +24,6 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
       .catch((error) => console.error('Error loading data:', error));
   }, []);
 
-  // const handleAreaChange = (event) => {
-  //   onAreaSelected(event.target.value);
-  // };
-
-  // const handleTypeChange = (event) => {
-  //   onTypeSelected(event.target.value);
-  // };
-
   return (
     <div className="lg:basis-2/12 flex flex-col gap-4">
       <select

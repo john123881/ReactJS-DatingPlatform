@@ -12,8 +12,7 @@ export default function BarList({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const currentPage = '酒吧列表';
 
@@ -33,7 +32,7 @@ export default function BarList({ onPageChange }) {
   useEffect(() => {
     getBarList();
     // console.log('useEffect log -> bars:', bars);
-  }, []);
+  }, [getBarList]);
 
   return (
     <>
@@ -76,8 +75,8 @@ export default function BarList({ onPageChange }) {
             </div>
             {/* BarCard元件展示 */}
             <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto">
-              {bars.slice(0, 8).map((bar, i) => (
-                <BarCard bar={bar} key={i} />
+              {bars.slice(0, 8).map((bar) => (
+                <BarCard bar={bar} key={bar.bar_id} />
               ))}
               {/* <BarCard />
               <BarCard />

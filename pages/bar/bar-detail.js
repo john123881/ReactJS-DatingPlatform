@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import TabBar from '@/components/bar/bar/tab-bar';
+import { useEffect } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarDetailCard from '@/components/bar/card/bar-detail-card';
 import { useRouter } from 'next/router';
@@ -10,14 +9,8 @@ export default function BarDetail({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
-  const initialTabs = [
-    { title: '酒吧地圖', path: '/bar/bar-map', active: false },
-    { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false },
-  ];
   const currentPage = 'Fake Sober';
 
   return (

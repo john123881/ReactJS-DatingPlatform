@@ -24,11 +24,9 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [movieCards, setMovieCards] = useState([]);
-  const [savedMovies, setSavedMovies] = useState({});
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -345,7 +343,7 @@ export default function Index({ onPageChange }) {
             <MovieCard
               movie={movie}
               key={index}
-              isSaved={savedMovies[movie.movie_id] || false}
+              isSaved={false}
             />
           ))
         )}

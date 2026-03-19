@@ -8,8 +8,7 @@ export default function MovieSeatSelection({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   // 假设这是您的电影座位数据
   const [selectedSeats, setSelectedSeats] = useState([]);

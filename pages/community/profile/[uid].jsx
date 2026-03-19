@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { usePostContext } from '@/context/post-context';
 import { useAuth } from '@/context/auth-context';
@@ -16,8 +16,7 @@ export default function Profile({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -80,7 +79,15 @@ export default function Profile({ onPageChange }) {
         return newPage;
       });
     }
-  }, [auth.id, uid, reload]); // uid 變化時重新調用, 或是重複點擊則 reload
+  }, [
+    auth.id,
+    uid,
+    reload,
+    getCommunityUserProfilePost,
+    setProfilePage,
+    setProfilePosts,
+    setUserProfileHasMore,
+  ]); // uid 變化時重新調用, 或是重複點擊則 reload
 
   return (
     <>

@@ -1,23 +1,23 @@
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
-import BookingConfirmModal from '@/components/bar/modal/booking-confirm-modal';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+
+const BookingConfirmModal = dynamic(
+  () => import('@/components/bar/modal/booking-confirm-modal'),
+  { ssr: false },
+);
 
 export default function BarBooking({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const currentPage = '訂位';
-  const BookingConfirmModal = dynamic(
-    () => import('@/components/bar/modal/booking-confirm-modal'),
-    { ssr: false },
-  );
   const [selectedTime, setSelectedTime] = useState('');
 
   // Handler to set the selected time
@@ -41,10 +41,12 @@ export default function BarBooking({ onPageChange }) {
               <div className="text-white text-[18px]">我要訂位</div>
               {/* 移動端顯示的圖片 */}
               <div className="lg:hidden">
-                <img
+                <Image
                   className="w-[340px] h-[130px] object-cover rounded-[20px]"
                   src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
                   alt="Bar Image"
+                  width={340}
+                  height={130}
                 />
               </div>
               <div className="text-[18px] lg:text-[32px] text-white">
@@ -135,10 +137,12 @@ export default function BarBooking({ onPageChange }) {
           </div>
           {/* 圖片區塊在大螢幕顯示，佔5列 */}
           <div className="hidden lg:block lg:col-span-4">
-            <img
+            <Image
               className="w-[456px] h-[300px] object-cover rounded-[20px]"
               src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
               alt=""
+              width={456}
+              height={300}
             />
           </div>
         </div>

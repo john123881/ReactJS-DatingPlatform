@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -16,8 +17,7 @@ export default function Post({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -97,7 +97,7 @@ export default function Post({ onPageChange }) {
     if (auth.id !== undefined && auth.id !== null) {
       getPostPage(pid);
     }
-  }, [auth.id, pid]);
+  }, [auth.id, pid, getPostPage]);
 
   return (
     <>
@@ -128,9 +128,11 @@ export default function Post({ onPageChange }) {
                     }
                   }}
                 >
-                  <img
+                  <Image
                     src={postPage.img || '/unavailable-image.jpg'}
                     alt={postPage.photo_name || 'No Image Available'}
+                    width={800}
+                    height={600}
                     className="object-contain h-full w-full"
                   />
                 </figure>
@@ -143,9 +145,11 @@ export default function Post({ onPageChange }) {
                           <Link
                             href={`/community/profile/${postPage.post_userId}`}
                           >
-                            <img
+                            <Image
                               src={postPage.avatar || '/unknown-user-image.jpg'}
                               alt={postPage.photo_name || 'No Image Available'}
+                              width={40}
+                              height={40}
                             />
                           </Link>
                         </div>
@@ -220,13 +224,15 @@ export default function Post({ onPageChange }) {
                               <Link
                                 href={`/community/profile/${comment.user_id}`}
                               >
-                                <img
+                                <Image
                                   src={
                                     comment.avatar || '/unknown-user-image.jpg'
                                   }
                                   alt={
                                     postPage.photo_name || 'No Image Available'
                                   }
+                                  width={32}
+                                  height={32}
                                 />
                               </Link>
                             </div>

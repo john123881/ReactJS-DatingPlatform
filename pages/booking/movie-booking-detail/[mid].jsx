@@ -1,51 +1,33 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import Image from 'next/image';
 import { API_BASE_URL } from '@/configs/api-config';
 
 import YouTube from 'react-youtube';
-import dynamic from 'next/dynamic';
 
 export default function MovieDetail({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
   const { mid } = router.query;
 
   const [clickedButton, setClickedButton] = useState(null);
-  const descriptionRef = useRef(null); // 创建对电影描述元素的引用
 
-  const [showFullDescription, setShowFullDescription] = useState(false); // 初始化电影描述显示状态为false
+  const [showFullDescription, setShowFullDescription] = useState(false); // 初始化电影描述显示状态為false
 
   const [movie, setMovie] = useState([]);
-  const [savedMovies, setSavedMovies] = useState({});
 
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription); // 切换电影描述显示状态
-  };
-
-  const scrollToDescription = () => {
-    if (descriptionRef.current) {
-      descriptionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
   const [hovered, setHovered] = useState(false);
-
-  const [clickedButtonIndex, setClickedButtonIndex] = useState(null);
-
-  const handleButtonClick = () => {
-    setClickedButtonIndex((prevIndex) => (prevIndex === null ? 0 : null)); // 切换样式
-  };
 
   const getMovieDetail = async (mid) => {
     try {
@@ -66,7 +48,7 @@ export default function MovieDetail({ onPageChange }) {
       getMovieDetail(mid);
       // console.log('movie', movie);
     }
-  }, [auth.id, mid]);
+  }, [auth.id, router.query.mid, getMovieDetail]);
 
   // const BookingConfirmModal = dynamic(
   //   () => import('@/components/bar/modal/booking-confirm-modal'),
@@ -94,10 +76,12 @@ export default function MovieDetail({ onPageChange }) {
             {/* 電影資訊 */}
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
               <figure>
-                <img
+                <Image
                   className="lg:w-[300px] lg:h-[480px]"
                   src={movie[0]?.movie_img || '/unavailable-image.jpg'}
                   alt="電影海報"
+                  width={300}
+                  height={480}
                 />
               </figure>
               <div className="card-body">

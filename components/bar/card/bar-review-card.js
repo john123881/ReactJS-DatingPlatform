@@ -1,57 +1,25 @@
 import RatingStar from '../bar-rating/rating-star';
 import BarRatingDeleteModal from '../modal/bar-rating-delete-modal';
 import BarRatingEditModal from '../modal/bar-rating-edit-modal';
+import Image from 'next/image';
 
-export default function BarReviewCard({ rating, id }) {
+export default function BarReviewCard({ rating }) {
   console.log(rating);
   return (
     <>
       <div className="flex justify-between items-center border-b border-white pb-2 mb-4">
         <div className="flex">
-          <img
+          <Image
             className="h-[71px] w-[71px] rounded-full"
-            // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFYeFJDGzt1LOUrw_SLn1yXUkNRUkryv0BBqh_q2pyvw&s"
             src={rating.avatar}
             alt={rating.username}
+            width={71}
+            height={71}
           />
           <div className="ml-4 text-white space-y-1">
-            <div className="text-[15px]">
-              {/* username */}
-              {rating.username}
-            </div>
-            {/* <div className="bar-detail-stars flex gap-1 rating rating-sm">
-              <input
-                type="radio"
-                name="rating-6"
-                className="mask mask-star-2 bg-[#A0FF1F]"
-              />
-              <input
-                type="radio"
-                name="rating-6"
-                className="mask mask-star-2 bg-[#A0FF1F]"
-              />
-              <input
-                type="radio"
-                name="rating-6"
-                className="mask mask-star-2 bg-[#A0FF1F]"
-              />
-              <input
-                type="radio"
-                name="rating-6"
-                className="mask mask-star-2 bg-[#A0FF1F]"
-              />
-              <input
-                type="radio"
-                name="rating-6"
-                className="mask mask-star-2 bg-[#A0FF1F]"
-                checked
-              />
-            </div> */}
+            <div className="text-[15px]">{rating.username}</div>
             <RatingStar />
-            <div className="text-[12px]">
-              {/* 2024-03-07 14:20 */}
-              {rating.created_at}
-            </div>
+            <div className="text-[12px]">{rating.created_at}</div>
           </div>
         </div>
         <div className="flex flex-col items-end space-y-1 h-[71px] w-[71px]">

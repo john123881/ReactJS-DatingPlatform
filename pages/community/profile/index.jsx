@@ -14,7 +14,7 @@ export default function Profile() {
 
   useEffect(() => {
     router.back();
-  }, []);
+  }, [router]);
 
   // const { auth } = useAuth();
 

@@ -11,8 +11,7 @@ export default function Rating({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   // const initialTabs = [
   //   { title: '酒吧地圖', path: '/bar/bar-map', active: false },
@@ -51,7 +50,7 @@ export default function Rating({ onPageChange }) {
       // 有pid後，向伺服器要求資料
       getBarRatingById(bar_id);
     }
-  }, [router.isReady]);
+  }, [router.isReady, router.query, getBarRatingById]);
 
   return (
     <>

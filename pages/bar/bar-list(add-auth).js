@@ -13,15 +13,13 @@ export default function BarList({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [bars, setBars] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [barsPerPage] = useState(8);
   const [selectedAreaId, setSelectedAreaId] = useState('');
-  const { userAvatar, setUserAvatar, auth, getAuthHeader, checkAuth } =
-    useAuth();
+  const { auth } = useAuth();
 
   const getBarList = async () => {
     console.log('Token:', auth);
@@ -47,7 +45,7 @@ export default function BarList({ onPageChange }) {
       return;
     }
     getBarList();
-  }, [auth]);
+  }, [auth, getBarList]);
 
   // useEffect(() => {
   //   const url = selectedAreaId
@@ -139,8 +137,8 @@ export default function BarList({ onPageChange }) {
           <div className="flex flex-wrap mx-auto w-full gap-4 justify-center items-center">
             {bars
               .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
-              .map((bar, i) => (
-                <BarCard bar={bar} key={i} />
+              .map((bar) => (
+                <BarCard bar={bar} key={bar.bar_id || i} />
               ))}
           </div>
           <div className="flex justify-center items-center">

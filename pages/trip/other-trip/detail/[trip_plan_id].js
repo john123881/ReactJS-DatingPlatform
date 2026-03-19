@@ -14,8 +14,7 @@ export default function OtherTripdetail({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
   const { auth } = useAuth();
 
   const { trip_plan_id } = router.query;
@@ -100,7 +99,7 @@ export default function OtherTripdetail({ onPageChange }) {
 
       fetchTripDetails();
     }
-  }, [trip_plan_id]);
+  }, [trip_plan_id, tripDetails]);
 
   useEffect(() => {
     console.log(tripDetails);

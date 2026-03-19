@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import TripSidebar from '../../../components/shen/sidebars/trip-sidebar';
 import TripCardMy from '../../../components/shen/trip-card-my';
 import TripCard from '@/components/shen/trip-card';
@@ -16,8 +16,7 @@ export default function MyTrip({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
   const { auth, getAuthHeader } = useAuth();
   const [trips, setTrips] = useState([]);
   const [userId, setUserId] = useState(null); // 添加 user_id 狀態
@@ -31,24 +30,7 @@ export default function MyTrip({ onPageChange }) {
   const localDate = today.toISOString().split('T')[0];
   // console.log(getAuthHeader());
   // console.log(auth.id);
-  useEffect(() => {
-    if (auth.id === 0) return;
-    fetchTrips();
-    // 解密 jwt 並設置 user_id
-    const jwtObject = getAuthHeader();
-    const jwt = jwtObject?.Authorization?.slice(7); // 提取 jwt 字串
-    console.log(jwt);
-    if (jwt) {
-      const decoded = jwtDecode(jwt);
-      setUserId(decoded.id);
-      // console.log(decoded.id);
-    }
-  }, [auth.id]);
-  useEffect(() => {
-    console.log(userId);
-  }, [userId]);
-
-  const fetchTrips = async () => {
+  const fetchTrips = useCallback(async () => {
     open();
     try {
       const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
@@ -64,14 +46,23 @@ export default function MyTrip({ onPageChange }) {
       console.error('Fetching trips error:', error);
     }
     close();
-  };
-  /////////////在尚無行程時顯示其他人的推薦行程//////////////////////
+  }, [getAuthHeader, open, close]);
+
   useEffect(() => {
     if (auth.id === 0) return;
-    fetchOtherTrips();
-  }, [auth.id]); // 防止重複執行
-
-  const fetchOtherTrips = async () => {
+    fetchTrips();
+    // 解密 jwt 並設置 user_id
+    const jwtObject = getAuthHeader();
+    const jwt = jwtObject?.Authorization?.slice(7); // 提取 jwt 字串
+    console.log(jwt);
+    if (jwt) {
+      const decoded = jwtDecode(jwt);
+      setUserId(decoded.id);
+      // console.log(decoded.id);
+    }
+  }, [auth.id, fetchTrips, getAuthHeader]);
+  /////////////在尚無行程時顯示其他人的推薦行程//////////////////////
+  const fetchOtherTrips = useCallback(async () => {
     open();
     try {
       const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
@@ -87,7 +78,12 @@ export default function MyTrip({ onPageChange }) {
       console.error('Fetching trips error:', error);
     }
     close();
-  };
+  }, [getAuthHeader, open, close]);
+
+  useEffect(() => {
+    if (auth.id === 0) return;
+    fetchOtherTrips();
+  }, [auth.id, fetchOtherTrips]); // 防止重複執行
   ////////////////////////////////////////////////////////
   const onDeleteSuccess = (tripPlanId) => {
     // 過濾掉被刪除的行程
@@ -138,7 +134,7 @@ export default function MyTrip({ onPageChange }) {
       console.error('Creating trip plan error:', error);
     }
   };
-  const recomend = (
+  const recommend = (
     <div className="flex flex-wrap justify-center mx-5 my-5 min-h-screen">
       <div className="flex flex-col items-center justify-start w-full max-w-4xl sm:mt-24">
         <p className="mb-12 sm:text-2xl text-center">
@@ -297,7 +293,7 @@ export default function MyTrip({ onPageChange }) {
       <>
         <PageTitle pageTitle={pageTitle} />
         <TripSidebar />
-        {isLoading ? <Loader /> : recomend}
+        {isLoading ? <Loader /> : recommend}
       </>
     );
   }

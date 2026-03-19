@@ -322,7 +322,16 @@ export default function AccountRecord({ onPageChange }) {
     //要求積分紀錄
     fetchPointRecord();
     close(0.5);
-  }, [router.query, auth.id, gameRecordOpen]);
+  }, [
+    router.query,
+    auth.id,
+    gameRecordOpen,
+    close,
+    getAuthHeader,
+    open,
+    recordListPoint,
+    router.isReady,
+  ]);
 
   //渲染->遊戲紀錄
   useEffect(() => {
@@ -373,8 +382,16 @@ export default function AccountRecord({ onPageChange }) {
     //要求遊戲紀錄
     fetchGameRecord();
     close(0.5);
-  }, [gameRecordOpen, router.query, auth.id]);
-
+  }, [
+    gameRecordOpen,
+    router.query,
+    auth.id,
+    close,
+    getAuthHeader,
+    open,
+    recordListGame,
+    router.isReady,
+  ]);
   //進頁面做唯一次渲染
   useEffect(() => {
     onPageChange(pageTitle);
@@ -390,7 +407,7 @@ export default function AccountRecord({ onPageChange }) {
     }
     const currentDateStr = `${year}-${month}-${day}`;
     setCurrentDate(currentDateStr);
-  }, []);
+  }, [onPageChange, pageTitle]);
 
   return (
     <>

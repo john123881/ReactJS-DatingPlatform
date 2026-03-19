@@ -13,8 +13,7 @@ export default function BarListSpecialty({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [bars, setBars] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,11 +50,23 @@ export default function BarListSpecialty({ onPageChange }) {
     }
   };
 
+  const updateBarsList = async (barAreaId, barTypeId) => {
+    try {
+      const data = await fetch(
+        `${API_BASE_URL}/bar/bar-list-specialty?area=${barAreaId}&type=${barTypeId}`,
+      );
+      const result = await data.json();
+      setBars(result);
+    } catch (error) {
+      console.error('Failed to fetch filtered bar list:', error);
+    }
+  };
+
   useEffect(() => {
     getBarList();
-  }, []);
+  }, [getBarList]);
 
-  // 處理地區和類型的選擇
+  // 處理地區 and 類型的選擇
   const onAreaSelected = (areaId) => {
     setSelectedAreaId(areaId);
     updateBarsList(areaId, selectedTypeId);
@@ -106,7 +117,7 @@ export default function BarListSpecialty({ onPageChange }) {
           <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto">
             {bars
               .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
-              .map((bar, i) => (
+              .map((bar) => (
                 <BarCard bar={bar} key={bar.bar_id} />
               ))}
           </div>

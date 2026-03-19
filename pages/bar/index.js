@@ -19,8 +19,7 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [randomBars, setRandomBars] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +41,7 @@ export default function Index({ onPageChange }) {
   // next 3 random
   useEffect(() => {
     getBarListRandom();
-  }, [barRender]);
+  }, [barRender, getBarListRandom]);
 
   // 按一下在生成隨機三筆
   const prevBars = () => {
@@ -112,8 +111,8 @@ export default function Index({ onPageChange }) {
               <button onClick={prevBars}>
                 <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
               </button>
-              {displayedBars.map((randomBar, i) => (
-                <BarCardIndex key={i} randomBar={randomBar} />
+              {displayedBars.map((randomBar) => (
+                <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
               ))}
               <button onClick={prevBars}>
                 <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
@@ -123,8 +122,8 @@ export default function Index({ onPageChange }) {
           <div className="flex items-center justify-center w-100 md:hidden">
             <div className="gap-5 carousel rounded-box">
               <div className="gap-5 carousel-item">
-                {randomBars.slice(0, 2).map((randomBar, i) => (
-                  <BarCardIndex key={i} randomBar={randomBar} />
+                {randomBars.slice(0, 2).map((randomBar) => (
+                  <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
                 ))}
               </div>
             </div>

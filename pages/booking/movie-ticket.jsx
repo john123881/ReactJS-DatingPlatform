@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { FiHeart } from 'react-icons/fi';
 import MovieTicketCard from '@/components/booking/card/movieTicketCard';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
@@ -10,11 +9,7 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
-
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  }, [onPageChange, pageTitle]);
 
   const [movieCards, setMovieCards] = useState([]);
 

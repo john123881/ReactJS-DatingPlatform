@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import TripSidebarOther from '@/components/shen/sidebars/trip-sidebar-other';
 import TripCard from '../../../components/shen/trip-card';
 import { useAuth } from '@/context/auth-context';
@@ -13,19 +13,13 @@ export default function OtherTrip({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
   const { auth, getAuthHeader } = useAuth();
   const [otherTrips, setOtherTrips] = useState([]);
   const { open, close, isLoading } = useLoader();
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    if (auth.id === 0) return;
-    fetchTrips();
-  }, [auth.id]);
-
-  const fetchTrips = async () => {
+  const fetchTrips = useCallback(async () => {
     open();
     try {
       const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
@@ -40,7 +34,12 @@ export default function OtherTrip({ onPageChange }) {
       console.error('Fetching trips error:', error);
     }
     close();
-  };
+  }, [getAuthHeader, open, close]);
+
+  useEffect(() => {
+    if (auth.id === 0) return;
+    fetchTrips();
+  }, [auth.id, fetchTrips]);
 
   // 以 filter 的方式過濾，只顯示標題之中包含關鍵字的行程
   const filteredTrips = otherTrips.filter((trip) =>

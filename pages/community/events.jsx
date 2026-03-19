@@ -14,8 +14,7 @@ export default function Events({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -25,7 +24,7 @@ export default function Events({ onPageChange }) {
     if (auth.id !== undefined && auth.id !== null) {
       getCommunityEvents();
     }
-  }, [auth.id]);
+  }, [auth.id, getCommunityEvents]);
 
   return (
     <>

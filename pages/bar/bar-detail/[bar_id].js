@@ -15,46 +15,14 @@ export default function Detail({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
-  const [error, setError] = useState(null);
   const [bar, setBar] = useState(null);
   const currentPage = bar?.bar_name;
   const [savedBars, setSavedBars] = useState({});
+  // const [rerender, setRerender] = useState(false);
 
   const { auth, getAuthHeader } = useAuth();
-
-  //酒吧收藏
-  // 檢查儲存酒吧狀態
-  const checkBarsStatus = async (barIds) => {
-    const userId = auth.id;
-
-    if (userId === 0) {
-      return;
-    }
-
-    try {
-      const data = await BarService.checkBarStatus(userId, barIds);
-      // console.log('checkBarsStatus 的 data:', data);
-
-      // 初始化來存儲所有酒吧的收藏狀態
-      const newSavedBars = { ...savedBars };
-      console.log('checkBarsStatus 的 newSavedBars:', newSavedBars);
-
-      // 遍歷從後端獲取的每個貼文的狀態數據
-      data.forEach((status) => {
-        // 將每個貼文的收藏狀態存儲到 newSavedBars 對象中
-        newSavedBars[status.barId] = status.isSaved;
-      });
-      // console.log('checkBarsStatus 的 newSavedBars2:', newSavedBars);
-
-      // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
-      setSavedBars(newSavedBars);
-    } catch (error) {
-      console.error('無法獲取酒吧狀態:', error);
-    }
-  };
 
   // save bar
   const isSaved = bar && savedBars[bar?.bar_id]; // Using optional chaining to safely access bar_id
@@ -79,14 +47,13 @@ export default function Detail({ onPageChange }) {
 
       if (result.success) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-        setRerender(!rerender);
+        // setRerender(!rerender);
         console.log('Save status updated:', result);
       } else {
         throw new Error(result.message || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
-      setError(error.message);
     }
   };
 
@@ -107,7 +74,7 @@ export default function Detail({ onPageChange }) {
       // 有bar_id後，向伺服器要求資料
       getBarDetailById(bar_id);
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, getBarDetailById]);
 
   // bar-rating-modal
   const handleLeaveReviewClick = () => {
@@ -248,13 +215,16 @@ export default function Detail({ onPageChange }) {
                 </button>
               </div>
               <div className="bar-detail-img">
-                <img
-                  className="object-cover rounded-[10px] w-[328px] h-[300px] md:w-[440px] md:h-[400px]"
-                  // src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
-                  // src={bar?.bar_img}
-                  src={`/barPic/${bar?.bar_pic_name}`}
-                  alt={`Image of ${bar?.bar_name}`}
-                />
+                {bar?.bar_pic_name && (
+                  <Image
+                    className="object-cover rounded-[10px]"
+                    src={`/barPic/${bar?.bar_pic_name}`}
+                    alt={`Image of ${bar?.bar_name}`}
+                    width={440}
+                    height={400}
+                    layout="intrinsic"
+                  />
+                )}
               </div>
             </div>
             <div className="flex my-4 google-map md:hidden">

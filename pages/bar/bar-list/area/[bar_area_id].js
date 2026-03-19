@@ -13,8 +13,7 @@ export default function List({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth, getAuthHeader } = useAuth();
   const [bars, setBars] = useState([]);
@@ -130,7 +129,7 @@ export default function List({ onPageChange }) {
       // bar_area_id
       getBarListType(bar_area_id);
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, getBarListType]);
 
   useEffect(() => {
     console.log(bars); // 查看bars數據結構
@@ -219,7 +218,7 @@ export default function List({ onPageChange }) {
                   (currentPage - 1) * barsPerPage,
                   currentPage * barsPerPage,
                 )
-                .map((bar, i) => (
+                .map((bar) => (
                   <BarCard
                     key={bar.bar_id}
                     bar={bar}

@@ -9,6 +9,8 @@ import { API_SERVER } from '@/configs/api-config';
 export async function apiClient(endpoint, { body, ...customConfig } = {}) {
   const headers = { 'Content-Type': 'application/json' };
 
+  const isFormData = body instanceof FormData;
+
   // 從 localStorage 取得 token (假設存在)
   const isLoginRequest = endpoint === '/login' || endpoint === '/google-login';
 
@@ -35,7 +37,11 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
     },
   };
 
-  if (body) {
+  // 如果是 FormData，不要設置 Content-Type，讓瀏覽器自動處理 (帶上 boundary)
+  if (isFormData) {
+    delete config.headers['Content-Type'];
+    config.body = body;
+  } else if (body) {
     config.body = JSON.stringify(body);
   }
 
@@ -51,8 +57,13 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const errorMessage = errorData.message || response.statusText;
+    let errorMessage = response.statusText;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorData.error || errorData.msg || errorMessage;
+    } catch (e) {
+      // 忽略解析錯誤，使用預設的 statusText
+    }
     throw new Error(errorMessage);
   }
 

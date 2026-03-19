@@ -3,19 +3,19 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import { usePostContext } from '@/context/post-context';
 import { FiSend, FiMoreHorizontal } from 'react-icons/fi';
-import EditEventModal from '../../../components/community/modal/editEventModal';
-import ShareEventModal from '../../../components/community/modal/shareEventModal';
-import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
 import Sidebar from '@/components/community/sidebar/sidebar';
 import PageTitle from '@/components/page-title';
+import Image from 'next/image';
+import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
+import EditEventModal from '@/components/community/modal/editEventModal';
+import ShareEventModal from '@/components/community/modal/shareEventModal';
 
 export default function Event({ onPageChange }) {
   const pageTitle = '社群媒體';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -43,7 +43,7 @@ export default function Event({ onPageChange }) {
     if (auth.id !== undefined && auth.id !== null) {
       getEventPage(eid);
     }
-  }, [auth.id, eid]);
+  }, [auth.id, eid, getEventPage]);
 
   return (
     <>
@@ -65,9 +65,11 @@ export default function Event({ onPageChange }) {
             <div className="flex max-w-[80vw] max-h-[80vh] overflow-auto">
               <div className="container flex flex-col md:flex-row">
                 <figure className="flex flex-col w-full md:w-1/2 card-photo m-0 ">
-                  <img
+                  <Image
                     src={eventPageCard.img || '/unavailable-image.jpg'}
                     alt={eventPageCard.photo_name || 'No Image Available'}
+                    width={800}
+                    height={600}
                     className="object-contain h-full w-full"
                   />
                 </figure>

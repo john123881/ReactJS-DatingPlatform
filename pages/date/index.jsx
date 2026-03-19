@@ -11,13 +11,11 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth, setLoginModalToggle } = useAuth();
-  const { toggleBar, setToggleBar } = useDate();
-  const { toggleMovie, setToggleMovie } = useDate();
-  const [redirectPath, setRedirectPath] = useState('/'); // 局部重定
+  const { setToggleBar } = useDate();
+  const { setToggleMovie } = useDate();
 
   useEffect(() => {
     if (!auth.id) {
@@ -35,7 +33,7 @@ export default function Index({ onPageChange }) {
     }
   };
 
-  const handleClearToggle = (event, bar) => {
+  const handleClearToggle = (event) => {
     setToggleBar({
       id: 0,
       name: '請選擇一種喜愛的酒吧類型',

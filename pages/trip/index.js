@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import TripSidebar from '../../components/shen/sidebars/trip-sidebar';
 import TripCalendar from '@/components/shen/trip-calendar';
 import { useEffect } from 'react';
@@ -10,8 +9,7 @@ export default function Calendar({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   return (
     <>

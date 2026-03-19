@@ -1,13 +1,9 @@
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import BookingCancelModal from '../modal/booking-cancel-modal';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export default function BarBookingListCard({
-  booking,
-  // bookingId,
-  // onDelete,
-  setBookings,
-}) {
+export default function BarBookingListCard({ booking, setBookings }) {
   console.log(booking);
 
   const cancelModalId = `cancel_modal_${booking.bar_booking_id}`;
@@ -16,12 +12,12 @@ export default function BarBookingListCard({
       <div className="flex gap-4">
         <div className="bar-booking-card-image">
           <Link href={`/bar/bar-detail/${booking.bar_id}`}>
-            <img
+            <Image
               className="h-[100px] w-[100px] lg:h-[120px] lg:w-[120px] object-cover rounded-xl"
-              // src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
               src={`/barPic/${booking.bar_pic_name}`}
-              // src={booking.bar_id}
               alt={`Image of ${booking.bar_name}`}
+              width={120}
+              height={120}
             />
           </Link>
         </div>

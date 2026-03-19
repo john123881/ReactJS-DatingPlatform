@@ -1,6 +1,7 @@
-import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
-import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import { IoMdStar } from 'react-icons/io';
+import { FaRegHeart } from 'react-icons/fa';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BarCardIndex({ randomBar }) {
   return (
@@ -8,11 +9,12 @@ export default function BarCardIndex({ randomBar }) {
       <div className="py-2">
         <div className="bar-card-index-img cursor-pointer">
           <Link href={`/bar/bar-detail/${randomBar.bar_id}`}>
-            <img
+            <Image
               className="relative object-cover w-[159px] h-[155px] md:w-[241px] md:h-[230px] rounded-[10px]"
-              // src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
               src={`/barPic/${randomBar.bar_pic_name}`}
               alt={`Image of ${randomBar.bar_name}`}
+              width={241}
+              height={230}
             />
           </Link>
           <div className="absolute text-white top-1 right-1 text-[20px]">

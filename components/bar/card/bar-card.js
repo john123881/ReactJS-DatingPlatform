@@ -1,20 +1,12 @@
-import { useMemo } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
-import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
+import { IoMdStar } from 'react-icons/io';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
-import { FiHeart } from 'react-icons/fi';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 
-export default function BarCard({
-  bar,
-  area,
-  id,
-  user,
-  savedBars,
-  setSavedBars,
-}) {
+export default function BarCard({ bar, savedBars, setSavedBars }) {
   // save bar
   // const [savedBars, setSavedBars] = useState({});
   const [error, setError] = useState('');
@@ -110,14 +102,12 @@ export default function BarCard({
         <figure>
           <div className="cursor-pointer bar-card-img">
             <Link href={`/bar/bar-detail/${bar.bar_id}`}>
-              <img
+              <Image
                 className="relative w-[159px] h-[146px] lg:w-[223px] lg:h-[205px] object-cover"
-                loading="lazy"
-                // src={bar.bar_img}
                 src={`/barPic/${bar.bar_pic_name}`}
-                // src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
-                // src={pic.img || 'https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg'}
                 alt={`Image of ${bar.bar_name}`}
+                width={223}
+                height={205}
               />
             </Link>
             {/* <div className="absolute text-white top-3 right-3 text-[20px]">

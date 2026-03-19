@@ -1,47 +1,30 @@
-import './index';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import YouTube from 'react-youtube';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import Image from 'next/image';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [clickedButton, setClickedButton] = useState(null);
-  const descriptionRef = useRef(null); // 创建对电影描述元素的引用
 
   const [showFullDescription, setShowFullDescription] = useState(false); // 初始化电影描述显示状态为false
 
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription); // 切换电影描述显示状态
-  };
-
-  const scrollToDescription = () => {
-    if (descriptionRef.current) {
-      descriptionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
   const [hovered, setHovered] = useState(false);
 
-  const [clickedButtonIndex, setClickedButtonIndex] = useState(null);
-
-  const handleButtonClick = () => {
-    setClickedButtonIndex((prevIndex) => (prevIndex === null ? 0 : null)); // 切换样式
+  const scrollToDescription = () => {
+    const descriptionElement = document.getElementById('movie-description');
+    if (descriptionElement) {
+      descriptionElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
-
-  const BookingConfirmModal = dynamic(
-    () => import('@/components/bar/modal/booking-confirm-modal'),
-    { ssr: false },
-  );
-  const [selectedTime, setSelectedTime] = useState('');
 
   return (
     <>
@@ -63,7 +46,7 @@ export default function Index({ onPageChange }) {
             {/* 電影資訊 */}
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
               <figure>
-                <img src="/movie_img/movie_2.jpg" alt="旺卡電影海報" />
+                <Image src="/movie_img/movie_2.jpg" alt="旺卡電影海報" width={300} height={480} />
               </figure>
               <div className="card-body" style={{ width: '200px' }}>
                 <h2 className="card-title pb-2" style={{ fontSize: '2rem' }}>
@@ -429,7 +412,7 @@ export default function Index({ onPageChange }) {
                       <YouTube videoId="wzbT8cB554I" className="w-full" />
                     </div>
 
-                    <p className="mt-12">
+                    <p id="movie-description" className="mt-12">
                       電影專注於威利·旺卡開設世界上最著名的巧克力工廠之前，年輕時期的生活及其冒險經歷：年輕時期的旺卡乘船抵達歐洲一座無名城市，以實現他在美食畫廊開設巧克力店的夢想。他決定住在狡猾的史瓜比夫人和她的追隨者布里奇爾開的自助洗衣店，認識孤兒小麵。儘管小麵警告他要閱讀細則，但由於旺卡不識文字還是自願簽署了合約，這迫使他在住宿期間被敲竹槓支付過高的費用。自信的旺卡前往美食走廊出售能讓食用者飛起來的「飄浮巧克力」，結果被走廊的三位主要巧克力製造商——史拉格沃斯先生、普羅德諾斯先生和費克勒格魯伯先生譏笑他開發的商品，通報警察局長沒收他當天的收入。
                       由於無力支付房租，史瓜比夫人迫使旺卡到自助洗衣店工作
                       10,000

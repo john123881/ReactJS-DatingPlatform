@@ -14,8 +14,7 @@ export default function Explore({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -26,7 +25,7 @@ export default function Explore({ onPageChange }) {
     if (auth.id !== undefined && auth.id !== null) {
       getCommunityExplorePost();
     }
-  }, [auth.id]);
+  }, [auth.id, getCommunityExplorePost]);
 
   return (
     <>

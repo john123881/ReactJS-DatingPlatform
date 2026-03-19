@@ -8,13 +8,12 @@ import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import { API_BASE_URL } from '@/configs/api-config';
 
-export default function BarList({ onPageChange }) {
+export default function BarListSport({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [bars, setBars] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,16 +50,21 @@ export default function BarList({ onPageChange }) {
     }
   };
 
-  // useEffect(() => {
-  //   if (auth.id === 0) {
-  //     return;
-  //   }
-  //   getBarList();
-  // }, [auth]);
+  const updateBarsList = async (barAreaId, barTypeId) => {
+    try {
+      const data = await fetch(
+        `${API_BASE_URL}/bar/bar-list-sport?area=${barAreaId}&type=${barTypeId}`,
+      );
+      const result = await data.json();
+      setBars(result);
+    } catch (error) {
+      console.error('Failed to fetch filtered bar list:', error);
+    }
+  };
 
   useEffect(() => {
     getBarList();
-  }, []);
+  }, [getBarList]);
 
   // 處理地區和類型的選擇
   const onAreaSelected = (areaId) => {
@@ -76,22 +80,22 @@ export default function BarList({ onPageChange }) {
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <div className="flex flex-row pt-28 justify-center">
-        <div className="hidden md:flex flex-col items-center md:w-2/12">
+      <div className="flex flex-row justify-center pt-28">
+        <div className="flex-col items-center hidden md:flex md:w-2/12">
           {/* <BarListSidebar onAreaSelected={handleAreaSelected} /> */}
           <BarListSidebar
             onAreaSelected={onAreaSelected}
             onTypeSelected={onTypeSelected}
           />
         </div>
-        <div className="flex flex-col justify-center mx-auto w-11/12 md:w-8/12 gap-6">
+        <div className="flex flex-col justify-center w-11/12 gap-6 mx-auto md:w-8/12">
           <div className="text-sm breadcrumbs">
             <Breadcrumbs currentPage="運動酒吧" />
           </div>
-          <div className="flex justify-between items-center">
-            <div className="md:text-h5 text-white font-bold">
+          <div className="flex items-center justify-between">
+            <div className="font-bold text-white md:text-h5">
               運動酒吧
-              {/* {bars?.bar_type_name} */}
+              {/* {bars?.bar_type_id} */}
             </div>
             <BarListDropdownMobile />
             <label className="hidden input input-bordered md:flex items-center gap-2 h-[32px] rounded-xl border-white bg-transparent hover:border-[#A0FF1F] text-white">
@@ -110,14 +114,14 @@ export default function BarList({ onPageChange }) {
               </svg>
             </label>
           </div>
-          <div className="flex flex-wrap mx-auto w-full gap-4 justify-center items-center">
+          <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto">
             {bars
               .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
-              .map((bar, i) => (
+              .map((bar) => (
                 <BarCard bar={bar} key={bar.bar_id} />
               ))}
           </div>
-          <div className="flex justify-center items-center">
+          <div className="flex items-center justify-center">
             <button
               className="btn btn-sm"
               onClick={() => handlePageChange(currentPage - 1)}

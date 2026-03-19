@@ -10,8 +10,7 @@ export default function Booking({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const [bookings, setBookings] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +89,7 @@ export default function Booking({ onPageChange }) {
             <div className="text-[15px] lg:text-[16px] text-white">
               {/* username */}
             </div>
-            {currentBookings.map((booking, i) => (
+            {currentBookings.map((booking) => (
               <BarBookingListCard
                 booking={booking}
                 bookingId={booking.bar_booking_id} // 使用新的 prop 名稱

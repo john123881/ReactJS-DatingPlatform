@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Sidebar from '@/components/account-center/sidebar/sidebar';
 import PageTitle from '@/components/page-title';
 import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
@@ -31,11 +31,11 @@ export default function AccountPlayGame({ onPageChange }) {
       close(1.5);
     };
     fetchCheck();
-  }, [router.query]);
+  }, [router.isReady, router.query.sid, checkAuth, close, router]);
 
   useEffect(() => {
     onPageChange(pageTitle);
-  }, []);
+  }, [onPageChange, pageTitle]);
 
   return (
     <>

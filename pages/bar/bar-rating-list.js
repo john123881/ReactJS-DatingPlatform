@@ -11,8 +11,7 @@ export default function BarRatingList({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const initialTabs = [
     { title: '酒吧地圖', path: '/bar/bar-map', active: false },
@@ -47,7 +46,7 @@ export default function BarRatingList({ onPageChange }) {
 
   useEffect(() => {
     getBarRating();
-  }, []);
+  }, [getBarRating]);
 
   return (
     <>

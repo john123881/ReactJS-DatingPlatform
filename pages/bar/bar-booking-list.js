@@ -11,8 +11,7 @@ export default function BarBookingList({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -25,6 +24,17 @@ export default function BarBookingList({ onPageChange }) {
     const response = await fetch(url);
     const data = await response.json();
     setBookings(data);
+  };
+
+  const deleteBooking = async (id) => {
+    const url = `${API_BASE_URL}/bar/delete-bar-booking/${id}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    const result = await response.json();
+    if (result.success) {
+      getBarBookingList();
+    }
   };
 
   useEffect(() => {
@@ -72,7 +82,7 @@ export default function BarBookingList({ onPageChange }) {
             {/* {booking.username} */}
           </div>
           <div className="space-y-4 bar-booking-list mt-4">
-            {currentBookings.map((booking, i) => (
+            {currentBookings.map((booking) => (
               <BarBookingListCard
                 booking={booking}
                 key={booking.bar_booking_id}

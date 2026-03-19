@@ -13,8 +13,7 @@ export default function BarList({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth, getAuthHeader } = useAuth();
   const [bars, setBars] = useState([]);
@@ -95,7 +94,7 @@ export default function BarList({ onPageChange }) {
 
   useEffect(() => {
     getBarList();
-  }, []);
+  }, [getBarList]);
 
   // BarListSidebar
   // const handleAreaSelected = (areaId) => {
@@ -237,7 +236,7 @@ export default function BarList({ onPageChange }) {
                   (currentPage - 1) * barsPerPage,
                   currentPage * barsPerPage,
                 )
-                .map((bar, i) => (
+                .map((bar) => (
                   <BarCard
                     key={bar.bar_id}
                     bar={bar}

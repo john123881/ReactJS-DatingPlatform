@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { LuPopcorn } from 'react-icons/lu';
 import { RiDrinks2Line } from 'react-icons/ri';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import PageTitle from '@/components/page-title';
 
 export default function MovieSeatSelection({ onPageChange }) {
@@ -9,12 +10,10 @@ export default function MovieSeatSelection({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   // 假设这是您的电影座位数据
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [quantity, setQuantity] = useState(0); // 将数量初始化为0
   // 假设这是您的电影座位数据
   const [ticketQuantity, setTicketQuantity] = useState(0); // 電影票數量狀態
   const [ticketQuantitySec, setTicketQuantitySec] = useState(0); // 電影票數量狀態
@@ -24,15 +23,6 @@ export default function MovieSeatSelection({ onPageChange }) {
   const [selectedTicketQuantity, setSelectedTicketQuantity] = useState(0); // 新增已选张数状态
 
   // 处理座位点击事件
-  const handleSeatClick = (seatNumber) => {
-    // 在这里可以编写逻辑来处理座位的选择和取消选择
-    // 这个示例只是简单地将座位号添加到已选择的座位列表中，或从中移除
-    if (selectedSeats.includes(seatNumber)) {
-      setSelectedSeats(selectedSeats.filter((seat) => seat !== seatNumber));
-    } else {
-      setSelectedSeats([...selectedSeats, seatNumber]);
-    }
-  };
 
   // 数量加减的函数
 
@@ -80,15 +70,6 @@ export default function MovieSeatSelection({ onPageChange }) {
     }
   };
 
-  const handleTicketAllIncrement = () => {
-    setticketAllQuantity(ticketAllQuantity + 1);
-  };
-
-  const handleTicketAllDecrement = () => {
-    if (ticketAllQuantity > 0) {
-      setticketAllQuantity(ticketAllQuantity - 1);
-    }
-  };
 
   const updateSelectedTicketQuantity = () => {
     setSelectedTicketQuantity(ticketQuantity + ticketQuantitySec); // 更新已选张数
@@ -282,9 +263,11 @@ export default function MovieSeatSelection({ onPageChange }) {
           >
             <div className="flex ml-6 mt-8">
               <figure>
-                <img
+                <Image
                   src="https://upload.wikimedia.org/wikipedia/zh/7/7a/Oppenheimer_%28film%29_poster.jpg"
                   alt="Shoes"
+                  width={150}
+                  height={150}
                   style={{ maxWidth: '150px', maxHeight: '150px' }}
                 />
               </figure>

@@ -46,7 +46,7 @@ export function AuthContextProvider({ children }) {
       return result;
     } catch (error) {
       console.error('註冊時發生錯誤', error);
-      return { success: false, error: '註冊時發生錯誤' };
+      return { success: false, error: error.message || '註冊時發生錯誤' };
     }
   }, []);
 
@@ -67,7 +67,7 @@ export function AuthContextProvider({ children }) {
       return result;
     } catch (error) {
       console.error('登入時發生錯誤', error);
-      return { success: false, error: '登入時發生錯誤' };
+      return { success: false, error: error.message || '登入時發生錯誤' };
     }
   }, []);
 
@@ -96,7 +96,7 @@ export function AuthContextProvider({ children }) {
       return await AuthService.checkAuth(sid);
     } catch (error) {
       console.error('CheckAuth error:', error);
-      return { success: false, error: '驗證失敗' };
+      return { success: false, error: error.message || '驗證失敗' };
     }
   }, []);
 

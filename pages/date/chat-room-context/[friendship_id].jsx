@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import PageTitle from '@/components/page-title';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
@@ -91,7 +92,7 @@ export default function ChatRoomContext() {
     return () => {
       controller.abort();
     };
-  }, [userAvatar, auth.id]);
+  }, [userAvatar, auth.id, getAuthHeader, setUserAvatar]);
 
   // 拿到好友名字
   useEffect(() => {
@@ -135,7 +136,7 @@ export default function ChatRoomContext() {
 
     fetchFriendIdAndName();
     fetchMessages();
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, auth.username, friendship_id, getAuthHeader]);
 
   // 使用 socket
   useEffect(() => {
@@ -189,7 +190,7 @@ export default function ChatRoomContext() {
       socket.current.off();
       console.log('Socket disconnected!');
     };
-  }, [router.isReady]);
+  }, [router.isReady, auth, getAuthHeader, roomName]);
 
   // 格式化時間的函數
   const formatTime = () =>
@@ -295,8 +296,6 @@ export default function ChatRoomContext() {
       }),
     });
     if (response.ok) {
-      const data = await response.json();
-
       toast.success('好友已封鎖！', { duration: 1500 });
       router.push('/date/friends-list');
     } else {
@@ -443,14 +442,15 @@ export default function ChatRoomContext() {
               return message.sender_id === auth.username ? (
                 <ChatMsgRightContext key={index} messages={message}>
                   {message.msg_type === 'I' ? (
-                    <img width={100} src={message.content} alt="Sent image" />
+                    <Image width={100} height={100} src={message.content} alt="Sent image" />
                   ) : null}
                 </ChatMsgRightContext>
               ) : (
                 <ChatMsgLeftContext key={index} messages={message}>
                   {message.msg_type === 'I' ? (
-                    <img
+                    <Image
                       width={100}
+                      height={100}
                       src={message.content}
                       alt="Received image"
                     />

@@ -1,21 +1,16 @@
 import MovieCard from '@/components/booking/card/movieCard';
 import { useAuth } from '@/context/auth-context';
 import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
-import { IoTicketOutline } from 'react-icons/io5';
 import { useRouter } from 'next/router';
 import { API_BASE_URL } from '@/configs/api-config';
 import PageTitle from '@/components/page-title';
-import Link from 'next/link';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -107,14 +102,11 @@ export default function Index({ onPageChange }) {
     }
   };
 
-  const [clickedButton, setClickedButton] = useState(null);
-  const [hovered, setHovered] = useState(false);
-
   useEffect(() => {
     if (auth.id !== undefined && auth.id !== null) {
       getBookingMovieCard();
     }
-  }, [auth.id]);
+  }, [auth.id, getBookingMovieCard]);
 
   return (
     <>

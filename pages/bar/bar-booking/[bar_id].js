@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
-import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
@@ -12,8 +12,7 @@ export default function Booking({ onPageChange }) {
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
-    if (!router.isReady) return;
-  }, [router.query]);
+  }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
 
@@ -89,7 +88,7 @@ export default function Booking({ onPageChange }) {
       if (!response.ok) {
         throw new Error('Network response was not ok: ' + response.status);
       }
-      const data = await response.json();
+      await response.json();
       if (response.ok) {
         Swal.fire({
           title: '訂位成功!',
@@ -149,10 +148,12 @@ export default function Booking({ onPageChange }) {
               <div className="text-white text-[18px]">我要訂位</div>
               {/* 移動端顯示的圖片 */}
               <div className="lg:hidden">
-                <img
+                <Image
                   className="w-[340px] h-[130px] object-cover rounded-[20px]"
-                  src={booking[0]?.bar_img}
+                  src={booking[0]?.bar_img || '/unavailable-image.jpg'}
                   alt="Bar Image"
+                  width={340}
+                  height={130}
                 />
               </div>
               <div className="text-[18px] lg:text-[32px] text-white">
@@ -286,10 +287,12 @@ export default function Booking({ onPageChange }) {
           </div>
           {/* 圖片區塊在大螢幕顯示，佔5列 */}
           <div className="hidden lg:block lg:col-span-4">
-            <img
+            <Image
               className="w-[456px] h-[300px] object-cover rounded-[20px]"
-              src={booking[0]?.bar_img}
+              src={booking[0]?.bar_img || '/unavailable-image.jpg'}
               alt=""
+              width={456}
+              height={300}
             />
           </div>
         </div>

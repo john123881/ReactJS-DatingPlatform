@@ -2,20 +2,19 @@ import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import Image from 'next/image';
 import Link from 'next/link';
-import { IoMdStarOutline, IoMdStar } from 'react-icons/io';
+import { IoMdStar } from 'react-icons/io';
 import { BsTelephone } from 'react-icons/bs';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaRegHeart } from 'react-icons/fa';
 import BarRatingModal from '@/components/bar/modal/bar-rating-modal';
 
-export default function BarDetailCard({ bar }) {
+export default function BarDetailCard() {
   const [bars, setBars] = useState([]);
 
   const getBarList = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/bar/bar-list`);
       const data = await res.json();
-      // console.log(data);
       setBars(data);
     } catch (error) {
       console.log('Failed to fetch bar list:', error);
@@ -24,7 +23,6 @@ export default function BarDetailCard({ bar }) {
 
   useEffect(() => {
     getBarList();
-    // console.log('useEffect log -> bars:', bars);
   }, []);
 
   return (
@@ -33,15 +31,9 @@ export default function BarDetailCard({ bar }) {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bar-detail-content text-white space-y-5">
             <div className="space-y-1 md:w-full">
-              <div className="text-h4 md:text-h3">
-                {/* Fake Sober Taipei */}
-                {bars.bar_name}
-              </div>
+              <div className="text-h4 md:text-h3">{bars.bar_name}</div>
               <div className="review flex gap-2 items-center">
-                <p className="text-h4 md:text-[20px]">
-                  {/* 4.6 */}
-                  {bars.rating}
-                </p>
+                <p className="text-h4 md:text-[20px]">{bars.rating}</p>
                 <div className="bar-detail-stars flex gap-1 rating rating-sm">
                   <input
                     type="radio"
@@ -68,6 +60,7 @@ export default function BarDetailCard({ bar }) {
                     name="rating-6"
                     className="mask mask-star-2 bg-[#A0FF1F]"
                     checked
+                    readOnly
                   />
                 </div>
                 <p className="text-[13px] md:text-h6">
@@ -75,14 +68,8 @@ export default function BarDetailCard({ bar }) {
                 </p>
               </div>
               <div className="flex gap-4 text-[13px] md:text-h6">
-                <div className="text-white">
-                  大安區
-                  {/* {bar.bar_area_name} */}
-                </div>
-                <div className="text-white">
-                  特色酒吧
-                  {/* {bar.bar_type_name} */}
-                </div>
+                <div className="text-white">大安區</div>
+                <div className="text-white">特色酒吧</div>
               </div>
               <div className="flex telephone gap-4">
                 <BsTelephone />
@@ -127,27 +114,21 @@ export default function BarDetailCard({ bar }) {
                 <BarRatingModal />
               </div>
             </div>
-            <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
-              <Link href="/bar/bar-booking">立即訂位</Link>
-            </button>
+            <Link
+              href="/bar/bar-booking"
+              className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px] flex items-center justify-center"
+            >
+              立即訂位
+            </Link>
           </div>
           <div className="bar-detail-img">
-            <img
+            <Image
               className="object-cover rounded-[10px] w-[328px] h-[300px] md:w-[440px] md:h-[400px]"
               src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
               alt="酒吧封面照"
+              width={440}
+              height={400}
             />
-            {/* <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                selectedStore.store_address
-              )}&output=embed`}
-              width="100%"
-              height="300"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              title="Store Location"
-            ></iframe> */}
           </div>
         </div>
         <div className="google-map hidden md:flex">
