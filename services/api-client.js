@@ -60,7 +60,8 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
     let errorMessage = response.statusText;
     try {
       const errorData = await response.json();
-      errorMessage = errorData.message || errorData.error || errorData.msg || errorMessage;
+      errorMessage =
+        errorData.message || errorData.error || errorData.msg || errorMessage;
     } catch (e) {
       // 忽略解析錯誤，使用預設的 statusText
     }
@@ -71,13 +72,17 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
 }
 
 // 輔助方法：GET
-apiClient.get = (endpoint, config) => apiClient(endpoint, { ...config, method: 'GET' });
+apiClient.get = (endpoint, config) =>
+  apiClient(endpoint, { ...config, method: 'GET' });
 
 // 輔助方法：POST
-apiClient.post = (endpoint, body, config) => apiClient(endpoint, { ...config, method: 'POST', body });
+apiClient.post = (endpoint, body, config) =>
+  apiClient(endpoint, { ...config, method: 'POST', body });
 
 // 輔助方法：PUT
-apiClient.put = (endpoint, body, config) => apiClient(endpoint, { ...config, method: 'PUT', body });
+apiClient.put = (endpoint, body, config) =>
+  apiClient(endpoint, { ...config, method: 'PUT', body });
 
 // 輔助方法：DELETE
-apiClient.delete = (endpoint, config) => apiClient(endpoint, { ...config, method: 'DELETE' });
+apiClient.delete = (endpoint, config) =>
+  apiClient(endpoint, { ...config, method: 'DELETE' });

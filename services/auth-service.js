@@ -29,7 +29,8 @@ export const AuthService = {
    * 忘記密碼發送 OTP
    * @param {string} email
    */
-  sendForgetPwdOtp: (email) => apiClient.post('/forget-password-send-otp', { email }),
+  sendForgetPwdOtp: (email) =>
+    apiClient.post('/forget-password-send-otp', { email }),
 
   /**
    * 忘記密碼修改

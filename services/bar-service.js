@@ -15,7 +15,8 @@ export const BarService = {
    * 搜索酒吧
    * @param {string} searchTerm
    */
-  searchBars: (searchTerm) => apiClient(`/bar/search-bars?searchTerm=${searchTerm}`),
+  searchBars: (searchTerm) =>
+    apiClient(`/bar/search-bars?searchTerm=${searchTerm}`),
 
   /**
    * 獲取酒吧詳情
@@ -28,7 +29,7 @@ export const BarService = {
    * @param {string|number} userId
    * @param {string} barIds - 逗號分隔的 ID 字串
    */
-  checkBarStatus: (userId, barIds) => 
+  checkBarStatus: (userId, barIds) =>
     apiClient(`/bar/check-bar-status?userId=${userId}&barIds=${barIds}`),
 
   /**
@@ -36,12 +37,14 @@ export const BarService = {
    * @param {string|number} userId
    * @param {string|number} barId
    */
-  saveBar: (userId, barId) => apiClient.post('/bar/saved-bar', { userId, barId }),
+  saveBar: (userId, barId) =>
+    apiClient.post('/bar/saved-bar', { userId, barId }),
 
   /**
    * 取消收藏酒吧
    * @param {string|number} userId
    * @param {string|number} barId
    */
-  unsaveBar: (userId, barId) => apiClient.delete('/bar/unsaved-bar', { body: { userId, barId } }),
+  unsaveBar: (userId, barId) =>
+    apiClient.delete('/bar/unsaved-bar', { body: { userId, barId } }),
 };

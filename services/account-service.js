@@ -39,7 +39,8 @@ export const AccountService = {
    * 上傳遊戲紀錄
    * @param {object} record - { auth_id, gameScore, gameTime }
    */
-  uploadGameRecord: (record) => apiClient.post('/account/game-record-upload', record),
+  uploadGameRecord: (record) =>
+    apiClient.post('/account/game-record-upload', record),
 
   /**
    * 讀取點數紀錄
@@ -61,7 +62,8 @@ export const AccountService = {
    */
   collectPost: {
     get: () => apiClient('/account/collect-post'),
-    delete: (data) => apiClient.delete('/account/collect-post-delete', { body: data }),
+    delete: (data) =>
+      apiClient.delete('/account/collect-post-delete', { body: data }),
   },
 
   /**
@@ -69,7 +71,8 @@ export const AccountService = {
    */
   collectBar: {
     get: () => apiClient('/account/collect-bar'),
-    delete: (data) => apiClient.delete('/account/collect-bar-delete', { body: data }),
+    delete: (data) =>
+      apiClient.delete('/account/collect-bar-delete', { body: data }),
   },
 
   /**
@@ -77,6 +80,7 @@ export const AccountService = {
    */
   collectMovie: {
     get: () => apiClient('/account/collect-movie'),
-    delete: (data) => apiClient.delete('/account/collect-movie-delete', { body: data }),
+    delete: (data) =>
+      apiClient.delete('/account/collect-movie-delete', { body: data }),
   },
 };

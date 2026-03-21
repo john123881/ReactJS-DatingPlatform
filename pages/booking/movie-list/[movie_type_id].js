@@ -1,6 +1,6 @@
 import MovieCard from '@/components/booking/card/movieCard';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PageTitle from '@/components/page-title';
 import { API_BASE_URL } from '@/configs/api-config';
 
@@ -85,7 +85,7 @@ export default function Index({ onPageChange }) {
   //   }, []);
 
   // try動態路由
-  const getMovieListType = async (movie_type_id) => {
+  const getMovieListType = useCallback(async (movie_type_id) => {
     if (!movie_type_id) return; // 確保 bar_type_id 存在
 
     const url = `${API_BASE_URL}/booking/movie-list/${movie_type_id}`;
@@ -96,7 +96,7 @@ export default function Index({ onPageChange }) {
     } catch (error) {
       console.error('Failed to fetch movie list:', error);
     }
-  };
+  }, []);
 
   // 動態路由成功
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function Index({ onPageChange }) {
       // 有 movie_type_id 後，向伺服器要求資料
       getMovieListType(movie_type_id);
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, getMovieListType]);
 
   useEffect(() => {
     console.log(movieCards); // 查看bars數據結構
@@ -340,11 +340,7 @@ export default function Index({ onPageChange }) {
           <p>未找到结果</p> // 搜索后无结果提示
         ) : (
           (hasSearched ? searchResults : movieCards).map((movie, index) => (
-            <MovieCard
-              movie={movie}
-              key={index}
-              isSaved={false}
-            />
+            <MovieCard movie={movie} key={index} isSaved={false} />
           ))
         )}
       </div>

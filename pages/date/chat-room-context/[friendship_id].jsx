@@ -136,7 +136,13 @@ export default function ChatRoomContext() {
 
     fetchFriendIdAndName();
     fetchMessages();
-  }, [router.isReady, router.query, auth.username, friendship_id, getAuthHeader]);
+  }, [
+    router.isReady,
+    router.query,
+    auth.username,
+    friendship_id,
+    getAuthHeader,
+  ]);
 
   // 使用 socket
   useEffect(() => {
@@ -442,7 +448,12 @@ export default function ChatRoomContext() {
               return message.sender_id === auth.username ? (
                 <ChatMsgRightContext key={index} messages={message}>
                   {message.msg_type === 'I' ? (
-                    <Image width={100} height={100} src={message.content} alt="Sent image" />
+                    <Image
+                      width={100}
+                      height={100}
+                      src={message.content}
+                      alt="Sent image"
+                    />
                   ) : null}
                 </ChatMsgRightContext>
               ) : (

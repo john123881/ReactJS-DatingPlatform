@@ -3,10 +3,7 @@ import Image from 'next/image';
 import { IoMdStar } from 'react-icons/io';
 
 export default function MovieModal({ movie, modalId, isOpen }) {
-  const {
-    setMovieModalToggle,
-  } = useCollect();
-
+  const { setMovieModalToggle } = useCollect();
 
   return (
     <>

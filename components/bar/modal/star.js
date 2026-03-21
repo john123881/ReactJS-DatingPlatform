@@ -13,9 +13,9 @@ export default function Star() {
     <>
       <h1>星星評分範例</h1>
       <div>
-        {/* 
+        {/*
           這裡使用簡易建立5個陣列1...N的語法，可以參考:
-          https://github.com/orgs/mfee-react/discussions/50 
+          https://github.com/orgs/mfee-react/discussions/50
         */}
         {Array(5)
           .fill(1)

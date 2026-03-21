@@ -14,7 +14,11 @@ export default function BarBookingListCard({ booking, setBookings }) {
           <Link href={`/bar/bar-detail/${booking.bar_id}`}>
             <Image
               className="h-[100px] w-[100px] lg:h-[120px] lg:w-[120px] object-cover rounded-xl"
-              src={`/barPic/${booking.bar_pic_name}`}
+              src={
+                booking?.bar_pic_name
+                  ? `/barPic/${booking.bar_pic_name}`
+                  : '/unavailable-image.jpg'
+              }
               alt={`Image of ${booking.bar_name}`}
               width={120}
               height={120}

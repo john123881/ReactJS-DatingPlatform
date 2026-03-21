@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { BsTelephone, HiOutlineLocationMarker } from '@/lib/react-icons';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
@@ -58,14 +58,14 @@ export default function Detail({ onPageChange }) {
   };
 
   //FETCH GET 酒吧資料
-  const getBarDetailById = async (bar_id) => {
+  const getBarDetailById = useCallback(async (bar_id) => {
     try {
       const data = await BarService.getBarDetail(bar_id);
       setBar(data);
     } catch (error) {
       console.error('Failed to fetch bar detail:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (router.isReady) {
@@ -215,16 +215,18 @@ export default function Detail({ onPageChange }) {
                 </button>
               </div>
               <div className="bar-detail-img">
-                {bar?.bar_pic_name && (
-                  <Image
-                    className="object-cover rounded-[10px]"
-                    src={`/barPic/${bar?.bar_pic_name}`}
-                    alt={`Image of ${bar?.bar_name}`}
-                    width={440}
-                    height={400}
-                    layout="intrinsic"
-                  />
-                )}
+                <Image
+                  className="object-cover rounded-[10px]"
+                  src={
+                    bar?.bar_pic_name
+                      ? `/barPic/${bar.bar_pic_name}`
+                      : '/unavailable-image.jpg'
+                  }
+                  alt={`Image of ${bar?.bar_name || 'bar'}`}
+                  width={440}
+                  height={400}
+                  layout="intrinsic"
+                />
               </div>
             </div>
             <div className="flex my-4 google-map md:hidden">

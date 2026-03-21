@@ -11,7 +11,11 @@ export default function BarCardIndex({ randomBar }) {
           <Link href={`/bar/bar-detail/${randomBar.bar_id}`}>
             <Image
               className="relative object-cover w-[159px] h-[155px] md:w-[241px] md:h-[230px] rounded-[10px]"
-              src={`/barPic/${randomBar.bar_pic_name}`}
+              src={
+                randomBar?.bar_pic_name
+                  ? `/barPic/${randomBar.bar_pic_name}`
+                  : '/unavailable-image.jpg'
+              }
               alt={`Image of ${randomBar.bar_name}`}
               width={241}
               height={230}

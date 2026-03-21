@@ -58,7 +58,11 @@ export default function CarouselContentBar({
   return (
     <div className="relative group">
       <img
-        src={`/barPic/${barSaved.bar_pic_name}`}
+        src={
+          barSaved.bar_pic_name
+            ? `/barPic/${barSaved.bar_pic_name}`
+            : '/unavailable-image.jpg'
+        }
         alt={altText}
         className="object-cover w-48 h-48 transition-transform duration-300 ease-in-out group-hover:scale-110 border border-white rounded-lg cursor-pointer"
         onClick={handleShowDetails}
@@ -73,7 +77,11 @@ export default function CarouselContentBar({
           <div className="flex justify-start items-center">
             <img
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-md object-cover"
-              src={`/barPic/${barSaved.bar_pic_name}`}
+              src={
+                barSaved.bar_pic_name
+                  ? `/barPic/${barSaved.bar_pic_name}`
+                  : '/unavailable-image.jpg'
+              }
               alt={`Image of ${barSaved.bar_name}`}
             />
             <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12">

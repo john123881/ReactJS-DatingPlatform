@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { usePostContext } from '@/context/post-context';
 import { useAuth } from '@/context/auth-context';
@@ -35,35 +35,48 @@ export default function Profile({ onPageChange }) {
 
   const { uid } = router.query;
 
-  const getCommunityUserProfilePost = async (page = profilePage) => {
-    if (!userProfileHasMore) return; // 防止重複請求
-    try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`,
-      );
-      const data = await res.json();
+  const getCommunityUserProfilePost = useCallback(
+    async (page = profilePage) => {
+      if (!userProfileHasMore) return; // 防止重複請求
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`,
+        );
+        const data = await res.json();
 
-      if (data.length === 0) {
-        setUserProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
-        return; // 提前停止加載
+        if (data.length === 0) {
+          setUserProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+          return; // 提前停止加載
+        }
+
+        const postIds = data.map((post) => post.post_id).join(',');
+
+        await Promise.all([
+          checkFollowingStatus(uid),
+          checkPostsStatus(postIds),
+          getPostComments(postIds),
+        ]);
+
+        setProfilePosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
+        setProfilePage((prevPage) => prevPage + 1); // 更新頁碼
+        // setIsLoading(false); // 結束加載
+      } catch (error) {
+        console.error('Failed to fetch index posts:', error);
+        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
-
-      const postIds = data.map((post) => post.post_id).join(',');
-
-      await Promise.all([
-        checkFollowingStatus(uid),
-        checkPostsStatus(postIds),
-        getPostComments(postIds),
-      ]);
-
-      setProfilePosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
-      setProfilePage((prevPage) => prevPage + 1); // 更新頁碼
-      // setIsLoading(false); // 結束加載
-    } catch (error) {
-      console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
-    }
-  };
+    },
+    [
+      uid,
+      userProfileHasMore,
+      profilePage,
+      checkFollowingStatus,
+      checkPostsStatus,
+      getPostComments,
+      setProfilePosts,
+      setProfilePage,
+      setUserProfileHasMore,
+    ],
+  );
 
   useEffect(() => {
     // Next.js 的路由器是異步, 確保拿到 uid 再 fetch !!! Important

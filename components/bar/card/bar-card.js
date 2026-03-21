@@ -104,7 +104,11 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
             <Link href={`/bar/bar-detail/${bar.bar_id}`}>
               <Image
                 className="relative w-[159px] h-[146px] lg:w-[223px] lg:h-[205px] object-cover"
-                src={`/barPic/${bar.bar_pic_name}`}
+                src={
+                  bar?.bar_pic_name
+                    ? `/barPic/${bar.bar_pic_name}`
+                    : '/unavailable-image.jpg'
+                }
                 alt={`Image of ${bar.bar_name}`}
                 width={223}
                 height={205}

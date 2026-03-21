@@ -70,7 +70,6 @@ export default function MovieSeatSelection({ onPageChange }) {
     }
   };
 
-
   const updateSelectedTicketQuantity = () => {
     setSelectedTicketQuantity(ticketQuantity + ticketQuantitySec); // 更新已选张数
     const totalTicketQuantity = ticketQuantity + ticketQuantitySec;

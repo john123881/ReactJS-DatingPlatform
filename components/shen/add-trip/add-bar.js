@@ -38,13 +38,15 @@ export default function AddBar({
   return (
     <div className="flex justify-start items-center ">
       <div className="flex justify-start items-center ">
-        {bar.bar_pic_name && (
-          <img
-            className="w-24 h-24 sm:w-32 sm:h-32 rounded-md object-cover"
-            src={`/barPic/${bar.bar_pic_name}`}
-            alt={`Image of ${bar.name}`}
-          />
-        )}
+        <img
+          className="w-24 h-24 sm:w-32 sm:h-32 rounded-md object-cover"
+          src={
+            bar.bar_pic_name
+              ? `/barPic/${bar.bar_pic_name}`
+              : '/unavailable-image.jpg'
+          }
+          alt={`Image of ${bar.name}`}
+        />
         <div
           className="flex flex-col justify-center sm:w-64 items-start ml-5 mr-5 sm:ml-12
      sm:mr-12"

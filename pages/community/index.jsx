@@ -116,7 +116,7 @@ export default function Index({ onPageChange }) {
                     ? () => getCommunityIndexFilteredPost(currentKeyword)
                     : getCommunityIndexPost
                 }
-                hasMore={isFilterActive ? indexHasMore : indexFilteredHasMore}
+                hasMore={isFilterActive ? indexFilteredHasMore : indexHasMore}
                 loader={
                   <div
                     style={{

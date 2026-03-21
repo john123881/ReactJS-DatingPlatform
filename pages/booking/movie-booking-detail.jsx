@@ -46,7 +46,12 @@ export default function Index({ onPageChange }) {
             {/* 電影資訊 */}
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
               <figure>
-                <Image src="/movie_img/movie_2.jpg" alt="旺卡電影海報" width={300} height={480} />
+                <Image
+                  src="/movie_img/movie_2.jpg"
+                  alt="旺卡電影海報"
+                  width={300}
+                  height={480}
+                />
               </figure>
               <div className="card-body" style={{ width: '200px' }}>
                 <h2 className="card-title pb-2" style={{ fontSize: '2rem' }}>

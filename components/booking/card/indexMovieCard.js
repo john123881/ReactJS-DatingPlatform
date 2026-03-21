@@ -1,11 +1,9 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 
 export default function MovieCard({ movie, index }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [hovered, setHovered] = useState(null);
   const [isClicked, setIsClicked] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const handleHeartClick = () => {
@@ -38,7 +36,7 @@ export default function MovieCard({ movie, index }) {
       <div
         key={index}
         className={`card bg-base-100 shadow-xl relative ${
-          isHovered || isClicked ? ' bg-white' : ''
+          isClicked ? ' bg-white' : ''
         }`}
         style={{ width: '280px', height: '550px' }}
         onMouseEnter={() => setHoveredIndex(index)}
@@ -47,13 +45,13 @@ export default function MovieCard({ movie, index }) {
         <figure>
           <div className="card w-99 bg-base-100 shadow-xl">
             <figure>
-              <img
+              <Image
                 src={movie.movie_img || '/unavailable-image.jpg'}
-                // src={`/movie_img/${movie.poster_img}`}
-                // src="https://upload.wikimedia.org/wikipedia/zh/7/7a/Oppenheimer_%28film%29_poster.jpg"
-                alt={movie.title} // 使用動態的 movieName
+                alt={movie.title}
+                width={280}
+                height={400}
                 style={{
-                  height: ' 400px ',
+                  height: '400px',
                   objectFit: 'cover',
                   filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
                   transition: 'filter 0.3s',

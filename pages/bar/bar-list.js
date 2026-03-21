@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
@@ -36,36 +36,34 @@ export default function BarList({ onPageChange }) {
   };
 
   // 檢查儲存酒吧狀態
-  const checkBarsStatus = async (barIds) => {
-    const userId = auth.id;
+  const checkBarsStatus = useCallback(
+    async (barIds) => {
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
+      if (userId === 0) {
+        return;
+      }
 
-    try {
-      const data = await BarService.checkBarStatus(userId, barIds);
+      try {
+        const data = await BarService.checkBarStatus(userId, barIds);
 
-      // 初始化來存儲所有酒吧的收藏狀態
-      const newSavedBars = { ...savedBars };
-      console.log('checkBarsStatus 的 newSavedBars:', newSavedBars);
-
-      // 遍歷從後端獲取的每個貼文的狀態數據
-      data.forEach((status) => {
-        // 將每個貼文的收藏狀態存儲到 newSavedBars 對象中
-        newSavedBars[status.barId] = status.isSaved;
-      });
-      // console.log('checkBarsStatus 的 newSavedBars2:', newSavedBars);
-
-      // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
-      setSavedBars(newSavedBars);
-    } catch (error) {
-      console.error('無法獲取酒吧狀態:', error);
-    }
-  };
+        // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
+        setSavedBars((prevSavedBars) => {
+          const newSavedBars = { ...prevSavedBars };
+          data.forEach((status) => {
+            newSavedBars[status.barId] = status.isSaved;
+          });
+          return newSavedBars;
+        });
+      } catch (error) {
+        console.error('無法獲取酒吧狀態:', error);
+      }
+    },
+    [auth.id],
+  );
 
   //FETCH GET 酒吧列表資料
-  const getBarList = async () => {
+  const getBarList = useCallback(async () => {
     // console.log('Token:', auth);
 
     try {
@@ -83,7 +81,7 @@ export default function BarList({ onPageChange }) {
     } catch (error) {
       console.error('Failed to fetch bar list:', error);
     }
-  };
+  }, [checkBarsStatus]);
 
   // useEffect(() => {
   //   if (auth.id === 0) {

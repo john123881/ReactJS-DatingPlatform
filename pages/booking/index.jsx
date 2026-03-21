@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import IndexMovieCard from '@/components/booking/card/indexMovieCard';
@@ -23,7 +23,7 @@ export default function Index({ onPageChange }) {
   const router = useRouter();
   const [movieCards, setMovieCards] = useState([]);
 
-  const getBookingMovieCard = async () => {
+  const getBookingMovieCard = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/booking/index-movie-list`);
       const data = await res.json();
@@ -32,7 +32,7 @@ export default function Index({ onPageChange }) {
     } catch (error) {
       console.log('Failed to fetch movie card', error);
     }
-  };
+  }, []);
 
   const handleTabClick = () => {
     getBookingMovieCard(); // 點擊標籤時重新 fetch 電影卡片數據
@@ -96,7 +96,13 @@ export default function Index({ onPageChange }) {
             id="slide2"
             className="carousel-item relative w-full mt-20 h-[550px]"
           >
-            <Image src="/1111.jpeg" className="w-full" width={1920} height={530} alt="電影海報 2" />
+            <Image
+              src="/1111.jpeg"
+              className="w-full"
+              width={1920}
+              height={530}
+              alt="電影海報 2"
+            />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
               <a
                 href="#slide1"

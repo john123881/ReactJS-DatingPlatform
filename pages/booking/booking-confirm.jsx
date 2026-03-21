@@ -9,7 +9,6 @@ export default function MovieSeatSelection({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-
   return (
     <>
       <PageTitle pageTitle={pageTitle} />

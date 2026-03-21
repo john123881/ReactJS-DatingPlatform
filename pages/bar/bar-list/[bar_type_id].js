@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
@@ -68,62 +68,63 @@ export default function List({ onPageChange }) {
   };
 
   // 檢查儲存酒吧狀態
-  const checkBarsStatus = async (barIds) => {
-    const userId = auth.id;
+  const checkBarsStatus = useCallback(
+    async (barIds) => {
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
+      if (userId === 0) {
+        return;
+      }
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
           },
-        },
-      );
-      const data = await response.json();
-      // console.log('checkBarsStatus 的 data:', data);
+        );
+        const data = await response.json();
+        // console.log('checkBarsStatus 的 data:', data);
 
-      // 初始化來存儲所有酒吧的收藏狀態
-      const newSavedBars = { ...savedBars };
-      console.log('checkBarsStatus 的 newSavedBars:', newSavedBars);
-
-      // 遍歷從後端獲取的每個貼文的狀態數據
-      data.forEach((status) => {
-        // 將每個貼文的收藏狀態存儲到 newSavedBars 對象中
-        newSavedBars[status.barId] = status.isSaved;
-      });
-      // console.log('checkBarsStatus 的 newSavedBars2:', newSavedBars);
-
-      // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
-      setSavedBars(newSavedBars);
-    } catch (error) {
-      console.error('無法獲取酒吧狀態:', error);
-    }
-  };
+        // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
+        setSavedBars((prevSavedBars) => {
+          const newSavedBars = { ...prevSavedBars };
+          data.forEach((status) => {
+            newSavedBars[status.barId] = status.isSaved;
+          });
+          return newSavedBars;
+        });
+      } catch (error) {
+        console.error('無法獲取酒吧狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
 
   //FETCH GET 酒吧列表資料
-  const getBarListDynamicById = async (bar_type_id) => {
-    if (!bar_type_id) return; // 確保 bar_type_id 存在
+  const getBarListDynamicById = useCallback(
+    async (bar_type_id) => {
+      if (!bar_type_id) return; // 確保 bar_type_id 存在
 
-    const url = `${API_BASE_URL}/bar/bar-list/${bar_type_id}`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      // console.log('getBarListDynamicById 的 data:', data);
+      const url = `${API_BASE_URL}/bar/bar-list/${bar_type_id}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        // console.log('getBarListDynamicById 的 data:', data);
 
-      const barIds = data.map((bar) => bar.bar_id).join(',');
-      // console.log('getBarListDynamicById 的 barIds:', barIds);
-      checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
+        const barIds = data.map((bar) => bar.bar_id).join(',');
+        // console.log('getBarListDynamicById 的 barIds:', barIds);
+        checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
 
-      setBars(data); // 確認數據是否為預期格式
-    } catch (error) {
-      console.error('Failed to fetch bar list:', error);
-    }
-  };
+        setBars(data); // 確認數據是否為預期格式
+      } catch (error) {
+        console.error('Failed to fetch bar list:', error);
+      }
+    },
+    [checkBarsStatus],
+  );
 
   const handleSearchChange = async (e) => {
     getSearchBars(e.target.value);

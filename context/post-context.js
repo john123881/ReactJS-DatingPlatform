@@ -1,4 +1,11 @@
-import { useState, createContext, useContext, useRef, useEffect, useCallback } from 'react';
+import {
+  useState,
+  createContext,
+  useContext,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
@@ -88,7 +95,7 @@ export const PostProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [userInfo, setUserInfo] = useState({});
 
-  const getUserDetail = async () => {
+  const getUserDetail = useCallback(async () => {
     if (!auth.id) return;
 
     try {
@@ -99,9 +106,9 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch user info', error);
       setUserInfo({}); // 當請求失敗時，也設置一個空對象
     }
-  };
+  }, [auth.id]);
 
-  const getCommunityIndexPost = async () => {
+  const getCommunityIndexPost = useCallback(async () => {
     if (!indexHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
 
@@ -123,38 +130,41 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch index posts:', error);
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  };
+  }, [indexHasMore, page, checkPostsStatus, getPostComments]);
 
-  const getCommunityIndexFilteredPost = async (keyword) => {
-    if (!indexFilteredHasMore) return; // 防止重複請求
-    // setIsLoading(true); // 開始加載
+  const getCommunityIndexFilteredPost = useCallback(
+    async (keyword) => {
+      if (!indexFilteredHasMore) return; // 防止重複請求
+      // setIsLoading(true); // 開始加載
 
-    try {
-      const data = await CommunityService.getPostsByKeyword(
-        keyword,
-        filteredPage,
-        12,
-      );
-      if (data.length === 0) {
-        setIndexFilteredHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
-      } else {
-        const postIds = data.map((post) => post.post_id).join(',');
+      try {
+        const data = await CommunityService.getPostsByKeyword(
+          keyword,
+          filteredPage,
+          12,
+        );
+        if (data.length === 0) {
+          setIndexFilteredHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+        } else {
+          const postIds = data.map((post) => post.post_id).join(',');
 
-        await checkPostsStatus(postIds); // 檢查貼文狀態
-        await getPostComments(postIds);
+          await checkPostsStatus(postIds); // 檢查貼文狀態
+          await getPostComments(postIds);
 
-        setFilteredPosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
-        setFilteredPage((prevPage) => prevPage + 1); // 更新頁碼
-        setIsFilterActive(true);
-        // setIsLoading(false); // 結束加載
+          setFilteredPosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
+          setFilteredPage((prevPage) => prevPage + 1); // 更新頁碼
+          setIsFilterActive(true);
+          // setIsLoading(false); // 結束加載
+        }
+      } catch (error) {
+        console.error('Failed to fetch index posts:', error);
+        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
-    } catch (error) {
-      console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
-    }
-  };
+    },
+    [indexFilteredHasMore, filteredPage, checkPostsStatus, getPostComments],
+  );
 
-  const getCommunityExplorePost = async () => {
+  const getCommunityExplorePost = useCallback(async () => {
     if (!exploreHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
 
@@ -176,9 +186,9 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch explore posts:', error);
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  };
+  }, [exploreHasMore, randomPage, checkPostsStatus, getPostComments]);
 
-  const getCommunityProfilePost = async () => {
+  const getCommunityProfilePost = useCallback(async () => {
     if (!profileHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
     try {
@@ -199,38 +209,44 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch profile posts:', error);
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  };
+  }, [profileHasMore, page, checkPostsStatus, getPostComments]);
 
-  const getPostPage = async (pid) => {
-    try {
-      const data = await CommunityService.getPostDetail(pid);
-      if (data.length !== 0) {
-        await checkPostsStatus(pid); // 檢查貼文狀態
-        await getPostComments(pid);
+  const getPostPage = useCallback(
+    async (pid) => {
+      try {
+        const data = await CommunityService.getPostDetail(pid);
+        if (data.length !== 0) {
+          await checkPostsStatus(pid); // 檢查貼文狀態
+          await getPostComments(pid);
 
-        setPostPage(data[0]);
+          setPostPage(data[0]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch index posts:', error);
+        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
-    } catch (error) {
-      console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
-    }
-  };
+    },
+    [checkPostsStatus, getPostComments],
+  );
 
-  const getEventPage = async (eid) => {
-    try {
-      const data = await CommunityService.getEventDetail(eid);
-      if (data.length !== 0) {
-        await checkEventsStatus(eid); // 檢查活動狀態
+  const getEventPage = useCallback(
+    async (eid) => {
+      try {
+        const data = await CommunityService.getEventDetail(eid);
+        if (data.length !== 0) {
+          await checkEventsStatus(eid); // 檢查活動狀態
 
-        setEventPageCard(data[0]);
+          setEventPageCard(data[0]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch index posts:', error);
+        // setIsLoading(true); // 確保即使出錯也要結束加載
       }
-    } catch (error) {
-      console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
-    }
-  };
+    },
+    [checkEventsStatus],
+  );
 
-  const getCommunityEvents = async () => {
+  const getCommunityEvents = useCallback(async () => {
     if (!eventHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
 
@@ -251,7 +267,7 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch events:', error);
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  };
+  }, [eventHasMore, eventPage, checkEventsStatus]);
 
   const getPostComments = useCallback(async (postIds) => {
     try {
@@ -295,53 +311,47 @@ export const PostProvider = ({ children }) => {
   }, []);
 
   // 上傳回覆
-  const handleCommentUpload = async (post, newComment) => {
-    const postId = post.post_id;
-    const userId = auth.id;
+  const handleCommentUpload = useCallback(
+    async (post, newComment) => {
+      const postId = post.post_id;
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
+      if (userId === 0) {
+        return;
+      }
 
-    try {
-      const data = await CommunityService.addComment({
-        context: newComment,
-        status: 'posted',
-        postId,
-        userId,
-      });
-
-      if (res.ok) {
-        setComments((prevComments) => {
-          // 從先前的評論狀態（prevComments）創建一個新的物件副本。
-          const updatedComments = { ...prevComments };
-
-          // 獲取指定貼文ID（post_id）的評論列表。如果這個貼文沒有評論，則創建一個空陣列來儲存新評論。
-          const commentsForPost = updatedComments[postId] || [];
-
-          // 將新的評論數據（data，剛從後端API獲得的評論對象）添加到該貼文的評論列表中。
-          updatedComments[postId] = [...commentsForPost, data];
-
-          // 返回更新後的評論狀態物件，觸發相關組件的重新渲染，在界面上顯示包括新評論在內的更新後的評論列表。
-          return updatedComments;
+      try {
+        const data = await CommunityService.addComment({
+          context: newComment,
+          status: 'posted',
+          postId,
+          userId,
         });
 
-        getPostComments(postId);
+        // 原本程式碼中有 res.ok，但這裡 CommunityService 應該直接回傳 data
+        // 如果 handleCommentUpload 內部需要 res，請確保 CommunityService 回傳完整的回應
+        // 假設 CommunityService.addComment 成功即回傳 data
+        if (data) {
+          setComments((prevComments) => {
+            const updatedComments = { ...prevComments };
+            const commentsForPost = updatedComments[postId] || [];
+            updatedComments[postId] = [...commentsForPost, data];
+            return updatedComments;
+          });
 
-        // 將狀態 newComment 更新為空字串，清空 textarea
+          getPostComments(postId);
+          setNewComment('');
+        }
+      } catch (error) {
+        console.error('upload comment failed:', error);
+      } finally {
         setNewComment('');
-      } else {
-        throw new Error(data.message || '新增回覆失敗');
       }
-    } catch (error) {
-      console.error('upload comment failed:', error);
-    } finally {
-      // 清空textarea
-      setNewComment(''); // 清空 textarea
-    }
-  };
+    },
+    [auth.id, getPostComments],
+  );
 
-  const getSearchUsers = async (value) => {
+  const getSearchUsers = useCallback(async (value) => {
     setSearchTerm(value);
 
     if (!value.trim()) {
@@ -360,7 +370,7 @@ export const PostProvider = ({ children }) => {
         console.error('Search error:', error);
       }
     }
-  };
+  }, []);
 
   // 重置搜尋內容並關閉視窗
   const resetAndCloseSearchModal = () => {
@@ -904,169 +914,199 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  const handleLikedClick = async (post) => {
-    const postId = post.post_id;
-    const userId = auth.id;
+  const handleLikedClick = useCallback(
+    async (post) => {
+      const postId = post.post_id;
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
-    const wasLiked = likedPosts[postId] || false;
-    const newLikedState = !wasLiked;
-
-    try {
-      const result = wasLiked
-        ? await CommunityService.unlikePost(userId, postId)
-        : await CommunityService.likePost(userId, postId);
-
-      if (result.success) {
-        setLikedPosts((prev) => ({ ...prev, [postId]: newLikedState }));
-      } else {
-        throw new Error('Failed to update like status');
+      if (userId === 0) {
+        return;
       }
-    } catch (error) {
-      console.error('Error updating like status:', error);
-    }
-  };
 
-  const handleAttendedClick = async (event) => {
-    const eventId = event.comm_event_id;
-    const userId = auth.id;
+      // 先獲取當前狀態
+      let wasLiked = false;
+      setLikedPosts((prev) => {
+        wasLiked = prev[postId] || false;
+        return prev;
+      });
 
-    if (userId === 0) {
-      return;
-    }
+      const newLikedState = !wasLiked;
 
-    const wasAttended = attendedEvents[eventId] || false;
-    const newAttendedState = !wasAttended;
+      try {
+        const result = wasLiked
+          ? await CommunityService.unlikePost(userId, postId)
+          : await CommunityService.likePost(userId, postId);
 
-    try {
-      const result = wasAttended
-        ? await CommunityService.notAttendEvent(userId, eventId)
-        : await CommunityService.attendEvent(userId, eventId);
-
-      if (result.success) {
-        setAttendedEvents((prev) => ({
-          ...prev,
-          [eventId]: newAttendedState,
-        }));
-      } else {
-        throw new Error('Failed to update attendance status');
+        if (result.success) {
+          setLikedPosts((prev) => ({ ...prev, [postId]: newLikedState }));
+        } else {
+          throw new Error('Failed to update like status');
+        }
+      } catch (error) {
+        console.error('Error updating like status:', error);
       }
-    } catch (error) {
-      console.error('Error updating event attendance:', error);
-    }
-  };
+    },
+    [auth.id],
+  );
 
-  const handleSavedClick = async (post) => {
-    const postId = post.post_id;
-    const userId = auth.id;
+  const handleAttendedClick = useCallback(
+    async (event) => {
+      const eventId = event.comm_event_id;
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
-
-    const wasSaved = savedPosts[postId] || false;
-    const newSavedState = !wasSaved;
-
-    try {
-      const result = wasSaved
-        ? await CommunityService.unsavePost(userId, postId)
-        : await CommunityService.savePost(userId, postId);
-
-      if (result.success) {
-        setRerender(!rerender);
-        setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
-      } else {
-        throw new Error('Failed to update save status');
+      if (userId === 0) {
+        return;
       }
-    } catch (error) {
-      console.error('Error updating save status:', error);
-    }
-  };
 
-  const handleFollowClick = async (FollowingId) => {
-    const userId = auth.id; // 當前登入用戶的ID
+      const wasAttended = attendedEvents[eventId] || false;
+      const newAttendedState = !wasAttended;
 
-    if (userId === 0) return; // 未登入狀態直接返回
+      try {
+        const result = wasAttended
+          ? await CommunityService.notAttendEvent(userId, eventId)
+          : await CommunityService.attendEvent(userId, eventId);
 
-    const isFollowing = following[FollowingId] || false; // 檢查是否已追蹤該用戶
-    const newFollowingState = !isFollowing; // 新的追蹤狀態為當前狀態的反向值
-
-    try {
-      const result = isFollowing
-        ? await CommunityService.unfollowUser(userId, FollowingId)
-        : await CommunityService.followUser(userId, FollowingId);
-
-      if (result.success) {
-        setFollowing((prev) => ({
-          ...prev,
-          [FollowingId]: newFollowingState,
-        }));
-      } else {
-        throw new Error('Failed to update follow status');
+        if (result.success) {
+          setAttendedEvents((prev) => ({
+            ...prev,
+            [eventId]: newAttendedState,
+          }));
+        } else {
+          throw new Error('Failed to update attendance status');
+        }
+      } catch (error) {
+        console.error('Error updating event attendance:', error);
       }
-    } catch (error) {
-      console.error('Error updating follow status:', error);
-    }
-  };
+    },
+    [auth.id, attendedEvents],
+  );
 
-  const handleDeletePostClick = async (post) => {
-    const postId = post.post_id;
+  const handleSavedClick = useCallback(
+    async (post) => {
+      const postId = post.post_id;
+      const userId = auth.id;
 
-    if (!postId) return;
+      if (userId === 0) {
+        return;
+      }
 
-    Swal.fire({
-      title: '確定刪除?',
-      showCancelButton: true,
-      confirmButtonText: '確認',
-      cancelButtonText: `取消`,
-      confirmButtonColor: '#A0FF1F',
-      background: 'rgba(0, 0, 0, 0.85)',
-    }).then(async (result) => {
-      // 如果點擊確認刪除才執行
-      if (result.isConfirmed) {
-        try {
-          const res = await fetch(`${API_BASE_URL}/community/delete-post`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeader(),
-            },
-            body: JSON.stringify({ postId }),
-          });
+      const wasSaved = savedPosts[postId] || false;
+      const newSavedState = !wasSaved;
 
-          if (res.ok) {
-            // 更新 posts, randomPosts 狀態以移除已刪除的貼文
-            setPosts((prevPosts) => {
-              return prevPosts.filter((post) => post.post_id !== postId);
-            });
-            setProfilePosts((prevPosts) => {
-              return prevPosts.filter((post) => post.post_id !== postId);
-            });
-            setFilteredPosts((prevPosts) => {
-              return prevPosts.filter((post) => post.post_id !== postId);
-            });
-            setRandomPosts((prevPosts) => {
-              return prevPosts.filter((post) => post.post_id !== postId);
-            });
-            setPostPage((prevPosts) => {
-              // return prevPosts.filter((post) => post.post_id !== postId);
-              return Array.isArray(prevPosts)
-                ? prevPosts.filter((post) => post.post_id !== postId)
-                : [];
+      try {
+        const result = wasSaved
+          ? await CommunityService.unsavePost(userId, postId)
+          : await CommunityService.savePost(userId, postId);
+
+        if (result.success) {
+          setRerender(!rerender);
+          setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
+        } else {
+          throw new Error('Failed to update save status');
+        }
+      } catch (error) {
+        console.error('Error updating save status:', error);
+      }
+    },
+    [auth.id, savedPosts, rerender, setRerender],
+  );
+
+  const handleFollowClick = useCallback(
+    async (FollowingId) => {
+      const userId = auth.id; // 當前登入用戶的ID
+
+      if (userId === 0) return; // 未登入狀態直接返回
+
+      const isFollowing = following[FollowingId] || false; // 檢查是否已追蹤該用戶
+      const newFollowingState = !isFollowing; // 新的追蹤狀態為當前狀態的反向值
+
+      try {
+        const result = isFollowing
+          ? await CommunityService.unfollowUser(userId, FollowingId)
+          : await CommunityService.followUser(userId, FollowingId);
+
+        if (result.success) {
+          setFollowing((prev) => ({
+            ...prev,
+            [FollowingId]: newFollowingState,
+          }));
+        } else {
+          throw new Error('Failed to update follow status');
+        }
+      } catch (error) {
+        console.error('Error updating follow status:', error);
+      }
+    },
+    [auth.id, following],
+  );
+
+  const handleDeletePostClick = useCallback(
+    async (post) => {
+      const postId = post.post_id;
+
+      if (!postId) return;
+
+      Swal.fire({
+        title: '確定刪除?',
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        cancelButtonText: `取消`,
+        confirmButtonColor: '#A0FF1F',
+        background: 'rgba(0, 0, 0, 0.85)',
+      }).then(async (result) => {
+        // 如果點擊確認刪除才執行
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`${API_BASE_URL}/community/delete-post`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeader(),
+              },
+              body: JSON.stringify({ postId }),
             });
 
-            setPostsCount((prevCount) => prevCount - 1); // 減少貼文數量
+            if (res.ok) {
+              // 更新 posts, randomPosts 狀態以移除已刪除的貼文
+              setPosts((prevPosts) => {
+                return prevPosts.filter((post) => post.post_id !== postId);
+              });
+              setProfilePosts((prevPosts) => {
+                return prevPosts.filter((post) => post.post_id !== postId);
+              });
+              setFilteredPosts((prevPosts) => {
+                return prevPosts.filter((post) => post.post_id !== postId);
+              });
+              setRandomPosts((prevPosts) => {
+                return prevPosts.filter((post) => post.post_id !== postId);
+              });
+              setPostPage((prevPosts) => {
+                // return prevPosts.filter((post) => post.post_id !== postId);
+                return Array.isArray(prevPosts)
+                  ? prevPosts.filter((post) => post.post_id !== postId)
+                  : [];
+              });
 
-            Swal.fire({
-              title: '刪除成功!',
-              icon: 'success',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
-          } else {
+              setPostsCount((prevCount) => prevCount - 1); // 減少貼文數量
+
+              Swal.fire({
+                title: '刪除成功!',
+                icon: 'success',
+                confirmButtonText: '關閉',
+                confirmButtonColor: '#A0FF1F',
+                background: 'rgba(0, 0, 0, 0.85)',
+              });
+            } else {
+              Swal.fire({
+                title: '刪除失敗!',
+                icon: 'error',
+                confirmButtonText: '關閉',
+                confirmButtonColor: '#A0FF1F',
+                background: 'rgba(0, 0, 0, 0.85)',
+              });
+            }
+          } catch (error) {
+            console.error('Error delete post status:', error);
             Swal.fire({
               title: '刪除失敗!',
               icon: 'error',
@@ -1075,19 +1115,11 @@ export const PostProvider = ({ children }) => {
               background: 'rgba(0, 0, 0, 0.85)',
             });
           }
-        } catch (error) {
-          console.error('Error delete post status:', error);
-          Swal.fire({
-            title: '刪除失敗!',
-            icon: 'error',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          });
         }
-      }
-    });
-  };
+      });
+    },
+    [getAuthHeader],
+  );
 
   const handleDeleteEventClick = async (event, modalId) => {
     const eventId = event.comm_event_id;
@@ -1152,57 +1184,68 @@ export const PostProvider = ({ children }) => {
     });
   };
 
-  const handleDeleteCommentClick = async (comment, modalId) => {
-    const commentId = comment.comm_comment_id;
+  const handleDeleteCommentClick = useCallback(
+    async (comment, modalId) => {
+      const commentId = comment.comm_comment_id;
 
-    if (!commentId) return;
+      if (!commentId) return;
 
-    const result = await Swal.fire({
-      title: '確定刪除?',
-      showCancelButton: true,
-      confirmButtonText: '確認',
-      cancelButtonText: '取消',
-      confirmButtonColor: '#A0FF1F',
-      background: 'rgba(0, 0, 0, 0.85)',
-    });
+      const result = await Swal.fire({
+        title: '確定刪除?',
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        cancelButtonText: '取消',
+        confirmButtonColor: '#A0FF1F',
+        background: 'rgba(0, 0, 0, 0.85)',
+      });
 
-    // 如果點擊確認刪除才執行
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch(`${API_BASE_URL}/community/delete-comment`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader(),
-          },
-          body: JSON.stringify({ commentId }),
-        });
-
-        if (res.ok) {
-          // 更新 comments 狀態以移除已刪除的回覆
-          setComments((prevComments) => {
-            // 遍歷所有貼文的評論
-            const updatedComments = { ...prevComments };
-
-            for (const postId in updatedComments) {
-              // 過濾出除了要刪除的那個評論外的所有評論
-              updatedComments[postId] = updatedComments[postId].filter(
-                (comment) => comment.comm_comment_id !== commentId,
-              );
-            }
-
-            return updatedComments; // 返回更新後的評論對象
+      // 如果點擊確認刪除才執行
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/community/delete-comment`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ commentId }),
           });
 
-          Swal.fire({
-            title: '刪除成功!',
-            icon: 'success',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          });
-          return true; // 確保成功時返回 true 給 handleRemoveNotification
-        } else {
+          if (res.ok) {
+            // 更新 comments 狀態以移除已刪除的回覆
+            setComments((prevComments) => {
+              // 遍歷所有貼文的評論
+              const updatedComments = { ...prevComments };
+
+              for (const postId in updatedComments) {
+                // 過濾出除了要刪除的那個評論外的所有評論
+                updatedComments[postId] = updatedComments[postId].filter(
+                  (comment) => comment.comm_comment_id !== commentId,
+                );
+              }
+
+              return updatedComments; // 返回更新後的評論對象
+            });
+
+            Swal.fire({
+              title: '刪除成功!',
+              icon: 'success',
+              confirmButtonText: '關閉',
+              confirmButtonColor: '#A0FF1F',
+              background: 'rgba(0, 0, 0, 0.85)',
+            });
+            return true; // 確保成功時返回 true 給 handleRemoveNotification
+          } else {
+            Swal.fire({
+              title: '刪除失敗!',
+              icon: 'error',
+              confirmButtonText: '關閉',
+              confirmButtonColor: '#A0FF1F',
+              background: 'rgba(0, 0, 0, 0.85)',
+            });
+          }
+        } catch (error) {
+          console.error('Error delete post status:', error);
           Swal.fire({
             title: '刪除失敗!',
             icon: 'error',
@@ -1211,18 +1254,10 @@ export const PostProvider = ({ children }) => {
             background: 'rgba(0, 0, 0, 0.85)',
           });
         }
-      } catch (error) {
-        console.error('Error delete post status:', error);
-        Swal.fire({
-          title: '刪除失敗!',
-          icon: 'error',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
       }
-    }
-  };
+    },
+    [getAuthHeader],
+  );
 
   const checkPostsStatus = useCallback(
     async (postIds) => {
@@ -1243,87 +1278,91 @@ export const PostProvider = ({ children }) => {
         );
         const data = await response.json();
 
-        // 初始化兩個對象來存儲所有貼文的喜愛和收藏狀態
-        const newLikedPosts = { ...likedPosts };
-        const newSavedPosts = { ...savedPosts };
-
-        // 遍歷從後端獲取的每個貼文的狀態數據
-        data.forEach((status) => {
-          // 將每個貼文的點讚狀態存儲到 newLikedPosts 對象中
-          newLikedPosts[status.postId] = status.isLiked;
-          // 將每個貼文的收藏狀態存儲到 newSavedPosts 對象中
-          newSavedPosts[status.postId] = status.isSaved;
+        // 使用函式式更新來避免對 likedPosts 和 savedPosts 的依賴
+        setLikedPosts((prevLiked) => {
+          const newLiked = { ...prevLiked };
+          data.forEach((status) => {
+            newLiked[status.postId] = status.isLiked;
+          });
+          return newLiked;
         });
 
-        // 更新 React 狀態以觸發界面更新，以顯示最新的點讚和收藏狀態
-        setLikedPosts(newLikedPosts);
-        setSavedPosts(newSavedPosts);
+        setSavedPosts((prevSaved) => {
+          const newSaved = { ...prevSaved };
+          data.forEach((status) => {
+            newSaved[status.postId] = status.isSaved;
+          });
+          return newSaved;
+        });
       } catch (error) {
         console.error('無法獲取貼文狀態:', error);
       }
     },
-    [auth.id, getAuthHeader, likedPosts, savedPosts],
+    [auth.id, getAuthHeader],
   );
 
-  const checkEventsStatus = async (eventIds) => {
-    const userId = auth.id;
+  const checkEventsStatus = useCallback(
+    async (eventIds) => {
+      const userId = auth.id;
 
-    if (userId === 0) {
-      return;
-    }
+      if (userId === 0) {
+        return;
+      }
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
           },
-        },
-      );
-      const data = await response.json();
+        );
+        const data = await response.json();
 
-      // 初始化對象來存儲所有活動參加狀態
-      const newAttendedEvents = { ...attendedEvents };
+        // 使用函式式更新來避免對 attendedEvents 的依賴
+        setAttendedEvents((prevAttended) => {
+          const newAttended = { ...prevAttended };
+          data.forEach((status) => {
+            newAttended[status.eventId] = status.isAttended;
+          });
+          return newAttended;
+        });
+      } catch (error) {
+        console.error('無法獲取活動狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
 
-      // 遍歷從後端獲取的每個活動的狀態數據
-      data.forEach((status) => {
-        // 將每個活動參加狀態存儲到 newAttendedEvents 對象中
-        newAttendedEvents[status.eventId] = status.isAttended;
-      });
+  const checkFollowingStatus = useCallback(
+    async (followingId) => {
+      const userId = auth.id;
 
-      // 更新 React 狀態以觸發界面更新，以顯示最新的參加狀態
-      setAttendedEvents(newAttendedEvents);
-    } catch (error) {
-      console.error('無法獲取活動狀態:', error);
-    }
-  };
+      if (userId === 0) return;
 
-  const checkFollowingStatus = async (followingId) => {
-    const userId = auth.id;
-
-    if (userId === 0) return;
-
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
-        {
-          headers: {
-            ...getAuthHeader(),
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
           },
-        },
-      );
-      const data = await response.json();
+        );
+        const data = await response.json();
 
-      // 更新追蹤狀態
-      setFollowing((prev) => ({
-        ...prev,
-        [followingId]: data.isFollowing,
-      }));
-    } catch (error) {
-      console.error('無法獲取追蹤狀態:', error);
-    }
-  };
+        // 更新追蹤狀態
+        setFollowing((prev) => ({
+          ...prev,
+          [followingId]: data.isFollowing,
+        }));
+      } catch (error) {
+        console.error('無法獲取追蹤狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
 
   // 重置貼文狀態
   const resetEventState = () => {

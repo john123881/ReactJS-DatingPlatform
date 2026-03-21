@@ -99,7 +99,7 @@ export default function OtherTripdetail({ onPageChange }) {
 
       fetchTripDetails();
     }
-  }, [trip_plan_id, tripDetails]);
+  }, [trip_plan_id]);
 
   useEffect(() => {
     console.log(tripDetails);
