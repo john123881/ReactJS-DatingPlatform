@@ -108,6 +108,152 @@ export const PostProvider = ({ children }) => {
     }
   }, [auth.id]);
 
+  const getPostComments = useCallback(async (postIds) => {
+    try {
+      const data = await CommunityService.getComments(postIds);
+
+      // 將評論數據按 post_id 分類
+      const commentsByPostId = data.reduce((accumulator, comment) => {
+        // 從每個評論中解構出 post_id
+        const { post_id } = comment;
+        // 如果累積器（accumulator）中尚未有這個 post_id 的鍵，則初始化為空陣列, 以確保後面可以將評論推送到這個陣列中
+        if (!accumulator[post_id]) {
+          accumulator[post_id] = [];
+        }
+        // 將當前的評論對象推送到對應 post_id 的陣列中
+        accumulator[post_id].push(comment);
+        // 返回更新後的累積器物件，供 reduce 函數的下一次迭代使用
+        return accumulator;
+      }, {}); // 初始值為一個空物件，這是 reduce 函數建立物件累積的起點
+
+      // 更新評論狀態，結合新載入的評論數據
+      setComments((prevComments) => {
+        // 創建一個新的物件來存放更新後的評論數據，這個物件是基於先前的評論狀態（prevComments）的副本
+        const updatedComments = { ...prevComments };
+
+        // 遍歷每個postId對應的新評論列表
+        for (const postId in commentsByPostId) {
+          // 直接用新載入的評論數據替換掉原有的評論數據
+          updatedComments[postId] = commentsByPostId[postId];
+        }
+
+        // 返回更新後的評論物件，這個操作將觸發React的狀態更新，導致相關組件根據新的評論數據重新渲染
+        return updatedComments;
+      });
+
+      if (data.length === 0) {
+        setCommentHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+      }
+    } catch (error) {
+      console.error('Failed to fetch comments:', error);
+    }
+  }, []);
+
+  const checkPostsStatus = useCallback(
+    async (postIds) => {
+      const userId = auth.id;
+
+      if (userId === 0) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
+          },
+        );
+        const data = await response.json();
+
+        // 使用函式式更新來避免對 likedPosts 和 savedPosts 的依賴
+        setLikedPosts((prevLiked) => {
+          const newLiked = { ...prevLiked };
+          data.forEach((status) => {
+            newLiked[status.postId] = status.isLiked;
+          });
+          return newLiked;
+        });
+
+        setSavedPosts((prevSaved) => {
+          const newSaved = { ...prevSaved };
+          data.forEach((status) => {
+            newSaved[status.postId] = status.isSaved;
+          });
+          return newSaved;
+        });
+      } catch (error) {
+        console.error('無法獲取貼文狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
+
+  const checkEventsStatus = useCallback(
+    async (eventIds) => {
+      const userId = auth.id;
+
+      if (userId === 0) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
+          },
+        );
+        const data = await response.json();
+
+        // 使用函式式更新來避免對 attendedEvents 的依賴
+        setAttendedEvents((prevAttended) => {
+          const newAttended = { ...prevAttended };
+          data.forEach((status) => {
+            newAttended[status.eventId] = status.isAttended;
+          });
+          return newAttended;
+        });
+      } catch (error) {
+        console.error('無法獲取活動狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
+
+  const checkFollowingStatus = useCallback(
+    async (followingId) => {
+      const userId = auth.id;
+
+      if (userId === 0) return;
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
+          {
+            headers: {
+              ...getAuthHeader(),
+            },
+          },
+        );
+        const data = await response.json();
+
+        // 更新追蹤狀態
+        setFollowing((prev) => ({
+          ...prev,
+          [followingId]: data.isFollowing,
+        }));
+      } catch (error) {
+        console.error('無法獲取追蹤狀態:', error);
+      }
+    },
+    [auth.id, getAuthHeader],
+  );
+
   const getCommunityIndexPost = useCallback(async () => {
     if (!indexHasMore) return; // 防止重複請求
     // setIsLoading(true); // 開始加載
@@ -268,47 +414,6 @@ export const PostProvider = ({ children }) => {
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
   }, [eventHasMore, eventPage, checkEventsStatus]);
-
-  const getPostComments = useCallback(async (postIds) => {
-    try {
-      const data = await CommunityService.getComments(postIds);
-
-      // 將評論數據按 post_id 分類
-      const commentsByPostId = data.reduce((accumulator, comment) => {
-        // 從每個評論中解構出 post_id
-        const { post_id } = comment;
-        // 如果累積器（accumulator）中尚未有這個 post_id 的鍵，則初始化為空陣列, 以確保後面可以將評論推送到這個陣列中
-        if (!accumulator[post_id]) {
-          accumulator[post_id] = [];
-        }
-        // 將當前的評論對象推送到對應 post_id 的陣列中
-        accumulator[post_id].push(comment);
-        // 返回更新後的累積器物件，供 reduce 函數的下一次迭代使用
-        return accumulator;
-      }, {}); // 初始值為一個空物件，這是 reduce 函數建立物件累積的起點
-
-      // 更新評論狀態，結合新載入的評論數據
-      setComments((prevComments) => {
-        // 創建一個新的物件來存放更新後的評論數據，這個物件是基於先前的評論狀態（prevComments）的副本
-        const updatedComments = { ...prevComments };
-
-        // 遍歷每個postId對應的新評論列表
-        for (const postId in commentsByPostId) {
-          // 直接用新載入的評論數據替換掉原有的評論數據
-          updatedComments[postId] = commentsByPostId[postId];
-        }
-
-        // 返回更新後的評論物件，這個操作將觸發React的狀態更新，導致相關組件根據新的評論數據重新渲染
-        return updatedComments;
-      });
-
-      if (data.length === 0) {
-        setCommentHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
-      }
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    }
-  }, []);
 
   // 上傳回覆
   const handleCommentUpload = useCallback(
@@ -1257,111 +1362,6 @@ export const PostProvider = ({ children }) => {
       }
     },
     [getAuthHeader],
-  );
-
-  const checkPostsStatus = useCallback(
-    async (postIds) => {
-      const userId = auth.id;
-
-      if (userId === 0) {
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
-
-        // 使用函式式更新來避免對 likedPosts 和 savedPosts 的依賴
-        setLikedPosts((prevLiked) => {
-          const newLiked = { ...prevLiked };
-          data.forEach((status) => {
-            newLiked[status.postId] = status.isLiked;
-          });
-          return newLiked;
-        });
-
-        setSavedPosts((prevSaved) => {
-          const newSaved = { ...prevSaved };
-          data.forEach((status) => {
-            newSaved[status.postId] = status.isSaved;
-          });
-          return newSaved;
-        });
-      } catch (error) {
-        console.error('無法獲取貼文狀態:', error);
-      }
-    },
-    [auth.id, getAuthHeader],
-  );
-
-  const checkEventsStatus = useCallback(
-    async (eventIds) => {
-      const userId = auth.id;
-
-      if (userId === 0) {
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
-
-        // 使用函式式更新來避免對 attendedEvents 的依賴
-        setAttendedEvents((prevAttended) => {
-          const newAttended = { ...prevAttended };
-          data.forEach((status) => {
-            newAttended[status.eventId] = status.isAttended;
-          });
-          return newAttended;
-        });
-      } catch (error) {
-        console.error('無法獲取活動狀態:', error);
-      }
-    },
-    [auth.id, getAuthHeader],
-  );
-
-  const checkFollowingStatus = useCallback(
-    async (followingId) => {
-      const userId = auth.id;
-
-      if (userId === 0) return;
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
-
-        // 更新追蹤狀態
-        setFollowing((prev) => ({
-          ...prev,
-          [followingId]: data.isFollowing,
-        }));
-      } catch (error) {
-        console.error('無法獲取追蹤狀態:', error);
-      }
-    },
-    [auth.id, getAuthHeader],
   );
 
   // 重置貼文狀態
