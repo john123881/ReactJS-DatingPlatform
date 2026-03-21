@@ -1,5 +1,5 @@
-import TripSidebar from '../../components/shen/sidebars/trip-sidebar';
-import TripCalendar from '@/components/shen/trip-calendar';
+import TripSidebar from '../../components/trip/sidebars/trip-sidebar';
+import TripCalendar from '@/components/trip/trip-calendar';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';

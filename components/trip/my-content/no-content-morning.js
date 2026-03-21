@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
-import TripRecomendModal from '@/components/shen/add-trip/trip-recomend-modal';
+import TripRecomendModal from '@/components/trip/add-trip/trip-recomend-modal';
 import { useRouter } from 'next/router';
 
 export default function NoContentMorning({
@@ -39,15 +39,16 @@ export default function NoContentMorning({
         },
       );
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.success !== false) {
         console.log('Set block = 1 成功');
-        setNewTripDetailId(data.trip_detail_id); // 更新 trip_detail_id
+        setNewTripDetailId(data.trip_detail_id || data.insertId || data.id); // 更新 trip_detail_id
         console.log(newTripDetailId);
       } else {
-        throw new Error('Set block = 1 失敗');
+        throw new Error(data.error || data.message || data.msg || 'Set block = 1 失敗');
       }
     } catch (error) {
       console.error('錯誤:', error);
+      alert('新增失敗: ' + error.message);
     }
   };
   useEffect(() => {

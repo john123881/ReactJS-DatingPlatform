@@ -4,7 +4,7 @@ import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
 import TripRecomendModal from '../add-trip/trip-recomend-modal';
 
-export default function NoContentNoon({ trip_plan_id, refreshTripDetails }) {
+export default function NoContentNight({ trip_plan_id, refreshTripDetails }) {
   const [deleteContent, setDeleteContent] = useState(false);
 
   // 為彈跳視窗設定開啟和關閉函數（刪除不存在的行程）
@@ -19,7 +19,7 @@ export default function NoContentNoon({ trip_plan_id, refreshTripDetails }) {
     refreshTripDetails();
   };
 
-  const handleAddNoonClick = async () => {
+  const handleAddNightClick = async () => {
     if (!trip_plan_id) {
       console.error('Missing trip_plan_id');
       return;
@@ -28,7 +28,7 @@ export default function NoContentNoon({ trip_plan_id, refreshTripDetails }) {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/add-noon/${trip_plan_id}`,
+        `${API_BASE_URL}/trip/my-details/add-night/${trip_plan_id}`,
         {
           method: 'POST',
           headers: {
@@ -37,15 +37,16 @@ export default function NoContentNoon({ trip_plan_id, refreshTripDetails }) {
         },
       );
       const data = await response.json();
-      if (response.ok) {
-        console.log('Set block = 2 成功');
-        setNewTripDetailId(data.trip_detail_id); // 更新 trip_detail_id
+      if (response.ok && data.success !== false) {
+        console.log('Set block = 3 成功');
+        setNewTripDetailId(data.trip_detail_id || data.insertId || data.id); // 更新 trip_detail_id
         console.log(newTripDetailId);
       } else {
-        throw new Error('Set block = 2 失敗');
+        throw new Error(data.error || data.message || data.msg || 'Set block = 3 失敗');
       }
     } catch (error) {
       console.error('錯誤:', error);
+      alert('新增失敗: ' + error.message);
     }
   };
   useEffect(() => {
@@ -64,13 +65,13 @@ export default function NoContentNoon({ trip_plan_id, refreshTripDetails }) {
         <div className="flex flex-col justify-center items-center w-32 h-32 sm:w-48 sm:h-48 border border-white rounded-2xl">
           <button
             onClick={() => {
-              handleAddNoonClick();
+              handleAddNightClick();
             }}
             className="text-2xl mb-1.5 hover:text-[#a0ff1f]"
           >
             <FaCirclePlus />
           </button>
-          <h3>下午</h3>
+          <h3>晚上</h3>
         </div>
         {isAddModalOpen && (
           <dialog id="my_modal_add" open className="modal">

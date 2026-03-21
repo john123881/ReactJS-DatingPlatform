@@ -1,6 +1,6 @@
-import AddBar from '@/components/shen/add-trip/add-bar';
-import AddMovie from '@/components/shen/add-trip/add-movie';
-import Recomendbar from '@/components/shen/sidebars/recomendbar';
+import AddBar from '@/components/trip/add-trip/add-bar';
+import AddMovie from '@/components/trip/add-trip/add-movie';
+import Recomendbar from '@/components/trip/sidebars/recomendbar';
 import { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL } from '@/configs/api-config';
 

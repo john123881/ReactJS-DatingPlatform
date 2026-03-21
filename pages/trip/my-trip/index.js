@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import TripSidebar from '../../../components/shen/sidebars/trip-sidebar';
-import TripCardMy from '../../../components/shen/trip-card-my';
-import TripCard from '@/components/shen/trip-card';
+import TripSidebar from '../../../components/trip/sidebars/trip-sidebar';
+import TripCardMy from '../../../components/trip/trip-card-my';
+import TripCard from '@/components/trip/trip-card';
 import { useAuth } from '@/context/auth-context';
 import { jwtDecode } from 'jwt-decode';
 import Router from 'next/router';
@@ -120,18 +120,26 @@ export default function MyTrip({ onPageChange }) {
         }),
       });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.msg || 'Network response was not ok');
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || data.error || data.msg || 'Network response was not ok');
       }
       console.log('Trip plan created successfully:', data);
       closeModal();
 
-      const newTripPlanId = data.tripPlanId;
+      const newTripPlanId = data.tripPlanId || data.insertId || data.id;
+      if (!newTripPlanId) {
+          throw new Error('未取得行程ID');
+      }
       console.log(newTripPlanId);
       const newPath = `/trip/my-trip/detail/${newTripPlanId}`;
       Router.push(newPath);
     } catch (error) {
       console.error('Creating trip plan error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: '新增失敗',
+        text: error.message || '發生未知錯誤',
+      });
     }
   };
   const recommend = (

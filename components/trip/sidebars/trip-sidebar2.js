@@ -94,14 +94,16 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         `${API_BASE_URL}/trip/my-details/share/${trip_plan_id}`,
         { method: 'POST' },
       );
-      if (response.ok) {
+      const data = await response.json();
+      if (response.ok && data.success !== false) {
         const newTrip = { ...trip, trip_draft: 1 };
         setTrip(newTrip);
       } else {
-        throw new Error('Sharing failed');
+        throw new Error(data.error || data.message || data.msg || 'Sharing failed');
       }
     } catch (error) {
       console.error('Error sharing the trip:', error);
+      alert('分享失敗: ' + error.message);
     }
   };
   const UnShareTrip = async () => {
@@ -110,14 +112,16 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         `${API_BASE_URL}/trip/my-details/unshare/${trip_plan_id}`,
         { method: 'POST' },
       );
-      if (response.ok) {
+      const data = await response.json();
+      if (response.ok && data.success !== false) {
         const newTrip = { ...trip, trip_draft: 0 };
         setTrip(newTrip);
       } else {
-        throw new Error('Sharing failed');
+        throw new Error(data.error || data.message || data.msg || 'Unsharing failed');
       }
     } catch (error) {
-      console.error('Error sharing the trip:', error);
+      console.error('Error unsharing the trip:', error);
+      alert('取消分享失敗: ' + error.message);
     }
   };
   //////上傳圖片測試////////////////
@@ -147,7 +151,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
       );
 
       const result = await response.json();
-      if (response.ok) {
+      if (response.ok && result.success !== false) {
         closeNewTripCoverModal(); // 上傳成功後關閉模態框
         Swal.fire({
           icon: 'success',
@@ -157,7 +161,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
           background: 'rgba(0,0,0,0.85)',
         });
       } else {
-        throw new Error(result.message || '網絡響應不正常');
+        throw new Error(result.message || result.error || '網絡響應不正常或上傳失敗');
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -189,14 +193,15 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update trip details.');
-      }
       const result = await response.json();
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || result.error || 'Failed to update trip details.');
+      }
       console.log('Trip details updated successfully:', result);
       closeNewTripNoteModal();
     } catch (error) {
       console.error('Error updating trip details:', error);
+      alert('更新失敗: ' + error.message);
     }
   };
   ////////////////////////////////////

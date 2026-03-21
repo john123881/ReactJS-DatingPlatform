@@ -22,9 +22,9 @@ export default function AddBar({
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || data.success === false) {
         throw new Error(
-          `Failed to update the trip detail: ${data.message || ''}`,
+          data.message || data.error || data.msg || 'Update trip detail failed',
         );
       }
       refreshTripDetails();
@@ -32,6 +32,7 @@ export default function AddBar({
       //alert('Bar added to the trip successfully!'); //換成sweet alert
     } catch (error) {
       console.error('Error updating trip detail:', error);
+      alert('加入失敗: ' + error.message);
     }
   };
 

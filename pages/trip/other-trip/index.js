@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import TripSidebarOther from '@/components/shen/sidebars/trip-sidebar-other';
-import TripCard from '../../../components/shen/trip-card';
+import TripSidebarOther from '@/components/trip/sidebars/trip-sidebar-other';
+import TripCard from '../../../components/trip/trip-card';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import TripSidebar2 from '@/components/shen/sidebars/trip-sidebar2';
-import ContentMorning from '@/components/shen/my-content/contentMorning';
-import ContentNoon from '@/components/shen/my-content/contentNoon';
-import ContentNight from '@/components/shen/my-content/contentNight';
-import BarPhotoCarousel from '@/components/shen/carousel/bar-photo-carousel';
-import MoviePhotoCarousel2 from '@/components/shen/carousel/movie-photo-carousel2';
+import TripSidebar2 from '@/components/trip/sidebars/trip-sidebar2';
+import ContentMorning from '@/components/trip/my-content/contentMorning';
+import ContentNoon from '@/components/trip/my-content/contentNoon';
+import ContentNight from '@/components/trip/my-content/contentNight';
+import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
+import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
 import { API_BASE_URL } from '@/configs/api-config';
 
@@ -20,6 +20,12 @@ export default function MyTripDetail({ onPageChange }) {
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
+
+  useEffect(() => {
+    if (trip_plan_id === 'undefined') {
+      router.replace('/trip/my-trip');
+    }
+  }, [trip_plan_id, router]);
 
   //trip_calendar 的資料
   useEffect(() => {
