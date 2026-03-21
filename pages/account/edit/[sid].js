@@ -148,11 +148,13 @@ export default function AccountEdit({ onPageChange }) {
   //進頁面fetch DATA
   useEffect(() => {
     if (!router.isReady) return;
+
+    let isSubscribed = true;
     const fetchEditData = async () => {
       try {
         const result = await AccountService.getEditProfile(router.query.sid);
 
-        if (result.success) {
+        if (result.success && isSubscribed) {
           //fetch成功後 將DATA解構
           const {
             user_id,
@@ -188,7 +190,7 @@ export default function AccountEdit({ onPageChange }) {
 
           //把大頭照抓下來放入狀態
           setUserAvatar(avatar);
-        } else {
+        } else if (!result.success && isSubscribed) {
           toast.error(result.error, {
             duration: 1500,
           });
@@ -201,20 +203,31 @@ export default function AccountEdit({ onPageChange }) {
 
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
-      if (auth.id === 0 || !router.isReady) return;
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
+        return;
+      }
       const result = await checkAuth(router.query.sid);
       if (!result.success) {
         router.push('/');
         toast.error(result.error, { duration: 1500 });
+        close();
         return;
       }
 
       //進頁面做授權確認，授權通過，接收user的待編輯資料
-      fetchEditData();
-      close(1.5);
+      await fetchEditData();
+      close(0.5);
     };
+    
     fetchCheck();
-  }, [router.query, rerender]);
+    
+    return () => {
+      isSubscribed = false;
+      close();
+    };
+  }, [router.isReady, router.query.sid, auth.id, rerender, checkAuth, close, open]);
 
   //日期格式
   useEffect(() => {

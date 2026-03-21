@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
 import PostModal from '@/components/community/modal/postModal';
+import EmptyCollection from '@/components/account-center/empty-collection';
 
 export default function AccountCollect({ onPageChange }) {
   const pageTitle = '會員中心';
@@ -137,20 +138,23 @@ export default function AccountCollect({ onPageChange }) {
 
   //渲染-貼文收藏
   useEffect(() => {
-    if (auth.id === 0 || !router.isReady) return;
-
     const fetchCheck = async () => {
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
+        return;
+      }
       const result = await checkAuth(router.query.sid);
       if (!result.success) {
         router.push('/');
         toast.error(result.error, { duration: 1500 });
+        close();
         return;
       }
       await getSavePostData();
-      close(2);
+      close(0.5);
     };
 
-    open();
     fetchCheck();
   }, [router.isReady, router.query.sid, auth.id, radio, rerender, checkAuth, close, open]);
 
@@ -344,20 +348,17 @@ export default function AccountCollect({ onPageChange }) {
                                   const result = await AccountService.collectPost.delete(
                                     post.save_id,
                                   );
-                                  if (
-                                    result.output.success &&
-                                    result.output.action === 'remove'
-                                  ) {
-                                    toast.success('刪除收藏成功', {
-                                      duration: 1500,
-                                    });
-                                  }
-                                  router.push({
-                                    pathname: router.pathname, // 將 pathname 設置到 url 中
-                                    query: router.query, // 將 query 設置到 url 中
-                                  });
-                                }}
-                                className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
+                                    if (
+                                      result.output.success &&
+                                      result.output.action === 'remove'
+                                    ) {
+                                      toast.success('刪除收藏成功', {
+                                        duration: 1500,
+                                      });
+                                      setPosts((prev) => prev.filter(p => p.save_id !== post.save_id));
+                                    }
+                                  }}
+                                  className="text-white absolute right-[8px] top-[8px] cursor-pointer hover:text-[#a0ff1f] text-4xl "
                               />
                               <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
                                 <span
@@ -390,16 +391,7 @@ export default function AccountCollect({ onPageChange }) {
                         </div>
                       ))
                     ) : (
-                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
-                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
-                        <p className="text-xl">目前沒有收藏的貼文</p>
-                        <Link
-                          href="/community"
-                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
-                        >
-                          去探索貼文
-                        </Link>
-                      </div>
+                      <EmptyCollection itemType="貼文" linkPath="/community" />
                     )}
                     <PostModal
                       className={`z-[100]`}

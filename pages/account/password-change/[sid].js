@@ -91,15 +91,21 @@ export default function AccountPasswordChange({ onPageChange }) {
     if (!router.isReady) return;
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
-      if (auth.id === 0 || !router.isReady) return;
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
+        return;
+      }
       const result = await checkAuth(router.query.sid);
       if (!result.success) {
         router.push('/');
         toast.error(result.error, { duration: 1500 });
+        close();
         return;
       }
-      close(1.5);
+      close(0.5);
     };
+    
     fetchCheck();
   }, [router.query]);
 

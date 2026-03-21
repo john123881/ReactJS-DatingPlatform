@@ -25,7 +25,7 @@ export default function AccountRecord({ onPageChange }) {
   const [currentDate, setCurrentDate] = useState('');
   const [gameRecordOpen, setGameRecordOpen] = useState(false);
 
-  const [pointSource, setPointSource] = useState('選擇');
+  const [pointSource, setPointSource] = useState('全部');
   const [dateSortToggle, setDateSortToggle] = useState(false);
   const [valueDateBegin, setValueDateBegin] = useState('');
   const [valueDateEnd, setValueDateEnd] = useState('');
@@ -250,146 +250,115 @@ export default function AccountRecord({ onPageChange }) {
     setGameRecordOpen(e.target.checked);
   };
 
-  //Router_ID 與 JWT_ID 之 檢查
-  const fetchCheck = async () => {
-    if (auth.id === 0 || !router.isReady) return;
-    const result = await checkAuth(router.query.sid);
-    if (!result.success) {
-      router.push('/');
-      toast.error(result.error, { duration: 1500 });
-      return;
-    }
-    close(1.5);
-  };
-
   //渲染->積分紀錄
   useEffect(() => {
-    if (!router.isReady || auth.id === 0 || router.query.sid === undefined)
-      return;
+    if (!router.isReady || auth.id === 0 || router.query.sid === undefined) return;
+    if (gameRecordOpen) return;
 
-    //gameRecordOpen 開啟時 才會fetch
-    if (gameRecordOpen) {
-      return;
-    }
+    let isSubscribed = true;
 
-    fetchCheck();
-
-    open();
-    //定義: FETCH積分紀錄
-    const fetchPointRecord = async () => {
-      // console.log('${location.search}是:', location.search);
-      // const query = {
-      //   ...router.query,
-      //   pointSource: pointSource, // 添加 pointSource 到 query 对象中
-      // };
-
-      // const queryString = new URLSearchParams(query).toString();
-      // console.log('FETCH->qS:', queryString);
-      // // qS: page=2&sid=1&pointSource=%E7%99%BB%E5%85%A5%E7%8D%B2%E5%BE%97
-      // console.log('FETCH->router.query:', router.query);
-      // // page: '2';
-      // // sid: '1';
-      // console.log('FETCH->location.search:', location.search);
-      // // location.search: ?page=2
-
-      const r = await fetch(
-        `${ACCOUNT_RECORD_POINT_GET}/${router.query.sid}${location.search}`,
-        {
-          headers: { ...getAuthHeader() },
-        },
-      );
-      const result = await r.json();
-      console.log('積分紀錄資料:', result);
-      if (result.output.error === '無相關紀錄') {
-        setRecordListPoint({
-          rows: [],
-          page: 0,
-          totalPages: 0,
-        });
-        toast.error(result.output.error, { duration: 1500 });
-      }
-      if (!result.success) {
+    const loadData = async () => {
+      setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
+      open();
+      const authResult = await checkAuth(router.query.sid);
+      if (!authResult.success) {
+        if (isSubscribed) {
+          router.push('/');
+          toast.error(authResult.error, { duration: 1500 });
+        }
+        close(0);
         return;
       }
 
-      setRecordListPoint((prev) => ({
-        ...prev,
-        rows: result.output.data,
-        page: result.page,
-        totalPages: result.totalPages,
-      }));
+      try {
+        const r = await fetch(
+          `${ACCOUNT_RECORD_POINT_GET}/${router.query.sid}${location.search}`,
+          { headers: { ...getAuthHeader() } },
+        );
+        const result = await r.json();
+        if (!isSubscribed) return;
+
+        console.log('積分紀錄資料:', result);
+        if (result.output?.error === '無相關紀錄') {
+          setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
+          toast.error(result.output.error, { duration: 1500 });
+        } else if (result.success) {
+          setRecordListPoint((prev) => ({
+            ...prev,
+            rows: result.output.data,
+            page: result.page,
+            totalPages: result.totalPages,
+          }));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      
+      if (isSubscribed) close(0.5);
     };
-    //要求積分紀錄
-    fetchPointRecord();
-    close(0.5);
-  }, [
-    router.query,
-    auth.id,
-    gameRecordOpen,
-    close,
-    getAuthHeader,
-    open,
-    router.isReady,
-  ]);
+
+    loadData();
+
+    return () => {
+      isSubscribed = false;
+      close();
+    };
+  }, [router.query, auth.id, gameRecordOpen, getAuthHeader, router.isReady, checkAuth, open, close]);
 
   //渲染->遊戲紀錄
   useEffect(() => {
-    if (!router.isReady || auth.id === 0 || router.query.sid === undefined)
-      return;
+    if (!router.isReady || auth.id === 0 || router.query.sid === undefined) return;
+    if (!gameRecordOpen) return;
 
-    //gameRecordOpen 開啟時 才會fetch
-    if (!gameRecordOpen) {
-      return;
-    }
+    let isSubscribed = true;
 
-    fetchCheck();
+    const loadData = async () => {
+      setRecordListGame({ rows: [], page: 0, totalPages: 0 });
+      open();
+      const authResult = await checkAuth(router.query.sid);
+      if (!authResult.success) {
+        if (isSubscribed) {
+          router.push('/');
+          toast.error(authResult.error, { duration: 1500 });
+        }
+        close(0);
+        return;
+      }
 
-    open();
-    //定義:FETCH遊戲紀錄
-    const fetchGameRecord = async () => {
       try {
         const r = await fetch(
           `${ACCOUNT_RECORD_GAME}/${router.query.sid}${location.search}`,
-          {
-            headers: { ...getAuthHeader() },
-          },
+          { headers: { ...getAuthHeader() } },
         );
         const result = await r.json();
+        if (!isSubscribed) return;
+
         console.log('遊戲紀錄資料:', result);
-        if (result.output.error === '無相關紀錄') {
-          setRecordListGame({
-            rows: [],
-            page: 0,
-            totalPages: 0,
-          });
+        if (result.output?.error === '無相關紀錄') {
+          setRecordListGame({ rows: [], page: 0, totalPages: 0 });
           toast.error(result.output.error, { duration: 1500 });
+        } else if (result.success) {
+          setRecordListGame((prev) => ({
+            ...prev,
+            rows: result.output.data,
+            page: result.page,
+            totalPages: result.totalPages,
+          }));
         }
-        if (!result.success) {
-          // alert('error to fetch');
-          return;
-        }
-        setRecordListGame((prev) => ({
-          ...prev,
-          rows: result.output.data,
-          page: result.page,
-          totalPages: result.totalPages,
-        }));
       } catch (error) {
         console.log('fetchGameRecord has error:', error);
       }
+
+      if (isSubscribed) close(0.5);
     };
-    //要求遊戲紀錄
-    fetchGameRecord();
-    close(0.5);
-  }, [
-    gameRecordOpen,
-    router.query,
-    auth.id,
-    close,
-    getAuthHeader,
-    open,
-    router.isReady,
-  ]);
+
+    loadData();
+
+    return () => {
+      isSubscribed = false;
+      close();
+    };
+  }, [gameRecordOpen, router.query, auth.id, getAuthHeader, router.isReady, checkAuth, open, close]);
   //進頁面做唯一次渲染
   useEffect(() => {
     onPageChange(pageTitle);
@@ -519,7 +488,7 @@ export default function AccountRecord({ onPageChange }) {
                   <tr className="border-b border-slate-500 min-h-[52px]">
                     <th
                       onClick={handleDateSort}
-                      className="text-lg text-center cursor-pointer text-light hover:text-neongreen"
+                      className="w-1/3 text-lg text-center cursor-pointer text-light hover:text-neongreen"
                     >
                       日期
                       <span className="relative ">
@@ -535,10 +504,10 @@ export default function AccountRecord({ onPageChange }) {
                         />
                       </span>
                     </th>
-                    <th className="text-lg text-center text-light ">
+                    <th className="w-1/3 text-lg text-center text-light ">
                       紅利積分
                     </th>
-                    <th className="text-lg text-center text-light ">
+                    <th className="w-1/3 text-lg text-center text-light ">
                       獲得來源
                     </th>
                   </tr>
@@ -669,7 +638,7 @@ export default function AccountRecord({ onPageChange }) {
                       onClick={() => {
                         handleSort('created_at');
                       }}
-                      className="text-lg text-center cursor-pointer text-light hover:text-neongreen"
+                      className="w-1/3 text-lg text-center cursor-pointer text-light hover:text-neongreen"
                     >
                       日期{' '}
                       <span className={'relative '}>
@@ -693,7 +662,7 @@ export default function AccountRecord({ onPageChange }) {
                       onClick={() => {
                         handleSort('game_score');
                       }}
-                      className="text-lg text-center cursor-pointer text-light hover:text-neongreen"
+                      className="w-1/3 text-lg text-center cursor-pointer text-light hover:text-neongreen"
                     >
                       遊戲分數{' '}
                       <span className={'relative '}>
@@ -717,7 +686,7 @@ export default function AccountRecord({ onPageChange }) {
                       onClick={() => {
                         handleSort('game_time');
                       }}
-                      className="text-lg text-center cursor-pointer text-light hover:text-neongreen"
+                      className="w-1/3 text-lg text-center cursor-pointer text-light hover:text-neongreen"
                     >
                       遊戲時間{' '}
                       <span className={'relative '}>

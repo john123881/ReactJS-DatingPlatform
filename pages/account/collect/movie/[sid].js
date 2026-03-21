@@ -8,6 +8,7 @@ import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useLoader } from '@/context/use-loader';
 import MovieModal from '@/components/account-center/modal/movieModal';
+import EmptyCollection from '@/components/account-center/empty-collection';
 import CollectLoader from '@/components/account-center/loader/collect-loader';
 import Link from 'next/link';
 
@@ -133,18 +134,22 @@ export default function AccountCollect({ onPageChange }) {
     };
 
     const fetchCheck = async () => {
-      if (auth.id === 0 || !router.isReady) return;
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
+        return;
+      }
       const result = await checkAuth(router.query.sid);
       if (!result.success) {
-        router.push('/');
         toast.error(result.error, { duration: 1500 });
+        router.push('/');
+        close();
         return;
       }
       await getSaveMovieData();
-      close(1);
+      close(0.5);
     };
 
-    open();
     fetchCheck();
   }, [router.isReady, router.query.sid, auth.id, checkAuth, close, open, setMovies]);
 
@@ -305,13 +310,10 @@ export default function AccountCollect({ onPageChange }) {
                                       toast.success('刪除收藏成功', {
                                         duration: 1500,
                                       });
+                                      setMovies((prev) => prev.filter(m => m.save_id !== movie.save_id));
                                     }
-                                    router.push({
-                                      pathname: router.pathname, // 將 pathname 設置到 url 中
-                                      query: router.query, // 將 query 設置到 url 中
-                                    });
                                   }}
-                                  className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
+                                  className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-[#a0ff1f] text-4xl"
                                 />
                                 <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
                                   <span
@@ -350,16 +352,7 @@ export default function AccountCollect({ onPageChange }) {
                         );
                       })
                     ) : (
-                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
-                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
-                        <p className="text-xl">目前沒有收藏的電影</p>
-                        <Link
-                          href="/booking"
-                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
-                        >
-                          去探索電影
-                        </Link>
-                      </div>
+                      <EmptyCollection itemType="電影" linkPath="/booking" />
                     )}
 
                     <MovieModal

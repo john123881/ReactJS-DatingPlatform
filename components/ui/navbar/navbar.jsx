@@ -91,20 +91,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   } = useCollect();
   // const [movieV, setMovieV] = useState({});
 
-  const [listData, setListData] = useState([
-    {
-      title: 'unknownTitle',
-      subtitle: 'unknown',
-      img: '/unavailable-image.jpg',
-      img_name: 'No Image Available',
-      content: 'Null',
-      item_type: 'post',
-      saved_id: 0,
-      email: 'unknown@mail.com',
-      item_id: 0,
-      username: 'unknownUser',
-    },
-  ]);
+  const [listData, setListData] = useState([]);
 
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
@@ -316,12 +303,14 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     const fetchAllCollectList = async () => {
       try {
         const result = await AccountService.getCollectList(auth.id);
-        // console.log(result);
-        if (result?.output?.error === '無收藏') {
+        console.log('Navbar collect fetch:', result);
+        const fetchedData = result?.output?.data || result?.data || (Array.isArray(result) ? result : null);
+        
+        if (result?.output?.error === '無收藏' || !fetchedData || fetchedData.length === 0) {
           setListData([]); // 設置為空列表
           return;
-        } else if (result?.output?.data) {
-          setListData(result.output.data);
+        } else {
+          setListData(fetchedData);
         }
       } catch (error) {
         console.error('Failed to fetch NAVBAR COLLECT LIST:', error);

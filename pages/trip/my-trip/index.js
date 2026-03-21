@@ -10,6 +10,7 @@ import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import { API_BASE_URL } from '@/configs/api-config';
+import Swal from 'sweetalert2';
 
 export default function MyTrip({ onPageChange }) {
   const pageTitle = '行程規劃';

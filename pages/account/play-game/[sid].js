@@ -22,14 +22,21 @@ export default function AccountPlayGame({ onPageChange }) {
     if (!router.isReady) return;
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
+        return;
+      }
       const result = await checkAuth(router.query.sid);
       if (!result.success) {
         toast.error(result.error, { duration: 1500 });
         router.push('/');
+        close();
         return;
       }
-      close(1.5);
+      close(0.5);
     };
+    
     fetchCheck();
   }, [router.isReady, router.query.sid, checkAuth, close, router]);
 

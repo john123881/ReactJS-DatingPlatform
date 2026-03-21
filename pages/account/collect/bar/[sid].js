@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
 import { useCollect } from '@/context/use-collect';
+import EmptyCollection from '@/components/account-center/empty-collection';
 
 export default function AccountCollect({ onPageChange }) {
   const pageTitle = '會員中心';
@@ -114,20 +115,22 @@ export default function AccountCollect({ onPageChange }) {
     };
 
     const fetchCheck = async () => {
-      if (auth.id === 0 || !router.isReady) return;
-
-      const result = await checkAuth(router.query.sid);
-      if (!result.success) {
-        router.push('/');
-        toast.error(result.error, { duration: 1500 });
+      open();
+      if (auth.id === 0 || !router.isReady) {
+        close();
         return;
       }
-
+      const result = await checkAuth(router.query.sid);
+      if (!result.success) {
+        toast.error(result.error, { duration: 1500 });
+        router.push('/');
+        close();
+        return;
+      }
       await getSaveBarData();
-      close(1); // 確保在資料拿到後才關閉 Loader
+      close(0.5);
     };
 
-    open();
     fetchCheck();
   }, [router.isReady, router.query.sid, auth.id, checkAuth, close, open, setBars]);
 
@@ -313,13 +316,10 @@ export default function AccountCollect({ onPageChange }) {
                                     toast.success('刪除收藏成功', {
                                       duration: 1500,
                                     });
+                                    setBars((prev) => prev.filter(b => b.save_id !== bar.save_id));
                                   }
-                                  router.push({
-                                    pathname: router.pathname, // 將 pathname 設置到 url 中
-                                    query: router.query, // 將 query 設置到 url 中
-                                  });
                                 }}
-                                className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
+                                className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-[#a0ff1f] text-4xl"
                               />
                               <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
                                 <Link
@@ -348,16 +348,7 @@ export default function AccountCollect({ onPageChange }) {
                         );
                       })
                     ) : (
-                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
-                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
-                        <p className="text-xl">目前沒有收藏的酒吧</p>
-                        <Link
-                          href="/bar"
-                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
-                        >
-                          去探索酒吧
-                        </Link>
-                      </div>
+                      <EmptyCollection itemType="酒吧" linkPath="/bar" />
                     )}
 
                     <div className="mb-3 join bg-base-100">
