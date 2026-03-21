@@ -312,12 +312,12 @@ export default function AccountRecord({ onPageChange }) {
         return;
       }
 
-      setRecordListPoint({
-        ...recordListPoint,
+      setRecordListPoint((prev) => ({
+        ...prev,
         rows: result.output.data,
         page: result.page,
         totalPages: result.totalPages,
-      });
+      }));
     };
     //要求積分紀錄
     fetchPointRecord();
@@ -329,7 +329,6 @@ export default function AccountRecord({ onPageChange }) {
     close,
     getAuthHeader,
     open,
-    recordListPoint,
     router.isReady,
   ]);
 
@@ -369,12 +368,12 @@ export default function AccountRecord({ onPageChange }) {
           // alert('error to fetch');
           return;
         }
-        setRecordListGame({
-          ...recordListGame,
+        setRecordListGame((prev) => ({
+          ...prev,
           rows: result.output.data,
           page: result.page,
           totalPages: result.totalPages,
-        });
+        }));
       } catch (error) {
         console.log('fetchGameRecord has error:', error);
       }
@@ -389,7 +388,6 @@ export default function AccountRecord({ onPageChange }) {
     close,
     getAuthHeader,
     open,
-    recordListGame,
     router.isReady,
   ]);
   //進頁面做唯一次渲染

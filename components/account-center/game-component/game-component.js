@@ -80,69 +80,73 @@ const GameComponent = () => {
   }, [timer]);
 
   const handleGameOver = useCallback(() => {
-    if (timer) clearInterval(timer); // 清除計時器
+    setTimer((prevTimer) => {
+      if (prevTimer) clearInterval(prevTimer);
+      return null;
+    });
     setDirection(INITIAL_DIRECTION); // 將方向設置為初始方向
     setGameOver(true);
-    setEndTime(time); // 紀錄遊戲結束時間
+    setEndTime(Date.now() - startTimeRef.current); // 紀錄遊戲結束時間，改用 Ref 確保穩定性
     setIsTiming(false); // 停止計時器
     setCanMove(false); // 遊戲結束時停止蛇移動
     setBtnDisabled(true);
-  }, [timer, time]);
+  }, [startTimeRef]);
 
   const moveSnake = useCallback(() => {
-    const head = { ...snake[0] };
-    const newSnake = [head, ...snake.slice(0, -1)];
+    setSnake((prevSnake) => {
+      const head = { ...prevSnake[0] };
+      const newSnake = [head, ...prevSnake.slice(0, -1)];
 
-    // 檢查新方向是否與當前移動方向相反，如果是，則忽略新方向
-    switch (direction) {
-      case 'UP':
-        if (currentDirection === 'DOWN') return;
-        head.y -= 1;
-        break;
-      case 'DOWN':
-        if (currentDirection === 'UP') return;
-        head.y += 1;
-        break;
-      case 'LEFT':
-        if (currentDirection === 'RIGHT') return;
-        head.x -= 1;
-        break;
-      case 'RIGHT':
-        if (currentDirection === 'LEFT') return;
-        head.x += 1;
-        break;
-      default:
-        break;
-    }
+      // 檢查新方向是否與當前移動方向相反，如果是，則忽略新方向
+      switch (direction) {
+        case 'UP':
+          if (currentDirection === 'DOWN') return prevSnake;
+          head.y -= 1;
+          break;
+        case 'DOWN':
+          if (currentDirection === 'UP') return prevSnake;
+          head.y += 1;
+          break;
+        case 'LEFT':
+          if (currentDirection === 'RIGHT') return prevSnake;
+          head.x -= 1;
+          break;
+        case 'RIGHT':
+          if (currentDirection === 'LEFT') return prevSnake;
+          head.x += 1;
+          break;
+        default:
+          break;
+      }
 
-    // 判斷蛇頭與蛇身碰撞
-    if (
-      newSnake
-        .slice(1)
-        .some((segment) => segment.x === head.x && segment.y === head.y)
-    ) {
-      handleGameOver();
-      return;
-    }
+      // 判斷蛇頭與蛇身碰撞
+      if (
+        newSnake
+          .slice(1)
+          .some((segment) => segment.x === head.x && segment.y === head.y)
+      ) {
+        handleGameOver();
+        return prevSnake;
+      }
 
-    // 判斷是否碰到邊界
-    if (head.x < 0 || head.x >= 19.0 || head.y < 0 || head.y >= 18) {
-      handleGameOver();
-      return;
-    }
+      // 判斷是否碰到邊界
+      if (head.x < 0 || head.x >= 19.0 || head.y < 0 || head.y >= 18) {
+        handleGameOver();
+        return prevSnake;
+      }
 
-    // 更新蛇的位置
-    setSnake(newSnake);
+      // 如果吃到食物，增加長度並生成新食物，得到一分
+      if (
+        newSnake.some((segment) => segment.x === food.x && segment.y === food.y)
+      ) {
+        setFood(generateFoodPosition());
+        newSnake.push(prevSnake[prevSnake.length - 1]);
+        setScore((prevScore) => prevScore + 1);
+      }
 
-    // 如果吃到食物，增加長度並生成新食物，得到一分
-    if (
-      newSnake.some((segment) => segment.x === food.x && segment.y === food.y)
-    ) {
-      setFood(generateFoodPosition());
-      newSnake.push(snake[snake.length - 1]);
-      setScore((prevScore) => prevScore + 1);
-    }
-  }, [snake, direction, currentDirection, food, handleGameOver]);
+      return newSnake;
+    });
+  }, [direction, currentDirection, food, handleGameOver]);
 
   //蛇頭的轉動方向計算
   const calculateRotation = useCallback((direction) => {
@@ -319,7 +323,7 @@ const GameComponent = () => {
 
       return () => clearInterval(interval);
     }
-  }, [canMove, snake, moveSnake, speed]);
+  }, [canMove, moveSnake, speed]); // 移除了 snake 依賴，依靠 moveSnake 內部功能性更新
 
   //監聽鍵盤操作
   useEffect(() => {
