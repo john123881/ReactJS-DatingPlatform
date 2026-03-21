@@ -330,16 +330,16 @@ export default function Header({ currentPageTitle, handlePageChange }) {
           headers: { ...getAuthHeader() },
         });
         const result = await r.json();
-        // console.log(result);
-        if (result.output.error === '無收藏') {
-          // alert(result.output.error);
-          return;
-        } else {
-          setListData(result.output.data);
+        // 增加更嚴格的檢查以防止 TypeError
+        if (result && result.output) {
+          if (result.output.error === '無收藏') {
+            setListData([]); // 設置為空列表
+          } else if (Array.isArray(result.output.data)) {
+            setListData(result.output.data);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch NAVBAR COLLECT LIST:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
     };
     fetchAllCollectList();

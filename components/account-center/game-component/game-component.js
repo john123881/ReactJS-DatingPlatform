@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import styles from './game-page.module.css';
 import { ACCOUNT_GAME_RECORD_POST } from '@/configs/api-config';
@@ -38,6 +38,221 @@ const GameComponent = () => {
   const [btnDisabled, setBtnDisabled] = useState(false);
   const startTimeRef = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isTiming, setIsTiming] = useState(false); // 新增計時狀態
+
+  const handleStartGame = useCallback(() => {
+    setGameStarted(true); // click遊戲開始後設定開始狀態為 true
+    setCanMove(true); // 設置蛇可以移動
+    setDirection(INITIAL_DIRECTION); // 設置方向為初始方向
+    setCurrentDirection(INITIAL_DIRECTION); // 設置當前方向為初始方向
+    let newFoodPosition = generateFoodPosition();
+    // 確保食物與蛇位置不相同
+    while (
+      snake.some(
+        (segment) =>
+          segment.x === newFoodPosition.x && segment.y === newFoodPosition.y,
+      )
+    ) {
+      newFoodPosition = generateFoodPosition();
+    }
+    setFood(newFoodPosition); // 設置新食物位置
+    // 啟動計時器
+    startTimeRef.current = Date.now() - elapsedTime;
+    const newTimer = setInterval(() => {
+      setTime(Date.now() - startTimeRef.current);
+    }, 10); // 每秒更新時間
+    setTimer(newTimer); // 將計時器存在變量中
+  }, [elapsedTime, snake]);
+
+  const handleRestart = useCallback(() => {
+    setSnake(INITIAL_SNAKE);
+    setDirection(INITIAL_DIRECTION); // 如果 currentDirection 為空，則設置為初始方向
+    setCurrentDirection(INITIAL_DIRECTION); // 設置 currentDirection 為初始方向
+    setFood(generateFoodPosition());
+    setScore(0);
+    setTime(0);
+    setElapsedTime(0);
+    if (timer) clearInterval(timer); // 清除計時器
+    setGameOver(false);
+    setCanMove(true); // 重新開始遊戲時設置蛇可以移動
+    setPressedKey(''); // 清除按下的方向鍵
+    startTimeRef.current = Date.now();
+  }, [timer]);
+
+  const handleGameOver = useCallback(() => {
+    if (timer) clearInterval(timer); // 清除計時器
+    setDirection(INITIAL_DIRECTION); // 將方向設置為初始方向
+    setGameOver(true);
+    setEndTime(time); // 紀錄遊戲結束時間
+    setIsTiming(false); // 停止計時器
+    setCanMove(false); // 遊戲結束時停止蛇移動
+    setBtnDisabled(true);
+  }, [timer, time]);
+
+  const moveSnake = useCallback(() => {
+    const head = { ...snake[0] };
+    const newSnake = [head, ...snake.slice(0, -1)];
+
+    // 檢查新方向是否與當前移動方向相反，如果是，則忽略新方向
+    switch (direction) {
+      case 'UP':
+        if (currentDirection === 'DOWN') return;
+        head.y -= 1;
+        break;
+      case 'DOWN':
+        if (currentDirection === 'UP') return;
+        head.y += 1;
+        break;
+      case 'LEFT':
+        if (currentDirection === 'RIGHT') return;
+        head.x -= 1;
+        break;
+      case 'RIGHT':
+        if (currentDirection === 'LEFT') return;
+        head.x += 1;
+        break;
+      default:
+        break;
+    }
+
+    // 判斷蛇頭與蛇身碰撞
+    if (
+      newSnake
+        .slice(1)
+        .some((segment) => segment.x === head.x && segment.y === head.y)
+    ) {
+      handleGameOver();
+      return;
+    }
+
+    // 判斷是否碰到邊界
+    if (head.x < 0 || head.x >= 19.0 || head.y < 0 || head.y >= 18) {
+      handleGameOver();
+      return;
+    }
+
+    // 更新蛇的位置
+    setSnake(newSnake);
+
+    // 如果吃到食物，增加長度並生成新食物，得到一分
+    if (
+      newSnake.some((segment) => segment.x === food.x && segment.y === food.y)
+    ) {
+      setFood(generateFoodPosition());
+      newSnake.push(snake[snake.length - 1]);
+      setScore((prevScore) => prevScore + 1);
+    }
+  }, [snake, direction, currentDirection, food, handleGameOver]);
+
+  //蛇頭的轉動方向計算
+  const calculateRotation = useCallback((direction) => {
+    // 根據方向選轉角度
+    let targetRotation = 0;
+    switch (direction) {
+      case 'UP':
+        targetRotation = 180;
+        break;
+      case 'DOWN':
+        targetRotation = 0;
+        break;
+      case 'LEFT':
+        targetRotation = -270;
+        break;
+      case 'RIGHT':
+        targetRotation = -90;
+        break;
+      default:
+        targetRotation = -90;
+        break;
+    }
+
+    // 計算蛇頭當前的旋轉角度
+    let currentRotation = 0;
+    if (snake.length > 0) {
+      // const head = snake[0];
+      switch (currentDirection) {
+        case 'UP':
+          currentRotation = 180;
+          break;
+        case 'DOWN':
+          currentRotation = 0;
+          break;
+        case 'LEFT':
+          currentRotation = -270;
+          break;
+        case 'RIGHT':
+          currentRotation = -90;
+          break;
+        default:
+          currentRotation = -90;
+          break;
+      }
+    }
+
+    // 根據當前角度 and 目標角度計算新的角度
+    const diff = targetRotation - currentRotation;
+    const step = diff / 20; // 步長，可以根據需要調整
+    return currentRotation + step + 'deg'; // 將結果轉換為字串
+  }, [snake, currentDirection]);
+
+  //渲染蛇的身體
+  const renderSnake = useMemo(() => {
+    if (!gameStarted || gameOver) {
+      return null; // 如果遊戲未開始或遊戲結束，則不渲染蛇
+    }
+
+    return snake.map((segment, index) => (
+      <div
+        className={`bg-neongreen rounded-full  ${
+          index === 0 ? 'relative' : 'border border-dark'
+        }`}
+        key={index}
+        style={{
+          position: 'absolute',
+          top: segment.y * 18,
+          left: segment.x * 18,
+          width: 19.5,
+          height: 19.5,
+          transform: `rotate(${calculateRotation(direction)})`, // 根據方向選轉角度
+        }}
+      >
+        {index === 0 && (
+          <Image
+            src="/snakeHead.png"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '155%',
+            }}
+            alt="蛇頭"
+            width={20}
+            height={31}
+          />
+        )}
+      </div>
+    ));
+  }, [gameStarted, gameOver, snake, direction, calculateRotation]);
+
+  //渲染食物
+  const renderFood = useMemo(() => {
+    return (
+      <div
+        className={`${styles[`lds-heart`]} text-neonpink`}
+        style={{
+          position: 'absolute',
+          top: food.y * 18,
+          left: food.x * 18,
+          width: 20,
+          height: 20,
+        }}
+      >
+        <div></div>
+      </div>
+    );
+  }, [food]);
+
 
   const GameRecord = async (myForm) => {
     try {
@@ -172,235 +387,7 @@ const GameComponent = () => {
     }
   }, [gameStarted, elapsedTime, timer]);
 
-  //控制蛇的移動
-  const moveSnake = () => {
-    const head = { ...snake[0] };
-    const newSnake = [head, ...snake.slice(0, -1)];
 
-    // 檢查新方向是否與當前移動方向相反，如果是，則忽略新方向
-    switch (direction) {
-      case 'UP':
-        if (currentDirection === 'DOWN') return;
-        head.y -= 1;
-        break;
-      case 'DOWN':
-        if (currentDirection === 'UP') return;
-        head.y += 1;
-        break;
-      case 'LEFT':
-        if (currentDirection === 'RIGHT') return;
-        head.x -= 1;
-        break;
-      case 'RIGHT':
-        if (currentDirection === 'LEFT') return;
-        head.x += 1;
-        break;
-      default:
-        break;
-    }
-
-    // 判斷蛇頭與蛇身碰撞
-    if (
-      newSnake
-        .slice(1)
-        .some((segment) => segment.x === head.x && segment.y === head.y)
-    ) {
-      handleGameOver();
-      return;
-    }
-
-    // 判斷是否碰到邊界
-    if (head.x < 0 || head.x >= 19.0 || head.y < 0 || head.y >= 18) {
-      handleGameOver();
-      return;
-    }
-
-    // 更新蛇的位置
-    setSnake(newSnake);
-
-    // 如果吃到食物，增加長度並生成新食物，得到一分
-    if (
-      newSnake.some((segment) => segment.x === food.x && segment.y === food.y)
-    ) {
-      setFood(generateFoodPosition());
-      newSnake.push(snake[snake.length - 1]);
-      setScore((prevScore) => prevScore + 1);
-    }
-  };
-
-  //蛇頭的轉動方向計算
-  const calculateRotation = (direction) => {
-    // 根據方向選轉角度
-    let targetRotation = 0;
-    switch (direction) {
-      case 'UP':
-        targetRotation = 180;
-        break;
-      case 'DOWN':
-        targetRotation = 0;
-        break;
-      case 'LEFT':
-        targetRotation = -270;
-        break;
-      case 'RIGHT':
-        targetRotation = -90;
-        break;
-      default:
-        targetRotation = -90;
-        break;
-    }
-
-    // 計算蛇頭當前的旋轉角度
-    let currentRotation = 0;
-    if (snake.length > 0) {
-      // const head = snake[0];
-      switch (currentDirection) {
-        case 'UP':
-          currentRotation = 180;
-          break;
-        case 'DOWN':
-          currentRotation = 0;
-          break;
-        case 'LEFT':
-          currentRotation = -270;
-          break;
-        case 'RIGHT':
-          currentRotation = -90;
-          break;
-        default:
-          currentRotation = -90;
-          break;
-      }
-    }
-
-    // 根據當前角度和目標角度計算新的角度
-    const diff = targetRotation - currentRotation;
-    const step = diff / 20; // 步長，可以根據需要調整
-    return currentRotation + step + 'deg'; // 將結果轉換為字串
-  };
-
-  //渲染蛇的身體
-  const renderSnake = useMemo(() => {
-    if (!gameStarted || gameOver) {
-      return null; // 如果遊戲未開始或遊戲結束，則不渲染蛇
-    }
-
-    return snake.map((segment, index) => (
-      <div
-        className={`bg-neongreen rounded-full  ${
-          index === 0 ? 'relative' : 'border border-dark'
-        }`}
-        key={index}
-        style={{
-          position: 'absolute',
-          top: segment.y * 18,
-          left: segment.x * 18,
-          width: 19.5,
-          height: 19.5,
-          transform: `rotate(${calculateRotation(direction)})`, // 根據方向選轉角度
-        }}
-      >
-        {index === 0 && (
-          <Image
-            src="/snakeHead.png"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '155%',
-            }}
-            alt="蛇頭"
-            width={20}
-            height={31}
-          />
-        )}
-      </div>
-    ));
-  }, [gameStarted, gameOver, snake, direction, calculateRotation]);
-
-  //渲染食物
-  const renderFood = useMemo(() => {
-    return (
-      // <FaHeart
-      //   className={`${styles[`lds-heart`]} text-neonpink`}
-      //   style={{
-      //     position: 'absolute',
-      //     top: food.y * 18,
-      //     left: food.x * 18,
-      //     width: 20,
-      //     height: 20,
-      //   }}
-      // />
-      <div
-        className={`${styles[`lds-heart`]} text-neonpink`}
-        style={{
-          position: 'absolute',
-          top: food.y * 18,
-          left: food.x * 18,
-          width: 20,
-          height: 20,
-        }}
-      >
-        <div></div>
-      </div>
-    );
-  }, [food]);
-
-  //按下Start Game的處理
-  const handleStartGame = () => {
-    setGameStarted(true); // click遊戲開始後設定開始狀態為 true
-    setCanMove(true); // 設置蛇可以移動
-    setDirection(INITIAL_DIRECTION); // 設置方向為初始方向
-    setCurrentDirection(INITIAL_DIRECTION); // 設置當前方向為初始方向
-    let newFoodPosition = generateFoodPosition();
-    // 確保食物與蛇位置不相同
-    while (
-      snake.some(
-        (segment) =>
-          segment.x === newFoodPosition.x && segment.y === newFoodPosition.y,
-      )
-    ) {
-      newFoodPosition = generateFoodPosition();
-    }
-    setFood(newFoodPosition); // 設置新食物位置
-    // 啟動計時器
-    startTimeRef.current = Date.now() - elapsedTime;
-    const newTimer = setInterval(() => {
-      setTime(Date.now() - startTimeRef.current);
-    }, 10); // 每秒更新時間
-    setTimer(newTimer); // 將計時器存在變量中
-  };
-
-  // GameOver時停止計時，紀錄時間
-  const handleGameOver = () => {
-    clearInterval(timer); // 清除計時器
-    setDirection(INITIAL_DIRECTION); // 將方向設置為初始方向
-    setGameOver(true);
-    setEndTime(time); // 紀錄遊戲結束時間
-    setIsTiming(false); // 停止計時器
-    setCanMove(false); // 遊戲結束時停止蛇移動
-    setBtnDisabled(true);
-  };
-
-  //按下Restart的處理
-  const handleRestart = () => {
-    setSnake(INITIAL_SNAKE);
-    setDirection(INITIAL_DIRECTION); // 如果 currentDirection 為空，則設置為初始方向
-    setCurrentDirection(INITIAL_DIRECTION); // 設置 currentDirection 為初始方向
-    setFood(generateFoodPosition());
-    setScore(0);
-    setTime(0);
-    setElapsedTime(0);
-    clearInterval(timer); // 清除計時器
-    setGameOver(false);
-    setCanMove(true); // 重新開始遊戲時設置蛇可以移動
-    setPressedKey(''); // 清除按下的方向鍵
-    startTimeRef.current = Date.now();
-    console.log('restart-time', time);
-    console.log('restart-timer', timer);
-    console.log('restart-timeRef', startTimeRef.current);
-  };
 
   //按鈕的渲染
   const renderArrow = (direction, icon, position) => {

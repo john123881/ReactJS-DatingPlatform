@@ -46,10 +46,11 @@ export default function Friends({ searchQuery }) {
 
   // 使用 socket
   useEffect(() => {
-    if (!socket.current) {
+    if (auth.token && !socket.current) {
       // 當下無連接時，建立連結
       socket.current = io(SOCKET_SERVER, {
         auth: {
+          token: auth.token,
           headers: { ...getAuthHeader() },
         },
       });
@@ -64,12 +65,21 @@ export default function Friends({ searchQuery }) {
         console.log(auth.id);
       });
     }
-  }, []);
+
+    return () => {
+      if (socket.current) {
+        socket.current.close();
+        socket.current = null;
+      }
+    };
+  }, [auth.token]); // 加入 auth.token 依賴
 
   // 監控對方是否在線
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
+    if (!socket.current) return;
+
     const handleUserConnected = (userId) => {
       setOnlineUsers((prev) => [...prev, userId]); // 增加上線用戶
     };
@@ -82,10 +92,12 @@ export default function Friends({ searchQuery }) {
     socket.current.on('user_disconnected', handleUserDisconnected);
 
     return () => {
-      socket.current.off('user_connected', handleUserConnected);
-      socket.current.off('user_disconnected', handleUserDisconnected);
+      if (socket.current) {
+        socket.current.off('user_connected', handleUserConnected);
+        socket.current.off('user_disconnected', handleUserDisconnected);
+      }
     };
-  }, []);
+  }, [socket.current]);
 
   return (
     <>

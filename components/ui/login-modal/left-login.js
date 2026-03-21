@@ -69,26 +69,31 @@ export default function LeftLogin({ switchHandler }) {
       }
     };
 
-    try {
-      toast.promise(fetchGoogleLogin(user), {
-        loading: '登入中...',
-        success: (jsonResult) => {
-          if (!jsonResult.success) {
-            throw new Error('登入時出現錯誤');
-          }
-          if (jsonResult.data.getPointLogin) {
-            toast.success('登入獲得10積分', { duration: 1500 });
-          }
-          setShowPWD(false);
-          setLoginModalToggle(false);
-          router.push('/');
-          return '登入成功';
-        },
-        error: (e) => {
-          return `${e}`;
-        },
+    const toastId = toast.loading('登入中...');
+    const timeoutId = setTimeout(() => {
+      toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
+        id: toastId,
       });
+    }, 10000);
+
+    try {
+      const jsonResult = await fetchGoogleLogin(user);
+      clearTimeout(timeoutId);
+
+      if (jsonResult && jsonResult.success) {
+        if (jsonResult.data.getPointLogin) {
+          toast.success('登入獲得10積分', { duration: 1500 });
+        }
+        setShowPWD(false);
+        setLoginModalToggle(false);
+        router.push('/');
+        toast.success('登入成功', { id: toastId });
+      } else {
+        throw new Error('登入時出現錯誤');
+      }
     } catch (e) {
+      clearTimeout(timeoutId);
+      toast.error(`${e}`, { id: toastId });
       console.log('error:', e);
     }
 
@@ -114,34 +119,38 @@ export default function LeftLogin({ switchHandler }) {
     },
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-      try {
-        toast.promise(login(values.email, values.password), {
-          loading: '登入中',
-          success: (result) => {
-            if (!result.success) {
-              console.log('result not success:', result);
-              throw new Error(result.error);
-            }
-            resetForm();
-            setShowPWD(false);
-            setLoginModalToggle(false);
-            if (result.data.getPointLogin) {
-              toast.success('登入獲得10積分', { duration: 1500 });
-            }
-            router.push(
-              {
-                pathname: router.pathname, // 使用當前頁面作為 pathname
-              },
-              undefined,
-              { scroll: false },
-            );
-            return '登入成功';
-          },
-          error: (e) => {
-            return `error when logging: ${e}`;
-          },
+      const toastId = toast.loading('登入中...');
+      const timeoutId = setTimeout(() => {
+        toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
+          id: toastId,
         });
+      }, 10000);
+
+      try {
+        const result = await login(values.email, values.password);
+        clearTimeout(timeoutId);
+
+        if (result && result.success) {
+          resetForm();
+          setShowPWD(false);
+          setLoginModalToggle(false);
+          if (result.data.getPointLogin) {
+            toast.success('登入獲得10積分', { duration: 1500 });
+          }
+          router.push(
+            {
+              pathname: router.pathname,
+            },
+            undefined,
+            { scroll: false },
+          );
+          toast.success('登入成功', { id: toastId });
+        } else {
+          throw new Error(result?.error || '登入失敗');
+        }
       } catch (e) {
+        clearTimeout(timeoutId);
+        toast.error(`error when logging: ${e.message || e}`, { id: toastId });
         console.log('error:', e);
       }
     },

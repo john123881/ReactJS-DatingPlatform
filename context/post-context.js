@@ -1527,9 +1527,21 @@ export const PostProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER);
-    setSocket(newSocket);
-  }, []);
+    if (auth.token) {
+      const newSocket = io(SOCKET_SERVER, {
+        auth: {
+          token: auth.token, // 這裡也可以寫在 headers 裡，根據後端需求
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        },
+      });
+      setSocket(newSocket);
+      return () => {
+        newSocket.close();
+      };
+    }
+  }, [auth.token]);
 
   useEffect(() => {
     socket?.emit('newUser', userInfo.username);
