@@ -8,7 +8,9 @@ import PageTitle from '@/components/page-title';
 import Image from 'next/image';
 import { API_BASE_URL } from '@/configs/api-config';
 
+import { BookingService } from '@/services/booking-service';
 import YouTube from 'react-youtube';
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 
 export default function MovieDetail({ onPageChange }) {
   const pageTitle = '電影探索';
@@ -28,27 +30,89 @@ export default function MovieDetail({ onPageChange }) {
   const [movie, setMovie] = useState([]);
 
   const [hovered, setHovered] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const checkMoviesStatus = useCallback(async (movieId) => {
+    const userId = auth.id;
+    if (userId === 0 || !movieId) return;
+
+    try {
+      const data = await BookingService.checkMovieStatus(userId, movieId);
+      if (data && data.length > 0) {
+        setIsSaved(data[0].isSaved);
+      }
+    } catch (error) {
+      console.error('無法獲取電影狀態:', error);
+    }
+  }, [auth.id]);
 
   const getMovieDetail = useCallback(async (mid) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/booking/get-movie-detail/${mid}`,
-      );
-      const data = await res.json();
+      // 使用 BookingService
+      const data = await BookingService.getMovieDetail(mid);
       setMovie(data);
+      if (auth.id !== 0) {
+        checkMoviesStatus(mid);
+      }
     } catch (error) {
-      console.log('Failed to fetch movie card', error);
+      console.log('Failed to fetch movie detail', error);
     }
-  }, []);
+  }, [auth.id, checkMoviesStatus]);
 
   useEffect(() => {
     const { mid } = router.query;
 
-    if (auth.id !== undefined && auth.id !== null && mid) {
+    if (mid) {
       getMovieDetail(mid);
-      // console.log('movie', movie);
     }
-  }, [auth.id, router.query.mid, getMovieDetail]);
+  }, [router.query.mid, getMovieDetail]);
+
+  const handleSavedClick = async () => {
+    if (auth.id === 0) {
+      Swal.fire({
+        title: '請先登入!',
+        icon: 'warning',
+        confirmButtonText: '關閉',
+        confirmButtonColor: '#A0FF1F',
+        background: 'rgba(0, 0, 0, 0.85)',
+      });
+      return;
+    }
+    const movieId = mid;
+    const userId = auth.id;
+
+    const wasSaved = isSaved;
+    const newSavedState = !wasSaved;
+
+    try {
+      const result = wasSaved
+        ? await BookingService.unsaveMovie(userId, movieId)
+        : await BookingService.saveMovie(userId, movieId);
+
+      if (result.success || result.msg === '收藏成功' || result.msg === '取消收藏成功') {
+        setIsSaved(newSavedState);
+        Swal.fire({
+          title: wasSaved ? '已取消收藏!' : '收藏成功!',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          background: 'rgba(0, 0, 0, 0.85)',
+        });
+      } else {
+        throw new Error(result.message || result.msg || '操作失敗');
+      }
+    } catch (error) {
+      console.error('Error updating save status:', error);
+      Swal.fire({
+        title: '操作失敗!',
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: '關閉',
+        confirmButtonColor: '#A0FF1F',
+        background: 'rgba(0, 0, 0, 0.85)',
+      });
+    }
+  };
 
   // const BookingConfirmModal = dynamic(
   //   () => import('@/components/bar/modal/booking-confirm-modal'),
@@ -95,29 +159,23 @@ export default function MovieDetail({ onPageChange }) {
                     style={{
                       height: '0.5rem',
                       borderColor: '#A0FF1F',
-                      color: 'black',
-                      backgroundColor: '#A0FF1F',
+                      color: isSaved ? 'white' : 'black',
+                      backgroundColor: isSaved ? 'transparent' : '#A0FF1F',
                     }}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
-                    onClick={() => setClickedButton(!clickedButton)}
+                    onClick={handleSavedClick}
                   >
                     {/* 愛心圖標 */}
                     <FontAwesomeIcon
-                      icon={faHeart}
+                      icon={isSaved ? faHeart : farHeart}
                       className="heart-icon  lg:w-[16px] h-[16px]"
                       style={{
-                        color: 'red',
+                        color: isSaved ? 'red' : 'gray',
                         cursor: 'pointer',
                       }}
-                      onClick={() => {
-                        // 切換按鈕點擊狀態
-                        setClickedButton(
-                          clickedButton === 'heart' ? null : 'heart',
-                        );
-                      }}
                     />
-                    加入收藏
+                    {isSaved ? '已收藏' : '加入收藏'}
                   </button>
                 </h2>
                 <div className="review flex ">

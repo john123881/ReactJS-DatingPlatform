@@ -4,6 +4,7 @@ import { useAuth } from '@/context/auth-context';
 import { usePostContext } from '@/context/post-context';
 import FollowerModal from '../modal/followerModal';
 import FollowingModal from '../modal/followingModal';
+import { CommunityService } from '@/services/community-service';
 
 export default function ProfileInfo() {
   const { auth } = useAuth();
@@ -40,8 +41,7 @@ export default function ProfileInfo() {
   const getFollowUsers = async () => {
     if (!uid) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/community/get-follows/${uid}`);
-      const data = await res.json();
+      const data = await CommunityService.getFollows(uid);
       data.forEach((item) => {
         if (item.relation_type === 'followers') {
           setFollowersCount(item.count);
@@ -57,10 +57,7 @@ export default function ProfileInfo() {
   const getPostsCount = async () => {
     if (!uid) return;
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-count-posts/${uid}`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getCountPosts(uid);
       setPostsCount(data[0].PostCount);
     } catch (error) {
       console.error('Failed to fetch post count', error);
@@ -70,8 +67,7 @@ export default function ProfileInfo() {
   const getLocalUserInfo = async () => {
     if (!uid) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/community/get-userInfo/${uid}`);
-      const data = await res.json();
+      const data = await CommunityService.getUserInfo(uid);
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
       setLocalUserInfo(data[0] || {});
     } catch (error) {
@@ -83,8 +79,7 @@ export default function ProfileInfo() {
   const getFollowers = async () => {
     if (!uid) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/community/get-followers/${uid}`);
-      const data = await res.json();
+      const data = await CommunityService.getFollowers(uid);
       setUserFollowers(data); // 更新 userFollowers 狀態
     } catch (error) {
       console.error('Failed to fetch user followers', error);
@@ -95,10 +90,7 @@ export default function ProfileInfo() {
   const getFollowings = async () => {
     if (!uid) return;
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/community/get-followings/${uid}`,
-      );
-      const data = await res.json();
+      const data = await CommunityService.getFollowings(uid);
       setUserFollowings(data); // 更新 userFollowings 狀態
     } catch (error) {
       console.error('Failed to fetch user followings', error);

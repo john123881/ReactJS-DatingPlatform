@@ -70,6 +70,7 @@ export default function ChatRoomContext() {
     if (auth.id === 0) {
       return;
     }
+    const controller = new AbortController();
     const getUserAvatar = async () => {
       try {
         const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {

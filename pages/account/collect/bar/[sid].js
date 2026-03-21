@@ -9,10 +9,7 @@ import { useLoader } from '@/context/use-loader';
 import CollectLoader from '@/components/account-center/loader/collect-loader';
 import Link from 'next/link';
 
-import {
-  ACCOUNT_COLLECT_BAR,
-  ACCOUNT_COLLECT_BAR_DELETE,
-} from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
@@ -97,29 +94,22 @@ export default function AccountCollect({ onPageChange }) {
   useEffect(() => {
     const getSaveBarData = async () => {
       if (auth.id === 0 || !router.isReady) return;
-      // setIsLoading(true); // 開始加載
 
       try {
-        const res = await fetch(
-          `${ACCOUNT_COLLECT_BAR}/${router.query.sid}${location.search}`,
-          {
-            headers: { ...getAuthHeader() },
-          },
+        const result = await AccountService.collectBar.get(
+          router.query.sid,
+          location.search,
         );
-        const result = await res.json();
-        // console.log('fetch BAR data:', result);
+
         if (result.output.error === '無收藏') {
           setBars([]); //重置收藏
-          toast.error('無酒吧收藏', { duration: 1500 });
+          // toast.error('無酒吧收藏', { duration: 1500 }); // 不要報錯，因為這是正常狀態
         } else {
-          setBars(result.output.data); // 更新posts狀態
+          setBars(result.output.data);
           setPages({ page: result.page, totalPages: result.totalPages });
-          // setPage((prevPage) => prevPage + 1); // 更新頁碼
-          // setIsLoading(false); // 結束加載
         }
       } catch (error) {
-        console.error('Failed to fetch index posts:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
+        console.error('Failed to fetch bar collection:', error);
       }
     };
 
@@ -133,13 +123,13 @@ export default function AccountCollect({ onPageChange }) {
         return;
       }
 
-      getSaveBarData();
+      await getSaveBarData();
+      close(1); // 確保在資料拿到後才關閉 Loader
     };
 
     open();
     fetchCheck();
-    close(1);
-  }, [router, auth.id, checkAuth, close, getAuthHeader, open, setBars]);
+  }, [router.isReady, router.query.sid, auth.id, checkAuth, close, open, setBars]);
 
   useEffect(() => {
     onPageChange(pageTitle);
@@ -236,8 +226,9 @@ export default function AccountCollect({ onPageChange }) {
                     className={`mt-4 pb-3 flex flex-col justify-between w-full lg:mx-1 xl:mx-1 rounded-box  place-items-center `}
                   >
                     {/* CONTENT START */}
-                    {bars.map((bar, i) => {
-                      return (
+                    {bars.length > 0 ? (
+                      bars.map((bar, i) => {
+                        return (
                         <div
                           key={i}
                           className="grid outline outline-1 outline-grayBorder z-10 rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px]"
@@ -312,14 +303,9 @@ export default function AccountCollect({ onPageChange }) {
                               <RxCrossCircled
                                 onClick={async () => {
                                   console.log('bar.save_id:', bar.save_id);
-                                  const r = await fetch(
-                                    `${ACCOUNT_COLLECT_BAR_DELETE}/${bar.save_id}`,
-                                    {
-                                      method: 'DELETE',
-                                      headers: { ...getAuthHeader() },
-                                    },
+                                  const result = await AccountService.collectBar.delete(
+                                    bar.save_id,
                                   );
-                                  const result = await r.json();
                                   if (
                                     result.output.success &&
                                     result.output.action === 'remove'
@@ -359,8 +345,20 @@ export default function AccountCollect({ onPageChange }) {
 
                           {/* Card END */}
                         </div>
-                      );
-                    })}
+                        );
+                      })
+                    ) : (
+                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
+                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
+                        <p className="text-xl">目前沒有收藏的酒吧</p>
+                        <Link
+                          href="/bar"
+                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
+                        >
+                          去探索酒吧
+                        </Link>
+                      </div>
+                    )}
 
                     <div className="mb-3 join bg-base-100">
                       {/* Pagination START */}

@@ -91,7 +91,20 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   } = useCollect();
   // const [movieV, setMovieV] = useState({});
 
-  const [listData, setListData] = useState([]);
+  const [listData, setListData] = useState([
+    {
+      title: 'unknownTitle',
+      subtitle: 'unknown',
+      img: '/unavailable-image.jpg',
+      img_name: 'No Image Available',
+      content: 'Null',
+      item_type: 'post',
+      saved_id: 0,
+      email: 'unknown@mail.com',
+      item_id: 0,
+      username: 'unknownUser',
+    },
+  ]);
 
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
@@ -271,11 +284,12 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     if (auth.id === 0) {
       return;
     }
+    const controller = new AbortController(); //建立一個新的控制器
+    // const signal = controller.signal; //取得訊號 塞到fetch後面
     const getUserAvatar = async () => {
       try {
         const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
           headers: { ...getAuthHeader() },
-          signal: controller.signal,
         });
         const result = await res.json();
         // console.log('Navbar, getUserAvatar:', result);
@@ -284,9 +298,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
           setUserAvatar(avatar);
         }
       } catch (e) {
-        if (e.name !== 'AbortError') {
-          console.log(e);
-        }
+        console.log(e);
       }
     };
     getUserAvatar();
@@ -295,7 +307,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     return () => {
       controller.abort();
     };
-  }, [auth.id]);
+  }, [userAvatar, auth.id]);
 
   //COLLECT LIST : map迴圈 做 accordion 的處理
   const handleContentHover = (index, isHovered) => {
@@ -316,21 +328,18 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       try {
         const r = await fetch(`${ACCOUNT_COLLECT_LIST_GET}/${auth.id}`, {
           headers: { ...getAuthHeader() },
-          signal: controller.signal,
         });
         const result = await r.json();
-        // 增加更嚴格的檢查以防止 TypeError
-        if (result && result.output) {
-          if (result.output.error === '無收藏') {
-            setListData([]); // 設置為空列表
-          } else if (Array.isArray(result.output.data)) {
-            setListData(result.output.data);
-          }
+        // console.log(result);
+        if (result?.output?.error === '無收藏') {
+          setListData([]); // 設置為空列表
+          return;
+        } else if (result?.output?.data) {
+          setListData(result.output.data);
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Failed to fetch NAVBAR COLLECT LIST:', error);
-        }
+        console.error('Failed to fetch NAVBAR COLLECT LIST:', error);
+        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
     };
     fetchAllCollectList();

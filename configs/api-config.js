@@ -67,8 +67,29 @@ export const ACCOUNT_COLLECT_MOVIE = `${API_SERVER}/account/collect-movie`;
 //account路徑:個人收藏-刪除MOVIE收藏 方法:DELETE
 export const ACCOUNT_COLLECT_MOVIE_DELETE = `${API_SERVER}/account/collect-movie-delete`;
 
-//account路徑:個人收藏-NAVBAR收藏列表 方法:GET
+// account路徑:個人收藏-NAVBAR收藏列表 方法:GET
 export const ACCOUNT_COLLECT_LIST_GET = `${API_SERVER}/account/collect-list`;
+
+// Community路徑
+export const COMMUNITY_GET_SUGGEST_USERS = `${API_SERVER}/community/getSuggestUsers`;
+export const COMMUNITY_GET_POSTS = `${API_SERVER}/community/posts`;
+export const COMMUNITY_GET_FOLLOWS = `${API_SERVER}/community/get-follows`;
+export const COMMUNITY_GET_COUNT_POSTS = `${API_SERVER}/community/get-count-posts`;
+export const COMMUNITY_GET_USER_INFO = `${API_SERVER}/community/get-userInfo`;
+export const COMMUNITY_GET_FOLLOWERS = `${API_SERVER}/community/get-followers`;
+export const COMMUNITY_GET_FOLLOWINGS = `${API_SERVER}/community/get-followings`;
+export const COMMUNITY_FOLLOW = `${API_SERVER}/community/follow`;
+export const COMMUNITY_UNFOLLOW = `${API_SERVER}/community/unfollow`;
+
+// Booking路徑
+export const BOOKING_INDEX_MOVIE_LIST = `${API_SERVER}/booking/index-movie-list`;
+export const BOOKING_MOVIE_LIST = `${API_SERVER}/booking/movie-list`;
+export const BOOKING_CHECK_MOVIE_STATUS = `${API_SERVER}/booking/check-movie-status`;
+export const BOOKING_SAVE_MOVIE = `${API_SERVER}/booking/save-movie`;
+export const BOOKING_UNSAVE_MOVIE = `${API_SERVER}/booking/unsave-movie`;
+export const BOOKING_SEARCH_MOVIES = `${API_SERVER}/booking/search-movies`;
+export const BOOKING_MOVIE_DETAIL = `${API_SERVER}/booking/get-movie-detail`;
+export const BOOKING_GET_BOOKING_SYSTEM = `${API_SERVER}/booking/get-booking-system`;
 
 // Date路徑，拿bar type 方法：GET
 export const DATE_GET_BAR_TYPE = `${API_SERVER}/date/bar_type/api`;

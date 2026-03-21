@@ -1,10 +1,10 @@
-import { useAuth } from '@/context/auth-context';
-import { API_BASE_URL } from '@/configs/api-config';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
-import { useRouter } from 'next/router';
+import { useAuth } from '@/context/auth-context';
+import { BookingService } from '@/services/booking-service';
 
 export default function MovieCard({ movie, index, isSaved: initialSaved }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -35,17 +35,11 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     const newSavedState = !wasSaved;
 
     try {
-      const url = wasSaved ? 'unsave-movie' : 'save-movie';
-      const res = await fetch(`${API_BASE_URL}/booking/${url}`, {
-        method: wasSaved ? 'DELETE' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ movieId, userId }),
-      });
-      if (res.ok) {
-        // setRerender(!rerender);
-        // setSavedMovies((prev) => ({ ...prev, [movieId]: newSavedState }));
+      const res = wasSaved
+        ? await BookingService.unsaveMovie(userId, movieId)
+        : await BookingService.saveMovie(userId, movieId);
+
+      if (res.status) {
         setIsSaved(newSavedState); // 更新本地狀態
         setRerender(!rerender);
       } else {

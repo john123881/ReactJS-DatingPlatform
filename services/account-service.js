@@ -1,4 +1,12 @@
 import { apiClient } from './api-client';
+import {
+  ACCOUNT_COLLECT_POST,
+  ACCOUNT_COLLECT_POST_DELETE,
+  ACCOUNT_COLLECT_BAR,
+  ACCOUNT_COLLECT_BAR_DELETE,
+  ACCOUNT_COLLECT_MOVIE,
+  ACCOUNT_COLLECT_MOVIE_DELETE,
+} from '@/configs/api-config';
 
 export const AccountService = {
   /**
@@ -61,26 +69,26 @@ export const AccountService = {
    * 收藏管理 - POST
    */
   collectPost: {
-    get: () => apiClient('/account/collect-post'),
-    delete: (data) =>
-      apiClient.delete('/account/collect-post-delete', { body: data }),
+    get: (sid, query = '') =>
+      apiClient(`${ACCOUNT_COLLECT_POST}/${sid}${query}`),
+    delete: (saveId) => apiClient.delete(`${ACCOUNT_COLLECT_POST_DELETE}/${saveId}`),
   },
 
   /**
    * 收藏管理 - BAR
    */
   collectBar: {
-    get: () => apiClient('/account/collect-bar'),
-    delete: (data) =>
-      apiClient.delete('/account/collect-bar-delete', { body: data }),
+    get: (sid, query = '') => apiClient(`${ACCOUNT_COLLECT_BAR}/${sid}${query}`),
+    delete: (saveId) => apiClient.delete(`${ACCOUNT_COLLECT_BAR_DELETE}/${saveId}`),
   },
 
   /**
    * 收藏管理 - MOVIE
    */
   collectMovie: {
-    get: () => apiClient('/account/collect-movie'),
-    delete: (data) =>
-      apiClient.delete('/account/collect-movie-delete', { body: data }),
+    get: (sid, query = '') =>
+      apiClient(`${ACCOUNT_COLLECT_MOVIE}/${sid}${query}`),
+    delete: (saveId) =>
+      apiClient.delete(`${ACCOUNT_COLLECT_MOVIE_DELETE}/${saveId}`),
   },
 };

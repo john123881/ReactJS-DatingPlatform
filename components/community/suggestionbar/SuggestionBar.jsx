@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { useRouter } from 'next/router';
+import { CommunityService } from '@/services/community-service';
 
 export default function SuggestionBar() {
   const { setProfilePosts, setProfilePage, setUserProfileHasMore } =
@@ -12,11 +13,10 @@ export default function SuggestionBar() {
 
   const getSuggestUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/community/getSuggestUsers`);
-      const data = await res.json();
+      const data = await CommunityService.getSuggestUsers();
       setUsers(data);
     } catch (error) {
-      console.error('Failed to fetch index posts:', error);
+      console.error('Failed to fetch suggested users:', error);
     }
   };
 

@@ -45,27 +45,50 @@ export default function Detail({ onPageChange }) {
         ? await BarService.unsaveBar(userId, barId)
         : await BarService.saveBar(userId, barId);
 
-      if (result.success) {
+      if (result.success || result.msg === '收藏酒吧成功' || result.msg === '取消收藏成功') {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-        // setRerender(!rerender);
         console.log('Save status updated:', result);
       } else {
-        throw new Error(result.message || 'Failed to update save status');
+        throw new Error(result.message || result.msg || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
     }
   };
 
+  // 檢查儲存酒吧狀態
+  const checkBarsStatus = useCallback(
+    async (barId) => {
+      const userId = auth.id;
+      if (userId === 0 || !barId) return;
+
+      try {
+        const data = await BarService.checkBarStatus(userId, barId);
+        if (data && data.length > 0) {
+          setSavedBars((prev) => ({ ...prev, [barId]: data[0].isSaved }));
+        }
+      } catch (error) {
+        console.error('無法獲取酒吧狀態:', error);
+      }
+    },
+    [auth.id],
+  );
+
   //FETCH GET 酒吧資料
-  const getBarDetailById = useCallback(async (bar_id) => {
-    try {
-      const data = await BarService.getBarDetail(bar_id);
-      setBar(data);
-    } catch (error) {
-      console.error('Failed to fetch bar detail:', error);
-    }
-  }, []);
+  const getBarDetailById = useCallback(
+    async (bar_id) => {
+      try {
+        const data = await BarService.getBarDetail(bar_id);
+        setBar(data);
+        if (auth.id !== 0) {
+          checkBarsStatus(bar_id);
+        }
+      } catch (error) {
+        console.error('Failed to fetch bar detail:', error);
+      }
+    },
+    [auth.id, checkBarsStatus],
+  );
 
   useEffect(() => {
     if (router.isReady) {

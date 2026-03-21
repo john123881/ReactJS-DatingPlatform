@@ -34,7 +34,7 @@ const GameComponent = () => {
   // const [isTiming, setIsTiming] = useState(false);
   const [endTime, setEndTime] = useState(0);
   const router = useRouter();
-  const { getAuthHeader } = useAuth();
+  const { getAuthHeader, auth } = useAuth();
   const [btnDisabled, setBtnDisabled] = useState(false);
   const startTimeRef = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -285,7 +285,7 @@ const GameComponent = () => {
     const formattedTime = `00:${padZero(minutes)}:${padZero(remainingSeconds)}`;
 
     //包裝成myFrom fetch 上傳紀錄
-    let myForm = { gameScore, formattedTime };
+    let myForm = { auth_id: auth.id, gameScore, gameTime: formattedTime };
     try {
       toast.promise(GameRecord(myForm), {
         loading: '登入中...',

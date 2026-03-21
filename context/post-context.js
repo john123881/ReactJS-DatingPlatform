@@ -159,15 +159,7 @@ export const PostProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-post-status?userId=${userId}&postIds=${postIds}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
+        const data = await CommunityService.checkPostStatus(userId, postIds);
 
         // 使用函式式更新來避免對 likedPosts 和 savedPosts 的依賴
         setLikedPosts((prevLiked) => {
@@ -189,7 +181,7 @@ export const PostProvider = ({ children }) => {
         console.error('無法獲取貼文狀態:', error);
       }
     },
-    [auth.id, getAuthHeader],
+    [auth.id],
   );
 
   const checkEventsStatus = useCallback(
@@ -201,15 +193,7 @@ export const PostProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
+        const data = await CommunityService.checkEventStatus(userId, eventIds);
 
         // 使用函式式更新來避免對 attendedEvents 的依賴
         setAttendedEvents((prevAttended) => {
@@ -223,7 +207,7 @@ export const PostProvider = ({ children }) => {
         console.error('無法獲取活動狀態:', error);
       }
     },
-    [auth.id, getAuthHeader],
+    [auth.id],
   );
 
   const checkFollowingStatus = useCallback(
@@ -233,15 +217,7 @@ export const PostProvider = ({ children }) => {
       if (userId === 0) return;
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/community/check-follow-status?userId=${userId}&followingId=${followingId}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
+        const data = await CommunityService.checkFollowStatus(userId, followingId);
 
         // 更新追蹤狀態
         setFollowing((prev) => ({
@@ -252,7 +228,7 @@ export const PostProvider = ({ children }) => {
         console.error('無法獲取追蹤狀態:', error);
       }
     },
-    [auth.id, getAuthHeader],
+    [auth.id],
   );
 
   const getCommunityIndexPost = useCallback(async () => {
@@ -1163,16 +1139,9 @@ export const PostProvider = ({ children }) => {
         // 如果點擊確認刪除才執行
         if (result.isConfirmed) {
           try {
-            const res = await fetch(`${API_BASE_URL}/community/delete-post`, {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader(),
-              },
-              body: JSON.stringify({ postId }),
-            });
+            const res = await CommunityService.deletePost(postId);
 
-            if (res.ok) {
+            if (res.success) {
               // 更新 posts, randomPosts 狀態以移除已刪除的貼文
               setPosts((prevPosts) => {
                 return prevPosts.filter((post) => post.post_id !== postId);
@@ -1243,16 +1212,9 @@ export const PostProvider = ({ children }) => {
       // 如果點擊確認刪除才執行
       if (result.isConfirmed) {
         try {
-          const res = await fetch(`${API_BASE_URL}/community/delete-event`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeader(),
-            },
-            body: JSON.stringify({ eventId }),
-          });
+          const res = await CommunityService.deleteEvent(eventId);
 
-          if (res.ok) {
+          if (res.success) {
             // 更新 events 狀態以移除已刪除的貼文
             setEvents((prevEvents) => {
               return prevEvents.filter(
@@ -1308,16 +1270,9 @@ export const PostProvider = ({ children }) => {
       // 如果點擊確認刪除才執行
       if (result.isConfirmed) {
         try {
-          const res = await fetch(`${API_BASE_URL}/community/delete-comment`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeader(),
-            },
-            body: JSON.stringify({ commentId }),
-          });
+          const res = await CommunityService.deleteComment(commentId);
 
-          if (res.ok) {
+          if (res.success) {
             // 更新 comments 狀態以移除已刪除的回覆
             setComments((prevComments) => {
               // 遍歷所有貼文的評論
@@ -1390,19 +1345,14 @@ export const PostProvider = ({ children }) => {
       return;
     }
 
-    try {
-      // 用fetch送出檔案
-      const res = await fetch(`${API_BASE_URL}/community/create-event`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
+      try {
+        const data = await CommunityService.createEvent({
           ...eventDetails,
           status: 'upcoming',
           userId,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+        });
+
+        if (data.success) {
         setEventId(data.event.comm_event_id);
         setEventCreated(true);
         return data.event.comm_event_id; // 返回 eventId 給 handleEventFileUpload
@@ -1449,16 +1399,9 @@ export const PostProvider = ({ children }) => {
     fd.append('eventId', currentEventId);
 
     try {
-      // 用fetch送出檔案
-      const res = await fetch(`${API_BASE_URL}/community/upload-event-photo`, {
-        method: 'POST',
-        body: fd,
-        headers: { ...getAuthHeader() },
-      });
+      const data = await CommunityService.uploadEventPhoto(fd);
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.success) {
         // 更新活動以觸發刷新頁面 !!!Important!!!
         setEvents((prevEvents) => [data.event, ...prevEvents]);
       } else {

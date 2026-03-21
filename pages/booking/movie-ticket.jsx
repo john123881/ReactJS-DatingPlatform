@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import MovieTicketCard from '@/components/booking/card/movieTicketCard';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BookingService } from '@/services/booking-service';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
@@ -15,8 +15,7 @@ export default function Index({ onPageChange }) {
 
   const getBookingSystemMovieCard = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/booking/get-booking-system`);
-      const data = await res.json();
+      const data = await BookingService.getBookingSystem();
       setMovieCards(data);
     } catch (error) {
       console.log('Failed to fetch movie card', error);

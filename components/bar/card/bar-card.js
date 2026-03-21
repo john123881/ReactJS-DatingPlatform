@@ -40,7 +40,7 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
         setRerender(!rerender);
         console.log('Save status updated:', data);
       } else {
-        throw new Error(data.message || 'Failed to update save status');
+        throw new Error(data.message || data.msg || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);

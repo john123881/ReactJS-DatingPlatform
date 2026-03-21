@@ -65,7 +65,10 @@ export default function ContentNight({ trip_plan_id, newDetail }) {
   return (
     <>
       {tripDetails.block !== 3 ? (
-        <NoContentNight refreshTripDetails={refreshTripDetails} />
+        <NoContentNight
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
       ) : tripDetails.movie_id ? (
         <MoviePhotoMy
           trip_plan_id={trip_plan_id}
@@ -79,7 +82,10 @@ export default function ContentNight({ trip_plan_id, newDetail }) {
           refreshTripDetails={refreshTripDetails}
         />
       ) : (
-        <NoContentNight />
+        <NoContentNight
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
       )}
     </>
   );

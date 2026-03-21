@@ -10,10 +10,7 @@ import { useLoader } from '@/context/use-loader';
 import CollectLoader from '@/components/account-center/loader/collect-loader';
 import Link from 'next/link';
 
-import {
-  ACCOUNT_COLLECT_POST,
-  ACCOUNT_COLLECT_POST_DELETE,
-} from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
@@ -110,40 +107,31 @@ export default function AccountCollect({ onPageChange }) {
 
   //渲染方法定義-貼文收藏
   const getSavePostData = async () => {
-    // setIsLoading(true); // 開始加載
-
     try {
-      const res = await fetch(
-        `${ACCOUNT_COLLECT_POST}/${router.query.sid}${location.search}`,
-        {
-          headers: { ...getAuthHeader() },
-        },
+      const result = await AccountService.collectPost.get(
+        router.query.sid,
+        location.search,
       );
-      const result = await res.json();
+
       console.log(
         'getSavePostData() fetch data 中的result:',
         result.output.data,
       );
       if (result.output.error === '無收藏') {
         setPosts([]);
-        toast.error('無貼文收藏', { duration: 1500 });
       } else {
         const postIds = result.output.data
           .map((post) => post.post_id)
           .join(',');
-        // console.log('postID為:', postIds); //1,2,3,4,5
+
         await checkPostsStatus(postIds); // 檢查貼文狀態
         await getPostComments(postIds);
 
         setPosts(result.output.data); // 更新posts狀態
         setPages({ page: result.page, totalPages: result.totalPages });
-        // setPage((prevPage) => prevPage + 1); // 更新頁碼
-        // setIsLoading(false); // 結束加載
-        // close(2);
       }
     } catch (error) {
-      console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
+      console.error('Failed to fetch post collection:', error);
     }
   };
 
@@ -158,14 +146,13 @@ export default function AccountCollect({ onPageChange }) {
         toast.error(result.error, { duration: 1500 });
         return;
       }
-      getSavePostData();
+      await getSavePostData();
       close(2);
-      // console.log('fecth後post為:', posts);
     };
 
     open();
     fetchCheck();
-  }, [router, auth.id, radio, rerender, checkAuth, close, open]);
+  }, [router.isReady, router.query.sid, auth.id, radio, rerender, checkAuth, close, open]);
 
   //當modal中做收藏的動作
   // useEffect(() => {
@@ -297,109 +284,123 @@ export default function AccountCollect({ onPageChange }) {
                     className={`mt-4 pb-3 flex flex-col justify-between w-full lg:mx-1 xl:mx-1 rounded-box  place-items-center `}
                   >
                     {/* CONTENT1 START */}
-                    {posts.map((post, i) => (
-                      <div
-                        key={i}
-                        className="grid z-0 outline outline-1 outline-grayBorder  rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px]"
-                      >
-                        <div className="shadow-xl card sm:card-side ">
-                          <figure className=" sm:w-[300px] h-[200px]  sm:basis-1/3">
-                            <img
-                              src={post.img || '/unavailable-image.jpg'}
-                              className="object-cover sm:min-w-[300px] sm:min-h-full z-0"
-                              alt={post.photo_name || 'No Image Available'}
-                            />
-                          </figure>
-                          <div className="card-body h-[200px] relative pe-[48px] sm:basis-2/3">
-                            <Link
-                              className="absolute top-[23px] left-[32px] avatar me-2"
-                              href={`/community/profile/${post.post_userId}`}
-                            >
-                              <div className="w-[36px] h-[36px] rounded-full ">
-                                <img
-                                  src={post.avatar || '/unknown-user-image.jpg'}
-                                  alt={post.photo_name || 'No Image Available'}
-                                />
-                              </div>
-                            </Link>
-                            <div className="flex items-center ms-[46px] font-bold text-white text-h5">
-                              {post.email
-                                ? post.email.split('@')[0]
-                                : 'unknown'}
-                            </div>
-                            <div>{post.post_context.split('#')[0]}</div>
-                            <div className="absolute bottom-[16px] left-[32px] ">
-                              {post.post_context.split('#')[1] && (
-                                <div className=" badge text-neongreen badge-outline">
-                                  {post.post_context.split('#')[1]}
-                                </div>
-                              )}
-                              {post.post_context.split('#')[2] && (
-                                <div className="ms-1 badge badge-secondary badge-outline">
-                                  {post.post_context.split('#')[2]}
-                                </div>
-                              )}
-                              {post.post_context.split('#')[3] && (
-                                <div className="ms-1 sm:absolute sm:bottom-[26px] sm:ms-0 md:relative md:bottom-0 md:ms-1 left-[0px]  badge badge-info badge-outline">
-                                  {post.post_context.split('#')[3]}
-                                </div>
-                              )}
-                            </div>
-
-                            <RxCrossCircled
-                              onClick={async () => {
-                                console.log('post.save_id:', post.save_id);
-                                const r = await fetch(
-                                  `${ACCOUNT_COLLECT_POST_DELETE}/${post.save_id}`,
-                                  {
-                                    method: 'DELETE',
-                                    headers: { ...getAuthHeader() },
-                                  },
-                                );
-                                const result = await r.json();
-                                if (
-                                  result.output.success &&
-                                  result.output.action === 'remove'
-                                ) {
-                                  toast.success('刪除收藏成功', {
-                                    duration: 1500,
-                                  });
-                                }
-                                router.push({
-                                  pathname: router.pathname, // 將 pathname 設置到 url 中
-                                  query: router.query, // 將 query 設置到 url 中
-                                });
-                              }}
-                              className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
-                            />
-                            <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
-                              <span
-                                onClick={() => {
-                                  handlePostClick(post, post.post_id);
-                                  // console.log('點下詳細的postID', post.post_id);
-                                  // setPostModalToggle(post.post_id);
-                                  // setP({ post });
-                                  // setModalId(post.post_id);
-                                  // handleShowModal(post.post_id);
-                                }}
-                                onMouseEnter={() => handleArrowHover(i, true)}
-                                onMouseLeave={() => handleArrowHover(i, false)}
-                                className={`flex items-center cursor-pointer hover:text-neongreen`}
+                    {posts.length > 0 ? (
+                      posts.map((post, i) => (
+                        <div
+                          key={i}
+                          className="grid z-0 outline outline-1 outline-grayBorder  rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px]"
+                        >
+                          <div className="shadow-xl card sm:card-side ">
+                            <figure className=" sm:w-[300px] h-[200px]  sm:basis-1/3">
+                              <img
+                                src={post.img || '/unavailable-image.jpg'}
+                                className="object-cover sm:min-w-[300px] sm:min-h-full z-0"
+                                alt={post.photo_name || 'No Image Available'}
+                              />
+                            </figure>
+                            <div className="card-body h-[200px] relative pe-[48px] sm:basis-2/3">
+                              <Link
+                                className="absolute top-[23px] left-[32px] avatar me-2"
+                                href={`/community/profile/${post.post_userId}`}
                               >
-                                <RxDoubleArrowRight
-                                  className={`me-4 ${
-                                    arrowHovered[i]
-                                      ? 'translate-x-[10px] duration-500 ease-in-out '
-                                      : 'text-dark duration-500 ease-in-out'
-                                  }`}
-                                />
-                                詳細...
-                              </span>
+                                <div className="w-[36px] h-[36px] rounded-full ">
+                                  <img
+                                    src={
+                                      post.avatar || '/unknown-user-image.jpg'
+                                    }
+                                    alt={
+                                      post.photo_name || 'No Image Available'
+                                    }
+                                  />
+                                </div>
+                              </Link>
+                              <div className="flex items-center ms-[46px] font-bold text-white text-h5">
+                                {post.email
+                                  ? post.email.split('@')[0]
+                                  : 'unknown'}
+                              </div>
+                              <div>{post.post_context.split('#')[0]}</div>
+                              <div className="absolute bottom-[16px] left-[32px] ">
+                                {post.post_context.split('#')[1] && (
+                                  <div className=" badge text-neongreen badge-outline">
+                                    {post.post_context.split('#')[1]}
+                                  </div>
+                                )}
+                                {post.post_context.split('#')[2] && (
+                                  <div className="ms-1 badge badge-secondary badge-outline">
+                                    {post.post_context.split('#')[2]}
+                                  </div>
+                                )}
+                                {post.post_context.split('#')[3] && (
+                                  <div className="ms-1 sm:absolute sm:bottom-[26px] sm:ms-0 md:relative md:bottom-0 md:ms-1 left-[0px]  badge badge-info badge-outline">
+                                    {post.post_context.split('#')[3]}
+                                  </div>
+                                )}
+                              </div>
+
+                              <RxCrossCircled
+                                onClick={async () => {
+                                  console.log('post.save_id:', post.save_id);
+                                  const result = await AccountService.collectPost.delete(
+                                    post.save_id,
+                                  );
+                                  if (
+                                    result.output.success &&
+                                    result.output.action === 'remove'
+                                  ) {
+                                    toast.success('刪除收藏成功', {
+                                      duration: 1500,
+                                    });
+                                  }
+                                  router.push({
+                                    pathname: router.pathname, // 將 pathname 設置到 url 中
+                                    query: router.query, // 將 query 設置到 url 中
+                                  });
+                                }}
+                                className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
+                              />
+                              <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
+                                <span
+                                  onClick={() => {
+                                    handlePostClick(post, post.post_id);
+                                    // console.log('點下詳細的postID', post.post_id);
+                                    // setPostModalToggle(post.post_id);
+                                    // setP({ post });
+                                    // setModalId(post.post_id);
+                                    // handleShowModal(post.post_id);
+                                  }}
+                                  onMouseEnter={() => handleArrowHover(i, true)}
+                                  onMouseLeave={() =>
+                                    handleArrowHover(i, false)
+                                  }
+                                  className={`flex items-center cursor-pointer hover:text-neongreen`}
+                                >
+                                  <RxDoubleArrowRight
+                                    className={`me-4 ${
+                                      arrowHovered[i]
+                                        ? 'translate-x-[10px] duration-500 ease-in-out '
+                                        : 'text-dark duration-500 ease-in-out'
+                                    }`}
+                                  />
+                                  詳細...
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
+                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
+                        <p className="text-xl">目前沒有收藏的貼文</p>
+                        <Link
+                          href="/community"
+                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
+                        >
+                          去探索貼文
+                        </Link>
                       </div>
-                    ))}
+                    )}
                     <PostModal
                       className={`z-[100]`}
                       post={p}

@@ -45,10 +45,16 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
     config.body = JSON.stringify(body);
   }
 
-  console.log('Fetching URL:', `${API_SERVER}${endpoint}`);
+  // 如果 endpoint 已經是完整 URL (以 http 或 https 開頭)，則不重複拼接 API_SERVER
+  const fullUrl =
+    endpoint.startsWith('http://') || endpoint.startsWith('https://')
+      ? endpoint
+      : `${API_SERVER}${endpoint}`;
+
+  console.log('Fetching URL:', fullUrl);
   console.log('Config headers:', config.headers);
 
-  const response = await fetch(`${API_SERVER}${endpoint}`, config);
+  const response = await fetch(fullUrl, config);
 
   if (response.status === 401) {
     // 處理未授權情況 (例如：Token 過期)

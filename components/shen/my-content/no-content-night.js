@@ -4,7 +4,7 @@ import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
 import TripRecomendModal from '../add-trip/trip-recomend-modal';
 
-export default function NoContentNight({ refreshTripDetails }) {
+export default function NoContentNight({ trip_plan_id, refreshTripDetails }) {
   const [deleteContent, setDeleteContent] = useState(false);
 
   // 為彈跳視窗設定開啟和關閉函數（刪除不存在的行程）
@@ -20,8 +20,11 @@ export default function NoContentNight({ refreshTripDetails }) {
   };
 
   const handleAddNightClick = async () => {
-    const { trip_plan_id } = router.query; // 取得路徑中的 trip_plan_id
-    console.log(trip_plan_id);
+    if (!trip_plan_id) {
+      console.error('Missing trip_plan_id');
+      return;
+    }
+    console.log('Using trip_plan_id from prop:', trip_plan_id);
 
     try {
       const response = await fetch(
@@ -62,7 +65,6 @@ export default function NoContentNight({ refreshTripDetails }) {
           <button
             onClick={() => {
               handleAddNightClick();
-              setIsAddModalOpen(true);
             }}
             className="text-2xl mb-1.5 hover:text-[#a0ff1f]"
           >

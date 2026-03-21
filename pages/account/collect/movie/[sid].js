@@ -8,13 +8,7 @@ import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useLoader } from '@/context/use-loader';
 import MovieModal from '@/components/account-center/modal/movieModal';
-import CollectLoader from '@/components/account-center/loader/collect-loader';
-import Link from 'next/link';
-
-import {
-  ACCOUNT_COLLECT_MOVIE,
-  ACCOUNT_COLLECT_MOVIE_DELETE,
-} from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
@@ -117,30 +111,21 @@ export default function AccountCollect({ onPageChange }) {
   useEffect(() => {
     const getSaveMovieData = async () => {
       if (auth.id === 0 || !router.isReady) return;
-      // setIsLoading(true); // 開始加載
 
       try {
-        const res = await fetch(
-          `${ACCOUNT_COLLECT_MOVIE}/${router.query.sid}${location.search}`,
-          {
-            headers: { ...getAuthHeader() },
-          },
+        const result = await AccountService.collectMovie.get(
+          router.query.sid,
+          location.search,
         );
-        const result = await res.json();
-        // console.log('fetch MOVIE data:', result);
 
         if (result.output.error === '無收藏') {
           setMovies([]); //重置收藏
-          toast.error('無電影收藏', { duration: 1500 });
         } else {
-          setMovies(result.output.data); // 更新狀態
+          setMovies(result.output.data);
           setPages({ page: result.page, totalPages: result.totalPages });
-          // setPage((prevPage) => prevPage + 1); // 更新頁碼
-          // setIsLoading(false); // 結束加載
         }
       } catch (error) {
-        console.error('Failed to fetch saved movie:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
+        console.error('Failed to fetch movie collection:', error);
       }
     };
 
@@ -152,13 +137,13 @@ export default function AccountCollect({ onPageChange }) {
         toast.error(result.error, { duration: 1500 });
         return;
       }
-      getSaveMovieData();
+      await getSaveMovieData();
+      close(1);
     };
 
     open();
     fetchCheck();
-    close(1);
-  }, [router, auth.id, checkAuth, close, open]);
+  }, [router.isReady, router.query.sid, auth.id, checkAuth, close, open, setMovies]);
 
   useEffect(() => {
     onPageChange(pageTitle);
@@ -257,112 +242,122 @@ export default function AccountCollect({ onPageChange }) {
                   >
                     {/* CONTENT START */}
                     {/* Card START */}
-                    {movies.map((movie, i) => {
-                      return (
-                        <div
-                          key={i}
-                          className="grid outline outline-1 outline-grayBorder z-10 rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px]"
-                        >
-                          <div className="shadow-xl card sm:card-side ">
-                            <figure className=" sm:w-[300px] h-[200px]  sm:basis-1/3">
-                              <img
-                                src={movie.img || '/unavailable-image.jpg'}
-                                className="object-cover w-[360px] sm:min-w-[300px] sm:min-h-full z-0 2xl:w-full 2xl:h-fit"
-                                alt={movie.img_name || 'No Image Available'}
-                              />
-                            </figure>
-                            <div className="card-body h-[200px] relative pe-[48px] sm:basis-2/3">
-                              <div className="font-bold text-white text-h5">
-                                {movie.title
-                                  ? movie.title.match(/[\u4e00-\u9fa5]+/g)
-                                  : 'unknownMovie'}
-                              </div>
-                              <div
-                                className={`absolute bottom-[16px] left-[32px] 
-                             `}
-                              >
+                    {movies.length > 0 ? (
+                      movies.map((movie, i) => {
+                        return (
+                          <div
+                            key={i}
+                            className="grid outline outline-1 outline-grayBorder z-10 rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px]"
+                          >
+                            <div className="shadow-xl card sm:card-side ">
+                              <figure className=" sm:w-[300px] h-[200px]  sm:basis-1/3">
+                                <img
+                                  src={movie.img || '/unavailable-image.jpg'}
+                                  className="object-cover w-[360px] sm:min-w-[300px] sm:min-h-full z-0 2xl:w-full 2xl:h-fit"
+                                  alt={movie.img_name || 'No Image Available'}
+                                />
+                              </figure>
+                              <div className="card-body h-[200px] relative pe-[48px] sm:basis-2/3">
+                                <div className="font-bold text-white text-h5">
+                                  {movie.title
+                                    ? movie.title.match(/[\u4e00-\u9fa5]+/g)
+                                    : 'unknownMovie'}
+                                </div>
                                 <div
-                                  className={`badge
+                                  className={`absolute bottom-[16px] left-[32px] 
+                             `}
+                                >
+                                  <div
+                                    className={`badge
                             ${movie.type === '愛情' ? 'badge-error' : ''}
                             ${movie.type === '劇情' ? 'badge-info' : ''}
                             ${movie.type === '懸疑' ? 'badge-success' : ''}
                             ${movie.type === '喜劇' ? 'badge-secondary' : ''}
                             ${movie.type === '動作' ? 'badge-primary' : ''}`}
-                                >
-                                  {movie.type}
-                                </div>
-                                <div className="ms-2 ps-2 pe-1 badge badge-warning badge-outline">
-                                  {movie.rating}{' '}
-                                  <div className="m-0.5">
-                                    <IoMdStar className="text-[14px] lg:text-[16px] text-warning" />
+                                  >
+                                    {movie.type}
+                                  </div>
+                                  <div className="ms-2 ps-2 pe-1 badge badge-warning badge-outline">
+                                    {movie.rating}{' '}
+                                    <div className="m-0.5">
+                                      <IoMdStar className="text-[14px] lg:text-[16px] text-warning" />
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div>
-                                {movie.description.length > 35
-                                  ? movie.description.substring(0, 35) + '...'
-                                  : movie.description}
-                              </div>
-                              <RxCrossCircled
-                                onClick={async () => {
-                                  console.log('bar.save_id:', movie.save_id);
-                                  const r = await fetch(
-                                    `${ACCOUNT_COLLECT_MOVIE_DELETE}/${movie.save_id}`,
-                                    {
-                                      method: 'DELETE',
-                                      headers: { ...getAuthHeader() },
-                                    },
-                                  );
-                                  const result = await r.json();
-                                  if (
-                                    result.output.success &&
-                                    result.output.action === 'remove'
-                                  ) {
-                                    toast.success('刪除收藏成功', {
-                                      duration: 1500,
+                                <div>
+                                  {movie.description.length > 35
+                                    ? movie.description.substring(0, 35) + '...'
+                                    : movie.description}
+                                </div>
+                                <RxCrossCircled
+                                  onClick={async () => {
+                                    console.log('bar.save_id:', movie.save_id);
+                                    const result = await AccountService.collectMovie.delete(
+                                      movie.save_id,
+                                    );
+                                    if (
+                                      result.output.success &&
+                                      result.output.action === 'remove'
+                                    ) {
+                                      toast.success('刪除收藏成功', {
+                                        duration: 1500,
+                                      });
+                                    }
+                                    router.push({
+                                      pathname: router.pathname, // 將 pathname 設置到 url 中
+                                      query: router.query, // 將 query 設置到 url 中
                                     });
-                                  }
-                                  router.push({
-                                    pathname: router.pathname, // 將 pathname 設置到 url 中
-                                    query: router.query, // 將 query 設置到 url 中
-                                  });
-                                }}
-                                className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
-                              />
-                              <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
-                                <span
-                                  onClick={() => {
-                                    handleMovieClick(movie, movie.movie_id);
-                                    // console.log('點下詳細的postID', post.post_id);
-                                    // setPostModalToggle(post.post_id);
-                                    // setP({ post });
-                                    // setModalId(post.post_id);
-                                    // handleShowModal(post.post_id);
                                   }}
-                                  // href={`/movie/movie-detail/${movie.bar_id}`}
-                                  onMouseEnter={() => handleArrowHover(i, true)}
-                                  onMouseLeave={() =>
-                                    handleArrowHover(i, false)
-                                  }
-                                  className={`flex items-center cursor-pointer hover:text-neongreen`}
-                                >
-                                  <RxDoubleArrowRight
-                                    className={`me-4 ${
-                                      arrowHovered[i]
-                                        ? 'translate-x-[10px] duration-500 ease-in-out '
-                                        : 'text-dark duration-500 ease-in-out'
-                                    }`}
-                                  />
-                                  詳細...
-                                </span>
+                                  className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-neongreen text-4xl"
+                                />
+                                <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
+                                  <span
+                                    onClick={() => {
+                                      handleMovieClick(movie, movie.movie_id);
+                                      // console.log('點下詳細的postID', post.post_id);
+                                      // setPostModalToggle(post.post_id);
+                                      // setP({ post });
+                                      // setModalId(post.post_id);
+                                      // handleShowModal(post.post_id);
+                                    }}
+                                    // href={`/movie/movie-detail/${movie.bar_id}`}
+                                    onMouseEnter={() =>
+                                      handleArrowHover(i, true)
+                                    }
+                                    onMouseLeave={() =>
+                                      handleArrowHover(i, false)
+                                    }
+                                    className={`flex items-center cursor-pointer hover:text-neongreen`}
+                                  >
+                                    <RxDoubleArrowRight
+                                      className={`me-4 ${
+                                        arrowHovered[i]
+                                          ? 'translate-x-[10px] duration-500 ease-in-out '
+                                          : 'text-dark duration-500 ease-in-out'
+                                      }`}
+                                    />
+                                    詳細...
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Card END */}
-                        </div>
-                      );
-                    })}
+                            {/* Card END */}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="flex flex-col items-center justify-center w-full min-h-[400px] text-gray-400">
+                        <RxCrossCircled className="text-6xl mb-4 opacity-20" />
+                        <p className="text-xl">目前沒有收藏的電影</p>
+                        <Link
+                          href="/booking"
+                          className="mt-4 btn btn-outline btn-primary rounded-full px-8"
+                        >
+                          去探索電影
+                        </Link>
+                      </div>
+                    )}
 
                     <MovieModal
                       className={`z-[100]`}

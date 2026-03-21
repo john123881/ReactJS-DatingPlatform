@@ -88,7 +88,10 @@ export default function ContentMorning({ trip_plan_id, newDetail }) {
           refreshTripDetails={refreshTripDetails}
         />
       ) : (
-        <NoContentMorning />
+        <NoContentMorning
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
       )}
     </>
   );

@@ -1,8 +1,8 @@
-import MovieCard from '@/components/booking/card/movieCard';
-import { useAuth } from '@/context/auth-context';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { API_BASE_URL } from '@/configs/api-config';
+import { useAuth } from '@/context/auth-context';
+import { BookingService } from '@/services/booking-service';
+import MovieCard from '@/components/booking/card/movieCard';
 import PageTitle from '@/components/page-title';
 
 export default function Index({ onPageChange }) {
@@ -30,8 +30,7 @@ export default function Index({ onPageChange }) {
 
   const getBookingMovieCard = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/booking/movie-list`);
-      const data = await res.json();
+      const data = await BookingService.getMovieList();
 
       const movieIds = data.map((movie) => movie.movie_id).join(',');
 
@@ -49,10 +48,7 @@ export default function Index({ onPageChange }) {
     console.log('checkMoviesStatus');
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/booking/check-movie-status?userId=${userId}&movieIds=${movieIds}`,
-      );
-      const data = await response.json();
+      const data = await BookingService.checkMovieStatus(userId, movieIds);
 
       console.log(data);
 
@@ -88,10 +84,7 @@ export default function Index({ onPageChange }) {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`,
-        );
-        const data = await response.json();
+        const data = await BookingService.searchMovies(value);
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {

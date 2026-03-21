@@ -22,8 +22,11 @@ export default function NoContentMorning({
   };
 
   const handleAddMorningClick = async () => {
-    const { trip_plan_id } = router.query; // 取得路徑中的 trip_plan_id
-    console.log(trip_plan_id);
+    if (!trip_plan_id) {
+      console.error('Missing trip_plan_id');
+      return;
+    }
+    console.log('Using trip_plan_id from prop:', trip_plan_id);
 
     try {
       const response = await fetch(
@@ -64,7 +67,6 @@ export default function NoContentMorning({
           <button
             onClick={() => {
               handleAddMorningClick();
-              setIsAddModalOpen(true);
             }}
             className="text-2xl mb-1.5 hover:text-[#a0ff1f]"
           >

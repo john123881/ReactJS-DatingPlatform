@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import IndexMovieCard from '@/components/booking/card/indexMovieCard';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BookingService } from '@/services/booking-service';
 import Link from 'next/link';
 import { IoTicketOutline } from 'react-icons/io5';
 
@@ -25,8 +25,7 @@ export default function Index({ onPageChange }) {
 
   const getBookingMovieCard = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/booking/index-movie-list`);
-      const data = await res.json();
+      const data = await BookingService.getIndexMovies();
       // console.log('asdsadcasc===>>>', data);
       setMovieCards(data);
     } catch (error) {
