@@ -56,12 +56,7 @@ const GameComponent = () => {
       newFoodPosition = generateFoodPosition();
     }
     setFood(newFoodPosition); // 設置新食物位置
-    // 啟動計時器
-    startTimeRef.current = Date.now() - elapsedTime;
-    const newTimer = setInterval(() => {
-      setTime(Date.now() - startTimeRef.current);
-    }, 10); // 每秒更新時間
-    setTimer(newTimer); // 將計時器存在變量中
+    // 啟動計時器 (邏輯已移至 useEffect)
   }, [elapsedTime, snake]);
 
   const handleRestart = useCallback(() => {
@@ -373,23 +368,22 @@ const GameComponent = () => {
 
   //按下遊戲開始後 紀錄時間
   useEffect(() => {
-    if (gameStarted) {
+    let intervalId = null;
+    if (gameStarted && !gameOver) {
       setIsTiming(true); // 遊戲開始開啟計時
       startTimeRef.current = Date.now() - elapsedTime;
-      // console.log('stimeRef:', startTimeRef.current);
-      const newTimer = setInterval(() => {
-        // setTime((prevTime) => prevTime + 1);
+      intervalId = setInterval(() => {
         setTime(Date.now() - startTimeRef.current);
       }, 10);
-      setTimer(newTimer);
-      return () => clearInterval(newTimer);
+      setTimer(intervalId);
+      return () => {
+        if (intervalId) clearInterval(intervalId);
+      };
     } else {
-      // 清除計時器
-      clearInterval(timer);
-      setIsTiming(false); // 遊戲結束停止計時
-      setTimer(null); // 將計時器狀態設為null
+      setIsTiming(false); // 遊戲結束或未開始時停止計時
+      // 如果要清除全域 timer 狀態，可以在這裡做，但不要把 timer 加到相依陣列
     }
-  }, [gameStarted, elapsedTime, timer]);
+  }, [gameStarted, gameOver, elapsedTime]); // 移除了 timer 依賴，避免無限循環
 
 
 

@@ -22,10 +22,11 @@ export default function Explore({ onPageChange }) {
     usePostContext();
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null) {
+    if (auth.id !== undefined && auth.id !== null && randomPosts.length === 0) {
       getCommunityExplorePost();
     }
-  }, [auth.id, getCommunityExplorePost]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id]);
 
   return (
     <>

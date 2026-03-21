@@ -35,21 +35,15 @@ export default function Index({ onPageChange }) {
 
   useEffect(() => {
     if (auth.id !== undefined && auth.id !== null) {
-      if (!isFilterActive) {
+      if (!isFilterActive && posts.length === 0) {
         getCommunityIndexPost();
       }
-      if (filteredPage === 1 && isFilterActive) {
+      if (filteredPage === 1 && isFilterActive && filteredPosts.length === 0) {
         getCommunityIndexFilteredPost(currentKeyword);
       }
     }
-  }, [
-    auth.id,
-    filteredPage,
-    isFilterActive,
-    currentKeyword,
-    getCommunityIndexPost,
-    getCommunityIndexFilteredPost,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id, isFilterActive, currentKeyword]);
 
   return (
     <>

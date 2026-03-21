@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import TabBar from '@/components/bar/bar/tab-bar';
@@ -27,7 +27,7 @@ export default function Index({ onPageChange }) {
   const displayCount = 3; // Number of bars to display at once
 
   // random bar
-  const getBarListRandom = async () => {
+  const getBarListRandom = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/bar/bar-list-random`);
       const data = await res.json();
@@ -36,7 +36,7 @@ export default function Index({ onPageChange }) {
     } catch (error) {
       console.log('Failed to fetch bar random:', error);
     }
-  };
+  }, []);
 
   // next 3 random
   useEffect(() => {

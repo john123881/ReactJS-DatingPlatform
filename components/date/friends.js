@@ -13,22 +13,33 @@ export default function Friends({ searchQuery }) {
   const socket = useRef(null);
   const socketPort = 3003;
 
-  const getFriend = async () => {
-    try {
-      const url = `${API_BASE_URL}/date/friends-list/accepted/${auth.id}`;
-      const res = await fetch(url, { headers: { ...getAuthHeader() } });
-      const data = await res.json();
-      console.log(data);
-      if (Array.isArray(data.data)) {
-        setFriend(data.data);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   useEffect(() => {
-    getFriend();
+    const controller = new AbortController();
+    const getFriend = async () => {
+      try {
+        const url = `${API_BASE_URL}/date/friends-list/accepted/${auth.id}`;
+        const res = await fetch(url, {
+          headers: { ...getAuthHeader() },
+          signal: controller.signal,
+        });
+        const data = await res.json();
+        if (Array.isArray(data.data)) {
+          setFriend(data.data);
+        }
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.log(e);
+        }
+      }
+    };
+
+    if (auth.id) {
+      getFriend();
+    }
+
+    return () => {
+      controller.abort();
+    };
   }, [auth.id]);
 
   // 根據 searchQuery 過濾朋友列表
@@ -43,11 +54,14 @@ export default function Friends({ searchQuery }) {
   });
 
   const [socketId, setSocketId] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
-  // 使用 socket
+  // 使用 socket & 監控對方是否在線
   useEffect(() => {
-    if (auth.token && !socket.current) {
-      // 當下無連接時，建立連結
+    if (!auth.token) return;
+
+    // 當下無連接時，建立連結
+    if (!socket.current) {
       socket.current = io(SOCKET_SERVER, {
         auth: {
           token: auth.token,
@@ -58,46 +72,32 @@ export default function Friends({ searchQuery }) {
       // 連結成功
       socket.current.on('connect', () => {
         console.log('Socket connected：）');
-
         socket.current.userId = auth.id;
         setSocketId(auth.id);
         socket.current.emit('get_online', { isOnline: true });
-        console.log(auth.id);
       });
+
+      const handleUserConnected = (userId) => {
+        setOnlineUsers((prev) => [...prev, userId]);
+      };
+
+      const handleUserDisconnected = (userId) => {
+        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+      };
+
+      socket.current.on('user_connected', handleUserConnected);
+      socket.current.on('user_disconnected', handleUserDisconnected);
     }
 
     return () => {
       if (socket.current) {
+        socket.current.off('user_connected');
+        socket.current.off('user_disconnected');
         socket.current.close();
         socket.current = null;
       }
     };
-  }, [auth.token]); // 加入 auth.token 依賴
-
-  // 監控對方是否在線
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
-  useEffect(() => {
-    if (!socket.current) return;
-
-    const handleUserConnected = (userId) => {
-      setOnlineUsers((prev) => [...prev, userId]); // 增加上線用戶
-    };
-
-    const handleUserDisconnected = (userId) => {
-      setOnlineUsers((prev) => prev.filter((id) => id !== userId)); // 移除下線用戶
-    };
-
-    socket.current.on('user_connected', handleUserConnected);
-    socket.current.on('user_disconnected', handleUserDisconnected);
-
-    return () => {
-      if (socket.current) {
-        socket.current.off('user_connected', handleUserConnected);
-        socket.current.off('user_disconnected', handleUserDisconnected);
-      }
-    };
-  }, [socket.current]);
+  }, [auth.token, auth.id]);
 
   return (
     <>

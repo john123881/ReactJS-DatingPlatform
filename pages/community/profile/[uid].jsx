@@ -80,7 +80,7 @@ export default function Profile({ onPageChange }) {
 
   useEffect(() => {
     // Next.js 的路由器是異步, 確保拿到 uid 再 fetch !!! Important
-    if (auth.id !== undefined && auth.id !== null && uid) {
+    if (auth.id !== undefined && auth.id !== null && uid && profilePosts.length === 0) {
       setProfilePosts([]); // 清空現有貼文
       setUserProfileHasMore(true);
       // setProfilePage(1);
@@ -92,15 +92,8 @@ export default function Profile({ onPageChange }) {
         return newPage;
       });
     }
-  }, [
-    auth.id,
-    uid,
-    reload,
-    getCommunityUserProfilePost,
-    setProfilePage,
-    setProfilePosts,
-    setUserProfileHasMore,
-  ]); // uid 變化時重新調用, 或是重複點擊則 reload
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id, uid, reload]); // uid 變化時重新調用, 或是重複點擊則 reload
 
   return (
     <>

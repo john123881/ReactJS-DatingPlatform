@@ -40,10 +40,11 @@ export default function Event({ onPageChange }) {
   const shareEventModalId = `share_event_modal_${getEventPage?.comm_event_id}`;
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null) {
+    if (auth.id !== undefined && auth.id !== null && eid && eventPageCard.comm_event_id != eid) {
       getEventPage(eid);
     }
-  }, [auth.id, eid, getEventPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id, eid]);
 
   return (
     <>

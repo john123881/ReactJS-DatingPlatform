@@ -21,10 +21,11 @@ export default function Events({ onPageChange }) {
   const { events, eventHasMore, getCommunityEvents } = usePostContext();
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null) {
+    if (auth.id !== undefined && auth.id !== null && events.length === 0) {
       getCommunityEvents();
     }
-  }, [auth.id, getCommunityEvents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id]);
 
   return (
     <>

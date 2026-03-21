@@ -70,11 +70,11 @@ export default function ChatRoomContext() {
     if (auth.id === 0) {
       return;
     }
-    const controller = new AbortController(); //建立一個新的控制器
     const getUserAvatar = async () => {
       try {
         const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
           headers: { ...getAuthHeader() },
+          signal: controller.signal,
         });
         const result = await res.json();
         console.log('Navbar, getUserAvatar:', result);
@@ -83,7 +83,9 @@ export default function ChatRoomContext() {
           setUserAvatar(avatar);
         }
       } catch (e) {
-        console.log(e);
+        if (e.name !== 'AbortError') {
+          console.log(e);
+        }
       }
     };
     getUserAvatar();
@@ -92,7 +94,7 @@ export default function ChatRoomContext() {
     return () => {
       controller.abort();
     };
-  }, [userAvatar, auth.id, getAuthHeader, setUserAvatar]);
+  }, [auth.id]);
 
   // 拿到好友名字
   useEffect(() => {
@@ -136,13 +138,7 @@ export default function ChatRoomContext() {
 
     fetchFriendIdAndName();
     fetchMessages();
-  }, [
-    router.isReady,
-    router.query,
-    auth.username,
-    friendship_id,
-    getAuthHeader,
-  ]);
+  }, [router.isReady, auth.username, friendship_id]);
 
   // 使用 socket
   useEffect(() => {
@@ -196,7 +192,7 @@ export default function ChatRoomContext() {
       socket.current.off();
       console.log('Socket disconnected!');
     };
-  }, [router.isReady, auth, getAuthHeader, roomName]);
+  }, [router.isReady, auth.token, roomName]);
 
   // 格式化時間的函數
   const formatTime = () =>

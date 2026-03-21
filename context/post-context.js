@@ -109,6 +109,7 @@ export const PostProvider = ({ children }) => {
   }, [auth.id]);
 
   const getPostComments = useCallback(async (postIds) => {
+    if (!postIds || postIds === '0' || postIds === 0) return;
     try {
       const data = await CommunityService.getComments(postIds);
 
@@ -153,7 +154,7 @@ export const PostProvider = ({ children }) => {
     async (postIds) => {
       const userId = auth.id;
 
-      if (userId === 0) {
+      if (userId === 0 || !postIds || postIds === '0' || postIds === 0) {
         return;
       }
 
@@ -421,7 +422,7 @@ export const PostProvider = ({ children }) => {
       const postId = post.post_id;
       const userId = auth.id;
 
-      if (userId === 0) {
+      if (userId === 0 || !postId || postId === '0' || postId === 0) {
         return;
       }
 
@@ -1024,7 +1025,7 @@ export const PostProvider = ({ children }) => {
       const postId = post.post_id;
       const userId = auth.id;
 
-      if (userId === 0) {
+      if (userId === 0 || !postId || postId === '0' || postId === 0) {
         return;
       }
 
@@ -1091,7 +1092,7 @@ export const PostProvider = ({ children }) => {
       const postId = post.post_id;
       const userId = auth.id;
 
-      if (userId === 0) {
+      if (userId === 0 || !postId || postId === '0' || postId === 0) {
         return;
       }
 
@@ -1149,7 +1150,7 @@ export const PostProvider = ({ children }) => {
     async (post) => {
       const postId = post.post_id;
 
-      if (!postId) return;
+      if (!postId || postId === '0' || postId === 0) return;
 
       Swal.fire({
         title: '確定刪除?',

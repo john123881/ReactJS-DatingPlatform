@@ -94,10 +94,11 @@ export default function Post({ onPageChange }) {
   };
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null) {
+    if (auth.id !== undefined && auth.id !== null && pid && postPage.post_id != pid) {
       getPostPage(pid);
     }
-  }, [auth.id, pid, getPostPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.id, pid]);
 
   return (
     <>

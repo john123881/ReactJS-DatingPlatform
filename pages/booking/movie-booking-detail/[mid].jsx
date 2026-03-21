@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
@@ -29,7 +29,7 @@ export default function MovieDetail({ onPageChange }) {
 
   const [hovered, setHovered] = useState(false);
 
-  const getMovieDetail = async (mid) => {
+  const getMovieDetail = useCallback(async (mid) => {
     try {
       const res = await fetch(
         `${API_BASE_URL}/booking/get-movie-detail/${mid}`,
@@ -39,7 +39,7 @@ export default function MovieDetail({ onPageChange }) {
     } catch (error) {
       console.log('Failed to fetch movie card', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const { mid } = router.query;
