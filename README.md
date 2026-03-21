@@ -84,7 +84,7 @@ Back-end
 </div>
 <br>
 
-![](imgs//gmae.gif)
+![](imgs/game.gif)
 
 ![record](imgs/record.png)
 

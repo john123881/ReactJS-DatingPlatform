@@ -60,10 +60,8 @@ export const AccountService = {
    */
   getGameRecord: () => apiClient('/account/record-game'),
 
-  /**
-   * 讀取收藏列表 (Navbar 用)
-   */
-  getCollectList: () => apiClient('/account/collect-list'),
+  getCollectList: (sid) =>
+    apiClient(sid ? `/account/collect-list/${sid}` : '/account/collect-list'),
 
   /**
    * 收藏管理 - POST

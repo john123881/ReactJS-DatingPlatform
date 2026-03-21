@@ -9,7 +9,7 @@ import ProfileInfo from '@/components/community/profileInfo/profileInfo';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from '../page.module.css';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { CommunityService } from '@/services/community-service';
 
 export default function Profile({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -39,10 +39,7 @@ export default function Profile({ onPageChange }) {
     async (page = profilePage) => {
       if (!userProfileHasMore) return; // 防止重複請求
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/community/posts/${uid}?page=${page}&limit=12`,
-        );
-        const data = await res.json();
+        const data = await CommunityService.getPostsByUser(uid, page, 12);
 
         if (data.length === 0) {
           setUserProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false

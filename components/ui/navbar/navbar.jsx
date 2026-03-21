@@ -19,9 +19,9 @@ import MovieModal from '@/components/account-center/modal/movieModal';
 
 import {
   API_SERVER,
-  ACCOUNT_GET,
-  ACCOUNT_COLLECT_LIST_GET,
 } from '@/configs/api-config';
+import { CommunityService } from '@/services/community-service';
+import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
@@ -154,28 +154,20 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   };
 
   const getNotifications = async () => {
-    const response = await fetch(
-      `${API_SERVER}/community/get-noti/${userInfo.user_id}`,
-    );
-    const data = await response.json();
-    setNotifications(data.noti);
-    setUnreadCount(data.noti.filter((noti) => !noti.isRead).length);
+    try {
+      const data = await CommunityService.getNotifications(userInfo.user_id);
+      setNotifications(data.noti);
+      setUnreadCount(data.noti.filter((noti) => !noti.isRead).length);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    }
   };
 
   const markNotiAsRead = async (notiId) => {
     const userId = userInfo.user_id;
     try {
-      const response = await fetch(
-        `${API_SERVER}/community/mark-noti-as-read/${notiId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId }),
-        },
-      );
-      if (response.ok) {
+      const result = await CommunityService.markNotiAsRead(notiId, userId);
+      if (result.success) {
         setNotifications((prev) =>
           prev.map((noti) =>
             noti.comm_noti_id === notiId ? { ...noti, isRead: true } : noti,
@@ -184,7 +176,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
         // 更新未讀計數
         setUnreadCount((prevCount) => prevCount - 1);
       } else {
-        throw new Error('Failed to mark notification as read');
+        throw new Error(result.message || 'Failed to mark notification as read');
       }
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -288,10 +280,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     // const signal = controller.signal; //取得訊號 塞到fetch後面
     const getUserAvatar = async () => {
       try {
-        const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
-          headers: { ...getAuthHeader() },
-        });
-        const result = await res.json();
+        const result = await AccountService.getProfile(auth.id);
         // console.log('Navbar, getUserAvatar:', result);
         if (result.success) {
           const { avatar } = result.data;
@@ -326,10 +315,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     // const signal = controller.signal; //取得訊號 塞到fetch後面
     const fetchAllCollectList = async () => {
       try {
-        const r = await fetch(`${ACCOUNT_COLLECT_LIST_GET}/${auth.id}`, {
-          headers: { ...getAuthHeader() },
-        });
-        const result = await r.json();
+        const result = await AccountService.getCollectList(auth.id);
         // console.log(result);
         if (result?.output?.error === '無收藏') {
           setListData([]); // 設置為空列表

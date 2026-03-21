@@ -52,6 +52,9 @@ export const CommunityService = {
   getPosts: (page, limit) =>
     apiClient(`${COMMUNITY_GET_POSTS}?page=${page}&limit=${limit}`),
 
+  getPostsByUser: (uid, page, limit) =>
+    apiClient(`${COMMUNITY_GET_POSTS}/${uid}?page=${page}&limit=${limit}`),
+
   getPostsByKeyword: (keyword, page, limit) =>
     apiClient(
       `/community/get-posts-by-keyword?keyword=${keyword}&page=${page}&limit=${limit}`,
@@ -156,4 +159,11 @@ export const CommunityService = {
 
   searchUsers: (searchTerm) =>
     apiClient(`/community/search-users?searchTerm=${searchTerm}`),
+
+  // --- 通知相關 ---
+
+  getNotifications: (userId) => apiClient(`/community/get-noti/${userId}`),
+
+  markNotiAsRead: (notiId, userId) =>
+    apiClient.post(`/community/mark-noti-as-read/${notiId}`, { userId }),
 };

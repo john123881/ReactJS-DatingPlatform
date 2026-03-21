@@ -89,6 +89,8 @@ export const PostProvider = ({ children }) => {
   const followerModalRef = useRef(null);
   const followingModalRef = useRef(null);
 
+  const interactingItems = useRef(new Set());
+
   const router = useRouter();
   const { uid } = router.query;
 
@@ -1005,6 +1007,9 @@ export const PostProvider = ({ children }) => {
         return;
       }
 
+      if (interactingItems.current.has(`like-${postId}`)) return;
+      interactingItems.current.add(`like-${postId}`);
+
       // 先獲取當前狀態
       let wasLiked = false;
       setLikedPosts((prev) => {
@@ -1019,13 +1024,26 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.unlikePost(userId, postId)
           : await CommunityService.likePost(userId, postId);
 
-        if (result.success) {
+        console.log('Like interaction result:', result);
+
+        if (
+          result.success ||
+          result.output?.success ||
+          result.status === 'success' ||
+          result.status === 'ok' ||
+          result.msg?.includes('成功') ||
+          result.message?.includes('成功')
+        ) {
           setLikedPosts((prev) => ({ ...prev, [postId]: newLikedState }));
         } else {
-          throw new Error('Failed to update like status');
+          throw new Error(
+            result.message || result.msg || 'Failed to update like status',
+          );
         }
       } catch (error) {
         console.error('Error updating like status:', error);
+      } finally {
+        interactingItems.current.delete(`like-${postId}`);
       }
     },
     [auth.id],
@@ -1040,6 +1058,9 @@ export const PostProvider = ({ children }) => {
         return;
       }
 
+      if (interactingItems.current.has(`attend-${eventId}`)) return;
+      interactingItems.current.add(`attend-${eventId}`);
+
       const wasAttended = attendedEvents[eventId] || false;
       const newAttendedState = !wasAttended;
 
@@ -1048,16 +1069,29 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.notAttendEvent(userId, eventId)
           : await CommunityService.attendEvent(userId, eventId);
 
-        if (result.success) {
+        console.log('Attendance interaction result:', result);
+
+        if (
+          result.success ||
+          result.output?.success ||
+          result.status === 'success' ||
+          result.status === 'ok' ||
+          result.msg?.includes('成功') ||
+          result.message?.includes('成功')
+        ) {
           setAttendedEvents((prev) => ({
             ...prev,
             [eventId]: newAttendedState,
           }));
         } else {
-          throw new Error('Failed to update attendance status');
+          throw new Error(
+            result.message || result.msg || 'Failed to update attendance status',
+          );
         }
       } catch (error) {
         console.error('Error updating event attendance:', error);
+      } finally {
+        interactingItems.current.delete(`attend-${eventId}`);
       }
     },
     [auth.id, attendedEvents],
@@ -1072,6 +1106,9 @@ export const PostProvider = ({ children }) => {
         return;
       }
 
+      if (interactingItems.current.has(`save-${postId}`)) return;
+      interactingItems.current.add(`save-${postId}`);
+
       const wasSaved = savedPosts[postId] || false;
       const newSavedState = !wasSaved;
 
@@ -1080,14 +1117,27 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.unsavePost(userId, postId)
           : await CommunityService.savePost(userId, postId);
 
-        if (result.success) {
+        console.log('Save interaction result:', result);
+
+        if (
+          result.success ||
+          result.output?.success ||
+          result.status === 'success' ||
+          result.status === 'ok' ||
+          result.msg?.includes('成功') ||
+          result.message?.includes('成功')
+        ) {
           setRerender(!rerender);
           setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
         } else {
-          throw new Error('Failed to update save status');
+          throw new Error(
+            result.message || result.msg || 'Failed to update save status',
+          );
         }
       } catch (error) {
         console.error('Error updating save status:', error);
+      } finally {
+        interactingItems.current.delete(`save-${postId}`);
       }
     },
     [auth.id, savedPosts, rerender, setRerender],
@@ -1099,6 +1149,9 @@ export const PostProvider = ({ children }) => {
 
       if (userId === 0) return; // 未登入狀態直接返回
 
+      if (interactingItems.current.has(`follow-${FollowingId}`)) return;
+      interactingItems.current.add(`follow-${FollowingId}`);
+
       const isFollowing = following[FollowingId] || false; // 檢查是否已追蹤該用戶
       const newFollowingState = !isFollowing; // 新的追蹤狀態為當前狀態的反向值
 
@@ -1107,7 +1160,12 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.unfollowUser(userId, FollowingId)
           : await CommunityService.followUser(userId, FollowingId);
 
-        if (result.success) {
+        if (
+          result.success ||
+          result.output?.success ||
+          result.msg?.includes('成功') ||
+          result.message?.includes('成功')
+        ) {
           setFollowing((prev) => ({
             ...prev,
             [FollowingId]: newFollowingState,
@@ -1117,6 +1175,8 @@ export const PostProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error updating follow status:', error);
+      } finally {
+        interactingItems.current.delete(`follow-${FollowingId}`);
       }
     },
     [auth.id, following],

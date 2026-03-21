@@ -89,10 +89,15 @@ export default function MovieDetail({ onPageChange }) {
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (result.success || result.msg === '收藏成功' || result.msg === '取消收藏成功') {
+      if (
+        result.success ||
+        result.output?.success ||
+        result.msg?.includes('成功') ||
+        result.message?.includes('成功')
+      ) {
         setIsSaved(newSavedState);
         Swal.fire({
-          title: wasSaved ? '已取消收藏!' : '收藏成功!',
+          title: newSavedState ? '收藏成功!' : '已取消收藏!',
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
@@ -340,10 +345,16 @@ export default function MovieDetail({ onPageChange }) {
                   />
                   <div role="tabpanel" className="tab-content p-10 mt-4 mx-2">
                     <div className="card bg-transparent shadow-xl">
-                      <YouTube
-                        videoId={movie[0]?.youtube_id}
-                        className="w-full"
-                      />
+                      {movie[0]?.youtube_id ? (
+                        <YouTube
+                          videoId={movie[0]?.youtube_id}
+                          className="w-full h-full lg:h-[500px]"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-[300px] bg-slate-800 text-gray-400 rounded-xl">
+                          暫無預告片影片
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
