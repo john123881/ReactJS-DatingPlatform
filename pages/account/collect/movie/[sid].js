@@ -8,6 +8,9 @@ import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useLoader } from '@/context/use-loader';
 import MovieModal from '@/components/account-center/modal/movieModal';
+import CollectLoader from '@/components/account-center/loader/collect-loader';
+import Link from 'next/link';
+
 import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
