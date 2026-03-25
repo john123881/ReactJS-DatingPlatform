@@ -128,7 +128,7 @@ export default function AccountPasswordChange({ onPageChange }) {
               <CPLoader />
             ) : (
               <>
-                <form autoComplete="off" onSubmit={handleSubmit}>
+                <form autoComplete="on" onSubmit={handleSubmit}>
                   {/* CONTENT1 START */}
                   <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">
                     <div className="container">
@@ -141,7 +141,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                             value={values.password}
                             name="password"
                             id="password"
-                            // autoComplete="current-password"
+                            autoComplete="current-password"
                             onFocus={() => setIsFocused1(true)}
                             type={showOldPWD ? 'text' : 'password'}
                             onBlur={handleBlur}
@@ -181,7 +181,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                             value={values.newPassword}
                             name="newPassword"
                             id="newPassword"
-                            // autoComplete="new-password"
+                            autoComplete="new-password"
                             onFocus={() => setIsFocused2(true)}
                             type={showNewPWD ? 'text' : 'password'}
                             onBlur={handleBlur}
@@ -219,7 +219,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                             value={values.confirmNewPassword}
                             name="confirmNewPassword"
                             id="confirmNewPassword"
-                            // autoComplete="new-password"
+                            autoComplete="new-password"
                             onFocus={() => setIsFocused3(true)}
                             type={showConfirmNewPWD ? 'text' : 'password'}
                             onBlur={handleBlur}

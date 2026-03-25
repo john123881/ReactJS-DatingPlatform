@@ -66,8 +66,13 @@ export default function OtherTripdetail({ onPageChange }) {
             icon: 'success',
             title: '成功',
             text: `成功將${tripName.trip_title}加入月曆!`,
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0,0,0,0.85)',
+            background: '#2a303c',
+            color: '#ffffff',
+            confirmButtonColor: '#a0ff1f',
+            customClass: {
+              confirmButton: 'text-black font-bold border-none px-6 py-2',
+              popup: 'border border-slate-700 rounded-box'
+            }
           });
         } else {
           console.error('行程添加失败：', data.error);
@@ -101,9 +106,7 @@ export default function OtherTripdetail({ onPageChange }) {
     }
   }, [trip_plan_id]);
 
-  useEffect(() => {
-    console.log(tripDetails);
-  }, [tripDetails]);
+
 
   //trip_plans 的資料
   useEffect(() => {

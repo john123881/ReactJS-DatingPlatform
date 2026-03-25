@@ -61,10 +61,8 @@ export default function MyTripDetail({ onPageChange }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log('Fetched Trip Name Data:', data);
           if (data) {
             setTripName(data);
-            console.log('Setting tripName to:', data);
           }
         } catch (error) {
           console.error('Fetching trip details error:', error);
@@ -78,7 +76,6 @@ export default function MyTripDetail({ onPageChange }) {
   //傳遞給子元件的函數 用於重新渲染頁面 針對三個時段的行程細節
   const refreshAllDetails = useCallback(async () => {
     if (!trip_plan_id) return;
-    console.log('Calling refreshAllDetails');
     try {
       const response = await fetch(
         `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`,
@@ -87,7 +84,6 @@ export default function MyTripDetail({ onPageChange }) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log('Fetched TripDetail Data:', data);
       if (data && data.length > 0) {
         setNewDetail(data);
       } else {
@@ -99,9 +95,7 @@ export default function MyTripDetail({ onPageChange }) {
     }
   }, [trip_plan_id]);
 
-  useEffect(() => {
-    console.log('refreshAllDetails in parent:', refreshAllDetails);
-  }, [refreshAllDetails]);
+
 
   //TODO
   //讀取trip_calendar的資料，並根據 trip_plan_id 獲取行程詳情

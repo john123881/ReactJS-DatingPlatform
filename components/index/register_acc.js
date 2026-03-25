@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import FireworkAnimation from '@/components/ui/animation/firework-animation';
-import FireworkAnimationRight from '@/components/ui/animation/firework-animation-right';
-import IndexHeart from '@/components/ui/animation/index-heart';
+import dynamic from 'next/dynamic';
+
+const IndexHeart = dynamic(() => import('@/components/ui/animation/index-heart'), { ssr: false });
+const FireworkAnimation = dynamic(() => import('@/components/ui/animation/firework-animation'), { ssr: false });
+const FireworkAnimationRight = dynamic(() => import('@/components/ui/animation/firework-animation-right'), { ssr: false });
 
 export default function RegisterAcc() {
   const { auth, setLoginModalToggle, switchHandler, isOnLogin, setIsOnLogin } =
     useAuth();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <>

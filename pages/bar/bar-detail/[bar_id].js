@@ -45,14 +45,21 @@ export default function Detail({ onPageChange }) {
         ? await BarService.unsaveBar(userId, barId)
         : await BarService.saveBar(userId, barId);
 
-      if (result.success || result.msg === '收藏酒吧成功' || result.msg === '取消收藏成功') {
+      const successText = String(result.message || result.msg || '');
+      if (result.success || successText.includes('成功')) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
         console.log('Save status updated:', result);
       } else {
-        throw new Error(result.message || result.msg || 'Failed to update save status');
+        throw new Error(successText || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
+      // Even if it's caught as an error, if the message says "成功", update the UI state anyway
+      const errorMsg = error.message || '';
+      if (errorMsg.includes('成功')) {
+        setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+        console.log('Detected success message in error catch, updating UI state.');
+      }
     }
   };
 

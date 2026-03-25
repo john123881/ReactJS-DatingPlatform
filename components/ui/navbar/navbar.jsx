@@ -304,7 +304,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       try {
         const result = await AccountService.getCollectList(auth.id);
         console.log('Navbar collect fetch:', result);
-        const fetchedData = result?.output?.data || result?.data || (Array.isArray(result) ? result : null);
+        const fetchedData = result?.output?.data || result?.data || result?.rows || (Array.isArray(result) ? result : null);
         
         if (result?.output?.error === '無收藏' || !fetchedData || fetchedData.length === 0) {
           setListData([]); // 設置為空列表

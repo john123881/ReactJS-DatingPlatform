@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { FaCircleInfo } from 'react-icons/fa6';
 import Link from 'next/link';
 
@@ -19,8 +19,7 @@ function truncateChinese(title, maxChineseChars = 7) {
   return truncated;
 }
 
-export default function TripCard({ otherTrip }) {
-  console.log(otherTrip);
+const TripCard = memo(function TripCard({ otherTrip }) {
   // 使用動態生成路徑
   const detailPagePath = `/trip/other-trip/detail/${otherTrip.trip_plan_id}`;
 
@@ -30,7 +29,6 @@ export default function TripCard({ otherTrip }) {
     if (otherTrip.trip_pic) {
       const modifiedImageUrl = `${otherTrip.trip_pic}`;
       setImageUrl(modifiedImageUrl);
-      console.log('Modified Image URL:', modifiedImageUrl);
     }
   }, [otherTrip]); // 依賴 otherTrip 更新來觸發 useEffect
 
@@ -85,4 +83,6 @@ export default function TripCard({ otherTrip }) {
       </div>
     </>
   );
-}
+});
+
+export default TripCard;

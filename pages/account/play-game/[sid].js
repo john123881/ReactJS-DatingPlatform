@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 
 export default function AccountPlayGame({ onPageChange }) {
   const { close, isLoading } = useLoader();
-  const { checkAuth } = useAuth();
+  const { auth, checkAuth } = useAuth();
   const router = useRouter();
 
   const pageTitle = '會員中心';

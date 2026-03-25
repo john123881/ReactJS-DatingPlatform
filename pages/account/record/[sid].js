@@ -727,7 +727,7 @@ export default function AccountRecord({ onPageChange }) {
                                 {v.game_score}
                               </td>
                               <td className="text-base text-center ">
-                                {v.game_time}
+                                {v.game_time ? (v.game_time.includes('T') ? v.game_time.split('T')[1].substring(0, 8) : v.game_time) : ''}
                               </td>
                             </tr>
                           );

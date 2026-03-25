@@ -194,9 +194,11 @@ export default function TripCalendar() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: auth.id,
-          trip_date: modalDate,
-          trip_title: tripTitle,
+          tripPlan: {
+            user_id: auth.id,
+            trip_date: modalDate,
+            trip_title: tripTitle,
+          },
         }),
       });
       const data = await response.json();
@@ -219,6 +221,13 @@ export default function TripCalendar() {
         icon: 'error',
         title: '新增失敗',
         text: error.message || '發生未知錯誤',
+        background: '#2a303c',
+        color: '#ffffff',
+        confirmButtonColor: '#a0ff1f',
+        customClass: {
+          confirmButton: 'text-black font-bold border-none px-6 py-2',
+          popup: 'border-2 border-[#a0ff1f] rounded-box shadow-[0_0_20px_rgba(160,255,31,0.3)]'
+        }
       });
     }
   };
@@ -282,10 +291,11 @@ export default function TripCalendar() {
               <p className="text-white">行程名稱</p>
               <input
                 type="text"
-                className="mt-4 mb-4 px-2 py-1 w-full"
+                className="mt-4 mb-4 px-2 py-1 w-full text-black"
                 value={tripTitle}
                 onChange={(event) => setTripTitle(event.target.value)}
                 placeholder="請輸入行程名稱"
+                required
               />
               <div className="modal-action">
                 {/* 更新按鈕的onClick處理函式，以關閉彈出視窗 */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
@@ -21,7 +21,7 @@ function truncateChinese(title, maxChineseChars = 7) {
   return truncated;
 }
 
-export default function TripCardMy({ trip, onDeleteSuccess }) {
+const TripCardMy = memo(function TripCardMy({ trip, onDeleteSuccess }) {
   const detailPagePath = `/trip/my-trip/detail/${trip.trip_plan_id}`;
   const [errorMessage, setErrorMessage] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -30,7 +30,6 @@ export default function TripCardMy({ trip, onDeleteSuccess }) {
     if (trip.trip_pic) {
       const modifiedImageUrl = `${trip.trip_pic}`;
       setImageUrl(modifiedImageUrl);
-      console.log('Modified Image URL:', modifiedImageUrl);
     }
   }, [trip]); // 依賴 trip 更新來觸發 useEffect
 
@@ -131,4 +130,6 @@ export default function TripCardMy({ trip, onDeleteSuccess }) {
       </div>
     </>
   );
-}
+});
+
+export default TripCardMy;

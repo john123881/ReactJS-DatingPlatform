@@ -53,13 +53,9 @@ export default function MyTrip({ onPageChange }) {
     if (auth.id === 0) return;
     fetchTrips();
     // 解密 jwt 並設置 user_id
-    const jwtObject = getAuthHeader();
-    const jwt = jwtObject?.Authorization?.slice(7); // 提取 jwt 字串
-    console.log(jwt);
     if (jwt) {
       const decoded = jwtDecode(jwt);
       setUserId(decoded.id);
-      // console.log(decoded.id);
     }
   }, [auth.id, fetchTrips, getAuthHeader]);
   /////////////在尚無行程時顯示其他人的推薦行程//////////////////////
@@ -86,13 +82,10 @@ export default function MyTrip({ onPageChange }) {
     fetchOtherTrips();
   }, [auth.id, fetchOtherTrips]); // 防止重複執行
   ////////////////////////////////////////////////////////
-  const onDeleteSuccess = (tripPlanId) => {
+  const onDeleteSuccess = useCallback((tripPlanId) => {
     // 過濾掉被刪除的行程
-    const updatedTrips = trips.filter(
-      (trip) => trip.trip_plan_id !== tripPlanId,
-    );
-    setTrips(updatedTrips);
-  };
+    setTrips((prev) => prev.filter((trip) => trip.trip_plan_id !== tripPlanId));
+  }, []);
 
   // 以 useState 控制 modal 的開關
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,9 +108,11 @@ export default function MyTrip({ onPageChange }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: auth.id,
-          trip_date: tripDate,
-          trip_title: tripTitle,
+          tripPlan: {
+            user_id: auth.id,
+            trip_date: tripDate,
+            trip_title: tripTitle,
+          },
         }),
       });
       const data = await response.json();
@@ -184,6 +179,7 @@ export default function MyTrip({ onPageChange }) {
                     placeholder="請輸入行程名稱"
                     value={tripTitle}
                     onChange={(event) => setTripTitle(event.target.value)}
+                    required
                   />
                   <div className="modal-action">
                     <button
