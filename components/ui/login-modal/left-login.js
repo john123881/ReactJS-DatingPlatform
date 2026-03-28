@@ -17,13 +17,8 @@ export default function LeftLogin({ switchHandler }) {
   const [googleUser, setgoogleUser] = useAuthState(getAuthGoogle);
   const [passwordForgetBtn, setPasswordForgetBtn] = useState(false);
   const {
-    auth,
-    storageKey,
-    setAuth,
-    login,
-    loginModalToggle,
-    isOnLogin,
     setLoginModalToggle,
+    setUserAvatar,
   } = useAuth();
   const router = useRouter();
 
@@ -60,9 +55,13 @@ export default function LeftLogin({ switchHandler }) {
           username: jsonResult.data.username,
           email: jsonResult.data.email,
           token: jsonResult.data.token,
+          avatar: user.photoURL || jsonResult.data.avatar,
         };
         localStorage.setItem(storageKey, JSON.stringify(data));
         setAuth(data);
+        if (data.avatar) {
+          setUserAvatar(data.avatar);
+        }
         console.log('google login auth :', auth);
         console.log(jsonResult);
         return jsonResult;

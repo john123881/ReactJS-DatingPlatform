@@ -15,6 +15,7 @@ const emptyAuth = {
   email: '',
   password: '',
   token: '',
+  avatar: '',
 };
 
 export function AuthContextProvider({ children }) {
@@ -59,8 +60,15 @@ export function AuthContextProvider({ children }) {
       const result = await AuthService.login({ email, password });
 
       if (result.success) {
-        localStorage.setItem(storageKey, JSON.stringify(result.data));
-        setAuth(result.data);
+        const authData = {
+          ...result.data,
+          avatar: result.data.avatar || `${API_SERVER}/avatar/defaultAvatar.jpg`,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(authData));
+        setAuth(authData);
+        if (authData.avatar) {
+          setUserAvatar(authData.avatar);
+        }
       }
 
       console.log(result);
@@ -119,6 +127,9 @@ export function AuthContextProvider({ children }) {
       const data = JSON.parse(str);
       if (data) {
         setAuth(data);
+        if (data.avatar) {
+          setUserAvatar(data.avatar);
+        }
       }
     } catch (ex) {
       console.log(ex);
