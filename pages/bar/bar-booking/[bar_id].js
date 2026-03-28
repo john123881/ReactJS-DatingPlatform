@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function Booking({ onPageChange }) {
   const pageTitle = '酒吧訂位';
@@ -36,12 +36,14 @@ export default function Booking({ onPageChange }) {
     setSelectedTime(time); // Update the selected time state
   };
 
-  //FETCH GET 酒吧資料
+  // 獲取酒吧資料
   const getBarBookingById = async (bar_id) => {
-    const url = `${API_BASE_URL}/bar/bar-list/id/${bar_id}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    setBooking(data);
+    try {
+      const data = await BarService.getBarDetail(bar_id);
+      setBooking(Array.isArray(data) ? data : [data]);
+    } catch (error) {
+      console.error('Failed to fetch bar details:', error);
+    }
   };
 
   // 提交訂位資料到後端
@@ -72,16 +74,9 @@ export default function Booking({ onPageChange }) {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/bar/create-bar-booking`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData),
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok: ' + response.status);
-      }
-      await response.json();
-      if (response.ok) {
+      const result = await BarService.createBooking(bookingData);
+      
+      if (result.success) {
         Swal.fire({
           title: '訂位成功!',
           icon: 'success',
@@ -93,7 +88,7 @@ export default function Booking({ onPageChange }) {
     } catch (error) {
       console.error('訂位失敗:', error);
       Swal.fire({
-        title: '訂位失敗!',
+        title: error.message || '訂位失敗!',
         icon: 'error',
         confirmButtonText: '關閉',
         confirmButtonColor: '#A0FF1F',

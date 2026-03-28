@@ -6,7 +6,8 @@ import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mob
 // import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import PageTitle from '@/components/page-title';
+import { BarService } from '@/services/bar-service';
 
 export default function BarListForeign({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -33,14 +34,7 @@ export default function BarListForeign({ onPageChange }) {
 
   const getBarList = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/bar/bar-list-foreign`, {
-        // headers: { Authorization: 'Bearer ' + auth.token },
-      });
-      const data = await res.json();
-      // if (!data.success) {
-      //   // alert('error');
-      //   return;
-      // }
+      const data = await BarService.getBarsByCategory('foreign');
       setBars(data);
     } catch (error) {
       console.error('Failed to fetch bar list:', error);
@@ -49,11 +43,11 @@ export default function BarListForeign({ onPageChange }) {
 
   const updateBarsList = async (barAreaId, barTypeId) => {
     try {
-      const data = await fetch(
-        `${API_BASE_URL}/bar/bar-list-foreign?area=${barAreaId}&type=${barTypeId}`,
-      );
-      const result = await data.json();
-      setBars(result);
+      const data = await BarService.getBarsByCategory('foreign', {
+        area: barAreaId,
+        type: barTypeId,
+      });
+      setBars(data);
     } catch (error) {
       console.error('Failed to fetch filtered bar list:', error);
     }

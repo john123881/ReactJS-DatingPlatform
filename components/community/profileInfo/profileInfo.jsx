@@ -72,8 +72,8 @@ export default function ProfileInfo() {
     if (!uid) return;
     try {
       const data = await CommunityService.getUserInfo(uid);
-      // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
-      setLocalUserInfo(data[0] || {});
+      // 後端返回的是單一物件 (findUnique)，直接設置即可
+      setLocalUserInfo(data || {});
     } catch (error) {
       console.error('Failed to fetch user info', error);
       setLocalUserInfo({}); // 當請求失敗時，也設置一個空對象
@@ -138,7 +138,8 @@ export default function ProfileInfo() {
 
   useEffect(() => {
     if (auth.id !== undefined && auth.id !== null && uid) {
-      setIsLoading(true);
+      // 不要在組件內部再次觸發 setIsLoading(true)，因為父組件已經在處理了
+      // 除非是 uid 以外的異步更新，否則應保持流暢
       Promise.all([
         getFollowUsers(),
         getPostsCount(),
@@ -148,8 +149,10 @@ export default function ProfileInfo() {
       ]).finally(() => {
         setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
-  }, [uid]);
+  }, [uid, auth.id]);
 
   if (isLoading) {
     return <AccountLoader type="profile" minHeight="200px" />;
@@ -174,9 +177,11 @@ export default function ProfileInfo() {
           <div className="basis-8/12 flex flex-col justify-between item-center gap-2 w-full flex-grow">
             <div className="flex items-center">
               <div className="userId">
-                {localUserInfo.email
-                  ? localUserInfo.email.split('@')[0]
-                  : 'unknownuser'}
+                {localUserInfo.username
+                  ? localUserInfo.username
+                  : localUserInfo.email
+                    ? localUserInfo.email.split('@')[0]
+                    : '載入中...'}
               </div>
               <div className="flex mx-10">
                 {/* 確保個人頁面不顯示追蹤功能, 轉換 uid 從字符串到數字，以保持類型一致 */}

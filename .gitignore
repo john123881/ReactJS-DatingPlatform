@@ -37,3 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 local
+doc
+
+GEMINI.md
+SOUL.md

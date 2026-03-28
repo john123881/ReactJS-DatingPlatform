@@ -1,133 +1,171 @@
 import { API_SERVER } from '@/configs/api-config';
 
 /**
- * 核心 API 請求器
- * @param {string} endpoint - API 路徑 (不含 Base URL)
- * @param {object} options - Fetch 配置項
- * @returns {Promise<any>} - 解析後的 JSON 數據
+ * 取得認證配置 (Token 備援)
  */
-export async function apiClient(endpoint, { body, ...customConfig } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
-
-  const isFormData = body instanceof FormData;
-
-  // Note: JWT is now handled via httpOnly cookies; 'credentials: include' takes care of it.
-  const isLoginRequest = endpoint === '/login' || endpoint === '/google-login';
-
-  const config = {
-    method: body ? 'POST' : 'GET',
-    ...customConfig,
-    credentials: 'include', // 核心！允許發送 Cookie
-    headers: {
-      ...headers,
-      ...customConfig.headers,
-    },
-  };
-
-  // 取得 localStorage 中的 token 作為備援 (針對 localhost 開發環境)
+function getAuthConfig(customConfig = {}) {
+  const headers = { 'Content-Type': 'application/json', ...customConfig.headers };
   const storageKey = 'TD_auth';
   const str = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+
   if (str) {
     try {
       const parsed = JSON.parse(str);
-      if (parsed && parsed.token) {
-        config.headers.Authorization = `Bearer ${parsed.token}`;
+      if (parsed?.token) {
+        headers.Authorization = `Bearer ${parsed.token}`;
       }
     } catch (e) {
-      console.error('API Client: Failed to parse auth data from localStorage', e);
+      console.error('API Client: Auth parse error', e);
     }
   }
+  return headers;
+}
 
-  // 如果是 FormData，不要設置 Content-Type，讓瀏覽器自動處理 (帶上 boundary)
-  if (isFormData) {
-    delete config.headers['Content-Type'];
-    config.body = body;
-  } else if (body) {
-    config.body = JSON.stringify(body);
+/**
+ * 準備請求主體 (JSON vs FormData)
+ */
+function prepareRequestBody(body) {
+  if (body instanceof FormData) {
+    return { body, isFormData: true };
   }
+  return { body: body ? JSON.stringify(body) : undefined, isFormData: false };
+}
 
-  // 如果 endpoint 已經是完整 URL (以 http 或 https 開頭)，則不重複拼接 API_SERVER
-  const fullUrl =
-    endpoint.startsWith('http://') || endpoint.startsWith('https://')
-      ? endpoint
-      : `${API_SERVER}${endpoint}`;
-
-
-  const response = await fetch(fullUrl, config);
-
-  if (response.status === 401 || response.status === 438) {
-    console.warn(`Auth error detected - status ${response.status}`);
+/**
+ * 處理特殊錯誤狀態 (401/438)
+ */
+function handleErrorStatus(status) {
+  if (status === 401 || status === 438) {
+    console.warn(`Auth error: ${status}`);
     localStorage.removeItem('TD_auth');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('auth:expired'));
     }
   }
+}
 
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType && contentType.includes('application/json');
-
-  if (!response.ok) {
-    let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+/**
+ * 解析回應錯誤訊息
+ */
+async function parseResponseError(response) {
+  const isJson = response.headers.get('content-type')?.includes('application/json');
+  try {
     if (isJson) {
-      try {
-        const errorData = await response.json();
-        const msg = errorData.message || errorData.error || errorData.msg;
-        if (msg) {
-          errorMessage = msg;
-        }
-      } catch (e) {
-        console.error('Error parsing JSON from non-OK response:', e);
-      }
-    } else {
-      try {
-        const text = await response.text();
-        if (text && text.length < 500) {
-          errorMessage = text;
-        }
-      } catch (e) {
-        console.error('Error reading text from non-OK response:', e);
-      }
+      const errorData = await response.json();
+      return errorData.message || errorData.error || errorData.msg || `Error: ${response.status}`;
     }
-
-    // Special Global Handling: If the error message indicates success (contains "成功"), 
-    // we log it as a warning but DO NOT throw, instead returning the message body. 
-    // This handles inconsistent backends that return non-200 for successful operations.
-    if (errorMessage.includes('成功')) {
-      console.warn(`Backend returned non-OK status (${response.status}) but message indicates success: "${errorMessage}"`);
-      return { success: true, message: errorMessage, data: null };
-    }
-
-    // Global Handling for Auth Expiry Messages
-    if (errorMessage.includes('沒授權TOKEN') || errorMessage.includes('授權失敗')) {
-      localStorage.removeItem('TD_auth');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('auth:expired'));
-      }
-      errorMessage = '工作階段已過期，請重新登入';
-    }
-
-    throw new Error(errorMessage);
-  }
-
-  if (isJson) {
-    return response.json();
-  } else {
-    return response.text();
+    const text = await response.text();
+    return text.length < 500 ? text : `Server error: ${response.status}`;
+  } catch (e) {
+    return `Server error: ${response.status}`;
   }
 }
 
-// 輔助方法：GET
-apiClient.get = (endpoint, config) =>
-  apiClient(endpoint, { ...config, method: 'GET' });
+/**
+ * 最終回應處理 (解包 success/data)
+ */
+async function processResponse(response) {
+  const isJson = response.headers.get('content-type')?.includes('application/json');
 
-// 輔助方法：POST
-apiClient.post = (endpoint, body, config) =>
-  apiClient(endpoint, { ...config, method: 'POST', body });
+  if (!isJson) return response.text();
 
-// 輔助方法：PUT
-apiClient.put = (endpoint, body, config) =>
-  apiClient(endpoint, { ...config, method: 'PUT', body });
+  const result = await response.json();
 
-// 輔助方法：DELETE
-apiClient.delete = (endpoint, config) =>
-  apiClient(endpoint, { ...config, method: 'DELETE' });
+  // 統一回應包裝處理
+  if (result && typeof result === 'object' && 'success' in result) {
+    if (result.success) {
+      // 核心相容性邏輯 (Ghost Wrapper Pattern):
+      // 為了不破壞舊有直接預期 Array 的組件 (如 SuggestionBar)，
+      // 又要維持對 .success 和 .data 的檢查支援，
+      // 我們在資料物件/陣列上定義「隱形」(non-enumerable) 的屬性。
+      
+      const finalData = result.data !== undefined ? result.data : result;
+      
+      if (finalData && typeof finalData === 'object') {
+        // 定義 .success 屬性
+        Object.defineProperty(finalData, 'success', {
+          value: true,
+          enumerable: false, // 隱形成員，不影響 JSON.stringify 或 loops
+          configurable: true,
+        });
+
+        // 定義 .data 屬性，回傳自己 (達成 res.data === res)
+        Object.defineProperty(finalData, 'data', {
+          value: finalData,
+          enumerable: false,
+          configurable: true,
+        });
+
+        // 定義 .message
+        Object.defineProperty(finalData, 'message', {
+          value: result.message || 'Success',
+          enumerable: false,
+          configurable: true,
+        });
+
+        // 如果有分頁資訊，也塞入隱形屬性
+        if (result.pagination) {
+          Object.defineProperty(finalData, 'pagination', {
+            value: result.pagination,
+            enumerable: false,
+            configurable: true,
+          });
+        }
+      }
+
+      return finalData;
+    }
+    // 失敗時，拋出後端給的 message
+    throw new Error(result.message || '操作失敗');
+  }
+
+  // 針對舊有 API (沒有 success 欄位的)，直接返回原始 JSON
+  return result;
+}
+
+/**
+ * 核心 API 請求器
+ */
+export async function apiClient(endpoint, { body: rawBody, ...customConfig } = {}) {
+  const { body, isFormData } = prepareRequestBody(rawBody);
+  const headers = getAuthConfig(customConfig);
+
+  if (isFormData) delete headers['Content-Type'];
+
+  const config = {
+    method: rawBody ? 'POST' : 'GET',
+    ...customConfig,
+    credentials: 'include',
+    headers,
+    body,
+  };
+
+  const fullUrl = endpoint.startsWith('http') ? endpoint : `${API_SERVER}${endpoint}`;
+  const response = await fetch(fullUrl, config);
+
+  handleErrorStatus(response.status);
+
+  if (!response.ok) {
+    const errorMsg = await parseResponseError(response);
+
+    // 特殊邏輯：如果訊息包含「成功」但狀態碼非 200 (相容舊後端)
+    if (errorMsg.includes('成功')) {
+      return { success: true, message: errorMsg, data: null };
+    }
+
+    if (errorMsg.includes('沒授權TOKEN') || errorMsg.includes('授權失敗')) {
+      handleErrorStatus(401); // 觸發過期邏輯
+      throw new Error('工作階段已過期，請重新登入');
+    }
+
+    throw new Error(errorMsg);
+  }
+
+  return processResponse(response);
+}
+
+// 輔助方法
+apiClient.get = (endpoint, config) => apiClient(endpoint, { ...config, method: 'GET' });
+apiClient.post = (endpoint, body, config) => apiClient(endpoint, { ...config, method: 'POST', body });
+apiClient.put = (endpoint, body, config) => apiClient(endpoint, { ...config, method: 'PUT', body });
+apiClient.delete = (endpoint, config) => apiClient(endpoint, { ...config, method: 'DELETE' });

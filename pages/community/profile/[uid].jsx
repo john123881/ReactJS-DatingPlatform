@@ -98,7 +98,7 @@ export default function Profile({ onPageChange }) {
         <TabbarMobile />
       </div>
 
-      <div className="flex flex-col w-full items-center justify-center pt-28 ">
+      <div className="flex flex-col w-full items-center justify-center pt-28">
         <div className="flex flex-wrap justify-center w-full min-h-screen">
           <div className="hidden md:flex md:w-2/12">
             <Sidebar />
@@ -106,7 +106,9 @@ export default function Profile({ onPageChange }) {
 
           <div className="flex flex-col md:w-10/12 items-center">
             {isLoading ? (
-              <AccountLoader type="index" minHeight="500px" />
+              <div className="w-full flex justify-center py-20">
+                <AccountLoader type="index" minHeight="500px" />
+              </div>
             ) : (
               <>
                 {/* info area */}

@@ -38,13 +38,12 @@ export function AuthContextProvider({ children }) {
 
   const register = useCallback(async (email, validCode, username, password) => {
     try {
-      const result = await AuthService.register({
+      return await AuthService.register({
         email,
         validCode,
         username,
         password,
       });
-      return result;
     } catch (error) {
       console.error('註冊時發生錯誤', error);
       return { success: false, error: error.message || '註冊時發生錯誤' };
@@ -56,16 +55,15 @@ export function AuthContextProvider({ children }) {
     try {
       const result = await AuthService.login({ email, password });
 
-      if (result.success) {
-        const authData = {
-          ...result.data,
-          avatar: result.data.avatar || `${API_SERVER}/avatar/defaultAvatar.jpg`,
-        };
-        localStorage.setItem(storageKey, JSON.stringify(authData));
-        setAuth(authData);
-        if (authData.avatar) {
-          setUserAvatar(authData.avatar);
-        }
+      const authData = {
+        ...result.data,
+        avatar: result.data.avatar || `${API_SERVER}/avatar/defaultAvatar.jpg`,
+      };
+      
+      localStorage.setItem(storageKey, JSON.stringify(authData));
+      setAuth(authData);
+      if (authData.avatar) {
+        setUserAvatar(authData.avatar);
       }
 
       return result;
@@ -129,8 +127,9 @@ export function AuthContextProvider({ children }) {
         const data = JSON.parse(str);
         if (data && data.id) {
           // 向後端確認 Cookie 是否仍然有效
+          // 注意：checkAuth 回傳的是 { success: true, message: '...' }
           const result = await checkAuth(data.id);
-          if (result.success) {
+          if (result && result.success) {
             setAuth(data);
             if (data.avatar) {
               setUserAvatar(data.avatar);
