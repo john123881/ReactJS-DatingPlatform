@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import toast from 'react-hot-toast';
-import IndexLoader from '@/components/account-center/loader/index-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 export default function AccountIndex({ onPageChange }) {
   const pageTitle = '會員中心';
@@ -35,15 +35,12 @@ export default function AccountIndex({ onPageChange }) {
   });
 
   const getUserInf = async () => {
-    // console.log(router.query.sid);
 
     try {
       const res = await fetch(`${ACCOUNT_GET}/${router.query.sid}`, {
         headers: { ...getAuthHeader() },
       });
       const result = await res.json();
-
-      // console.log('result', result);
       if (result.success) {
         const {
           user_id,
@@ -85,7 +82,7 @@ export default function AccountIndex({ onPageChange }) {
       toast.error(ex, {
         duration: 1500,
       });
-      console.log({ ex });
+      console.error({ ex });
     }
   };
 
@@ -126,7 +123,7 @@ export default function AccountIndex({ onPageChange }) {
             <BurgerMenu currentPage={currentPage} />
             <Breadcrumbs currentPage={currentPage} />
             {isLoading ? (
-              <IndexLoader minHeight="500px" />
+              <AccountLoader type="index" />
             ) : (
               <>
                 <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">

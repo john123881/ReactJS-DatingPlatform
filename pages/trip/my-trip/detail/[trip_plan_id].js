@@ -8,7 +8,7 @@ import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
 import { apiClient } from '@/services/api-client';
-import IndexLoader from '@/components/account-center/loader/index-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 
 export default function MyTripDetail({ onPageChange }) {
@@ -93,7 +93,7 @@ export default function MyTripDetail({ onPageChange }) {
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen justify-center items-center">
-        <IndexLoader />
+        <AccountLoader type="index" />
       </div>
     );
   }

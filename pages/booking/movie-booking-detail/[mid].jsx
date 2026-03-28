@@ -55,7 +55,7 @@ export default function MovieDetail({ onPageChange }) {
         checkMoviesStatus(mid);
       }
     } catch (error) {
-      console.log('Failed to fetch movie detail', error);
+      console.error('Failed to fetch movie detail', error);
     }
   }, [auth.id, checkMoviesStatus]);
 

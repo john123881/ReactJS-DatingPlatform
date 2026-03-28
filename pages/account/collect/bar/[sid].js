@@ -6,7 +6,7 @@ import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
 import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useLoader } from '@/context/use-loader';
-import CollectLoader from '@/components/account-center/loader/collect-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 import Link from 'next/link';
 
 import { AccountService } from '@/services/account-service';
@@ -20,7 +20,7 @@ export default function AccountCollect({ onPageChange }) {
   const pageTitle = '會員中心';
   const currentPage = '個人收藏';
   const router = useRouter();
-  const { close, isLoading, open } = useLoader();
+  const { open, close, isLoading } = useLoader();
   const { auth, getAuthHeader, checkAuth } = useAuth();
   const { posts } = usePostContext();
 
@@ -35,6 +35,7 @@ export default function AccountCollect({ onPageChange }) {
   const [arrowHovered, setArrowHovered] = useState(
     Array(posts.length).fill(false),
   );
+  const [isFetched, setIsFetched] = useState(false);
 
   //詳細箭頭動畫
   const handleArrowHover = (index, isHovered) => {
@@ -51,10 +52,6 @@ export default function AccountCollect({ onPageChange }) {
       setPages({ ...pages, page: prevPage });
 
       const nweQuery = { ...router.query, page: prevPage };
-
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-      // console.log('prevPageQS:', queryString);
 
       // 更新路由的 query string
       router.push(
@@ -109,13 +106,16 @@ export default function AccountCollect({ onPageChange }) {
           setBars(result.output.data);
           setPages({ page: result.page, totalPages: result.totalPages });
         }
+        setIsFetched(true);
       } catch (error) {
         console.error('Failed to fetch bar collection:', error);
+        setIsFetched(true);
       }
     };
 
     const fetchCheck = async () => {
       open();
+      setIsFetched(false);
       if (auth.id === 0 || !router.isReady) {
         close();
         return;
@@ -221,8 +221,8 @@ export default function AccountCollect({ onPageChange }) {
                 </Link> */}
               </div>
               {/* TabBar END */}
-              {isLoading ? (
-                <CollectLoader />
+              {isLoading || !isFetched ? (
+                <AccountLoader type="collect" />
               ) : (
                 <>
                   <div
@@ -305,7 +305,6 @@ export default function AccountCollect({ onPageChange }) {
                               </p>
                               <RxCrossCircled
                                 onClick={async () => {
-                                  console.log('bar.save_id:', bar.save_id);
                                   const result = await AccountService.collectBar.delete(
                                     bar.save_id,
                                   );
@@ -348,7 +347,7 @@ export default function AccountCollect({ onPageChange }) {
                         );
                       })
                     ) : (
-                      <EmptyCollection itemType="酒吧" linkPath="/bar" />
+                      isFetched && <EmptyCollection itemType="酒吧" linkPath="/bar" />
                     )}
                     {/* CONTENT END */}
 

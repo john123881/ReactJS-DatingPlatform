@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import { SOCKET_SERVER } from '@/configs/api-config';
 
 // 連接到 Socket.IO 伺服器
-const socket = io(SOCKET_SERVER);
+const socket = io(SOCKET_SERVER, {
+  withCredentials: true,
+});
 
 const Chat = () => {
   // 狀態：訊息列表

@@ -367,8 +367,7 @@ export default function Index({ onPageChange }) {
                               </p>
                               <button
                                 onClick={() =>
-                                  (window.location.href =
-                                    '../../../booking/movie-seat')
+                                  router.push('/booking/movie-seat')
                                 }
                               >
                                 確認場次，前往座位選擇

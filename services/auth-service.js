@@ -43,4 +43,9 @@ export const AuthService = {
    * @param {object} data - Google 登入回傳的資料
    */
   googleLogin: (data) => apiClient.post('/google-login', data),
+
+  /**
+   * 登出
+   */
+  logout: () => apiClient.post('/logout'),
 };

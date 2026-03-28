@@ -69,7 +69,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
           },
         );
       } catch (e) {
-        console.log('error:', e);
+        console.error('error:', e);
       }
     },
   });
@@ -82,10 +82,9 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
         headers: { 'Content-Type': 'application/json' },
       });
       const result = await r.json();
-      // console.log('FETCH 要求 驗證碼之結果:', result);
       return result;
     } catch (error) {
-      console.log('發信時發生錯誤:', error);
+      console.error('發信時發生錯誤:', error);
       return { success: false, error: '發信時發生錯誤' }; // 如果發生錯誤，返回一個錯誤對象
     }
   };
@@ -94,7 +93,6 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
   const handleCodeClick = async () => {
     try {
       const result = await sendValidCode(); // 使用 await 等待 sendValidCode 函數的返回結果
-      // console.log('發信成功前:', result);
       if (!result.success) {
         toast.error(result.error, { duration: 1500 });
         return;
@@ -105,7 +103,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
         toast.success(result.message, { duration: 1500 });
       }
     } catch (error) {
-      console.log('按下發信按鍵時發生錯誤:', error);
+      console.error('按下發信按鍵時發生錯誤:', error);
     }
   };
 

@@ -17,6 +17,12 @@ export default function LeftLogin({ switchHandler }) {
   const [googleUser, setgoogleUser] = useAuthState(getAuthGoogle);
   const [passwordForgetBtn, setPasswordForgetBtn] = useState(false);
   const {
+    auth,
+    storageKey,
+    setAuth,
+    login,
+    loginModalToggle,
+    isOnLogin,
     setLoginModalToggle,
     setUserAvatar,
   } = useAuth();
@@ -41,15 +47,13 @@ export default function LeftLogin({ switchHandler }) {
         photoURL: user.photoURL,
       };
 
-      const r = await fetch(GOOGLE_LOGIN, {
+      const { apiClient } = await import('@/services/api-client');
+      const jsonResult = await apiClient(GOOGLE_LOGIN, {
         method: 'POST',
-        body: JSON.stringify(userData),
-        headers: { 'Content-Type': 'application/json' },
+        body: userData,
       });
-      const jsonResult = await r.json();
 
       if (jsonResult.success) {
-        console.log('jsonResult:', jsonResult);
         let data = {
           id: jsonResult.data.id,
           username: jsonResult.data.username,
@@ -62,8 +66,6 @@ export default function LeftLogin({ switchHandler }) {
         if (data.avatar) {
           setUserAvatar(data.avatar);
         }
-        console.log('google login auth :', auth);
-        console.log(jsonResult);
         return jsonResult;
       }
     };
@@ -154,7 +156,7 @@ export default function LeftLogin({ switchHandler }) {
       } catch (e) {
         clearTimeout(timeoutId);
         toast.error(`error when logging: ${e.message || e}`, { id: toastId });
-        console.log('error:', e);
+        console.error('error:', e);
       }
     },
   });

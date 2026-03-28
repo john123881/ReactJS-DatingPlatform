@@ -13,7 +13,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { ACCOUNT_CHANGE_PWD_PUT } from '@/configs/api-config';
 import { useNotify } from '@/context/use-notify';
 import { useLoader } from '@/context/use-loader';
-import CPLoader from '@/components/account-center/loader/ch-pwd-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 import toast from 'react-hot-toast';
 
 export default function AccountPasswordChange({ onPageChange }) {
@@ -23,7 +23,7 @@ export default function AccountPasswordChange({ onPageChange }) {
   const [isFocused2, setIsFocused2] = useState(false);
   const [showConfirmNewPWD, setConfirmNewShowPWD] = useState(false);
   const [isFocused3, setIsFocused3] = useState(false);
-  const { close, isLoading } = useLoader();
+  const { open, close, isLoading } = useLoader();
   const { auth, getAuthHeader, checkAuth } = useAuth();
   const { notifyPromise } = useNotify();
   const router = useRouter();
@@ -79,11 +79,6 @@ export default function AccountPasswordChange({ onPageChange }) {
         },
         error: (error) => `${error.toString()}`,
       });
-
-      // try {
-      // } catch (e) {
-      //   console.log('error:', e);
-      // }
     },
   });
 
@@ -125,10 +120,19 @@ export default function AccountPasswordChange({ onPageChange }) {
             <Breadcrumbs currentPage={currentPage} />
 
             {isLoading ? (
-              <CPLoader minHeight="500px" />
+              <AccountLoader type="password" />
             ) : (
               <>
                 <form autoComplete="on" onSubmit={handleSubmit}>
+                  {/* Accessibility: hidden username field */}
+                  <input
+                    type="text"
+                    name="username"
+                    autoComplete="username"
+                    value={auth.username || auth.email || ''}
+                    readOnly
+                    className="hidden"
+                  />
                   {/* CONTENT1 START */}
                   <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">
                     <div className="container">

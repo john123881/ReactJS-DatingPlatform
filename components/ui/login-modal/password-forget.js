@@ -37,10 +37,9 @@ export default function PasswordForget({
         headers: { 'Content-Type': 'application/json' },
       });
       const result = await r.json();
-      // console.log('FETCH 要求 驗證碼之結果:', result);
       return result;
     } catch (error) {
-      console.log('發信時發生錯誤:', error);
+      console.error('發信時發生錯誤:', error);
       return { success: false, error: '發信時發生錯誤' }; // 如果發生錯誤，返回一個錯誤對象
     }
   };
@@ -49,7 +48,6 @@ export default function PasswordForget({
   const handleOTPClick = async () => {
     try {
       const result = await sendOTPForForgetPWD(); // 使用 await 等待 sendValidCode 函數的返回結果
-      console.log('發信成功拿到回傳result:', result);
       if (!result.success) {
         toast.error(result.error, { duration: 1500 });
         return;
@@ -60,7 +58,7 @@ export default function PasswordForget({
         toast.success(result.message, { duration: 1500 });
       }
     } catch (error) {
-      console.log('按下發信按鍵時發生錯誤:', error);
+      console.error('按下發信按鍵時發生錯誤:', error);
     }
   };
 
@@ -89,7 +87,6 @@ export default function PasswordForget({
           headers: { 'Content-Type': 'application/json' },
         });
         const result = await r.json();
-        console.log('返回來的Result:', result);
         return result;
       };
 

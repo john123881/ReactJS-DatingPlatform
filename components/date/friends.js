@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { API_BASE_URL } from '@/configs/api-config';
-import { SOCKET_SERVER } from '@/configs/api-config';
 import Link from 'next/link';
 import io from 'socket.io-client';
+import { DateService } from '@/services/date-service';
 
 // 接收 searchQuery 作為屬性
 export default function Friends({ searchQuery }) {
@@ -11,24 +10,19 @@ export default function Friends({ searchQuery }) {
   const { auth, getAuthHeader } = useAuth();
 
   const socket = useRef(null);
-  const socketPort = 3003;
+  // Socket connection is handled via SOCKET_SERVER from config
 
   useEffect(() => {
     const controller = new AbortController();
     const getFriend = async () => {
       try {
-        const url = `${API_BASE_URL}/date/friends-list/accepted/${auth.id}`;
-        const res = await fetch(url, {
-          headers: { ...getAuthHeader() },
-          signal: controller.signal,
-        });
-        const data = await res.json();
+        const data = await DateService.getAcceptedFriends(auth.id);
         if (Array.isArray(data.data)) {
           setFriend(data.data);
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
-          console.log(e);
+          console.error('Error fetching friends list:', e);
         }
       }
     };
@@ -58,27 +52,25 @@ export default function Friends({ searchQuery }) {
 
   // 使用 socket & 監控對方是否在線
   useEffect(() => {
-    if (!auth.token) return;
+    if (!auth.id) return;
 
     // 當下無連接時，建立連結
     if (!socket.current) {
       socket.current = io(SOCKET_SERVER, {
-        auth: {
-          token: auth.token,
-          headers: { ...getAuthHeader() },
-        },
+        withCredentials: true, // 核心！允許發送 Cookie
       });
 
-      // 連結成功
       socket.current.on('connect', () => {
-        console.log('Socket connected：）');
         socket.current.userId = auth.id;
         setSocketId(auth.id);
         socket.current.emit('get_online', { isOnline: true });
       });
 
       const handleUserConnected = (userId) => {
-        setOnlineUsers((prev) => [...prev, userId]);
+        setOnlineUsers((prev) => {
+          if (prev.includes(userId)) return prev;
+          return [...prev, userId];
+        });
       };
 
       const handleUserDisconnected = (userId) => {
@@ -97,7 +89,7 @@ export default function Friends({ searchQuery }) {
         socket.current = null;
       }
     };
-  }, [auth.token, auth.id]);
+  }, [auth.id]);
 
   return (
     <>
@@ -119,7 +111,6 @@ export default function Friends({ searchQuery }) {
 
         // 判断是否在線
         const isOnline = onlineUsers.includes(friendId);
-        console.log(isOnline);
 
         return (
           <Link

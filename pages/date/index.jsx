@@ -13,15 +13,15 @@ export default function Index({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { auth, setLoginModalToggle } = useAuth();
+  const { auth, setLoginModalToggle, isAuthLoaded } = useAuth();
   const { setToggleBar } = useDate();
   const { setToggleMovie } = useDate();
 
   useEffect(() => {
-    if (!auth.id) {
+    if (isAuthLoaded && !auth.id) {
       setLoginModalToggle(true);
     }
-  }, [auth.id, setLoginModalToggle]);
+  }, [auth.id, isAuthLoaded, setLoginModalToggle]);
 
   // 在 "開始填寫" 按鈕也檢查登入狀態
   const handleStartClick = (event) => {

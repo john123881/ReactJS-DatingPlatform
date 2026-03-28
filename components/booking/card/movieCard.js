@@ -155,7 +155,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
 
                       onClick={() =>
                         router.push(
-                          `../../../booking/movie-booking-detail/${movie.movie_id}`,
+                          `/booking/movie-booking-detail/${movie.movie_id}`,
                         )
                       }
                     >

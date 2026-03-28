@@ -31,10 +31,9 @@ export default function Index({ onPageChange }) {
     try {
       const res = await fetch(`${API_BASE_URL}/bar/bar-list-random`);
       const data = await res.json();
-      // console.log(data);
       setRandomBars(data);
     } catch (error) {
-      console.log('Failed to fetch bar random:', error);
+      console.error('Failed to fetch bar random:', error);
     }
   }, []);
 

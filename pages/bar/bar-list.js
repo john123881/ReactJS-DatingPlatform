@@ -64,7 +64,6 @@ export default function BarList({ onPageChange }) {
 
   //FETCH GET 酒吧列表資料
   const getBarList = useCallback(async () => {
-    // console.log('Token:', auth);
 
     try {
       const data = await BarService.getBars();
@@ -72,10 +71,8 @@ export default function BarList({ onPageChange }) {
       //   // alert('error');
       //   return;
       // }
-      // console.log('getBarListDynamicById 的 data:', data);
 
       const barIds = data.map((bar) => bar.bar_id).join(',');
-      // console.log('getBarListDynamicById 的 barIds:', barIds);
       checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
       setBars(data);
     } catch (error) {
@@ -96,7 +93,6 @@ export default function BarList({ onPageChange }) {
 
   // BarListSidebar
   // const handleAreaSelected = (areaId) => {
-  //   console.log('Selected Area ID: ', areaId);
   //   setSelectedAreaId(areaId);
   // };
 

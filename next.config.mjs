@@ -4,6 +4,38 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'daisyui.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'magarticles.magzter.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'bartendersbusiness.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'taipei-date-node.onrender.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.themagnificentmile.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

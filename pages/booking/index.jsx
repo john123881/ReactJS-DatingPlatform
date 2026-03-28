@@ -26,10 +26,9 @@ export default function Index({ onPageChange }) {
   const getBookingMovieCard = useCallback(async () => {
     try {
       const data = await BookingService.getIndexMovies();
-      // console.log('asdsadcasc===>>>', data);
       setMovieCards(data);
     } catch (error) {
-      console.log('Failed to fetch movie card', error);
+      console.error('Failed to fetch movie card', error);
     }
   }, []);
 

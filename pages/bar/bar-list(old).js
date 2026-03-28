@@ -22,16 +22,14 @@ export default function BarList({ onPageChange }) {
     try {
       const res = await fetch(`${API_BASE_URL}/bar/bar-list`);
       const data = await res.json();
-      // console.log(data);
       setBars(data);
     } catch (error) {
-      console.log('Failed to fetch bar list:', error);
+      console.error('Failed to fetch bar list:', error);
     }
   };
 
   useEffect(() => {
     getBarList();
-    // console.log('useEffect log -> bars:', bars);
   }, [getBarList]);
 
   return (

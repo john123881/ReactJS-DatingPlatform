@@ -69,17 +69,6 @@ export default function Index({ onPageChange }) {
     }
   };
 
-  //   const getBookingMovieCard = async () => {
-  //     try {
-  //       const res = await fetch('http://localhost:3001/booking/movie-list');
-  //       const data = await res.json();
-  //       console.log('asdsadcasc===>>>', data);
-  //       setMovieCards(data);
-  //     } catch (error) {
-  //       console.log('Failed to fetch movie card', error);
-  //     }
-  //   };
-
   //   useEffect(() => {
   //     getBookingMovieCard();
   //   }, []);
@@ -108,9 +97,6 @@ export default function Index({ onPageChange }) {
     }
   }, [router.isReady, router.query, getMovieListType]);
 
-  useEffect(() => {
-    console.log(movieCards); // 查看bars數據結構
-  }, [movieCards]);
 
   return (
     <>

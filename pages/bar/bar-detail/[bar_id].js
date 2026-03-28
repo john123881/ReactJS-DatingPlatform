@@ -48,7 +48,6 @@ export default function Detail({ onPageChange }) {
       const successText = String(result.message || result.msg || '');
       if (result.success || successText.includes('成功')) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-        console.log('Save status updated:', result);
       } else {
         throw new Error(successText || 'Failed to update save status');
       }

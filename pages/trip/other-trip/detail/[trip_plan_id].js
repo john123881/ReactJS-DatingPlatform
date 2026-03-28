@@ -60,7 +60,6 @@ export default function OtherTripdetail({ onPageChange }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          console.log('行程添加成功！', data);
           closeModal();
           Swal.fire({
             icon: 'success',
@@ -94,9 +93,7 @@ export default function OtherTripdetail({ onPageChange }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log(data);
           setTripDetails(data.slice(0, 3));
-          console.log(tripDetails);
         } catch (error) {
           console.error('Fetching trip details error:', error);
         }
@@ -120,10 +117,8 @@ export default function OtherTripdetail({ onPageChange }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log('Fetched Trip Name Data:', data);
           if (data) {
             setTripName(data);
-            console.log('Setting tripName to:', data);
           }
         } catch (error) {
           console.error('Fetching trip details error:', error);

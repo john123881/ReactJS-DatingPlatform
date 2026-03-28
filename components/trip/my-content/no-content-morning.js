@@ -26,7 +26,6 @@ export default function NoContentMorning({
       console.error('Missing trip_plan_id');
       return;
     }
-    console.log('Using trip_plan_id from prop:', trip_plan_id);
 
     try {
       const response = await fetch(
@@ -40,9 +39,7 @@ export default function NoContentMorning({
       );
       const data = await response.json();
       if (response.ok && data.success !== false) {
-        console.log('Set block = 1 成功');
         setNewTripDetailId(data.trip_detail_id || data.insertId || data.id); // 更新 trip_detail_id
-        console.log(newTripDetailId);
       } else {
         throw new Error(data.error || data.message || data.msg || 'Set block = 1 失敗');
       }
@@ -53,7 +50,6 @@ export default function NoContentMorning({
   };
   useEffect(() => {
     if (newTripDetailId) {
-      console.log('New Trip Detail ID:', newTripDetailId);
       setIsAddModalOpen(true);
     }
   }, [newTripDetailId]);

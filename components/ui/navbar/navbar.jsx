@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { FaBell, FaBookmark, FaCircle } from 'react-icons/fa';
 import { MdAccountCircle } from 'react-icons/md';
@@ -59,7 +59,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   //     saved_id: 10,
   //   },
   // ];
-  // console.log('NAVBAR currentPageTitle:', currentPageTitle);
   const router = useRouter();
   const {
     posts,
@@ -77,6 +76,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     getAuthHeader,
     rerender,
     // setRerender,
+    isAuthLoaded,
   } = useAuth();
 
   const {
@@ -101,6 +101,9 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isFetchingProfile, setIsFetchingProfile] = useState(false);
+  const imgRef = useRef(null);
 
   // const [dropDownCollectOpen, setDropDownCollectOpen] = useState(false);
   const [showContent, setShowContent] = useState(
@@ -268,18 +271,26 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     const controller = new AbortController(); //建立一個新的控制器
     // const signal = controller.signal; //取得訊號 塞到fetch後面
     const getUserAvatar = async () => {
+      setIsFetchingProfile(true);
       try {
         const result = await AccountService.getProfile(auth.id);
-        // console.log('Navbar, getUserAvatar:', result);
         if (result.success) {
           const { avatar } = result.data;
           setUserAvatar(avatar);
         }
       } catch (e) {
-        console.log(e);
+        // Error handled silently or could be console.error if needed
+      } finally {
+        setIsFetchingProfile(false);
       }
     };
     getUserAvatar();
+    setImageLoaded(false); 
+    
+    // 如果圖片已經在緩存中並加載完成，手動觸發狀態更新
+    if (imgRef.current?.complete) {
+      setImageLoaded(true);
+    }
 
     //這裡return abort動作
     return () => {
@@ -305,7 +316,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     const fetchAllCollectList = async () => {
       try {
         const result = await AccountService.getCollectList(auth.id);
-        console.log('Navbar collect fetch:', result);
         const fetchedData = result?.output?.data || result?.data || result?.rows || (Array.isArray(result) ? result : null);
         
         if (result?.output?.error === '無收藏' || !fetchedData || fetchedData.length === 0) {
@@ -329,7 +339,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   //點擊COLLECT LIST視窗外的區域會觸發DropDown的變化為false，關閉COLLECT LIST視窗
   useEffect(() => {
     const listener = (e) => {
-      // console.log(e.target, e.target.closest('.collect_list'));
       if (
         !e.target.closest('.collect_list') &&
         !e.target.closest('.open_collect_list')
@@ -383,7 +392,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                 <Link
                   onMouseEnter={() => {
                     handleTitleEnter(page.title, true);
-                    // console.log('ENTER 發生時 titleHovered:', titleHovered);
                   }}
                   onMouseLeave={() => handleTitleLeave(page.title, false)}
                   href={`${page.href}`}
@@ -560,12 +568,20 @@ export default function Header({ currentPageTitle, handlePageChange }) {
               role="button"
               className="btn btn-ghost btn-circle avatar hover:shadow-xl3 hover:animate-pulse"
             >
-              <div className="w-6 rounded-full ">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center">
+                {( !isAuthLoaded || isFetchingProfile || !imageLoaded) && (
+                  <span className="loading loading-spinner loading-sm text-primary"></span>
+                )}
                 <img
+                  ref={imgRef}
                   width={24}
                   height={24}
-                  alt="Tailwind CSS Navbar component"
+                  alt="User Avatar"
                   src={getImageUrl(userAvatar, 'avatar')}
+                  className={`rounded-full ${
+                    !isAuthLoaded || isFetchingProfile || !imageLoaded ? 'hidden' : 'block'
+                  }`}
+                  onLoad={() => setImageLoaded(true)}
                 />
               </div>
             </div>
@@ -593,11 +609,9 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                 <li className="hover:text-neongreen">
                   <Link
                     onClick={async (e) => {
-                      e.preventDefault();
                       setDropDownOpen(false);
                       toast.success('已登出', { duration: 1500 });
                       logout();
-                      router.push('/');
                     }}
                     href="/"
                   >

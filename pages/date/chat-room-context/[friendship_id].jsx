@@ -78,14 +78,13 @@ export default function ChatRoomContext() {
           signal: controller.signal,
         });
         const result = await res.json();
-        console.log('Navbar, getUserAvatar:', result);
         if (result.success) {
           const { avatar } = result.data;
           setUserAvatar(avatar);
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
-          console.log(e);
+          // Error handled silently
         }
       }
     };
@@ -125,10 +124,8 @@ export default function ChatRoomContext() {
       const url = `${DATE_FRIENDSHIPS_MESSAGE}/${friendship_id}`;
       try {
         const response = await fetch(url, { headers: { ...getAuthHeader() } });
-        console.log('response', response);
         const result = await response.json();
 
-        console.log('date', result);
         if (Array.isArray(result.data)) {
           setMessages(result.data);
         }
@@ -143,21 +140,15 @@ export default function ChatRoomContext() {
 
   // 使用 socket
   useEffect(() => {
-    console.log('token', auth);
-    if (!auth.token || (socket.current && socket.current.connected)) return;
-
-    console.log('header', getAuthHeader());
+    if (!auth.id || (socket.current && socket.current.connected)) return;
 
     // 當下無連接時，建立連結
     socket.current = io(SOCKET_SERVER, {
-      auth: {
-        headers: { ...getAuthHeader() },
-      },
+      withCredentials: true, // 核心！允許發送 Cookie
     });
 
     // 連結成功
     socket.current.on('connect', () => {
-      console.log('Socket connected：）');
       // 在連線建立後，立即加入指定的房間
       socket.current.emit('addRoom', roomName);
       // 發送 'image' 事件，包含圖片資料
@@ -168,14 +159,12 @@ export default function ChatRoomContext() {
 
     // 添加圖片接收的監聽器
     socket.current.on('send_image', (messageData) => {
-      console.log('Received image data:', messageData);
       // 將圖片添加到原有的消息列表中;
       setMessages((prevMessages) => [...prevMessages, messageData]);
     });
 
     // 添加消息接收的監聽器
     socket.current.on('send_message', (message) => {
-      console.log('Received message data:', message);
       // 將新的消息添加到原有的消息列表中
       setMessages((prevMessages) => [...prevMessages, message]);
     });
@@ -191,7 +180,6 @@ export default function ChatRoomContext() {
 
       // 在組件卸載時，關閉 socket 連接
       socket.current.off();
-      console.log('Socket disconnected!');
     };
   }, [router.isReady, auth.token, roomName]);
 
@@ -203,21 +191,6 @@ export default function ChatRoomContext() {
       hour12: false,
     });
 
-  /*
-  // let isComposing = false;
-
-  // 處理中文輸入開始
-  const handleComposition = (e) => {
-    console.log(e.type);
-    if (e.type === 'compositionend') {
-      isComposing = false;
-    } else {
-      isComposing = true;
-    }
-
-    console.log('中文輸入開始');
-  };
-  */
 
   // 使用 useEffect 將訊息滾動到最下方
   useEffect(() => {
@@ -245,7 +218,6 @@ export default function ChatRoomContext() {
 
     // 發送 'send_message' 事件到後端
     socket.current.emit('send_message', { roomName, message });
-    console.log(`使用者：${auth.username}，傳送內容：${input}`);
 
     /// 將新消息添加到消息列表中
     // setMessages((prevMessages) => [...prevMessages, message]);
@@ -278,7 +250,6 @@ export default function ChatRoomContext() {
         return;
       }
 
-      console.log('訊息發送成功');
     } catch (error) {
       console.error('訊息發送出錯', error);
     }
@@ -286,7 +257,6 @@ export default function ChatRoomContext() {
 
   // 封鎖好友
   const handleBlockingClick = async () => {
-    console.log(friendship_id);
     // TODO try catch
     const response = await fetch(`${DATE_FRIENDSHIPS_EDIT}/${friendship_id}`, {
       method: 'PUT',
@@ -366,14 +336,8 @@ export default function ChatRoomContext() {
           sended_at: formatTime(),
           sender_avatar: userAvatar,
         };
-        console.log(messageData);
 
         socket.current.emit('send_image', { roomName, messageData });
-        console.log(
-          `使用者：${auth.username}，傳送內容：${messageData.content}`,
-        );
-
-        // setMessages((prevMessages) => [...prevMessages, messageData]);
       }
     } catch (error) {
       console.error('Error uploading file', error);
@@ -483,8 +447,6 @@ export default function ChatRoomContext() {
                 onChange={handleInputChange}
                 onKeyUp={(e) => {
                   const { isComposing, key } = e;
-                  console.log(e.nativeEvent.isComposing);
-                  console.log({ isComposing, key });
                   !e.nativeEvent.isComposing &&
                     e.key === 'Enter' &&
                     sendMessage();

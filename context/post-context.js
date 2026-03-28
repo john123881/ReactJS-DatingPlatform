@@ -1022,7 +1022,6 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.unlikePost(userId, postId)
           : await CommunityService.likePost(userId, postId);
 
-        console.log('Like interaction result:', result);
 
         if (
           !(result.success ||
@@ -1071,7 +1070,6 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.notAttendEvent(userId, eventId)
           : await CommunityService.attendEvent(userId, eventId);
 
-        console.log('Attendance interaction result:', result);
 
         if (
           !(result.success ||
@@ -1120,7 +1118,6 @@ export const PostProvider = ({ children }) => {
           ? await CommunityService.unsavePost(userId, postId)
           : await CommunityService.savePost(userId, postId);
 
-        console.log('Save interaction result:', result);
 
         if (
           result.success ||

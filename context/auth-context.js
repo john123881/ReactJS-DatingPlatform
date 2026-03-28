@@ -28,6 +28,7 @@ export function AuthContextProvider({ children }) {
     `${API_SERVER}/avatar/defaultAvatar.jpg`,
   );
   const [isOnLogin, setIsOnLogin] = useState(true);
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
   const storageKey = 'TD_auth';
 
@@ -43,7 +44,6 @@ export function AuthContextProvider({ children }) {
         username,
         password,
       });
-      console.log('register:', result);
       return result;
     } catch (error) {
       console.error('註冊時發生錯誤', error);
@@ -51,9 +51,6 @@ export function AuthContextProvider({ children }) {
     }
   }, []);
 
-  const tryClick = async () => {
-    console.log('click!');
-  };
 
   const login = useCallback(async (email, password) => {
     try {
@@ -71,7 +68,6 @@ export function AuthContextProvider({ children }) {
         }
       }
 
-      console.log(result);
       return result;
     } catch (error) {
       console.error('登入時發生錯誤', error);
@@ -80,9 +76,14 @@ export function AuthContextProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    router.push('/');
+    try {
+      await AuthService.logout(); // 呼叫後端清除 Cookie
+    } catch (e) {
+      console.error('Logout API failed:', e);
+    }
     localStorage.removeItem(storageKey);
     setAuth(emptyAuth);
+    await router.push('/');
   }, [router]);
 
   const getAuthHeader = useCallback(() => {
@@ -122,28 +123,36 @@ export function AuthContextProvider({ children }) {
   }, [setAuth, setLoginModalToggle]);
 
   useEffect(() => {
-    const str = localStorage.getItem(storageKey);
-    try {
-      const data = JSON.parse(str);
-      if (data) {
-        setAuth(data);
-        if (data.avatar) {
-          setUserAvatar(data.avatar);
+    const initAuth = async () => {
+      const str = localStorage.getItem(storageKey);
+      try {
+        const data = JSON.parse(str);
+        if (data && data.id) {
+          // 向後端確認 Cookie 是否仍然有效
+          const result = await checkAuth(data.id);
+          if (result.success) {
+            setAuth(data);
+            if (data.avatar) {
+              setUserAvatar(data.avatar);
+            }
+          } else {
+            // Cookie 無效，清除本地資料
+            localStorage.removeItem(storageKey);
+            setAuth(emptyAuth);
+          }
         }
+      } catch (ex) {
+        console.error(ex);
+      } finally {
+        setIsAuthLoaded(true);
       }
-    } catch (ex) {
-      console.log(ex);
-    }
-  }, []);
-
-  // useEffect(() => {
-  //   console.log('在AUTH-CONTEXT的 rerender 狀態:', rerender);
-  // }, [rerender]); // 確保這裡的依賴數組包含 rerender 狀態
+    };
+    initAuth();
+  }, [checkAuth]);
 
   return (
     <AuthContext.Provider
       value={{
-        tryClick,
         storageKey,
         auth,
         checkAuth,
@@ -161,6 +170,7 @@ export function AuthContextProvider({ children }) {
         setIsOnLogin,
         rerender,
         setRerender,
+        isAuthLoaded,
       }}
     >
       {children}

@@ -86,7 +86,6 @@ export default function List({ onPageChange }) {
           },
         );
         const data = await response.json();
-        // console.log('checkBarsStatus 的 data:', data);
 
         // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
         setSavedBars((prevSavedBars) => {
@@ -112,10 +111,8 @@ export default function List({ onPageChange }) {
       try {
         const res = await fetch(url);
         const data = await res.json();
-        // console.log('getBarListDynamicById 的 data:', data);
 
         const barIds = data.map((bar) => bar.bar_id).join(',');
-        // console.log('getBarListDynamicById 的 barIds:', barIds);
         checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
 
         setBars(data); // 確認數據是否為預期格式
@@ -164,13 +161,9 @@ export default function List({ onPageChange }) {
     }
   }, [router.isReady, router.query, getBarListDynamicById]);
 
-  // useEffect(() => {
-  //   console.log(bars); // 查看bars數據結構
-  // }, [bars]);
 
   // bar-type sidebar
   const onTypeSelected = (typeId) => {
-    console.log('Selected type ID:', typeId);
     // 使用 useRouter 的 push 方法
     router.push(`/bar/${typeId}`);
   };

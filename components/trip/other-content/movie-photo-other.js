@@ -18,7 +18,7 @@ export default function MoviePhotoOther({ trip_plan_id, tripDetails }) {
   const [imageSrc2, setImageSrc2] = useState('');
   const [movieDetails, setMovieDetails] = useState({}); //用於保存取得的電影資訊
   const [showDetails, setShowDetails] = useState(false); // 控制顯示電影細節的狀態
-  const { open, close, isLoading } = useLoader();
+  const { open, close } = useLoader();
   // console.log(movieDetails);
 
   useEffect(() => {

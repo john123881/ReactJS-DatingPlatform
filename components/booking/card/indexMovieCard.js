@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 
 export default function MovieCard({ movie, index }) {
+  const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const handleHeartClick = () => {
@@ -80,7 +82,7 @@ export default function MovieCard({ movie, index }) {
                         borderRadius: '30px',
                       }}
                       onClick={() =>
-                        (window.location.href = `../../../booking/movie-booking-detail/${movie.movie_id}`)
+                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`)
                       }
                     >
                       立即訂票
@@ -93,7 +95,7 @@ export default function MovieCard({ movie, index }) {
                         borderRadius: '30px',
                       }}
                       onClick={() =>
-                        (window.location.href = `../../../booking/movie-booking-detail/${movie.movie_id}`)
+                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`)
                       }
                     >
                       電影資訊

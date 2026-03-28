@@ -12,15 +12,14 @@ import {
 } from '@/configs/api-config';
 import toast from 'react-hot-toast';
 import { useLoader } from '@/context/use-loader';
-import RecordLoader2 from '@/components/account-center/loader/record-loader2';
-import RecordLoader3 from '@/components/account-center/loader/record-loader3';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 export default function AccountRecord({ onPageChange }) {
   const pageTitle = '會員中心';
   const currentPage = '紀錄查詢';
 
   const router = useRouter();
-  const { close, open, isLoading } = useLoader();
+  const { open, close, isLoading } = useLoader();
   const { auth, getAuthHeader, checkAuth } = useAuth();
   const [currentDate, setCurrentDate] = useState('');
   const [gameRecordOpen, setGameRecordOpen] = useState(false);
@@ -261,7 +260,7 @@ export default function AccountRecord({ onPageChange }) {
           }));
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
       
       if (isSubscribed) close(0.5);
@@ -315,7 +314,7 @@ export default function AccountRecord({ onPageChange }) {
           }));
         }
       } catch (error) {
-        console.log('fetchGameRecord has error:', error);
+        console.error('fetchGameRecord has error:', error);
       }
 
       if (isSubscribed) close(0.5);
@@ -486,7 +485,7 @@ export default function AccountRecord({ onPageChange }) {
                   {isLoading ? (
                     <tr>
                       <td colSpan="3" className="p-0 border-0">
-                        <RecordLoader2 minHeight="450px" />
+                        <AccountLoader type="points" minHeight="450px" />
                       </td>
                     </tr>
                   ) : (
@@ -668,7 +667,7 @@ export default function AccountRecord({ onPageChange }) {
                   {isLoading ? (
                     <tr>
                       <td colSpan="3" className="p-0 border-0">
-                        <RecordLoader3 minHeight="450px" />
+                        <AccountLoader type="game_record" minHeight="450px" />
                       </td>
                     </tr>
                   ) : (

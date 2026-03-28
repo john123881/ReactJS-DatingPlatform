@@ -24,7 +24,6 @@ export default function NoContentNight({ trip_plan_id, refreshTripDetails }) {
       console.error('Missing trip_plan_id');
       return;
     }
-    console.log('Using trip_plan_id from prop:', trip_plan_id);
 
     try {
       const response = await fetch(
@@ -38,9 +37,7 @@ export default function NoContentNight({ trip_plan_id, refreshTripDetails }) {
       );
       const data = await response.json();
       if (response.ok && data.success !== false) {
-        console.log('Set block = 3 成功');
         setNewTripDetailId(data.trip_detail_id || data.insertId || data.id); // 更新 trip_detail_id
-        console.log(newTripDetailId);
       } else {
         throw new Error(data.error || data.message || data.msg || 'Set block = 3 失敗');
       }
@@ -51,7 +48,6 @@ export default function NoContentNight({ trip_plan_id, refreshTripDetails }) {
   };
   useEffect(() => {
     if (newTripDetailId) {
-      console.log('New Trip Detail ID:', newTripDetailId);
       setIsAddModalOpen(true);
     }
   }, [newTripDetailId]);

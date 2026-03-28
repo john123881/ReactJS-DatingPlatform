@@ -18,7 +18,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
   const [imageSrc1, setImageSrc1] = useState('');
   const [barDetails, setBarDetails] = useState({});
   const [showDetails, setShowDetails] = useState(false);
-  const { open, close, isLoading } = useLoader();
+  const { open, close } = useLoader();
 
   useEffect(() => {
     const fetchBarImage = async () => {

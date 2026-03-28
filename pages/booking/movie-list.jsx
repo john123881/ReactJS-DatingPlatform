@@ -38,19 +38,17 @@ export default function Index({ onPageChange }) {
 
       setMovieCards(data);
     } catch (error) {
-      console.log('Failed to fetch movie card', error);
+      console.error('Failed to fetch movie card', error);
     }
   };
 
   const checkMoviesStatus = async (movieIds) => {
     const userId = auth.id;
 
-    console.log('checkMoviesStatus');
 
     try {
       const data = await BookingService.checkMovieStatus(userId, movieIds);
 
-      console.log(data);
 
       // 初始化兩個對象來存儲所有電影的收藏狀態
       const newSavedMoives = { ...savedMovies };

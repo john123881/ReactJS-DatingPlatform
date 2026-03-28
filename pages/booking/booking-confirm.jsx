@@ -51,7 +51,7 @@ export default function MovieSeatSelection({ onPageChange }) {
           borderColor: '#A0FF1F',
         }}
         onClick={() =>
-          (window.location.href = '../../../booking/booking-ticket-select')
+          router.push('/booking/booking-ticket-select')
         }
       >
         我已同意，前往票卷選擇

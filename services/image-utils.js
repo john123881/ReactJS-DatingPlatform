@@ -13,9 +13,11 @@ export const getImageUrl = (url, type = 'avatar') => {
 
   let finalUrl = url;
 
-  // 1. 處理硬編碼的舊 IP 位址 (關鍵修復)
-  if (finalUrl.includes('119.14.42.80:3001')) {
-    finalUrl = finalUrl.replace('http://119.14.42.80:3001', API_SERVER);
+  // 1. 處理硬編碼的舊 IP 位址 (強化修復)
+  // 使用正則表達式匹配 119.14.x.x 系列的硬編碼網址並替換為當前的 API_SERVER
+  const ipRegex = /http:\/\/119\.14\.\d{1,3}\.\d{1,3}:3001/g;
+  if (ipRegex.test(finalUrl)) {
+    finalUrl = finalUrl.replace(ipRegex, API_SERVER);
   }
 
   // 2. 如果已經是完整網址 (http/https)，直接回傳

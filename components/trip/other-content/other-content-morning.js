@@ -6,7 +6,6 @@ import BarPhotoOther from './bar-photo-other';
 import NoContentNoon from '../my-content/no-content-noon';
 
 export default function OtherContentMorning({ trip_plan_id }) {
-  // console.log('Received trip_plan_id in OtherContentMorning:', trip_plan_id);
   const [tripDetails, setTripDetails] = useState({});
 
   useEffect(() => {
@@ -20,11 +19,9 @@ export default function OtherContentMorning({ trip_plan_id }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log('Fetched TripDetail Data:', data);
           // 假設 data 是數組或需要訪問特定屬性
           if (data && data.length > 0) {
             setTripDetails(data[0]);
-            console.log('Setting tripDetail to:', data[0]);
           } else {
             // 設置一個明確的“沒有內容”的狀態
             setTripDetails({ block: null });
@@ -39,7 +36,7 @@ export default function OtherContentMorning({ trip_plan_id }) {
       fetchTripDetails();
     }
   }, [trip_plan_id]);
-  console.log(tripDetails.block);
+
   // 根據 block 值來決定顯示哪個組件
   //   const content =
   //     tripDetails.block === 1 ? <TripPhotoMy /> : <NoContentMorning />;

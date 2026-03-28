@@ -26,7 +26,6 @@ function truncateChinese(title, maxChineseChars = 7) {
 }
 
 export default function TripSidebar2({ tripName, trip_plan_id }) {
-  // console.log('TripSidebar2 received tripName:', tripName);
   const [trip, setTrip] = useState({}); //用於儲存從trip_plans中獲取的值
   const router = useRouter();
   // const [tripDraft, setTripDraft] = useState(tripName.trip_draft);
@@ -78,10 +77,8 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log('Fetched Trip  Data:', data);
           if (data) {
             setTrip(data);
-            console.log('Setting trip to:', data);
           }
         } catch (error) {
           console.error('Fetching trip  error:', error);
@@ -176,7 +173,6 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
       });
 
       if (result.success !== false) {
-        console.log('Trip details updated successfully:', result);
         // 更新本地 trip 物件以反映更改
         setTrip(prev => ({
           ...prev,
@@ -204,7 +200,6 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
   // 更新 actionButton 按鈕的 useEffect (for sharing)
   useEffect(() => {
-    console.log('Trip draft changed:', trip.trip_draft);
     setActionButton(
       trip.trip_draft === 1 ? (
         <button
@@ -225,11 +220,6 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   }, [trip]);
   // 更新 noteButton 按鈕的 useEffect (for note)
   useEffect(() => {
-    console.log(
-      'Checking trip details:',
-      trip.trip_description,
-      trip.trip_notes,
-    );
     setNoteButton(
       trip.trip_description || trip.trip_notes ? (
         <button

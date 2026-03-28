@@ -28,10 +28,11 @@ export default function PairingModal() {
       <input type="checkbox" id="pairing_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box flex flex-col items-center">
-          <h3 className="font-bold text-lg text-neongreen ">配對中...</h3>
+          <h3 className="font-bold text-lg text-neongreen ">興趣選擇完成！</h3>
           <p className="py-4">
             我喜歡去{toggleBar['name']}與看{toggleMovie['name']}類型的電影！
           </p>
+          <p className="text-sm text-gray-500 mb-4">點擊「確認」開始為您尋找好友</p>
           <div className="modal-action items-center justify-center gap-3">
             <label
               htmlFor="pairing_modal"

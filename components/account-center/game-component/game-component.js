@@ -227,7 +227,7 @@ const GameComponent = () => {
             }}
             alt="蛇頭"
             width={20}
-            height={31}
+            height={20}
           />
         )}
       </div>
@@ -253,18 +253,13 @@ const GameComponent = () => {
   }, [food]);
 
 
-  const GameRecord = async (myForm) => {
+  const GameRecord = async (sid, record) => {
     try {
-      const r = await fetch(`${ACCOUNT_GAME_RECORD_POST}/${router.query.sid}`, {
-        method: 'POST',
-        body: JSON.stringify(myForm),
-        headers: { ...getAuthHeader(), 'content-type': 'application/json' },
-      });
-      const result = await r.json();
-      console.log(result);
+      const { AccountService } = await import('@/services/account-service');
+      const result = await AccountService.uploadGameRecord(sid, record);
       return result;
     } catch (ex) {
-      console.log('catchEx:', ex);
+      console.error('catchEx:', ex);
     }
   };
 
@@ -284,29 +279,35 @@ const GameComponent = () => {
     const padZero = (num) => (num < 10 ? `0${num}` : num);
     const formattedTime = `00:${padZero(minutes)}:${padZero(remainingSeconds)}`;
 
-    //包裝成myFrom fetch 上傳紀錄
-    let myForm = { auth_id: auth.id, gameScore, gameTime: formattedTime };
+    //包裝成 record 物件傳到後端
+    let record = {
+      gameScore: gameScore, // 使用 camelCase 以符合後端預期
+      gameTime: formattedTime, // 使用 camelCase 以符合後端預期
+    };
+    // console.log('Saving game record:', record);
     try {
-      toast.promise(GameRecord(myForm), {
-        loading: '登入中...',
+      const sid = auth.id || router.query.sid;
+      toast.promise(GameRecord(sid, record), {
+        loading: '紀錄儲存中...',
         success: (result) => {
-          if (!result.success) {
-            throw new Error('新增時出現錯誤');
+          // console.log('Save record result:', result);
+          if (!result || !result.success) {
+            throw new Error(result?.msg || '新增時出現錯誤');
           }
           if (result.getPointPlay) {
             toast.success('每日遊戲獲得10積分', { duration: 1500 });
           }
+          // 重置狀態
           setEndTime(0);
           setScore(0);
           setBtnDisabled(false);
           return '新增紀錄成功';
         },
         error: (e) => {
-          return `${e}`;
+          console.error('Save record error:', e);
+          return `儲存失敗: ${e.message || e}`;
         },
       });
-
-      // console.log(result);
     } catch (ex) {
       console.error('Error:', ex);
     }

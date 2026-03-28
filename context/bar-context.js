@@ -38,7 +38,6 @@ export const BarProvider = ({ children }) => {
       const data = await res.json();
       if (res.ok) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-        console.log('Save status updated:', data);
       } else {
         throw new Error(data.message || 'Failed to update save status');
       }

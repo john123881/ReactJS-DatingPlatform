@@ -18,11 +18,8 @@ export default function ContentNoon({ trip_plan_id, newDetail }) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          console.log('Fetched TripDetail Data:', data);
-
           if (data && data.length > 0) {
             setTripDetails(data[0]);
-            console.log('Setting tripDetail to:', data[0]);
           } else {
             // 設置一個明確的“沒有內容”的狀態
             setTripDetails({ block: null });
@@ -48,10 +45,8 @@ export default function ContentNoon({ trip_plan_id, newDetail }) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log('Fetched TripDetail Data:', data);
       if (data && data.length > 0) {
         setTripDetails(data[0]);
-        console.log('Setting tripDetail to:', data[0]);
       } else {
         setTripDetails({ block: null });
       }

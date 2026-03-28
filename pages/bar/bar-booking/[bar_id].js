@@ -38,15 +38,9 @@ export default function Booking({ onPageChange }) {
 
   //FETCH GET 酒吧資料
   const getBarBookingById = async (bar_id) => {
-    // console.log('func barId:', bar_id);
     const url = `${API_BASE_URL}/bar/bar-list/id/${bar_id}`;
     const response = await fetch(url);
     const data = await response.json();
-    // console.log('fetch data', data);
-    // // console.log('getBarListDynamicById 的 data:', data);
-
-    // const barIds = data.map((bar) => bar.bar_id).join(',');
-    // checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
     setBooking(data);
   };
 
@@ -66,8 +60,6 @@ export default function Booking({ onPageChange }) {
       bar_booking_people_num: peopleNum,
       bar_time_slot_id: timeSlotMapping[selectedTime],
     };
-
-    // console.log(bookingData);
     if (!bookingData) {
       Swal.fire({
         title: '請輸入訂位內容!',
@@ -116,15 +108,9 @@ export default function Booking({ onPageChange }) {
       //確保能得到bar_id
       const { bar_id } = router.query;
       // 有bar_id後，向伺服器要求資料
-      console.log('barId:', bar_id);
       getBarBookingById(bar_id);
     }
   }, [router.isReady]);
-
-  // useEffect(() => {
-  //   console.log(booking.bar_name); // 查看 booking 數據結構
-  //   // console.log('booking:', booking[0]);
-  // }, [booking]);
 
   // 訂位確認彈跳視窗
   // const BookingConfirmModal = dynamic(

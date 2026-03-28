@@ -83,7 +83,7 @@ export default function LoginModal() {
                       {`${isOnLogin ? '會員註冊' : '會員登入'} `}
                     </button>
                   </div>
-                  <div className="h-[310px} w-[100%] absolute top-[0px] left-0">
+                  <div className="h-[550px] w-[100%] absolute top-[0px] left-0">
                     <LoginBackgroundAnimation isOnLogin={isOnLogin} />
                   </div>
                 </div>

@@ -187,9 +187,17 @@ export default function NewFriends() {
               />
             </div>
             <div className="flex flex-col items-center justify-center mt-[20px]">
-              <p className="mb-3 text-lg md:text-lg sm:text-base">{`${bio.username}，${bio.age}`}</p>
               <p className="mb-3 text-lg md:text-lg sm:text-base">
-                {bio.bar_type_name}、{bio.movie_type}
+                {bio.username}，
+                {bio.birthday
+                  ? Math.floor(
+                      (new Date() - new Date(bio.birthday)) /
+                        (1000 * 60 * 60 * 24 * 365.25),
+                    )
+                  : '未知'}
+              </p>
+              <p className="mb-3 text-lg md:text-lg sm:text-base">
+                {bio.bar_type?.bar_type_name}、{bio.movie_type?.movie_type}
               </p>
               <p className="mb-6 text-center text-lg md:text-lg sm:text-base">
                 {bio.profile_content}

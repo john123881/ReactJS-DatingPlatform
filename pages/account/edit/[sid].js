@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { editSchema } from '@/components/schemas';
 import { useLoader } from '@/context/use-loader';
-import EditLoader from '@/components/account-center/loader/edit-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 export default function AccountEdit({ onPageChange }) {
   const pageTitle = '會員中心';
@@ -52,17 +52,15 @@ export default function AccountEdit({ onPageChange }) {
 
   //處理大頭照上傳
   const handleAvatar = async (formData) => {
-    console.log('handleAvatar 中的 formData:', formData);
     try {
       const result = await AccountService.uploadAvatar(
         router.query.sid,
         formData,
       );
-      console.log('大頭照上傳:result為', result);
       notifySuccess(result.msg);
       setRerender(!rerender);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       notifyError(e);
     }
   };
@@ -90,13 +88,6 @@ export default function AccountEdit({ onPageChange }) {
       formData.append('avatar', file);
       formData.append('userId', router.query.sid);
       const formData1 = new FormData(document.form1);
-      // console.log('formData:', formData);
-      // console.log(formData.get('avatar')); // 获取 'avatar' 字段的值
-      // console.log(formData.get('userId')); // 获取 'userId' 字段的值
-      // console.log('formData1:', formData1);
-      // for (let pair of formData1.entries()) {
-      //   console.log(pair[0] + ', ' + pair[1]);
-      // }
       open();
       handleAvatar(formData);
     }
@@ -197,7 +188,7 @@ export default function AccountEdit({ onPageChange }) {
           router.push('/');
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
@@ -258,7 +249,7 @@ export default function AccountEdit({ onPageChange }) {
             <Breadcrumbs currentPage={currentPage} />
 
             {isLoading ? (
-              <EditLoader minHeight="500px" />
+              <AccountLoader type="edit" />
             ) : (
               <>
                 {' '}

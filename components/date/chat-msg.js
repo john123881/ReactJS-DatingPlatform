@@ -35,15 +35,13 @@ export default function ChatMsg({ searchQuery }) {
     const url = `${DATE_FRIENDSHIPS_MESSAGE_SENDER}/${auth.id}`;
     try {
       const res = await fetch(url, { headers: { ...getAuthHeader() } });
-      console.log('res', res);
       const data = await res.json();
-      console.log('date', data);
 
       if (Array.isArray(data.data)) {
         setMsg(data.data);
       }
     } catch (e) {
-      console.log(e);
+      console.error('Failed to fetch messages:', e);
     }
   };
 
@@ -62,20 +60,14 @@ export default function ChatMsg({ searchQuery }) {
     if (auth.token && !socket.current) {
       // 當下無連接時，建立連結
       socket.current = io(SOCKET_SERVER, {
-        auth: {
-          token: auth.token,
-          headers: { ...getAuthHeader() },
-        },
+        withCredentials: true, // 核心！允許發送 Cookie
       });
 
       // 連結成功
       socket.current.on('connect', () => {
-        console.log('Socket connected：）');
-
         socket.current.userId = auth.id;
         setSocketId(auth.id);
         socket.current.emit('get_online', { isOnline: true });
-        console.log(auth.id);
       });
     }
     return () => {
@@ -84,7 +76,7 @@ export default function ChatMsg({ searchQuery }) {
         socket.current = null;
       }
     };
-  }, [auth.token]); // 加入 auth.token 依賴
+  }, [auth.id]); // 使用 auth.id 作為依賴
 
   // 監控對方是否在線
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -114,7 +106,6 @@ export default function ChatMsg({ searchQuery }) {
         const isCurrentUser = msg.sender_name === auth.username;
 
         const friendId = isCurrentUser ? msg.other_friend_id : msg.sender_id;
-        console.log(friendId);
         const displayName = isCurrentUser
           ? msg.other_friend_name
           : msg.sender_name;

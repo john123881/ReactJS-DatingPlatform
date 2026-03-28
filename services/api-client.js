@@ -11,31 +11,32 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
 
   const isFormData = body instanceof FormData;
 
-  // 從 localStorage 取得 token (假設存在)
+  // Note: JWT is now handled via httpOnly cookies; 'credentials: include' takes care of it.
   const isLoginRequest = endpoint === '/login' || endpoint === '/google-login';
-
-  if (!isLoginRequest) {
-    try {
-      const authData = localStorage.getItem('TD_auth');
-      if (authData) {
-        const parsed = JSON.parse(authData);
-        if (parsed && parsed.token) {
-          headers.Authorization = `Bearer ${parsed.token}`;
-        }
-      }
-    } catch (e) {
-      console.error('Error reading auth from localStorage:', e);
-    }
-  }
 
   const config = {
     method: body ? 'POST' : 'GET',
     ...customConfig,
+    credentials: 'include', // 核心！允許發送 Cookie
     headers: {
       ...headers,
       ...customConfig.headers,
     },
   };
+
+  // 取得 localStorage 中的 token 作為備援 (針對 localhost 開發環境)
+  const storageKey = 'TD_auth';
+  const str = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+  if (str) {
+    try {
+      const parsed = JSON.parse(str);
+      if (parsed && parsed.token) {
+        config.headers.Authorization = `Bearer ${parsed.token}`;
+      }
+    } catch (e) {
+      console.error('API Client: Failed to parse auth data from localStorage', e);
+    }
+  }
 
   // 如果是 FormData，不要設置 Content-Type，讓瀏覽器自動處理 (帶上 boundary)
   if (isFormData) {
@@ -51,8 +52,6 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
       ? endpoint
       : `${API_SERVER}${endpoint}`;
 
-  console.log('Fetching URL:', fullUrl);
-  console.log('Config headers:', config.headers);
 
   const response = await fetch(fullUrl, config);
 

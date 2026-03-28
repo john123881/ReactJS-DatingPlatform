@@ -14,7 +14,12 @@ export default function Sidebar({ currentPage }) {
   const { auth } = useAuth();
   const router = useRouter();
 
-  const handleNav = (path) => {
+  const handleNav = (e, path) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+      e.nativeEvent.stopImmediatePropagation();
+    }
     router.push(path);
   };
 
@@ -36,70 +41,100 @@ export default function Sidebar({ currentPage }) {
                 <p className="text-2xl text-light">會員中心</p>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <button
+                  type="button"
                   className={`${
                     currentPage === '個人資料' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/index/${auth.id}`}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/index/${auth.id}`);
+                  }}
                 >
                   <BsFillPersonFill />
                   個人資料
-                </Link>
+                </button>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <button
+                  type="button"
                   className={`${
                     currentPage === '資料編輯' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/edit/${auth.id}`}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/edit/${auth.id}`);
+                  }}
                 >
                   <BsCreditCard2FrontFill />
                   資料編輯
-                </Link>
+                </button>
               </li>
               <li className="hover:text-neongreen">
-                <div
+                <button
+                  type="button"
                   className={`${
                     currentPage === '更改密碼' ? 'text-neongreen' : ''
-                  } text-base cursor-pointer`}
-                  onClick={() => handleNav(`/account/password-change/${auth.id}`)}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/password-change/${auth.id}`);
+                  }}
                 >
                   <BsFillKeyFill />
                   更改密碼
-                </div>
+                </button>
               </li>
               <li className="hover:text-neongreen">
-                <div
+                <button
+                  type="button"
                   className={`${
                     currentPage === '遊玩遊戲' ? 'text-neongreen' : ''
-                  } text-base cursor-pointer`}
-                  onClick={() => handleNav(`/account/play-game/${auth.id}`)}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/play-game/${auth.id}`);
+                  }}
                 >
                   <BsDpadFill />
                   遊玩遊戲
-                </div>
+                </button>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <button
+                  type="button"
                   className={`${
                     currentPage === '紀錄查詢' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/record/${auth.id}`}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/record/${auth.id}`);
+                  }}
                 >
                   <BsCashCoin />
                   紀錄查詢
-                </Link>
+                </button>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <button
+                  type="button"
                   className={`${
                     currentPage === '個人收藏' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/collect/post/${auth.id}`}
+                  } text-base flex items-center gap-2`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNav(e, `/account/collect/post/${auth.id}`);
+                  }}
                 >
                   <BsCollection />
                   個人收藏
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

@@ -9,7 +9,7 @@ import PostCardLarge from '@/components/community/card/postCardLarge';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './page.module.css';
 import PageTitle from '@/components/page-title';
-import IndexLoader from '@/components/account-center/loader/index-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 
 export default function Index({ onPageChange }) {
@@ -113,7 +113,7 @@ export default function Index({ onPageChange }) {
                     : getCommunityIndexPost
                 }
                 hasMore={isFilterActive ? indexFilteredHasMore : indexHasMore}
-                loader={<IndexLoader minHeight="200px" />}
+                loader={<AccountLoader type="index" minHeight="200px" />}
                 // endMessage={<p>No more posts</p>}
                 style={{
                   display: 'flex',

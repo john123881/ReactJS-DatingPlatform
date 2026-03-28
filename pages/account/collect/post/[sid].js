@@ -7,7 +7,7 @@ import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useCollect } from '@/context/use-collect';
 import { useLoader } from '@/context/use-loader';
-import CollectLoader from '@/components/account-center/loader/collect-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 import Link from 'next/link';
 
 import { AccountService } from '@/services/account-service';
@@ -21,7 +21,7 @@ export default function AccountCollect({ onPageChange }) {
   const pageTitle = '會員中心';
   const currentPage = '個人收藏';
   const router = useRouter();
-  const { close, isLoading, open } = useLoader();
+  const { open, close, isLoading } = useLoader();
   const { p, setP, modalId, setModalId } = useCollect();
   const { auth, getAuthHeader, checkAuth, rerender } = useAuth();
   const {
@@ -43,6 +43,7 @@ export default function AccountCollect({ onPageChange }) {
   const [arrowHovered, setArrowHovered] = useState(
     Array(posts.length).fill(false),
   );
+  const [isFetched, setIsFetched] = useState(false);
 
   //處理 post.map 把裡面的post.id 及 post.data 導出來傳遞給Modal
   const handlePostClick = (post, post_id) => {
@@ -66,10 +67,6 @@ export default function AccountCollect({ onPageChange }) {
       setPages({ ...pages, page: prevPage });
 
       const nweQuery = { ...router.query, page: prevPage };
-
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-      // console.log('prevPageQS:', queryString);
 
       // 更新路由的 query string
       router.push(
@@ -114,10 +111,6 @@ export default function AccountCollect({ onPageChange }) {
         `?page=${router.query.page || 1}`,
       );
 
-      console.log(
-        'getSavePostData() fetch data 中的result:',
-        result.output.data,
-      );
       if (result.output.error === '無收藏') {
         setPosts([]);
       } else {
@@ -131,8 +124,10 @@ export default function AccountCollect({ onPageChange }) {
         setPosts(result.output.data); // 更新posts狀態
         setPages({ page: result.page, totalPages: result.totalPages });
       }
+      setIsFetched(true);
     } catch (error) {
       console.error('Failed to fetch post collection:', error);
+      setIsFetched(true);
     }
   };
 
@@ -140,6 +135,7 @@ export default function AccountCollect({ onPageChange }) {
   useEffect(() => {
     const fetchCheck = async () => {
       open();
+      setIsFetched(false);
       if (auth.id === 0 || !router.isReady) {
         close();
         return;
@@ -173,21 +169,10 @@ export default function AccountCollect({ onPageChange }) {
   //     ([postId, _]) => postId
   //   );
 
-  //   // 如果有未保存的貼文，則觸發重新渲染更新
-  //   // if (hasUnsavedPosts && falseKey !== undefined) {
-  //   // console.log('posts:', posts);
-  //   // console.log('savedPosts:', savedPosts); //{293: false, 294: true, 295: true, 296: true, 297: true, 298: true}
-  //   // console.log('有未保存的貼文，unsavedPosts:', unsavedPosts); //[Array(2), Array(2), Array(2), Array(2), Array(2)]
-  //   // console.log('unsavedPostsWithFalseStatus:', unsavedPosts。WithFalseStatus); //[Array(2)] ['293', false]
-  //   // console.log('unsavedPostIds:', unsavedPostIds); // ['293']
-
   //   if (!unsavedPostIds.length) return;
-  //   // console.log('有未保存的貼文，觸發重新渲染更新');
-
   //   const newSavedPosts = posts.filter(
   //     (post) => !unsavedPostIds.includes(post.post_id.toString())
   //   );
-  //   // console.log('newSavedPosts:', newSavedPosts);
   //   setPosts(newSavedPosts);
   //   setPostModalToggle(false);
   //   // }
@@ -280,8 +265,8 @@ export default function AccountCollect({ onPageChange }) {
               </div>
               {/* TabBar END */}
 
-              {isLoading ? (
-                <CollectLoader />
+              {isLoading || !isFetched ? (
+                <AccountLoader type="post" />
               ) : (
                 <>
                   <div
@@ -344,7 +329,6 @@ export default function AccountCollect({ onPageChange }) {
 
                               <RxCrossCircled
                                 onClick={async () => {
-                                  console.log('post.save_id:', post.save_id);
                                   const result = await AccountService.collectPost.delete(
                                     post.save_id,
                                   );
@@ -364,11 +348,6 @@ export default function AccountCollect({ onPageChange }) {
                                 <span
                                   onClick={() => {
                                     handlePostClick(post, post.post_id);
-                                    // console.log('點下詳細的postID', post.post_id);
-                                    // setPostModalToggle(post.post_id);
-                                    // setP({ post });
-                                    // setModalId(post.post_id);
-                                    // handleShowModal(post.post_id);
                                   }}
                                   onMouseEnter={() => handleArrowHover(i, true)}
                                   onMouseLeave={() =>
@@ -391,7 +370,7 @@ export default function AccountCollect({ onPageChange }) {
                         </div>
                       ))
                     ) : (
-                      <EmptyCollection itemType="貼文" linkPath="/community" />
+                      isFetched && <EmptyCollection itemType="貼文" linkPath="/community" />
                     )}
                     <PostModal
                       className={`z-[100]`}

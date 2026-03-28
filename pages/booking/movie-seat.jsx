@@ -84,7 +84,7 @@ export default function MovieSeatSelection({ onPageChange }) {
           borderColor: '#A0FF1F',
         }}
         onClick={() =>
-          (window.location.href = '../../../booking/booking-confirm')
+          router.push('/booking/booking-confirm')
         }
       >
         座位確認

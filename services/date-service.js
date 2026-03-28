@@ -78,7 +78,9 @@ export const DateService = {
   sendFriendRequest: (data) => apiClient.post('/date/friends-list', data),
 
   /**
-   * 獲取好友狀態與資訊
+   * 獲取已接受的好友列表
+   * @param {string|number} userId
    */
-  getFriendships: () => apiClient('/date/friends-list'),
+  getAcceptedFriends: (userId) =>
+    apiClient(`/date/friends-list/accepted/${userId}`),
 };

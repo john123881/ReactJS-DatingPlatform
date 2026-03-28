@@ -6,6 +6,7 @@ import {
   ACCOUNT_COLLECT_BAR_DELETE,
   ACCOUNT_COLLECT_MOVIE,
   ACCOUNT_COLLECT_MOVIE_DELETE,
+  ACCOUNT_GAME_RECORD_POST,
 } from '@/configs/api-config';
 
 export const AccountService = {
@@ -45,10 +46,11 @@ export const AccountService = {
 
   /**
    * 上傳遊戲紀錄
-   * @param {object} record - { auth_id, gameScore, gameTime }
+   * @param {string|number} sid
+   * @param {object} record - { gameScore, gameTime }
    */
-  uploadGameRecord: (record) =>
-    apiClient.post('/account/game-record-upload', record),
+  uploadGameRecord: (sid, record) =>
+    apiClient.post(`${ACCOUNT_GAME_RECORD_POST}/${sid}`, record),
 
   /**
    * 讀取點數紀錄

@@ -20,7 +20,7 @@ export default function BarTypeCards(bar, key) {
               <div className="w-[254px] hover:text-black">
                 <img
                   className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
-                  src="https://www.themagnificentmile.com/assets/Uploads/_resampled/CroppedFocusedImageWzE0MDAsNjAwLCJ5IiwxNjZd/Right-Field-Booth2.jpg"
+                  src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=254&h=248"
                   alt="運動酒吧"
                 />
               </div>
@@ -44,7 +44,7 @@ export default function BarTypeCards(bar, key) {
               <div className="w-[254px]">
                 <img
                   className="object-cover w-[254px] h-[248px] rounded-[10px] opacity-50 hover:opacity-100"
-                  src="https://hongkongcheapo.com/wp-content/uploads/sites/7/2020/03/Hong-Kong-music-venue_Peel-Fresco_by-Peel-Fresco.jpg"
+                  src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=254&h=248"
                   width={253}
                   alt="音樂酒吧"
                 />

@@ -22,14 +22,12 @@ export default function BarList({ onPageChange }) {
   const { auth } = useAuth();
 
   const getBarList = async () => {
-    console.log('Token:', auth);
 
     try {
       const res = await fetch(`${API_BASE_URL}/bar/bar-list`, {
         headers: { Authorization: 'Bearer ' + auth.token },
       });
       const data = await res.json();
-      console.log('json', data);
       // if (!data.success) {
       //   // alert('error');
       //   return;
@@ -76,7 +74,6 @@ export default function BarList({ onPageChange }) {
   // }, [selectedAreaId]);
 
   const handleAreaSelected = (areaId) => {
-    console.log('Selected Area ID: ', areaId);
     setSelectedAreaId(areaId);
   };
 

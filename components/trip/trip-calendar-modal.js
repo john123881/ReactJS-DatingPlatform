@@ -21,7 +21,6 @@ export default function TripCalendarModal({ tripName }) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log('Fetched Trip Data:', data);
       setTrips(data);
     } catch (error) {
       console.error('Fetching trips error:', error);
@@ -34,7 +33,6 @@ export default function TripCalendarModal({ tripName }) {
     const day = date.getDate();
     return { year, month, day };
   });
-  // console.log(tripDates);
 
   // 以 useState 控制 modal 的開關
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -160,8 +158,6 @@ export default function TripCalendarModal({ tripName }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // console.log('tripDate:', tripDate);
-    // console.log('tripTitle:', tripTitle);
     try {
       const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
         method: 'POST',
@@ -181,11 +177,9 @@ export default function TripCalendarModal({ tripName }) {
       if (!response.ok) {
         throw new Error(data.msg || 'Network response was not ok');
       }
-      console.log('Trip plan created successfully:', data);
       closeModal();
 
       const newTripPlanId = data.tripPlanId;
-      console.log(newTripPlanId);
       const newPath = `/trip/my-trip/detail/${newTripPlanId}`;
       Router.push(newPath);
     } catch (error) {

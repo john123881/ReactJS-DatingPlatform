@@ -25,8 +25,6 @@ export default function BarPhotoMy({
   const [showDetails, setShowDetails] = useState(false); // 控制顯示 Bar 細節的狀態
   const { open, close, isLoading } = useLoader();
 
-  // console.log(barDetails);
-
   useEffect(() => {
     const fetchBarImage = async () => {
       open();
@@ -50,13 +48,9 @@ export default function BarPhotoMy({
         );
         if (imageData && imageData.bar_img && imageData.bar_img.data) {
           const base64String = bufferToBase64(imageData.bar_img.data);
-          // console.log(
-          //   'Generated Base64 Image URL:',
-          //   `data:image/jpeg;base64,${base64String}`
-          // );
           setImageSrc1(`data:image/jpeg;base64,${base64String}`);
         } else {
-          console.log('No bar_img found or data is incorrect');
+          // No bar_img found
         }
       } catch (error) {
         console.error('Error fetching the image:', error);
@@ -89,9 +83,8 @@ export default function BarPhotoMy({
             name: filteredData[0].bar_name,
             description: filteredData[0].bar_description,
           });
-          // console.log(barDetails);
         } else {
-          console.log('No bar_name found');
+          // No bar_name found
         }
       } catch (error) {
         console.error('Error fetching the bar_name:', error);

@@ -6,7 +6,6 @@ import MoviePhotoMy from './movie-photo-my';
 import { useLoader } from '@/context/use-loader';
 
 export default function ContentMorning({ trip_plan_id, newDetail }) {
-  // console.log('Received trip_plan_id in ContentMorning:', trip_plan_id);
   const [tripDetails, setTripDetails] = useState({});
   const { close, isLoading } = useLoader();
 
@@ -48,10 +47,8 @@ export default function ContentMorning({ trip_plan_id, newDetail }) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      // console.log('Fetched TripDetail Data:', data);
       if (data && data.length > 0) {
         setTripDetails(data[0]);
-        // console.log('Setting tripDetail to:', data[0]);
       } else {
         setTripDetails({ block: null });
       }

@@ -29,13 +29,10 @@ export default function MyTrip({ onPageChange }) {
   const today = new Date();
   today.setHours(today.getHours() + 8); // 加八個小時
   const localDate = today.toISOString().split('T')[0];
-  // console.log(getAuthHeader());
-  // console.log(auth.id);
   const fetchTrips = useCallback(async () => {
     open();
     try {
       const data = await apiClient.get('/trip/trip-plans');
-      console.log('Fetched Trip Data:', data);
       setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
@@ -54,7 +51,6 @@ export default function MyTrip({ onPageChange }) {
     open();
     try {
       const data = await apiClient.get('/trip/other-plans');
-      console.log('Fetched Other Trip Data:', data);
       setOtherTrips(data || []);
     } catch (error) {
       console.error('Fetching other trips error:', error);
@@ -97,7 +93,6 @@ export default function MyTrip({ onPageChange }) {
         trip_draft: 0
       };
 
-      console.log('Attempting trip creation with full payload:', fullPayload);
 
       let data;
       try {
@@ -117,10 +112,8 @@ export default function MyTrip({ onPageChange }) {
         });
       }
 
-      console.log('Final Backend Response:', data);
 
       if (data && (data.success !== false && data.success !== 'false')) {
-        console.log('Trip plan created successfully:', data);
         closeModal();
 
         const newTripPlanId = data.tripPlanId || data.insertId || data.id;

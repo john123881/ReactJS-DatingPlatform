@@ -8,7 +8,7 @@ import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './page.module.css';
 import PageTitle from '@/components/page-title';
-import IndexLoader from '@/components/account-center/loader/index-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 
 export default function Events({ onPageChange }) {
@@ -47,7 +47,7 @@ export default function Events({ onPageChange }) {
               dataLength={events.length}
               next={getCommunityEvents}
               hasMore={eventHasMore}
-              loader={<IndexLoader minHeight="200px" />}
+              loader={<AccountLoader type="index" minHeight="200px" />}
               // endMessage={<p>No more events</p>}
               style={{
                 display: 'flex',

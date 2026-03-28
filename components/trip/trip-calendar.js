@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
 import Swal from 'sweetalert2';
 import { apiClient } from '@/services/api-client';
-import IndexLoader from '@/components/account-center/loader/index-loader';
+import AccountLoader from '@/components/account-center/loader/account-loader';
 
 
 function truncateChinese(title, maxChineseChars = 7) {
@@ -30,9 +30,6 @@ function truncateChinese(title, maxChineseChars = 7) {
 export default function TripCalendar() {
   const { auth } = useAuth();
   const [trips, setTrips] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // console.log(getAuthHeader());
 
   useEffect(() => {
     if (auth.id === 0) return;
@@ -43,7 +40,6 @@ export default function TripCalendar() {
     try {
       setIsLoading(true);
       const data = await apiClient.get('/trip/trip-plans');
-      console.log('Fetched Trip Data:', data);
       setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
@@ -59,7 +55,6 @@ export default function TripCalendar() {
     const day = date.getDate();
     return { year, month, day };
   });
-  // console.log(tripDates);
 
   // 以 useState 控制 modal 的開關
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -199,8 +194,6 @@ export default function TripCalendar() {
         trip_draft: 0
       };
 
-      console.log('Attempting trip creation with full payload:', fullPayload);
-
       let data;
       try {
         // 根據您的分析，後端目前直接將 req.body 丟給 Service，因此我們預設發送 FLAT 結構
@@ -219,8 +212,6 @@ export default function TripCalendar() {
           tripPlan: fullPayload
         });
       }
-
-      console.log('Final Backend Response:', data);
 
       if (data && (data.success !== false && data.success !== 'false')) {
         console.log('Trip plan created successfully:', data);
@@ -257,7 +248,7 @@ export default function TripCalendar() {
   if (isLoading) {
     return (
       <div className="min-h-[calc(100vh-200px)] flex flex-col justify-center items-center bg-black">
-        <IndexLoader />
+        <AccountLoader type="index" />
       </div>
     );
   }

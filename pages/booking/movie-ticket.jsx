@@ -18,7 +18,7 @@ export default function Index({ onPageChange }) {
       const data = await BookingService.getBookingSystem();
       setMovieCards(data);
     } catch (error) {
-      console.log('Failed to fetch movie card', error);
+      console.error('Failed to fetch movie card', error);
     }
   };
 
