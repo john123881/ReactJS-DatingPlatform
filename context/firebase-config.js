@@ -1,18 +1,18 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-// 這裡貼上從firebase專案設定中，網頁應用程式整合的設定值
+// 從環境變數讀取 Firebase 設定，避免金鑰洩漏到 GitHub
 const firebaseConfig = {
-  apiKey: 'AIzaSyCfa1Dw2BuYrWOIp0N2BVm739tTXo8LV2g',
-  authDomain: 'taipei-date-auth.firebaseapp.com',
-  projectId: 'taipei-date-auth',
-  storageBucket: 'taipei-date-auth.appspot.com',
-  messagingSenderId: '847875930005',
-  appId: '1:847875930005:web:7e48af8370b926dbf8a89c',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 export { firebaseConfig };
 
 const app = initializeApp(firebaseConfig);
 
-export const getAuthGoogle = getAuth();
+export const getAuthGoogle = getAuth(app);

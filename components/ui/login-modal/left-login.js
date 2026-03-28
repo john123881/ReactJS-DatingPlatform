@@ -74,7 +74,7 @@ export default function LeftLogin({ switchHandler }) {
       toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
         id: toastId,
       });
-    }, 10000);
+    }, 5000);
 
     try {
       const jsonResult = await fetchGoogleLogin(user);
@@ -93,8 +93,12 @@ export default function LeftLogin({ switchHandler }) {
       }
     } catch (e) {
       clearTimeout(timeoutId);
-      toast.error(`${e}`, { id: toastId });
-      console.log('error:', e);
+      console.error('Firebase Auth Error Details:', {
+        code: e.code,
+        message: e.message,
+        fullError: e
+      });
+      toast.error(`登入錯誤: ${e.code || e.message || e}`, { id: toastId });
     }
 
     // fetchGoogleLogin(user);
@@ -124,7 +128,7 @@ export default function LeftLogin({ switchHandler }) {
         toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
           id: toastId,
         });
-      }, 10000);
+      }, 5000);
 
       try {
         const result = await login(values.email, values.password);
