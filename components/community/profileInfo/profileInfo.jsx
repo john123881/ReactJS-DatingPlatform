@@ -5,6 +5,9 @@ import { usePostContext } from '@/context/post-context';
 import FollowerModal from '../modal/followerModal';
 import FollowingModal from '../modal/followingModal';
 import { CommunityService } from '@/services/community-service';
+import IndexLoader from '@/components/account-center/loader/index-loader';
+import { getImageUrl } from '@/services/image-utils';
+
 
 export default function ProfileInfo() {
   const { auth } = useAuth();
@@ -23,6 +26,7 @@ export default function ProfileInfo() {
   const [localUserInfo, setLocalUserInfo] = useState({});
   const [userFollowers, setUserFollowers] = useState([]);
   const [userFollowings, setUserFollowings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userId = auth.id;
 
@@ -133,14 +137,23 @@ export default function ProfileInfo() {
   };
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null) {
-      getFollowUsers();
-      getPostsCount();
-      getLocalUserInfo();
-      getFollowers();
-      getFollowings();
+    if (auth.id !== undefined && auth.id !== null && uid) {
+      setIsLoading(true);
+      Promise.all([
+        getFollowUsers(),
+        getPostsCount(),
+        getLocalUserInfo(),
+        getFollowers(),
+        getFollowings(),
+      ]).finally(() => {
+        setIsLoading(false);
+      });
     }
   }, [uid]);
+
+  if (isLoading) {
+    return <IndexLoader minHeight="200px" />;
+  }
 
   return (
     <>
@@ -151,7 +164,7 @@ export default function ProfileInfo() {
             <div className="avatar">
               <div className="w-32 rounded-full">
                 <img
-                  src={localUserInfo.avatar || '/unknown-user-image.jpg'}
+                  src={getImageUrl(localUserInfo.avatar, 'avatar')}
                   alt={localUserInfo.username || 'No Image Available'}
                 />
               </div>

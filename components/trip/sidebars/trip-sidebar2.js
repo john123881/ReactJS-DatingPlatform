@@ -4,6 +4,9 @@ import { useRouter } from 'next/router';
 import { AiFillPicture } from 'react-icons/ai';
 import Swal from 'sweetalert2';
 import { API_BASE_URL } from '@/configs/api-config';
+import { apiClient } from '@/services/api-client';
+import { getImageUrl } from '@/services/image-utils';
+
 
 function truncateChinese(title, maxChineseChars = 7) {
   let chineseCharCount = 0;
@@ -90,40 +93,32 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
   const shareTrip = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/share/${trip_plan_id}`,
-        { method: 'POST' },
-      );
-      const data = await response.json();
-      if (response.ok && data.success !== false) {
-        const newTrip = { ...trip, trip_draft: 1 };
-        setTrip(newTrip);
+      const data = await apiClient.post(`/trip/my-details/share/${trip_plan_id}`);
+      if (data.success !== false) {
+        setTrip((prev) => ({ ...prev, trip_draft: 1 }));
       } else {
-        throw new Error(data.error || data.message || data.msg || 'Sharing failed');
+        throw new Error(data.error || data.message || '分享失敗');
       }
     } catch (error) {
       console.error('Error sharing the trip:', error);
       alert('分享失敗: ' + error.message);
     }
   };
+
   const UnShareTrip = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/unshare/${trip_plan_id}`,
-        { method: 'POST' },
-      );
-      const data = await response.json();
-      if (response.ok && data.success !== false) {
-        const newTrip = { ...trip, trip_draft: 0 };
-        setTrip(newTrip);
+      const data = await apiClient.post(`/trip/my-details/unshare/${trip_plan_id}`);
+      if (data.success !== false) {
+        setTrip((prev) => ({ ...prev, trip_draft: 0 }));
       } else {
-        throw new Error(data.error || data.message || data.msg || 'Unsharing failed');
+        throw new Error(data.error || data.message || '取消分享失敗');
       }
     } catch (error) {
       console.error('Error unsharing the trip:', error);
       alert('取消分享失敗: ' + error.message);
     }
   };
+
   //////上傳圖片測試////////////////
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -139,20 +134,18 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
     const formData = new FormData();
     formData.append('tripPic', selectedFile);
-    console.log([...formData]);
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/photo/${trip_plan_id}`,
-        {
-          method: 'POST',
-          body: formData,
-        },
-      );
+      // apiClient 會自動處理 FormData 並移除 Content-Type
+      const result = await apiClient.post(`/trip/my-details/photo/${trip_plan_id}`, formData);
 
-      const result = await response.json();
-      if (response.ok && result.success !== false) {
-        closeNewTripCoverModal(); // 上傳成功後關閉模態框
+      if (result.success !== false) {
+        // 更新本地 state 以便即時顯示新圖片
+        if (result.filename) {
+          setTrip((prev) => ({ ...prev, trip_pic: result.filename }));
+        }
+        
+        closeNewTripCoverModal();
         Swal.fire({
           icon: 'success',
           title: '成功',
@@ -161,18 +154,14 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
           background: 'rgba(0,0,0,0.85)',
         });
       } else {
-        throw new Error(result.message || result.error || '網絡響應不正常或上傳失敗');
+        throw new Error(result.message || result.error || '上傳失敗');
       }
     } catch (error) {
-      if (error instanceof SyntaxError) {
-        console.error('JSON 解析錯誤:', error);
-        alert('服務器返回格式錯誤！');
-      } else {
-        console.error('上傳圖片出錯:', error);
-        alert('上傳圖片失敗！');
-      }
+      console.error('上傳圖片出錯:', error);
+      alert('上傳失敗: ' + error.message);
     }
   };
+
 
   ////////////////////////////////
 
@@ -180,30 +169,37 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const url = `${API_BASE_URL}/trip/my-details/DnN/${trip_plan_id}`;
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trip_description: tripDescription,
-          trip_notes: tripNote,
-        }),
+      const result = await apiClient.post(`/trip/my-details/DnN/${trip_plan_id}`, {
+        trip_description: tripDescription,
+        trip_notes: tripNote,
       });
 
-      const result = await response.json();
-      if (!response.ok || result.success === false) {
-        throw new Error(result.message || result.error || 'Failed to update trip details.');
+      if (result.success !== false) {
+        console.log('Trip details updated successfully:', result);
+        // 更新本地 trip 物件以反映更改
+        setTrip(prev => ({
+          ...prev,
+          trip_description: tripDescription,
+          trip_notes: tripNote
+        }));
+        closeNewTripNoteModal();
+        Swal.fire({
+          icon: 'success',
+          title: '已更新',
+          text: '行程筆記已保存!',
+          confirmButtonColor: '#A0FF1F',
+          background: 'rgba(0,0,0,0.85)',
+        });
+      } else {
+        throw new Error(result.message || result.error || '更新失敗');
       }
-      console.log('Trip details updated successfully:', result);
-      closeNewTripNoteModal();
     } catch (error) {
       console.error('Error updating trip details:', error);
       alert('更新失敗: ' + error.message);
     }
   };
+
   ////////////////////////////////////
 
   // 更新 actionButton 按鈕的 useEffect (for sharing)
@@ -427,7 +423,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
                 <form
                   onSubmit={(e) => e.preventDefault()}
                   method="post"
-                  enctype="multipart/form-data"
+                  encType="multipart/form-data"
                 >
                   <div className="modal-box w-96">
                     <h3 className="mb-4 text-lg font-bold text-white">

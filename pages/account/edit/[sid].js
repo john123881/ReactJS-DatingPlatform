@@ -258,7 +258,7 @@ export default function AccountEdit({ onPageChange }) {
             <Breadcrumbs currentPage={currentPage} />
 
             {isLoading ? (
-              <EditLoader />
+              <EditLoader minHeight="500px" />
             ) : (
               <>
                 {' '}

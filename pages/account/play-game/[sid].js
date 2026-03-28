@@ -59,7 +59,7 @@ export default function AccountPlayGame({ onPageChange }) {
             <div className="relative p-1 mx-auto mockup-phone">
               <div className="absolute top-0 left-0 camera"></div>
               <div className="min-h-[582px] flex flex-col min-w-[350px]  display w-full border  bg-base-300  border-slate-700 rounded-box">
-                {isLoading ? <PGLoader /> : <GameComponent />}
+                {isLoading ? <PGLoader minHeight="500px" /> : <GameComponent />}
               </div>
             </div>
             {/* CONTENT1 END */}

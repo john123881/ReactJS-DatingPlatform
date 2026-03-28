@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { usePostContext } from '@/context/post-context';
 import { useAuth } from '@/context/auth-context';
@@ -10,6 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from '../page.module.css';
 import PageTitle from '@/components/page-title';
 import { CommunityService } from '@/services/community-service';
+import IndexLoader from '@/components/account-center/loader/index-loader';
 
 export default function Profile({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -33,17 +34,19 @@ export default function Profile({ onPageChange }) {
     reload,
   } = usePostContext();
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const { uid } = router.query;
 
   const getCommunityUserProfilePost = useCallback(
     async (page = profilePage) => {
-      if (!userProfileHasMore) return; // 防止重複請求
+      if (!uid) return;
       try {
         const data = await CommunityService.getPostsByUser(uid, page, 12);
 
         if (data.length === 0) {
-          setUserProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
-          return; // 提前停止加載
+          setUserProfileHasMore(false);
+          return;
         }
 
         const postIds = data.map((post) => post.post_id).join(',');
@@ -54,12 +57,12 @@ export default function Profile({ onPageChange }) {
           getPostComments(postIds),
         ]);
 
-        setProfilePosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
-        setProfilePage((prevPage) => prevPage + 1); // 更新頁碼
-        // setIsLoading(false); // 結束加載
+        setProfilePosts((prevPosts) => [...prevPosts, ...data]);
+        setProfilePage((prevPage) => prevPage + 1);
       } catch (error) {
-        console.error('Failed to fetch index posts:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
+        console.error('Failed to fetch user posts:', error);
+      } finally {
+        setIsLoading(false);
       }
     },
     [
@@ -76,20 +79,13 @@ export default function Profile({ onPageChange }) {
   );
 
   useEffect(() => {
-    // Next.js 的路由器是異步, 確保拿到 uid 再 fetch !!! Important
-    if (auth.id !== undefined && auth.id !== null && uid && profilePosts.length === 0) {
-      setProfilePosts([]); // 清空現有貼文
+    if (auth.id !== undefined && auth.id !== null && uid) {
+      setProfilePosts([]);
       setUserProfileHasMore(true);
-      // setProfilePage(1);
-
-      // 直接在這裡設置 profilePage 為 1 並立即執行資料加載
-      setProfilePage((prevPage) => {
-        const newPage = 1;
-        getCommunityUserProfilePost(newPage); // 使用更新後的頁碼執行加載
-        return newPage;
-      });
+      setIsLoading(true);
+      setProfilePage(1);
+      getCommunityUserProfilePost(1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.id, uid, reload]); // uid 變化時重新調用, 或是重複點擊則 reload
 
   return (
@@ -109,43 +105,33 @@ export default function Profile({ onPageChange }) {
           </div>
 
           <div className="flex flex-col md:w-10/12 items-center">
-            {/* info area */}
-            <ProfileInfo posts={profilePosts} />
-            {/* post area */}
-            <div className="flex flex-wrap gap-5 justify-center">
-              <InfiniteScroll
-                dataLength={profilePosts.length}
-                next={getCommunityUserProfilePost}
-                hasMore={userProfileHasMore}
-                loader={
-                  <div
+            {isLoading ? (
+              <IndexLoader minHeight="500px" />
+            ) : (
+              <>
+                {/* info area */}
+                <ProfileInfo />
+                {/* post area */}
+                <div className="flex flex-wrap gap-5 justify-center">
+                  <InfiniteScroll
+                    dataLength={profilePosts.length}
+                    next={getCommunityUserProfilePost}
+                    hasMore={userProfileHasMore}
+                    loader={<IndexLoader minHeight="200px" />}
                     style={{
                       display: 'flex',
-                      width: '100%',
-                      textAlign: 'center',
-                      minHeight: '100vh',
+                      flexWrap: 'wrap',
                       justifyContent: 'center',
-                      alignItems: 'center',
+                      gap: '1.25rem',
                     }}
                   >
-                    <div className={`${styles[`lds-heart`]}`}>
-                      <div></div>
-                    </div>
-                  </div>
-                }
-                // endMessage={<p>No more posts</p>}
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  gap: '1.25rem',
-                }}
-              >
-                {profilePosts.map((post, i) => (
-                  <ProfileCard post={post} key={i} />
-                ))}
-              </InfiniteScroll>
-            </div>
+                    {profilePosts.map((post, i) => (
+                      <ProfileCard post={post} key={i} />
+                    ))}
+                  </InfiniteScroll>
+                </div>
+              </>
+            )}
             {/* <div className="md:flex md:flex-wrap md:gap-5 md:justify-center hidden">
                 {posts.map((_, index) => (
                   <ProfileCard key={index} />

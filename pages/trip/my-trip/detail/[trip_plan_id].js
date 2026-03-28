@@ -7,15 +7,19 @@ import ContentNight from '@/components/trip/my-content/contentNight';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { apiClient } from '@/services/api-client';
+import IndexLoader from '@/components/account-center/loader/index-loader';
+
 
 export default function MyTripDetail({ onPageChange }) {
   const router = useRouter();
 
   const { trip_plan_id } = router.query;
-  const [tripDetails, setTripDetails] = useState({}); //用於儲存從trip_calendar中獲取的值
-  const [tripName, setTripName] = useState({}); //用於儲存從trip_plans中獲取的值
+  const [tripDetails, setTripDetails] = useState({}); //用於儲存從trip_calendar中獲獲取的值
+  const [tripName, setTripName] = useState({}); //用於儲存從trip_plans中獲獲取的值
   const [newDetail, setNewDetail] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
   const pageTitle = '行程規劃';
   useEffect(() => {
     onPageChange(pageTitle);
@@ -27,73 +31,57 @@ export default function MyTripDetail({ onPageChange }) {
     }
   }, [trip_plan_id, router]);
 
-  //trip_calendar 的資料
+  // 整合資料獲取
   useEffect(() => {
-    if (trip_plan_id) {
-      const fetchTripDetails = async () => {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          setTripDetails(data[0]);
-        } catch (error) {
-          console.error('Fetching trip details error:', error);
-        }
-      };
+    if (!trip_plan_id || trip_plan_id === 'undefined') return;
 
-      fetchTripDetails();
-    }
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [detailsData, nameData, allDayData] = await Promise.all([
+          apiClient.get(`/trip/my-details/${trip_plan_id}`),
+          apiClient.get(`/trip/my-details/trip-plan/${trip_plan_id}`),
+          apiClient.get(`/trip/my-details/allday-content/${trip_plan_id}`)
+        ]);
+
+        if (detailsData && detailsData.length > 0) {
+          setTripDetails(detailsData[0]);
+        }
+        
+        if (nameData) {
+          setTripName(nameData);
+        }
+
+        if (allDayData && allDayData.length > 0) {
+          setNewDetail(allDayData);
+        } else {
+          setNewDetail({ block: null });
+        }
+      } catch (error) {
+        console.error('Fetching trip detail data error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [trip_plan_id]);
 
-  //trip_plans 的資料
-  useEffect(() => {
-    if (trip_plan_id) {
-      const fetchTripName = async () => {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          if (data) {
-            setTripName(data);
-          }
-        } catch (error) {
-          console.error('Fetching trip details error:', error);
-        }
-      };
-
-      fetchTripName();
-    }
-  }, [trip_plan_id]);
-
-  //傳遞給子元件的函數 用於重新渲染頁面 針對三個時段的行程細節
+  // 為子元件保留的刷新函數
   const refreshAllDetails = useCallback(async () => {
     if (!trip_plan_id) return;
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`,
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+      const data = await apiClient.get(`/trip/my-details/allday-content/${trip_plan_id}`);
       if (data && data.length > 0) {
         setNewDetail(data);
       } else {
         setNewDetail({ block: null });
       }
     } catch (error) {
-      console.error('Fetching trip details error:', error);
-      setNewDetail({ block: null });
+      console.error('Refreshing trip details error:', error);
     }
   }, [trip_plan_id]);
+
 
 
 
@@ -102,7 +90,16 @@ export default function MyTripDetail({ onPageChange }) {
 
   //TODO
   //根據時段是否有行程決定顯示的內容
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen justify-center items-center">
+        <IndexLoader />
+      </div>
+    );
+  }
+
   return (
+
     <>
       <PageTitle pageTitle={pageTitle} />
       <div className="flex flex-col min-h-screen">

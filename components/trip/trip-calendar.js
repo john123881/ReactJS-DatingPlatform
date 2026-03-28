@@ -5,8 +5,10 @@ import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
-import { API_BASE_URL } from '@/configs/api-config';
 import Swal from 'sweetalert2';
+import { apiClient } from '@/services/api-client';
+import IndexLoader from '@/components/account-center/loader/index-loader';
+
 
 function truncateChinese(title, maxChineseChars = 7) {
   let chineseCharCount = 0;
@@ -26,8 +28,10 @@ function truncateChinese(title, maxChineseChars = 7) {
 }
 
 export default function TripCalendar() {
-  const { auth, getAuthHeader } = useAuth();
+  const { auth } = useAuth();
   const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   // console.log(getAuthHeader());
 
   useEffect(() => {
@@ -37,19 +41,17 @@ export default function TripCalendar() {
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
-        headers: { ...getAuthHeader() },
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+      setIsLoading(true);
+      const data = await apiClient.get('/trip/trip-plans');
       console.log('Fetched Trip Data:', data);
-      setTrips(data);
+      setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   const tripDates = trips.map((trip) => {
     const date = new Date(trip.trip_date);
     const year = date.getFullYear();
@@ -184,43 +186,62 @@ export default function TripCalendar() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // console.log('tripDate:', tripDate);
-    // console.log('tripTitle:', tripTitle);
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeader(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tripPlan: {
-            user_id: auth.id,
-            trip_date: modalDate,
-            trip_title: tripTitle,
-          },
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || data.error || data.msg || 'Network response was not ok');
-      }
-      console.log('Trip plan created successfully:', data);
-      closeModal();
+      // 建立完整承載，補齊所有可能的資料庫欄位，避免 NOT NULL 約束衝突
+      const fullPayload = {
+        user_id: auth.id,
+        trip_date: modalDate,
+        trip_title: tripTitle,
+        trip_content: '',
+        trip_notes: '',
+        trip_description: '',
+        trip_pic: null,
+        trip_draft: 0
+      };
 
-      const newTripPlanId = data.tripPlanId || data.insertId || data.id;
-      if (!newTripPlanId) {
-          throw new Error('未取得行程ID');
+      console.log('Attempting trip creation with full payload:', fullPayload);
+
+      let data;
+      try {
+        // 根據您的分析，後端目前直接將 req.body 丟給 Service，因此我們預設發送 FLAT 結構
+        data = await apiClient.post('/trip/trip-plans/add', fullPayload);
+        
+        // 重要：如果後端回傳 200 但 success 為 false，手動切換到 nested 嘗試
+        if (data && data.success === false) {
+           console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
+           data = await apiClient.post('/trip/trip-plans/add', {
+             tripPlan: fullPayload
+           });
+        }
+      } catch (e) {
+        console.warn('First attempt failed with error, retrying with Nested payload...', e);
+        data = await apiClient.post('/trip/trip-plans/add', {
+          tripPlan: fullPayload
+        });
       }
-      console.log(newTripPlanId);
-      const newPath = `/trip/my-trip/detail/${newTripPlanId}`;
-      Router.push(newPath);
+
+      console.log('Final Backend Response:', data);
+
+      if (data && (data.success !== false && data.success !== 'false')) {
+        console.log('Trip plan created successfully:', data);
+        closeModal();
+
+        const newTripPlanId = data.tripPlanId || data.insertId || data.id;
+        const flatData = await apiClient.post('/trip/trip-plans/add', payload);
+        if (flatData.success !== false) {
+            closeModal();
+            const flatId = flatData.tripPlanId || flatData.insertId || flatData.id;
+            Router.push(`/trip/my-trip/detail/${flatId}`);
+        } else {
+            throw new Error(flatData.message || flatData.error || '新增資料到資料庫時出錯');
+        }
+      }
     } catch (error) {
       console.error('Creating trip plan error:', error);
       Swal.fire({
         icon: 'error',
         title: '新增失敗',
-        text: error.message || '發生未知錯誤',
+        text: error.message || '連線錯誤或資料結構不符',
         background: '#2a303c',
         color: '#ffffff',
         confirmButtonColor: '#a0ff1f',
@@ -232,7 +253,17 @@ export default function TripCalendar() {
     }
   };
 
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[calc(100vh-200px)] flex flex-col justify-center items-center bg-black">
+        <IndexLoader />
+      </div>
+    );
+  }
+
   return (
+
     <>
       <div className="min-h-[calc(100vh-200px)] flex flex-col justify-center items-center bg-black mb-5">
         <div className="flex justify-center items-center gap-12 sm:mb-10 mb-2 mt-2">

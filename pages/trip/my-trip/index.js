@@ -3,14 +3,14 @@ import TripSidebar from '../../../components/trip/sidebars/trip-sidebar';
 import TripCardMy from '../../../components/trip/trip-card-my';
 import TripCard from '@/components/trip/trip-card';
 import { useAuth } from '@/context/auth-context';
-import { jwtDecode } from 'jwt-decode';
 import Router from 'next/router';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
 import Swal from 'sweetalert2';
+import { apiClient } from '@/services/api-client';
+
 
 export default function MyTrip({ onPageChange }) {
   const pageTitle = '行程規劃';
@@ -34,53 +34,39 @@ export default function MyTrip({ onPageChange }) {
   const fetchTrips = useCallback(async () => {
     open();
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
-        headers: { ...getAuthHeader() },
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+      const data = await apiClient.get('/trip/trip-plans');
       console.log('Fetched Trip Data:', data);
-      setTrips(data);
+      setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
     }
     close();
-  }, [getAuthHeader, open, close]);
+  }, [open, close]);
 
   useEffect(() => {
     if (auth.id === 0) return;
     fetchTrips();
-    // 解密 jwt 並設置 user_id
-    if (jwt) {
-      const decoded = jwtDecode(jwt);
-      setUserId(decoded.id);
-    }
-  }, [auth.id, fetchTrips, getAuthHeader]);
+    // 這裡原本有 jwt 解碼邏輯，但 auth.id 已經可用，故移除。
+  }, [auth.id, fetchTrips]);
+
   /////////////在尚無行程時顯示其他人的推薦行程//////////////////////
   const fetchOtherTrips = useCallback(async () => {
     open();
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
-        headers: { ...getAuthHeader() },
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      console.log('Fetched Trip Data:', data);
-      setOtherTrips(data);
+      const data = await apiClient.get('/trip/other-plans');
+      console.log('Fetched Other Trip Data:', data);
+      setOtherTrips(data || []);
     } catch (error) {
-      console.error('Fetching trips error:', error);
+      console.error('Fetching other trips error:', error);
     }
     close();
-  }, [getAuthHeader, open, close]);
+  }, [open, close]);
 
   useEffect(() => {
     if (auth.id === 0) return;
     fetchOtherTrips();
-  }, [auth.id, fetchOtherTrips]); // 防止重複執行
+  }, [auth.id, fetchOtherTrips]);
+
   ////////////////////////////////////////////////////////
   const onDeleteSuccess = useCallback((tripPlanId) => {
     // 過濾掉被刪除的行程
@@ -98,46 +84,71 @@ export default function MyTrip({ onPageChange }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // console.log('tripDate:', tripDate);
-    // console.log('tripTitle:', tripTitle);
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeader(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tripPlan: {
-            user_id: auth.id,
-            trip_date: tripDate,
-            trip_title: tripTitle,
-          },
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || data.error || data.msg || 'Network response was not ok');
-      }
-      console.log('Trip plan created successfully:', data);
-      closeModal();
+      // 建立完整承載，補齊所有可能的資料庫欄位，避免 NOT NULL 約束衝突
+      const fullPayload = {
+        user_id: auth.id,
+        trip_date: tripDate,
+        trip_title: tripTitle,
+        trip_content: '',
+        trip_notes: '',
+        trip_description: '',
+        trip_pic: null,
+        trip_draft: 0
+      };
 
-      const newTripPlanId = data.tripPlanId || data.insertId || data.id;
-      if (!newTripPlanId) {
-          throw new Error('未取得行程ID');
+      console.log('Attempting trip creation with full payload:', fullPayload);
+
+      let data;
+      try {
+        // 預設發送 FLAT 結構
+        data = await apiClient.post('/trip/trip-plans/add', fullPayload);
+        
+        if (data && data.success === false) {
+           console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
+           data = await apiClient.post('/trip/trip-plans/add', {
+             tripPlan: fullPayload
+           });
+        }
+      } catch (e) {
+        console.warn('First attempt failed, retrying with Nested payload...', e);
+        data = await apiClient.post('/trip/trip-plans/add', {
+          tripPlan: fullPayload
+        });
       }
-      console.log(newTripPlanId);
-      const newPath = `/trip/my-trip/detail/${newTripPlanId}`;
-      Router.push(newPath);
+
+      console.log('Final Backend Response:', data);
+
+      if (data && (data.success !== false && data.success !== 'false')) {
+        console.log('Trip plan created successfully:', data);
+        closeModal();
+
+        const newTripPlanId = data.tripPlanId || data.insertId || data.id;
+        if (newTripPlanId) {
+          router.push(`/trip/my-trip/detail/${newTripPlanId}`);
+        } else {
+          fetchTrips();
+        }
+      } else {
+        throw new Error(data.message || data.error || '新增資料到資料庫時出錯');
+      }
     } catch (error) {
       console.error('Creating trip plan error:', error);
       Swal.fire({
         icon: 'error',
         title: '新增失敗',
-        text: error.message || '發生未知錯誤',
+        text: error.message || '連線錯誤或資料結構不符',
+        background: '#2a303c',
+        color: '#ffffff',
+        confirmButtonColor: '#a0ff1f',
+        customClass: {
+          confirmButton: 'text-black font-bold border-none px-6 py-2',
+          popup: 'border-2 border-[#a0ff1f] rounded-box shadow-[0_0_20px_rgba(160,255,31,0.3)]'
+        }
       });
     }
   };
+
   const recommend = (
     <div className="flex flex-wrap justify-center mx-5 my-5 min-h-screen">
       <div className="flex flex-col items-center justify-start w-full max-w-4xl sm:mt-24">

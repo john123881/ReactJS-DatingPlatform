@@ -8,6 +8,8 @@ import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './page.module.css';
 import PageTitle from '@/components/page-title';
+import IndexLoader from '@/components/account-center/loader/index-loader';
+
 
 export default function Events({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -45,22 +47,7 @@ export default function Events({ onPageChange }) {
               dataLength={events.length}
               next={getCommunityEvents}
               hasMore={eventHasMore}
-              loader={
-                <div
-                  style={{
-                    display: 'flex',
-                    width: '100%',
-                    textAlign: 'center',
-                    minHeight: '100vh',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div className={`${styles[`lds-heart`]}`}>
-                    <div></div>
-                  </div>
-                </div>
-              }
+              loader={<IndexLoader minHeight="200px" />}
               // endMessage={<p>No more events</p>}
               style={{
                 display: 'flex',

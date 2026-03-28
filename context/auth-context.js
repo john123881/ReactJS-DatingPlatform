@@ -101,6 +101,19 @@ export function AuthContextProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    const handleAuthExpired = () => {
+      console.warn('Auth session expired globally - resetting state.');
+      setAuth(emptyAuth);
+      setLoginModalToggle(true);
+    };
+
+    window.addEventListener('auth:expired', handleAuthExpired);
+    return () => {
+      window.removeEventListener('auth:expired', handleAuthExpired);
+    };
+  }, [setAuth, setLoginModalToggle]);
+
+  useEffect(() => {
     const str = localStorage.getItem(storageKey);
     try {
       const data = JSON.parse(str);

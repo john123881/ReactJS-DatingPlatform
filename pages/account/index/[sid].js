@@ -126,7 +126,7 @@ export default function AccountIndex({ onPageChange }) {
             <BurgerMenu currentPage={currentPage} />
             <Breadcrumbs currentPage={currentPage} />
             {isLoading ? (
-              <IndexLoader />
+              <IndexLoader minHeight="500px" />
             ) : (
               <>
                 <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">

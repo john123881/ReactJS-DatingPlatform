@@ -56,25 +56,65 @@ export async function apiClient(endpoint, { body, ...customConfig } = {}) {
 
   const response = await fetch(fullUrl, config);
 
-  if (response.status === 401) {
-    // 處理未授權情況 (例如：Token 過期)
-    console.warn('Unauthorized request - 401');
-    // 可在此加入全局登出邏輯或跳轉
+  if (response.status === 401 || response.status === 438) {
+    console.warn(`Auth error detected - status ${response.status}`);
+    localStorage.removeItem('TD_auth');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('auth:expired'));
+    }
   }
 
+  const contentType = response.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+
   if (!response.ok) {
-    let errorMessage = response.statusText;
-    try {
-      const errorData = await response.json();
-      errorMessage =
-        errorData.message || errorData.error || errorData.msg || errorMessage;
-    } catch (e) {
-      // 忽略解析錯誤，使用預設的 statusText
+    let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+    if (isJson) {
+      try {
+        const errorData = await response.json();
+        const msg = errorData.message || errorData.error || errorData.msg;
+        if (msg) {
+          errorMessage = msg;
+        }
+      } catch (e) {
+        console.error('Error parsing JSON from non-OK response:', e);
+      }
+    } else {
+      try {
+        const text = await response.text();
+        if (text && text.length < 500) {
+          errorMessage = text;
+        }
+      } catch (e) {
+        console.error('Error reading text from non-OK response:', e);
+      }
     }
+
+    // Special Global Handling: If the error message indicates success (contains "成功"), 
+    // we log it as a warning but DO NOT throw, instead returning the message body. 
+    // This handles inconsistent backends that return non-200 for successful operations.
+    if (errorMessage.includes('成功')) {
+      console.warn(`Backend returned non-OK status (${response.status}) but message indicates success: "${errorMessage}"`);
+      return { success: true, message: errorMessage, data: null };
+    }
+
+    // Global Handling for Auth Expiry Messages
+    if (errorMessage.includes('沒授權TOKEN') || errorMessage.includes('授權失敗')) {
+      localStorage.removeItem('TD_auth');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:expired'));
+      }
+      errorMessage = '工作階段已過期，請重新登入';
+    }
+
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  if (isJson) {
+    return response.json();
+  } else {
+    return response.text();
+  }
 }
 
 // 輔助方法：GET

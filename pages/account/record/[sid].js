@@ -54,19 +54,14 @@ export default function AccountRecord({ onPageChange }) {
 
       const nweQuery = { ...router.query, page: prevPage };
 
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-      // console.log('prevPageQS:', queryString);
-
-      // 更新路由的 query string
       router.push(
         {
-          pathname: router.pathname, // 將 pathname 設置到 url 中
-          query: nweQuery, // 將 query 設置到 url 中
+          pathname: router.pathname,
+          query: nweQuery,
         },
         undefined,
         { scroll: false },
-      ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+      );
     }
   };
   const handlePointNextPage = (e) => {
@@ -77,21 +72,16 @@ export default function AccountRecord({ onPageChange }) {
         ...recordListPoint,
         page: nextPage,
       }));
-      // 獲取當前路由的 query string
       const nweQuery = { ...router.query, page: nextPage };
 
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-
-      // 更新路由的 query string
       router.push(
         {
-          pathname: router.pathname, // 將 pathname 設置到 url 中
-          query: nweQuery, // 將 query 設置到 url 中
+          pathname: router.pathname,
+          query: nweQuery,
         },
         undefined,
         { scroll: false },
-      ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+      );
     }
   };
 
@@ -106,19 +96,14 @@ export default function AccountRecord({ onPageChange }) {
 
       const nweQuery = { ...router.query, page: prevPage };
 
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-      // console.log('prevPageQS:', queryString);
-
-      // 更新路由的 query string
       router.push(
         {
-          pathname: router.pathname, // 將 pathname 設置到 url 中
-          query: nweQuery, // 將 query 設置到 url 中
+          pathname: router.pathname,
+          query: nweQuery,
         },
         undefined,
         { scroll: false },
-      ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+      );
     }
   };
   const handleGameNextPage = (e) => {
@@ -129,41 +114,32 @@ export default function AccountRecord({ onPageChange }) {
         ...recordListGame,
         page: nextPage,
       }));
-      // 獲取當前路由的 query string
       const nweQuery = { ...router.query, page: nextPage };
 
-      // 構建新的 URL
-      // const queryString = new URLSearchParams(query).toString();
-
-      // 更新路由的 query string
       router.push(
         {
-          pathname: router.pathname, // 將 pathname 設置到 url 中
-          query: nweQuery, // 將 query 設置到 url 中
+          pathname: router.pathname,
+          query: nweQuery,
         },
         undefined,
         { scroll: false },
-      ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+      );
     }
   };
 
   //處理積分來源
   const handlePointSource = (e) => {
     const selectedValue = e.target.value;
-    // if (selectedValue === '選擇') {
-    //   return;
-    // }
     setPointSource(selectedValue);
 
-    // 更新路由的 query string
     router.push(
       {
-        pathname: router.pathname, // 將 pathname 設置到 url 中
-        query: { ...router.query, selectedValue, page: 1 }, // 將 query 設置到 url 中,選擇來源時，頁面要回到第一頁
+        pathname: router.pathname,
+        query: { ...router.query, selectedValue, page: 1 },
       },
       undefined,
       { scroll: false },
-    ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+    );
   };
 
   //處理日期開始
@@ -172,12 +148,12 @@ export default function AccountRecord({ onPageChange }) {
     setValueDateBegin(newValueDateBegin);
     router.push(
       {
-        pathname: router.pathname, // 將 pathname 設置到 url 中
-        query: { ...router.query, date_begin: newValueDateBegin, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
+        pathname: router.pathname,
+        query: { ...router.query, date_begin: newValueDateBegin, page: 1 },
       },
       undefined,
       { scroll: false },
-    ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+    );
   };
 
   //處理日期結束
@@ -186,34 +162,32 @@ export default function AccountRecord({ onPageChange }) {
     setValueDateEnd(newValueDateEnd);
     router.push(
       {
-        pathname: router.pathname, // 將 pathname 設置到 url 中
-        query: { ...router.query, date_end: newValueDateEnd, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
+        pathname: router.pathname,
+        query: { ...router.query, date_end: newValueDateEnd, page: 1 },
       },
       undefined,
       { scroll: false },
-    ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+    );
   };
 
   //處理日期排序
   const handleDateSort = () => {
     const newDateSortToggle = !dateSortToggle;
     const sort = newDateSortToggle ? 'ASC' : 'DESC';
-    // 更新路由的 query string
     router.push(
       {
-        pathname: router.pathname, // 將 pathname 設置到 url 中
-        query: { ...router.query, sortDate: sort, page: 1 }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
+        pathname: router.pathname,
+        query: { ...router.query, sortDate: sort, page: 1 },
       },
       undefined,
       { scroll: false },
-    ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
+    );
     setDateSortToggle(newDateSortToggle);
   };
 
   //處理類型排序
   const handleSort = (field) => {
     const newField = field;
-    console.log('點擊後的類型是:', newField);
     let sort = '';
     if (
       router.query.sortField === newField &&
@@ -225,22 +199,19 @@ export default function AccountRecord({ onPageChange }) {
     }
     const newSortDirection = sort === 'ASC' ? true : false;
 
-    // console.log('點擊後的sort是:', sort);
-    // console.log('點擊後的sortDirection是:', newSortDirection);
     router.push(
       {
-        pathname: router.pathname, // 將 pathname 設置到 url 中
+        pathname: router.pathname,
         query: {
           ...router.query,
           sortDirection: sort,
           sortField: newField,
           page: 1,
-        }, // 將 query 設置到 url 中,選擇排序時，頁面要回到第一頁
+        },
       },
       undefined,
       { scroll: false },
-    ); // 將 scroll 選項設置到 options 中，undefined 表示忽略 as 參數
-    // console.log('點擊後router.push.query是:', router.query);
+    );
     setSortDirection(newSortDirection);
     setSortField(newField);
   };
@@ -278,7 +249,6 @@ export default function AccountRecord({ onPageChange }) {
         const result = await r.json();
         if (!isSubscribed) return;
 
-        console.log('積分紀錄資料:', result);
         if (result.output?.error === '無相關紀錄') {
           setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
           toast.error(result.output.error, { duration: 1500 });
@@ -333,7 +303,6 @@ export default function AccountRecord({ onPageChange }) {
         const result = await r.json();
         if (!isSubscribed) return;
 
-        console.log('遊戲紀錄資料:', result);
         if (result.output?.error === '無相關紀錄') {
           setRecordListGame({ rows: [], page: 0, totalPages: 0 });
           toast.error(result.output.error, { duration: 1500 });
@@ -359,6 +328,7 @@ export default function AccountRecord({ onPageChange }) {
       close();
     };
   }, [gameRecordOpen, router.query, auth.id, getAuthHeader, router.isReady, checkAuth, open, close]);
+
   //進頁面做唯一次渲染
   useEffect(() => {
     onPageChange(pageTitle);
@@ -514,7 +484,11 @@ export default function AccountRecord({ onPageChange }) {
                 </thead>
                 <tbody className="relative">
                   {isLoading ? (
-                    <RecordLoader2 />
+                    <tr>
+                      <td colSpan="3" className="p-0 border-0">
+                        <RecordLoader2 minHeight="450px" />
+                      </td>
+                    </tr>
                   ) : (
                     <>
                       {recordListPoint.rows &&
@@ -540,43 +514,25 @@ export default function AccountRecord({ onPageChange }) {
                   )}
                 </tbody>
               </table>
-              {isLoading ? (
-                <>
-                  <div className="mb-3 skeleton join bg-base-200 min-h-[32px]"></div>
-                </>
-              ) : (
-                <>
-                  <div className="mb-3 join bg-base-200">
-                    <button
-                      className={`
+              {!isLoading && recordListPoint.totalPages > 1 && (
+                <div className="mb-3 join bg-base-200">
+                  <button
+                    className={`
                       ${Number(router.query.page) > 1 ? ' ' : 'btn-disabled'}
                       join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                      onClick={handlePointPrevPage}
-                    >
-                      «
-                    </button>
+                    onClick={handlePointPrevPage}
+                  >
+                    «
+                  </button>
 
-                    {[...Array(5)].map((v, i) => {
+                  {[...Array(Math.min(5, recordListPoint.totalPages))].map(
+                    (v, i) => {
                       let p =
                         recordListPoint.page <= 5
                           ? 1 + i
                           : recordListPoint.page + i;
 
-                      if (p < 1) return null;
-
-                      if (p > recordListPoint.totalPages)
-                        return (
-                          <button
-                            key={p}
-                            className={`${
-                              p === recordListPoint.page
-                                ? 'text-neongreen '
-                                : ''
-                            } btn-disabled max-w-[25px] join-item btn border-slate-700 hover:bg-primary hover:text-dark btn-xs `}
-                          >
-                            {p}
-                          </button>
-                        );
+                      if (p < 1 || p > recordListPoint.totalPages) return null;
 
                       return (
                         <button
@@ -603,10 +559,11 @@ export default function AccountRecord({ onPageChange }) {
                           {p}
                         </button>
                       );
-                    })}
+                    },
+                  )}
 
-                    <button
-                      className={`
+                  <button
+                    className={`
                       ${
                         router.query.page ===
                           recordListPoint.totalPages.toString() ||
@@ -615,12 +572,11 @@ export default function AccountRecord({ onPageChange }) {
                           : ''
                       }
                       join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                      onClick={handlePointNextPage}
-                    >
-                      »
-                    </button>
-                  </div>
-                </>
+                    onClick={handlePointNextPage}
+                  >
+                    »
+                  </button>
+                </div>
               )}
             </div>
             {/* CONTENT1 END */}
@@ -631,7 +587,7 @@ export default function AccountRecord({ onPageChange }) {
                 gameRecordOpen ? 'block ' : 'hidden '
               } lg:mx-1 xl:mx-1 bg-base-300 rounded-box place-items-center `}
             >
-              <table className="container table py-4">
+              <table className="container table py-4 bg-base-300">
                 <thead className="w-full ">
                   <tr className="border-b border-slate-500 min-h-[52px]">
                     <th
@@ -710,7 +666,11 @@ export default function AccountRecord({ onPageChange }) {
                 </thead>
                 <tbody className="relative">
                   {isLoading ? (
-                    <RecordLoader3 />
+                    <tr>
+                      <td colSpan="3" className="p-0 border-0">
+                        <RecordLoader3 minHeight="450px" />
+                      </td>
+                    </tr>
                   ) : (
                     <>
                       {recordListGame.rows &&
@@ -727,7 +687,11 @@ export default function AccountRecord({ onPageChange }) {
                                 {v.game_score}
                               </td>
                               <td className="text-base text-center ">
-                                {v.game_time ? (v.game_time.includes('T') ? v.game_time.split('T')[1].substring(0, 8) : v.game_time) : ''}
+                                {v.game_time
+                                  ? v.game_time.includes('T')
+                                    ? v.game_time.split('T')[1].substring(0, 8)
+                                    : v.game_time
+                                  : ''}
                               </td>
                             </tr>
                           );
@@ -736,42 +700,25 @@ export default function AccountRecord({ onPageChange }) {
                   )}
                 </tbody>
               </table>
-              {isLoading ? (
-                <>
-                  {' '}
-                  <div className="mb-3 skeleton join bg-base-200 min-h-[32px]"></div>
-                </>
-              ) : (
-                <>
-                  <div className="mb-3 join bg-base-200">
-                    <button
-                      className={`
-      ${Number(router.query.page) > 1 ? ' ' : 'btn-disabled'}
-      join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                      onClick={handleGamePrevPage}
-                    >
-                      «
-                    </button>
+              {!isLoading && recordListGame.totalPages > 1 && (
+                <div className="mb-3 join bg-base-200">
+                  <button
+                    className={`
+                      ${Number(router.query.page) > 1 ? ' ' : 'btn-disabled'}
+                      join-item btn border-slate-700 hover:bg-primary btn-xs`}
+                    onClick={handleGamePrevPage}
+                  >
+                    «
+                  </button>
 
-                    {[...Array(5)].map((v, i) => {
+                  {[...Array(Math.min(5, recordListGame.totalPages))].map(
+                    (v, i) => {
                       let p =
                         recordListGame.page <= 5
                           ? 1 + i
                           : recordListGame.page + i;
 
-                      if (p < 1) return null;
-
-                      if (p > recordListGame.totalPages)
-                        return (
-                          <button
-                            key={p}
-                            className={`${
-                              p === recordListGame.page ? 'text-neongreen ' : ''
-                            } btn-disabled max-w-[25px] join-item btn border-slate-700 hover:bg-primary hover:text-dark btn-xs `}
-                          >
-                            {p}
-                          </button>
-                        );
+                      if (p < 1 || p > recordListGame.totalPages) return null;
 
                       return (
                         <button
@@ -798,26 +745,25 @@ export default function AccountRecord({ onPageChange }) {
                           {p}
                         </button>
                       );
-                    })}
+                    },
+                  )}
 
-                    <button
-                      className={`
-      ${
-        router.query.page === recordListGame.totalPages.toString() ||
-        recordListGame.totalPages === 0
-          ? ' btn-disabled'
-          : ''
-      }
-      join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                      onClick={handleGameNextPage}
-                    >
-                      »
-                    </button>
-                  </div>
-                </>
+                  <button
+                    className={`
+                      ${
+                        router.query.page ===
+                          recordListGame.totalPages.toString() ||
+                        recordListGame.totalPages === 0
+                          ? ' btn-disabled'
+                          : ''
+                      }
+                      join-item btn border-slate-700 hover:bg-primary btn-xs`}
+                    onClick={handleGameNextPage}
+                  >
+                    »
+                  </button>
+                </div>
               )}
-              {/* <div className="mb-3 join bg-base-200">
-              </div> */}
             </div>
             {/* CONTENT2 END */}
           </div>

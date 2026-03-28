@@ -1,31 +1,22 @@
-import { useLottie } from 'lottie-react';
+import Lottie from 'lottie-react';
 import loginBackgroundAnima from './login-background.json';
 
-import Lottie from 'react-lottie';
-
 export default function LoginBackgroundAnimation({ isOnLogin }) {
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: loginBackgroundAnima,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
+  const style = {
+    height: 550,
+    borderRadius: '24px',
+    transform: isOnLogin ? 'scaleX(-1)' : 'none',
+    transition: 'transform 0.5s ease-in-out',
   };
+
   return (
-    <>
-      <div
-        // className="rounded-[24px]"
-        style={{
-          transform: isOnLogin ? 'scaleX(-1)' : 'none',
-        }}
-      >
-        <Lottie
-          options={defaultOptions}
-          height={550}
-          style={{ borderRadius: '24px' }}
-        />
-      </div>
-    </>
+    <div className="flex justify-center items-center overflow-hidden rounded-[24px]">
+      <Lottie
+        animationData={loginBackgroundAnima}
+        loop={true}
+        autoPlay={true}
+        style={style}
+      />
+    </div>
   );
 }

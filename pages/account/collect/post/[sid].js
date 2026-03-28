@@ -111,7 +111,7 @@ export default function AccountCollect({ onPageChange }) {
     try {
       const result = await AccountService.collectPost.get(
         router.query.sid,
-        location.search,
+        `?page=${router.query.page || 1}`,
       );
 
       console.log(
@@ -156,7 +156,7 @@ export default function AccountCollect({ onPageChange }) {
     };
 
     fetchCheck();
-  }, [router.isReady, router.query.sid, auth.id, radio, rerender, checkAuth, close, open]);
+  }, [router.isReady, router.query.sid, router.query.page, auth.id, radio, rerender, checkAuth, close, open]);
 
   //當modal中做收藏的動作
   // useEffect(() => {
@@ -401,75 +401,67 @@ export default function AccountCollect({ onPageChange }) {
                     />
 
                     {/* Pagination START */}
-                    <div className="mb-3 join bg-base-100">
-                      {/* 上一頁按紐 */}
-                      <button
-                        className={`
-                      ${Number(router.query.page) > 1 ? ' ' : 'btn-disabled'}
-                      join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                        onClick={handlePrevPage}
-                      >
-                        «
-                      </button>
-                      {/* 分頁按紐 */}
-                      {[...Array(5)].map((v, i) => {
-                        let p = pages.page <= 5 ? 1 + i : pages.page + i;
+                    {pages.totalPages >= 1 && (
+                      <div className="mb-3 join bg-base-100">
+                        {/* 上一頁按紐 */}
+                        <button
+                          className={`
+                        ${Number(router.query.page) > 1 ? ' ' : 'btn-disabled'}
+                        join-item btn border-slate-700 hover:bg-primary btn-xs`}
+                          onClick={handlePrevPage}
+                        >
+                          «
+                        </button>
+                        {/* 分頁按紐 */}
+                        {[...Array(Math.min(5, pages.totalPages))].map(
+                          (v, i) => {
+                            let p = pages.page <= 5 ? 1 + i : pages.page + i;
 
-                        if (p < 1) return null;
+                            if (p < 1 || p > pages.totalPages) return null;
 
-                        if (p > pages.totalPages)
-                          return (
-                            <button
-                              key={p}
-                              className={`${
-                                p === pages.page ? 'text-neongreen ' : ''
-                              } btn-disabled max-w-[25px] join-item btn border-slate-700 hover:bg-primary hover:text-dark btn-xs `}
-                            >
-                              {p}
-                            </button>
-                          );
-
-                        return (
-                          <button
-                            key={p}
-                            style={{
-                              transition: 'transform 0.2s ease-in-out',
-                            }}
-                            className={`${
-                              p === pages.page ? 'text-neongreen ' : ''
-                            } join-item btn max-w-[25px] border-slate-700 hover:bg-primary hover:text-dark btn-xs hover:sm:scale-[1.1]  hover:sm:translate-y-[-5px]`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const nweQuery = { ...router.query, page: p };
-                              router.push(
-                                {
-                                  pathname: router.pathname,
-                                  query: nweQuery,
-                                },
-                                // undefined,
-                                // { scroll: false }
-                              );
-                            }}
-                          >
-                            {p}
-                          </button>
-                        );
-                      })}
-                      {/* 下一頁按紐 */}
-                      <button
-                        className={`
-                      ${
-                        parseInt(router.query.page) === pages.totalPages ||
-                        pages.totalPages === 0
-                          ? ' btn-disabled'
-                          : ''
-                      }
-                      join-item btn border-slate-700 hover:bg-primary btn-xs`}
-                        onClick={handleNextPage}
-                      >
-                        »
-                      </button>
-                    </div>
+                            return (
+                              <button
+                                key={p}
+                                style={{
+                                  transition: 'transform 0.2s ease-in-out',
+                                }}
+                                className={`${
+                                  p === pages.page ? 'text-neongreen ' : ''
+                                } join-item btn max-w-[25px] border-slate-700 hover:bg-primary hover:text-dark btn-xs hover:sm:scale-[1.1]  hover:sm:translate-y-[-5px]`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  const nweQuery = { ...router.query, page: p };
+                                  router.push(
+                                    {
+                                      pathname: router.pathname,
+                                      query: nweQuery,
+                                    },
+                                    undefined,
+                                    { scroll: false },
+                                  );
+                                }}
+                              >
+                                {p}
+                              </button>
+                            );
+                          },
+                        )}
+                        {/* 下一頁按紐 */}
+                        <button
+                          className={`
+                        ${
+                          parseInt(router.query.page) === pages.totalPages ||
+                          pages.totalPages === 0
+                            ? ' btn-disabled'
+                            : ''
+                        }
+                        join-item btn border-slate-700 hover:bg-primary btn-xs`}
+                          onClick={handleNextPage}
+                        >
+                          »
+                        </button>
+                      </div>
+                    )}
                     {/* Pagination START */}
                     {/* CONTENT1 END */}
                   </div>

@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {
   BsFillPersonFill,
@@ -11,11 +12,16 @@ import { useAuth } from '@/context/auth-context';
 
 export default function Sidebar({ currentPage }) {
   const { auth } = useAuth();
+  const router = useRouter();
+
+  const handleNav = (path) => {
+    router.push(path);
+  };
 
   return (
     <>
       <div className="z-40 sm:z-0 sm:block">
-        <div className="*//drawer sm:drawer-open">
+        <div className="drawer sm:drawer-open">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
           <div className="drawer-side">
@@ -52,26 +58,26 @@ export default function Sidebar({ currentPage }) {
                 </Link>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <div
                   className={`${
                     currentPage === '更改密碼' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/password-change/${auth.id}`}
+                  } text-base cursor-pointer`}
+                  onClick={() => handleNav(`/account/password-change/${auth.id}`)}
                 >
                   <BsFillKeyFill />
                   更改密碼
-                </Link>
+                </div>
               </li>
               <li className="hover:text-neongreen">
-                <Link
+                <div
                   className={`${
                     currentPage === '遊玩遊戲' ? 'text-neongreen' : ''
-                  } text-base`}
-                  href={`/account/play-game/${auth.id}`}
+                  } text-base cursor-pointer`}
+                  onClick={() => handleNav(`/account/play-game/${auth.id}`)}
                 >
                   <BsDpadFill />
                   遊玩遊戲
-                </Link>
+                </div>
               </li>
               <li className="hover:text-neongreen">
                 <Link

@@ -16,14 +16,6 @@ export default function WithContent({
   const [movieTitle, setMovieTitle] = useState('');
   const { open, close, isLoading } = useLoader();
 
-  useEffect(() => {
-    console.log('Received imageSrc in WithContent:', imageSrc);
-  }, [imageSrc]);
-
-  useEffect(() => {
-    console.log(tripDetails);
-  }, [tripDetails]);
-
   const openDeleteModal = () => {
     setDeleteContent(true);
     // 調用 showModal 方法以開啟對話框

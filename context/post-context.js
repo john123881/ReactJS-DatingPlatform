@@ -1010,38 +1010,34 @@ export const PostProvider = ({ children }) => {
       if (interactingItems.current.has(`like-${postId}`)) return;
       interactingItems.current.add(`like-${postId}`);
 
-      // 先獲取當前狀態
-      let wasLiked = false;
+      // 獲取當前狀態並進行樂觀更新
+      let prevLikedState = false;
       setLikedPosts((prev) => {
-        wasLiked = prev[postId] || false;
-        return prev;
+        prevLikedState = prev[postId] || false;
+        return { ...prev, [postId]: !prevLikedState };
       });
 
-      const newLikedState = !wasLiked;
-
       try {
-        const result = wasLiked
+        const result = prevLikedState
           ? await CommunityService.unlikePost(userId, postId)
           : await CommunityService.likePost(userId, postId);
 
         console.log('Like interaction result:', result);
 
         if (
-          result.success ||
+          !(result.success ||
           result.output?.success ||
           result.status === 'success' ||
           result.status === 'ok' ||
           result.msg?.includes('成功') ||
-          result.message?.includes('成功')
+          result.message?.includes('成功'))
         ) {
-          setLikedPosts((prev) => ({ ...prev, [postId]: newLikedState }));
-        } else {
-          throw new Error(
-            result.message || result.msg || 'Failed to update like status',
-          );
+          throw new Error('Failed to update like status');
         }
       } catch (error) {
-        console.error('Error updating like status:', error);
+        console.error('Error updating like status, reverting:', error);
+        // 發生錯誤，還原回先前的狀態
+        setLikedPosts((prev) => ({ ...prev, [postId]: prevLikedState }));
       } finally {
         interactingItems.current.delete(`like-${postId}`);
       }
@@ -1061,35 +1057,39 @@ export const PostProvider = ({ children }) => {
       if (interactingItems.current.has(`attend-${eventId}`)) return;
       interactingItems.current.add(`attend-${eventId}`);
 
-      const wasAttended = attendedEvents[eventId] || false;
-      const newAttendedState = !wasAttended;
+      const prevAttendedState = attendedEvents[eventId] || false;
+      const newAttendedState = !prevAttendedState;
+
+      // 樂觀更新
+      setAttendedEvents((prev) => ({
+        ...prev,
+        [eventId]: newAttendedState,
+      }));
 
       try {
-        const result = wasAttended
+        const result = prevAttendedState
           ? await CommunityService.notAttendEvent(userId, eventId)
           : await CommunityService.attendEvent(userId, eventId);
 
         console.log('Attendance interaction result:', result);
 
         if (
-          result.success ||
+          !(result.success ||
           result.output?.success ||
           result.status === 'success' ||
           result.status === 'ok' ||
           result.msg?.includes('成功') ||
-          result.message?.includes('成功')
+          result.message?.includes('成功'))
         ) {
-          setAttendedEvents((prev) => ({
-            ...prev,
-            [eventId]: newAttendedState,
-          }));
-        } else {
-          throw new Error(
-            result.message || result.msg || 'Failed to update attendance status',
-          );
+          throw new Error('Failed to update attendance status');
         }
       } catch (error) {
-        console.error('Error updating event attendance:', error);
+        console.error('Error updating event attendance, reverting:', error);
+        // 還原
+        setAttendedEvents((prev) => ({
+          ...prev,
+          [eventId]: prevAttendedState,
+        }));
       } finally {
         interactingItems.current.delete(`attend-${eventId}`);
       }
@@ -1109,11 +1109,14 @@ export const PostProvider = ({ children }) => {
       if (interactingItems.current.has(`save-${postId}`)) return;
       interactingItems.current.add(`save-${postId}`);
 
-      const wasSaved = savedPosts[postId] || false;
-      const newSavedState = !wasSaved;
+      const prevSavedState = savedPosts[postId] || false;
+      const newSavedState = !prevSavedState;
+
+      // 樂觀更新
+      setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
 
       try {
-        const result = wasSaved
+        const result = prevSavedState
           ? await CommunityService.unsavePost(userId, postId)
           : await CommunityService.savePost(userId, postId);
 
@@ -1128,14 +1131,13 @@ export const PostProvider = ({ children }) => {
           result.message?.includes('成功')
         ) {
           setRerender(!rerender);
-          setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
         } else {
-          throw new Error(
-            result.message || result.msg || 'Failed to update save status',
-          );
+          throw new Error('Failed to update save status');
         }
       } catch (error) {
-        console.error('Error updating save status:', error);
+        console.error('Error updating save status, reverting:', error);
+        // 還原
+        setSavedPosts((prev) => ({ ...prev, [postId]: prevSavedState }));
       } finally {
         interactingItems.current.delete(`save-${postId}`);
       }
@@ -1152,29 +1154,35 @@ export const PostProvider = ({ children }) => {
       if (interactingItems.current.has(`follow-${FollowingId}`)) return;
       interactingItems.current.add(`follow-${FollowingId}`);
 
-      const isFollowing = following[FollowingId] || false; // 檢查是否已追蹤該用戶
-      const newFollowingState = !isFollowing; // 新的追蹤狀態為當前狀態的反向值
+      const prevFollowingState = following[FollowingId] || false;
+      const newFollowingState = !prevFollowingState;
+
+      // 樂觀更新
+      setFollowing((prev) => ({
+        ...prev,
+        [FollowingId]: newFollowingState,
+      }));
 
       try {
-        const result = isFollowing
+        const result = prevFollowingState
           ? await CommunityService.unfollowUser(userId, FollowingId)
           : await CommunityService.followUser(userId, FollowingId);
 
         if (
-          result.success ||
+          !(result.success ||
           result.output?.success ||
           result.msg?.includes('成功') ||
-          result.message?.includes('成功')
+          result.message?.includes('成功'))
         ) {
-          setFollowing((prev) => ({
-            ...prev,
-            [FollowingId]: newFollowingState,
-          }));
-        } else {
           throw new Error('Failed to update follow status');
         }
       } catch (error) {
-        console.error('Error updating follow status:', error);
+        console.error('Error updating follow status, reverting:', error);
+        // 還原
+        setFollowing((prev) => ({
+          ...prev,
+          [FollowingId]: prevFollowingState,
+        }));
       } finally {
         interactingItems.current.delete(`follow-${FollowingId}`);
       }

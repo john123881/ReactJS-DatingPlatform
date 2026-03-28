@@ -125,7 +125,7 @@ export default function AccountPasswordChange({ onPageChange }) {
             <Breadcrumbs currentPage={currentPage} />
 
             {isLoading ? (
-              <CPLoader />
+              <CPLoader minHeight="500px" />
             ) : (
               <>
                 <form autoComplete="on" onSubmit={handleSubmit}>

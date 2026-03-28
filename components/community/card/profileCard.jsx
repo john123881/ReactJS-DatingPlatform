@@ -1,6 +1,8 @@
 import PostModal from '../modal/postModal';
 import { usePostContext } from '@/context/post-context';
 import styles from './card.module.css';
+import { getImageUrl } from '@/services/image-utils';
+
 
 export default function ProfileCard({ post }) {
   const { postModalToggle, setPostModalToggle } = usePostContext();
@@ -30,7 +32,7 @@ export default function ProfileCard({ post }) {
               <div className={styles.parallaxContent}>
                 <div className="parallaxContentBack">
                   <img
-                    src={post.img || '/unavailable-image.jpg'}
+                    src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo w-[330px] h-[330px] object-cover`}
                   />

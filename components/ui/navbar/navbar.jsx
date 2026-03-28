@@ -16,6 +16,8 @@ import { useCollect } from '@/context/use-collect';
 import { usePostContext } from '@/context/post-context';
 import PostModal from '@/components/community/modal/postModal';
 import MovieModal from '@/components/account-center/modal/movieModal';
+import { getImageUrl } from '@/services/image-utils';
+
 
 import {
   API_SERVER,
@@ -219,7 +221,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
             className="rounded-full"
             width={24}
             height={24}
-            src={avatar || '/unknown-user-image.jpg'}
+            src={getImageUrl(avatar, 'avatar')}
             alt="使用者頭像"
           />
         </div>
@@ -563,7 +565,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                   width={24}
                   height={24}
                   alt="Tailwind CSS Navbar component"
-                  src={userAvatar ? userAvatar : `/unknown-user-image.jpg`}
+                  src={getImageUrl(userAvatar, 'avatar')}
                 />
               </div>
             </div>
