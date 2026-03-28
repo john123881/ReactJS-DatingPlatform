@@ -7,30 +7,35 @@ import Link from 'next/link';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
+import Loader from '@/components/ui/loader/loader';
 
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
-  useEffect(() => {
-    onPageChange(pageTitle);
-  }, [onPageChange, pageTitle]);
-
-  const [bar, setBar] = useState(null);
-  const currentPage = bar?.bar_name;
+  const { auth } = useAuth();
   const [savedBars, setSavedBars] = useState({});
-  // const [rerender, setRerender] = useState(false);
 
-  const { auth, getAuthHeader } = useAuth();
+  const { bar_id } = router.query;
+
+  // 使用 SWR 抓取詳情
+  const { data: bar, error, isLoading } = useSWR(
+    router.isReady && bar_id ? ['bar-detail', bar_id] : null,
+    () => BarService.getBarDetail(bar_id),
+    { revalidateOnFocus: false }
+  );
+
+  const currentPage = bar?.bar_name;
 
   // save bar
-  const isSaved = bar && savedBars[bar?.bar_id]; // Using optional chaining to safely access bar_id
+  const isSaved = bar && savedBars[bar?.bar_id];
 
   const handleSavedClick = async () => {
     if (auth.id == 0) return;
     const barId = bar.bar_id;
-    const userId = auth.id; // Ensure user is defined and has an id
+    const userId = auth.id;
 
     if (!userId) {
       console.error('User ID is undefined or not set');
@@ -45,11 +50,10 @@ export default function Detail({ onPageChange }) {
         ? await BarService.unsaveBar(userId, barId)
         : await BarService.saveBar(userId, barId);
 
-      const successText = String(result.message || result.msg || '');
-      if (result.success || successText.includes('成功')) {
+      if (result.success) {
         setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
       } else {
-        throw new Error(successText || 'Failed to update save status');
+        throw new Error(result.message || 'Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
@@ -74,218 +78,156 @@ export default function Detail({ onPageChange }) {
     [auth.id],
   );
 
-  //FETCH GET 酒吧資料
-  const getBarDetailById = useCallback(
-    async (bar_id) => {
-      try {
-        const data = await BarService.getBarDetail(bar_id);
-        setBar(data);
-        if (auth.id !== 0) {
-          checkBarsStatus(bar_id);
-        }
-      } catch (error) {
-        console.error('Failed to fetch bar detail:', error);
-      }
-    },
-    [auth.id, checkBarsStatus],
-  );
+  useEffect(() => {
+    if (bar?.bar_id && auth.id !== 0) {
+      checkBarsStatus(bar.bar_id);
+    }
+  }, [bar?.bar_id, auth.id, checkBarsStatus]);
 
   useEffect(() => {
-    if (router.isReady) {
-      //確保能得到bar_id
-      const { bar_id } = router.query;
-      // 有bar_id後，向伺服器要求資料
-      getBarDetailById(bar_id);
-    }
-  }, [router.isReady, router.query, getBarDetailById]);
+    onPageChange(pageTitle);
+  }, [onPageChange, pageTitle]);
 
-  // bar-rating-modal
   const handleLeaveReviewClick = () => {
     document.getElementById('bar-rating-modal').showModal();
   };
+
+  if (error) return <div className="pt-28 text-center text-white text-h3">載入失敗，請稍後再試</div>;
 
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
       <div className="flex flex-row justify-center pt-28">
-        {/* 留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
         <div className="w-10/12 md:w-8/12">
           <div className="text-sm breadcrumbs">
             <Breadcrumbs currentPage={currentPage} />
           </div>
-          <div className="md:space-y-12">
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="space-y-5 text-white bar-detail-content">
-                <div className="space-y-1 md:w-full">
-                  <div className="text-[18px] md:text-h3">
-                    {/* Fake Sober Taipei */}
-                    {bar?.bar_name}
+          {isLoading || !bar ? (
+            <Loader minHeight="600px" text="正在準備您的專屬酒單..." />
+          ) : (
+            <div className="md:space-y-12">
+              <div className="grid gap-8 md:grid-cols-2">
+                <div className="space-y-5 text-white bar-detail-content">
+                  <div className="space-y-1 md:w-full">
+                    <div className="text-[18px] md:text-h3">
+                      {bar?.bar_name}
+                    </div>
+                    <div className="flex items-center gap-2 review">
+                      <Link
+                        className="text-[13px] md:text-h6"
+                        href={`/bar/bar-rating-list/${bar?.bar_id}`}
+                      >
+                        {bar?.rating}
+                      </Link>
+                      <div className="flex gap-1 bar-detail-stars rating rating-sm">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <input
+                            key={i}
+                            type="radio"
+                            name="rating-6"
+                            className="mask mask-star-2 bg-[#A0FF1F]"
+                            checked={i <= Math.round(bar?.rating || 0)}
+                            readOnly
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[13px] md:text-h6">
+                        {'('}2 則評論{')'}
+                      </p>
+                    </div>
+                    <div className="flex gap-4 text-[13px] md:text-h6">
+                      <div className="text-white">
+                        {bar?.bar_area_name}
+                      </div>
+                      <div className="text-white">
+                        {bar?.bar_type_name}
+                      </div>
+                    </div>
+                    <div className="flex gap-4 telephone">
+                      <BsTelephone />
+                      <div className="text-white text-[13px] md:text-h6">
+                        {bar?.bar_contact}
+                      </div>
+                    </div>
+                    <div className="flex gap-4 address">
+                      <HiOutlineLocationMarker />
+                      <div className="text-white text-[13px] md:text-h6">
+                        {bar?.bar_addr}
+                      </div>
+                    </div>
+                    <div className="text-white text-[13px] md:text-h6 text-justify md:w-full">
+                      {bar?.bar_description}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 review">
-                    <Link
-                      className="text-[13px] md:text-h6"
-                      href={`/bar/bar-rating-list/${bar?.bar_id}`}
+                  <div className="flex items-center gap-4 bar-detail-button-group">
+                    <button onClick={handleSavedClick}>
+                      <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px]">
+                        {isSaved ? (
+                          <FaHeart className="card-icon hover:text-neongreen" />
+                        ) : (
+                          <FaRegHeart className="card-icon hover:text-neongreen" />
+                        )}
+                        加入收藏
+                      </div>
+                    </button>
+                    <div
+                      type="submit"
+                      onClick={handleLeaveReviewClick}
                     >
-                      {/* 4.6 */}
-                      {bar?.rating}
-                    </Link>
-                    <div className="flex gap-1 bar-detail-stars rating rating-sm">
-                      <input
-                        type="radio"
-                        name="rating-6"
-                        className="mask mask-star-2 bg-[#A0FF1F]"
-                        checked={true} // 這裡可以用來控制是否選中
-                        onChange={() => {}} // 只是個空處理程序
-                      />
-                      <input
-                        type="radio"
-                        name="rating-6"
-                        className="mask mask-star-2 bg-[#A0FF1F]"
-                        checked={true} // 這裡可以用來控制是否選中
-                        onChange={() => {}} // 只是個空處理程序
-                      />
-                      <input
-                        type="radio"
-                        name="rating-6"
-                        className="mask mask-star-2 bg-[#A0FF1F]"
-                        checked={true} // 這裡可以用來控制是否選中
-                        onChange={() => {}} // 只是個空處理程序
-                      />
-                      <input
-                        type="radio"
-                        name="rating-6"
-                        className="mask mask-star-2 bg-[#A0FF1F]"
-                        checked={true} // 這裡可以用來控制是否選中
-                        onChange={() => {}} // 只是個空處理程序
-                      />
-                      <input
-                        type="radio"
-                        name="rating-6"
-                        className="mask mask-star-2 bg-[#A0FF1F]"
-                        checked={true} // 這裡可以用來控制是否選中
-                        onChange={() => {}} // 只是個空處理程序
-                      />
-                    </div>
-                    <p className="text-[13px] md:text-h6">
-                      {'('}2 則評論{')'}
-                    </p>
-                  </div>
-                  <div className="flex gap-4 text-[13px] md:text-h6">
-                    <div className="text-white">
-                      {/* 大安區 */}
-                      {bar?.bar_area_name}
-                    </div>
-                    <div className="text-white">
-                      {/* 特色酒吧 */}
-                      {bar?.bar_type_name}
+                      <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px] cursor-pointer">
+                        留下評論
+                      </div>
+                      <BarRatingModal bar={bar} />
                     </div>
                   </div>
-                  <div className="flex gap-4 telephone">
-                    <BsTelephone />
-                    <div className="text-white text-[13px] md:text-h6">
-                      {/* 0227220723 */}
-                      {bar?.bar_contact}
-                    </div>
-                  </div>
-                  <div className="flex gap-4 address">
-                    <HiOutlineLocationMarker />
-                    <div className="text-white text-[13px] md:text-h6">
-                      {/* 台北市信義區松壽路20號 */}
-                      {bar?.bar_addr}
-                    </div>
-                  </div>
-                  <div className="text-white text-[13px] md:text-h6 text-justify md:w-full">
-                    {/* Fake_Sober, 位在信義威秀後方，
-                    許多人說他有美國又或是韓國感的咖啡館，半開放式的空間到了夜晚還有
-                    DJ 表演，甚至供應雞尾酒、啤酒與披薩，不趕時間的話可以很
-                    Chill
-                    的在這裡從白天待到晚間時刻，雖然那日是下午到訪，不過我們也舒服待上幾小時呢！ */}
-                    {bar?.bar_description}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 bar-detail-button-group">
-                  <button onClick={handleSavedClick}>
-                    <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px]">
-                      {isSaved ? (
-                        <FaHeart className="card-icon hover:text-neongreen" />
-                      ) : (
-                        <FaRegHeart className="card-icon hover:text-neongreen" />
-                      )}
-                      加入收藏
-                    </div>
+                  <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
+                    <Link href={`/bar/bar-booking/${bar?.bar_id}`}>立即訂位</Link>
                   </button>
-                  {/* <button>
-                    <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px]">
-                      加入行程
-                    </div>
-                  </button> */}
-                  <div
-                    type="submit"
-                    // onClick={() =>
-                    //   document.getElementById('bar-rating-modal').showModal()
-                    // }
-                    onClick={handleLeaveReviewClick}
-                  >
-                    <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px] cursor-pointer">
-                      留下評論
-                    </div>
-                    <BarRatingModal bar={bar} />
-                  </div>
                 </div>
-                <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
-                  <Link href={`/bar/bar-booking/${bar?.bar_id}`}>立即訂位</Link>
-                </button>
+                <div className="bar-detail-img">
+                  <Image
+                    className="object-cover rounded-[10px]"
+                    src={
+                      bar?.bar_pic_name
+                        ? `/barPic/${bar.bar_pic_name}`
+                        : '/unavailable-image.jpg'
+                    }
+                    alt={`Image of ${bar?.bar_name || 'bar'}`}
+                    width={440}
+                    height={400}
+                    layout="intrinsic"
+                  />
+                </div>
               </div>
-              <div className="bar-detail-img">
-                <Image
-                  className="object-cover rounded-[10px]"
-                  src={
-                    bar?.bar_pic_name
-                      ? `/barPic/${bar.bar_pic_name}`
-                      : '/unavailable-image.jpg'
-                  }
-                  alt={`Image of ${bar?.bar_name || 'bar'}`}
-                  width={440}
-                  height={400}
-                  layout="intrinsic"
-                />
+              <div className="flex my-4 google-map md:hidden">
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    bar?.bar_addr,
+                  )}&output=embed`}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  title="Store Location"
+                ></iframe>
+              </div>
+              <div className="hidden google-map md:flex">
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    bar?.bar_addr,
+                  )}&output=embed`}
+                  width="100%"
+                  height="700"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  title="Store Location"
+                ></iframe>
               </div>
             </div>
-            <div className="flex my-4 google-map md:hidden">
-              <iframe
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  bar?.bar_addr,
-                )}&output=embed`}
-                width="100%"
-                height="300"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                title="Store Location"
-              ></iframe>
-            </div>
-            <div className="hidden google-map md:flex">
-              {/* <Image
-                src="/images/googleMap.png"
-                width={1062}
-                height={741}
-                alt="map"
-                className="rounded-[20px]"
-              /> */}
-              <iframe
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  bar?.bar_addr,
-                )}&output=embed`}
-                width="100%"
-                height="700"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                title="Store Location"
-              ></iframe>
-            </div>
-          </div>
+          )}
         </div>
         <div className="w-1/12 md:w-2/12"></div>
       </div>

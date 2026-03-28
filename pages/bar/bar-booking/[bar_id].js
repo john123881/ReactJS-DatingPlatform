@@ -4,23 +4,28 @@ import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import Image from 'next/image';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
+import Loader from '@/components/ui/loader/loader';
 
 export default function Booking({ onPageChange }) {
   const pageTitle = '酒吧訂位';
   const router = useRouter();
-  useEffect(() => {
-    onPageChange(pageTitle);
-  }, [onPageChange, pageTitle]);
-
   const { auth } = useAuth();
 
-  const [booking, setBooking] = useState([]);
-  const currentPage = booking[0]?.bar_name;
+  const { bar_id } = router.query;
+
+  // 使用 SWR 抓取酒吧詳情
+  const { data: bar, error, isLoading } = useSWR(
+    router.isReady && bar_id ? ['bar-detail', bar_id] : null,
+    () => BarService.getBarDetail(bar_id),
+    { revalidateOnFocus: false }
+  );
+
+  const currentPage = bar?.bar_name;
 
   const [selectedTime, setSelectedTime] = useState('');
-
   const [bookingDate, setBookingDate] = useState('');
   const [peopleNum, setPeopleNum] = useState('');
 
@@ -28,27 +33,15 @@ export default function Booking({ onPageChange }) {
     '19:00': 1,
     '20:00': 2,
     '21:00': 3,
-    '22:00': 4, // 如果需要可以加入更多時間
+    '22:00': 4,
   };
 
-  // 訂位時間按鈕
   const handleTimeSelect = (time) => {
-    setSelectedTime(time); // Update the selected time state
+    setSelectedTime(time);
   };
 
-  // 獲取酒吧資料
-  const getBarBookingById = async (bar_id) => {
-    try {
-      const data = await BarService.getBarDetail(bar_id);
-      setBooking(Array.isArray(data) ? data : [data]);
-    } catch (error) {
-      console.error('Failed to fetch bar details:', error);
-    }
-  };
-
-  // 提交訂位資料到後端
   const handleBookingSubmit = async (event) => {
-    event.preventDefault(); // 阻止表單的默認提交行為
+    event.preventDefault();
 
     if (!bookingDate || !peopleNum || !selectedTime) {
       alert('請完整填寫訂位資訊');
@@ -56,22 +49,12 @@ export default function Booking({ onPageChange }) {
     }
 
     const bookingData = {
-      user_id: auth.id, // 通常從用戶狀態或身份驗證服務獲得
-      bar_id: booking[0]?.bar_id, // 從狀態或路由獲得
+      user_id: auth.id,
+      bar_id: bar?.bar_id,
       bar_booking_time: `${bookingDate}`,
       bar_booking_people_num: peopleNum,
       bar_time_slot_id: timeSlotMapping[selectedTime],
     };
-    if (!bookingData) {
-      Swal.fire({
-        title: '請輸入訂位內容!',
-        icon: 'warning',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
-      return;
-    }
 
     try {
       const result = await BarService.createBooking(bookingData);
@@ -97,187 +80,140 @@ export default function Booking({ onPageChange }) {
     }
   };
 
-  // 動態路由成功
   useEffect(() => {
-    if (router.isReady) {
-      //確保能得到bar_id
-      const { bar_id } = router.query;
-      // 有bar_id後，向伺服器要求資料
-      getBarBookingById(bar_id);
-    }
-  }, [router.isReady]);
+    onPageChange(pageTitle);
+  }, [onPageChange, pageTitle]);
 
-  // 訂位確認彈跳視窗
-  // const BookingConfirmModal = dynamic(
-  //   () => import('@/components/bar/modal/booking-confirm-modal'),
-  //   { ssr: false }
-  // );
+  if (error) return <div className="pt-28 text-center text-white text-h3">載入失敗，請稍後再試</div>;
+
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
       <div className="flex flex-row justify-center gap-4 pt-20 h-screen">
-        {/* 左留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
 
         <div className="w-10/12 gap-4 md:w-8/12 lg:grid lg:grid-cols-12">
-          {/* 表單內容部分占全部8列，在md時占5列 */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-12">
             <div className="text-sm breadcrumbs">
-              <Breadcrumbs currentPage={currentPage} />
+               <Breadcrumbs currentPage={currentPage} />
             </div>
-            <div className="space-y-2">
-              <div className="text-white text-[18px]">我要訂位</div>
-              {/* 移動端顯示的圖片 */}
-              <div className="lg:hidden">
-                <Image
-                  className="w-[340px] h-[130px] object-cover rounded-[20px]"
-                  src={booking[0]?.bar_img || '/unavailable-image.jpg'}
-                  alt="Bar Image"
-                  width={340}
-                  height={130}
-                />
-              </div>
-              <div className="text-[18px] lg:text-[32px] text-white">
-                {/* Fake Sober Taipei */}
-                {booking[0]?.bar_name}
-              </div>
-              <div className="flex gap-2 text-[12px] lg:text-[16px] text-white">
-                <p>
-                  {/* 大安區 */}
-                  {booking[0]?.bar_area_name}
-                </p>
-                <p>{booking[0]?.bar_type_name}</p>
-              </div>
-              <hr className="lg:w-[350px]" />
+          </div>
 
-              {/* 表單內容 */}
-              <form className="space-y-4" onSubmit={handleBookingSubmit}>
-                <div className="text-[15px] lg:text-[20px] text-white">
-                  選擇訂位時段
-                </div>
-                <div>
-                  <label className="text-[15px] lg:text-[18px] text-white">
-                    用餐人數
-                  </label>
-                  <br />
-                  {/* <select className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2">
-                    <option disabled selected>
-                      選擇用餐人數
-                    </option>
-                    <option>1位</option>
-                    <option>2位</option>
-                    <option>3位</option>
-                    <option>4位</option>
-                    <option>5位</option>
-                    <option>6位</option>
-                  </select> */}
-                  <select
-                    className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2"
-                    value={peopleNum}
-                    onChange={(e) => setPeopleNum(e.target.value)}
-                    required
-                  >
-                    <option disabled selected>
-                      選擇用餐人數
-                    </option>
-                    {[1, 2, 3, 4, 5, 6].map((num) => (
-                      <option key={num} value={num}>
-                        {num}位
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-[12px] text-white mt-1">
-                    （可接受1-6位定位，超過8人請來電。）
-                  </p>
-                </div>
-                <div>
-                  <label className="text-[15px] lg:text-[18px] text-white">
-                    預約日期
-                  </label>
-                  <br />
-                  <input
-                    className="w-full max-w-xs mt-2 input input-bordered input-sm"
-                    type="date"
-                    value={bookingDate}
-                    onChange={(e) => setBookingDate(e.target.value)}
-                    required
+          {isLoading || !bar ? (
+            <div className="lg:col-span-12">
+              <Loader minHeight="400px" text="正在為您預留座位..." />
+            </div>
+          ) : (
+            <>
+              <div className="lg:col-span-5 space-y-2">
+                <div className="text-white text-[18px]">我要訂位</div>
+                <div className="lg:hidden">
+                  <Image
+                    className="w-[340px] h-[130px] object-cover rounded-[20px]"
+                    src={bar?.bar_pic_name ? `/barPic/${bar.bar_pic_name}` : '/unavailable-image.jpg'}
+                    alt="Bar Image"
+                    width={340}
+                    height={130}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[15px] lg:text-[18px] text-white">
-                    預約時段
-                  </label>
-                  <br />
-                  <div className="flex gap-4">
-                    {/* 時段按鈕 */}
-                    {/* <button
-                      type="button"
-                      className="text-white btn btn-outline btn-sm"
-                    >
-                      19:00
-                    </button>
-                    <button
-                      type="button"
-                      className="text-white btn btn-outline btn-sm"
-                    >
-                      20:00
-                    </button>
-                    <button
-                      type="button"
-                      className="text-white btn btn-outline btn-sm"
-                    >
-                      21:00
-                    </button>
-                    <button
-                      type="button"
-                      className="text-white btn btn-outline btn-sm"
-                    >
-                      22:00
-                    </button> */}
-                    {/* 時段按鈕 */}
-                    {['19:00', '20:00', '21:00', '22:00'].map((time) => (
-                      <button
-                        key={time}
-                        type="button"
-                        className={`btn btn-outline btn-sm text-white ${
-                          selectedTime === time ? 'bg-[#A0FF1F] text-black' : ''
-                        }`}
-                        onClick={() => handleTimeSelect(time)}
-                      >
-                        {time}
-                      </button>
-                    ))}
+                <div className="text-[18px] lg:text-[32px] text-white">
+                  {bar?.bar_name}
+                </div>
+                <div className="flex gap-2 text-[12px] lg:text-[16px] text-white">
+                  <p>{bar?.bar_area_name}</p>
+                  <p>{bar?.bar_type_name}</p>
+                </div>
+                <hr className="lg:w-[350px]" />
+
+                <form className="space-y-4" onSubmit={handleBookingSubmit}>
+                  <div className="text-[15px] lg:text-[20px] text-white">
+                    選擇訂位時段
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-white">其他備註</label>
-                  <br />
-                  <textarea
-                    className="w-full h-24 max-w-xs textarea textarea-bordered textarea-sm"
-                    placeholder=""
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
-                >
-                  確認訂位
-                </button>
-              </form>
-            </div>
-          </div>
-          {/* 圖片區塊在大螢幕顯示，佔5列 */}
-          <div className="hidden lg:block lg:col-span-4">
-            <Image
-              className="w-[456px] h-[300px] object-cover rounded-[20px]"
-              src={booking[0]?.bar_img || '/unavailable-image.jpg'}
-              alt=""
-              width={456}
-              height={300}
-            />
-          </div>
+                  <div>
+                    <label className="text-[15px] lg:text-[18px] text-white">
+                      用餐人數
+                    </label>
+                    <br />
+                    <select
+                      className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2 bg-black text-white"
+                      value={peopleNum}
+                      onChange={(e) => setPeopleNum(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>
+                        選擇用餐人數
+                      </option>
+                      {[1, 2, 3, 4, 5, 6].map((num) => (
+                        <option key={num} value={num}>
+                          {num}位
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[12px] text-white mt-1">
+                      （可接受1-6位定位，超過8人請來電。）
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-[15px] lg:text-[18px] text-white">
+                      預約日期
+                    </label>
+                    <br />
+                    <input
+                      className="w-full max-w-xs mt-2 input input-bordered input-sm bg-black text-white"
+                      type="date"
+                      value={bookingDate}
+                      onChange={(e) => setBookingDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[15px] lg:text-[18px] text-white">
+                      預約時段
+                    </label>
+                    <br />
+                    <div className="flex gap-4">
+                      {['19:00', '20:00', '21:00', '22:00'].map((time) => (
+                        <button
+                          key={time}
+                          type="button"
+                          className={`btn btn-outline btn-sm text-white ${
+                            selectedTime === time ? 'bg-[#A0FF1F] text-black border-[#A0FF1F]' : ''
+                          }`}
+                          onClick={() => handleTimeSelect(time)}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-white">其他備註</label>
+                    <br />
+                    <textarea
+                      className="w-full h-24 max-w-xs textarea textarea-bordered textarea-sm bg-black text-white"
+                      placeholder=""
+                    ></textarea>
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
+                  >
+                    確認訂位
+                  </button>
+                </form>
+              </div>
+              <div className="hidden lg:block lg:col-span-4 lg:ml-10">
+                <Image
+                  className="w-[456px] h-[300px] object-cover rounded-[20px]"
+                  src={bar?.bar_pic_name ? `/barPic/${bar.bar_pic_name}` : '/unavailable-image.jpg'}
+                  alt=""
+                  width={456}
+                  height={300}
+                />
+              </div>
+            </>
+          )}
         </div>
-        {/* 右留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
       </div>
     </>

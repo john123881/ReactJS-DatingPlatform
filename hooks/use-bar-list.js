@@ -1,0 +1,71 @@
+import { useState, useMemo } from 'react';
+import useSWR from 'swr';
+import { BarService } from '@/services/bar-service';
+
+/**
+ * 自定義 Hook: 處理酒吧列表邏輯 (SWR 快取版)
+ * @param {string} category - 酒吧分類 (如 'sport', 'music')
+ * @returns {object} bars 相關狀態與處理函數
+ */
+export function useBarList(category) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [barsPerPage] = useState(8);
+  const [selectedAreaId, setSelectedAreaId] = useState('');
+  const [selectedTypeId, setSelectedTypeId] = useState('');
+
+  // SWR 快取金鑰
+  const swrKey = ['bar-list', category, selectedAreaId, selectedTypeId];
+
+  // 使用 SWR 進行抓取與快取
+  const { data, error, isLoading, mutate } = useSWR(
+    swrKey,
+    () => category 
+      ? BarService.getBarsByCategory(category, { area: selectedAreaId, type: selectedTypeId })
+      : BarService.getBars({ bar_area_id: selectedAreaId, bar_type_id: selectedTypeId }),
+    {
+      revalidateOnFocus: false, // 避免點擊視窗就重新抓
+      dedupingInterval: 60000,  // 1 分鐘內不重複抓取
+    }
+  );
+
+  // 取得資料陣列 (相容 Ghost Wrapper)
+  const bars = data || [];
+
+  // 計算分頁資訊
+  const totalPages = Math.ceil(bars.length / barsPerPage);
+  const maxPageNumberLimit = Math.min(currentPage + 2, totalPages);
+  const minPageNumberLimit = Math.max(currentPage - 2, 1);
+
+  // 事件處理器
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const onAreaSelected = (areaId) => {
+    setSelectedAreaId(areaId);
+    setCurrentPage(1);
+  };
+
+  const onTypeSelected = (typeId) => {
+    setSelectedTypeId(typeId);
+    setCurrentPage(1);
+  };
+
+  return {
+    bars,
+    error,
+    isLoading,
+    currentPage,
+    setCurrentPage,
+    barsPerPage,
+    selectedAreaId,
+    selectedTypeId,
+    totalPages,
+    maxPageNumberLimit,
+    minPageNumberLimit,
+    handlePageChange,
+    onAreaSelected,
+    onTypeSelected,
+    refresh: mutate
+  };
+}

@@ -1,12 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
+import Loader from '@/components/ui/loader/loader';
 import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
+import { useBarList } from '@/hooks/use-bar-list';
 
 export default function BarList({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -16,24 +18,28 @@ export default function BarList({ onPageChange }) {
   }, [onPageChange, pageTitle]);
 
   const { auth, getAuthHeader } = useAuth();
-  const [bars, setBars] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [barsPerPage] = useState(8);
-  const [selectedAreaId, setSelectedAreaId] = useState('');
-  const [selectedTypeId, setSelectedTypeId] = useState('');
   const [savedBars, setSavedBars] = useState({});
-
-  const totalPages = Math.ceil(bars.length / barsPerPage);
-  const maxPageNumberLimit = Math.min(currentPage + 2, totalPages);
-  const minPageNumberLimit = Math.max(currentPage - 2, 1);
+  const {
+    isLoading,
+    bars,
+    setBars,
+    currentPage,
+    setCurrentPage,
+    barsPerPage,
+    selectedAreaId,
+    selectedTypeId,
+    totalPages,
+    maxPageNumberLimit,
+    minPageNumberLimit,
+    handlePageChange,
+    onAreaSelected,
+    onTypeSelected,
+  } = useBarList();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
 
   // 檢查儲存酒吧狀態
   const checkBarsStatus = useCallback(
@@ -62,34 +68,13 @@ export default function BarList({ onPageChange }) {
     [auth.id],
   );
 
-  //FETCH GET 酒吧列表資料
-  const getBarList = useCallback(async () => {
-
-    try {
-      const data = await BarService.getBars();
-      // if (!data.success) {
-      //   // alert('error');
-      //   return;
-      // }
-
-      const barIds = data.map((bar) => bar.bar_id).join(',');
-      checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
-      setBars(data);
-    } catch (error) {
-      console.error('Failed to fetch bar list:', error);
-    }
-  }, [checkBarsStatus]);
-
-  // useEffect(() => {
-  //   if (auth.id === 0) {
-  //     return;
-  //   }
-  //   getBarList();
-  // }, [auth]);
-
+  // 監聽 bars 變化並檢查狀態
   useEffect(() => {
-    getBarList();
-  }, [getBarList]);
+    if (bars.length > 0) {
+      const barIds = bars.map((bar) => bar.bar_id).join(',');
+      checkBarsStatus(barIds);
+    }
+  }, [bars, checkBarsStatus]);
 
   // BarListSidebar
   // const handleAreaSelected = (areaId) => {
@@ -112,35 +97,6 @@ export default function BarList({ onPageChange }) {
   //     .catch(console.error);
   // }, [selectedAreaId]);
 
-  // try bar_type_id 篩選
-  // 更新酒吧列表
-  const updateBarsList = async (barAreaId, barTypeId) => {
-    try {
-      const data = await BarService.getBars({
-        bar_area_id: barAreaId,
-        bar_type_id: barTypeId,
-      });
-      setBars(data);
-    } catch (error) {
-      console.error('Failed to fetch filtered bar list:', error);
-    }
-  };
-
-  // 當地區或類型選擇變化時調用更新
-  // useEffect(() => {
-  //   updateBarsList(selectedAreaId, selectedTypeId);
-  // }, [selectedAreaId, selectedTypeId]);
-
-  // 處理地區和類型的選擇
-  const onAreaSelected = (areaId) => {
-    setSelectedAreaId(areaId);
-    updateBarsList(areaId, selectedTypeId);
-  };
-
-  const onTypeSelected = (typeId) => {
-    setSelectedTypeId(typeId);
-    updateBarsList(selectedAreaId, typeId);
-  };
 
   const handleSearchChange = async (e) => {
     getSearchBars(e.target.value);
@@ -210,8 +166,10 @@ export default function BarList({ onPageChange }) {
               </svg>
             </label>
           </div>
-          <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto">
-            {hasSearched ? (
+          <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto min-h-[400px]">
+            {isLoading && !hasSearched ? (
+              <Loader minHeight="400px" text="正在探索酒吧..." />
+            ) : hasSearched ? (
               searchResults.length > 0 ? (
                 searchResults.map((bar) => (
                   <BarCard
@@ -222,22 +180,21 @@ export default function BarList({ onPageChange }) {
                   />
                 ))
               ) : (
-                <p>未找到結果</p>
+                <div className="text-white py-20 text-center w-full">未找到結果</div>
               )
-            ) : (
+            ) : bars.length > 0 ? (
               bars
-                .slice(
-                  (currentPage - 1) * barsPerPage,
-                  currentPage * barsPerPage,
-                )
-                .map((bar) => (
-                  <BarCard
-                    key={bar.bar_id}
-                    bar={bar}
-                    savedBars={savedBars}
-                    setSavedBars={setSavedBars}
-                  />
-                ))
+              .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
+              .map((bar) => (
+                <BarCard
+                  key={bar.bar_id}
+                  bar={bar}
+                  savedBars={savedBars}
+                  setSavedBars={setSavedBars}
+                />
+              ))
+            ) : (
+                <div className="text-white py-20 text-center w-full">目前沒有酒吧資料</div>
             )}
           </div>
           {/* <div className="flex items-center justify-center"> */}

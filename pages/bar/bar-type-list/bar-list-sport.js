@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
+import Loader from '@/components/ui/loader/loader';
 import BarListSidebar from '@/components/bar/bar/bar-list-sidebar(1)';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
 // import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import PageTitle from '@/components/page-title';
+import { useBarList } from '@/hooks/use-bar-list';
 import { BarService } from '@/services/bar-service';
 
 export default function BarListSport({ onPageChange }) {
@@ -16,57 +17,20 @@ export default function BarListSport({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const [bars, setBars] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [barsPerPage] = useState(8);
-  const [selectedAreaId, setSelectedAreaId] = useState('');
-  const [selectedTypeId, setSelectedTypeId] = useState('');
-  // const { userAvatar, setUserAvatar, auth, getAuthHeader, checkAuth } =
-  //   useAuth();
-
-  const totalPages = Math.ceil(bars.length / barsPerPage);
-  const maxPageNumberLimit = Math.min(currentPage + 2, totalPages);
-  const minPageNumberLimit = Math.max(currentPage - 2, 1);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const getBarList = async () => {
-    try {
-      const data = await BarService.getBarsByCategory('sport');
-      setBars(data);
-    } catch (error) {
-      console.error('Failed to fetch bar list:', error);
-    }
-  };
-
-  const updateBarsList = async (barAreaId, barTypeId) => {
-    try {
-      const data = await BarService.getBarsByCategory('sport', {
-        area: barAreaId,
-        type: barTypeId,
-      });
-      setBars(data);
-    } catch (error) {
-      console.error('Failed to fetch filtered bar list:', error);
-    }
-  };
-
-  useEffect(() => {
-    getBarList();
-  }, [getBarList]);
-
-  // 處理地區和類型的選擇
-  const onAreaSelected = (areaId) => {
-    setSelectedAreaId(areaId);
-    updateBarsList(areaId, selectedTypeId);
-  };
-
-  const onTypeSelected = (typeId) => {
-    setSelectedTypeId(typeId);
-    updateBarsList(selectedAreaId, typeId);
-  };
+  const {
+    isLoading,
+    bars,
+    currentPage,
+    barsPerPage,
+    selectedAreaId,
+    selectedTypeId,
+    totalPages,
+    maxPageNumberLimit,
+    minPageNumberLimit,
+    handlePageChange,
+    onAreaSelected,
+    onTypeSelected,
+  } = useBarList('sport');
 
   return (
     <>
@@ -105,12 +69,18 @@ export default function BarListSport({ onPageChange }) {
               </svg>
             </label>
           </div>
-          <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto">
-            {bars
+          <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto min-h-[400px]">
+            {isLoading ? (
+              <Loader minHeight="400px" text="尋找美酒中..." />
+            ) : bars.length > 0 ? (
+              bars
               .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
               .map((bar) => (
                 <BarCard bar={bar} key={bar.bar_id} />
-              ))}
+              ))
+            ) : (
+                <div className="text-white py-20 text-center w-full">目前該地區沒有酒吧資料</div>
+            )}
           </div>
           <div className="flex items-center justify-center">
             <button
