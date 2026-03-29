@@ -36,11 +36,11 @@ export default function TripSidebarBase({
       {/* Desktop View */}
       <div className="hidden sm:block">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
-          <div className="flex flex-col">
-            <h1 className="text-5xl font-black text-white tracking-tighter mb-2 drop-shadow-glow-white">
+          <div className="flex flex-col items-start">
+            <h1 className="text-4xl font-black text-white/50 tracking-tighter mb-1 drop-shadow-sm">
               {titlePrefix}
             </h1>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               {tripName?.trip_title ? (
                 <div className="relative group">
                   <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-neongreen group-hover:to-white transition-all duration-300">

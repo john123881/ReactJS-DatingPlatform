@@ -69,7 +69,7 @@ export default function MyTripDetail({ onPageChange }) {
               refreshAllDetails={refreshAllDetails}
             />
           </div>
-          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-12 w-full max-w-5xl px-4">
+          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-12 w-full max-w-6xl px-4">
             <ContentMorning
               newDetail={newDetail}
               tripDetails={tripDetails}

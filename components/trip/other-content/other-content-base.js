@@ -8,28 +8,20 @@ export default function OtherContentBase({
   fetchMethod,
   OtherNoContentComponent,
 }) {
-  const [tripDetails, setTripDetails] = useState({});
+  const [tripDetailsList, setTripDetailsList] = useState([]);
 
   useEffect(() => {
     if (newDetail && Array.isArray(newDetail)) {
-      const currentBlock = newDetail.find(d => d.block === block);
-      if (currentBlock) {
-        setTripDetails(currentBlock);
-      } else {
-        setTripDetails({ block: null });
-      }
+      const filtered = newDetail.filter(d => d.block === block);
+      setTripDetailsList(filtered.length > 0 ? filtered : []);
     } else if (trip_plan_id) {
       const fetchData = async () => {
         try {
           const result = await fetchMethod(trip_plan_id);
-          if (result && result.length > 0) {
-            setTripDetails(result[0]);
-          } else {
-            setTripDetails({ block: null });
-          }
+          setTripDetailsList(result && result.length > 0 ? result : []);
         } catch (error) {
           console.error(`Fetching trip details error (block ${block}):`, error);
-          setTripDetails({ block: null });
+          setTripDetailsList([]);
         }
       };
       fetchData();
@@ -37,19 +29,25 @@ export default function OtherContentBase({
   }, [newDetail, trip_plan_id, fetchMethod, block]);
 
   return (
-    <>
-      {tripDetails.block !== block ? (
+    <div className="flex flex-wrap gap-8 justify-center lg:justify-start w-full">
+      {tripDetailsList.length === 0 ? (
         <OtherNoContentComponent />
-      ) : tripDetails.movie_id ? (
-        <MoviePhotoOther
-          trip_plan_id={trip_plan_id}
-          tripDetails={tripDetails}
-        />
-      ) : tripDetails.bar_id ? (
-        <BarPhotoOther trip_plan_id={trip_plan_id} tripDetails={tripDetails} />
       ) : (
-        <OtherNoContentComponent />
+        tripDetailsList.map((details, index) => (
+          <div key={details.trip_detail_id || index} className="flex-shrink-0">
+            {details.movie_id ? (
+              <MoviePhotoOther
+                trip_plan_id={trip_plan_id}
+                tripDetails={details}
+              />
+            ) : details.bar_id ? (
+              <BarPhotoOther trip_plan_id={trip_plan_id} tripDetails={details} />
+            ) : (
+              <OtherNoContentComponent />
+            )}
+          </div>
+        ))
       )}
-    </>
+    </div>
   );
 }

@@ -9,30 +9,21 @@ export default function ContentBase({
   fetchMethod,
   NoContentComponent,
 }) {
-  const [tripDetails, setTripDetails] = useState({});
+  const [tripDetailsList, setTripDetailsList] = useState([]);
 
   useEffect(() => {
     if (newDetail && Array.isArray(newDetail)) {
-      const currentBlock = newDetail.find(d => d.block === block);
-      if (currentBlock) {
-        setTripDetails(currentBlock);
-      } else {
-        setTripDetails({ block: null });
-      }
-    } else if (!newDetail || Object.keys(newDetail).length === 0) {
-      // 如果 newDetail 為空且有 ID，嘗試補抓一次 (備援)
+      const filtered = newDetail.filter(d => d.block === block);
+      setTripDetailsList(filtered.length > 0 ? filtered : []);
+    } else if (!newDetail || (typeof newDetail === 'object' && Object.keys(newDetail).length === 0)) {
       if (trip_plan_id) {
         const fetchData = async () => {
           try {
             const result = await fetchMethod(trip_plan_id);
-            if (result && result.length > 0) {
-              setTripDetails(result[0]);
-            } else {
-              setTripDetails({ block: null });
-            }
+            setTripDetailsList(result && result.length > 0 ? result : []);
           } catch (error) {
             console.error(`Fetching trip details error (block ${block}):`, error);
-            setTripDetails({ block: null });
+            setTripDetailsList([]);
           }
         };
         fetchData();
@@ -43,42 +34,43 @@ export default function ContentBase({
   const refreshTripDetails = async () => {
     try {
       const result = await fetchMethod(trip_plan_id);
-      if (result && result.length > 0) {
-        setTripDetails(result[0]);
-      } else {
-        setTripDetails({ block: null });
-      }
+      setTripDetailsList(result && result.length > 0 ? result : []);
     } catch (error) {
       console.error(`Fetching trip details error (block ${block}):`, error);
-      setTripDetails({ block: null });
     }
   };
 
   return (
-    <>
-      {tripDetails.block !== block ? (
+    <div className="flex flex-wrap gap-8 justify-center lg:justify-start w-full transition-all duration-300">
+      {tripDetailsList.length === 0 ? (
         <NoContentComponent
           trip_plan_id={trip_plan_id}
-          refreshTripDetails={refreshTripDetails}
-        />
-      ) : tripDetails.movie_id ? (
-        <MoviePhotoMy
-          trip_plan_id={trip_plan_id}
-          tripDetails={tripDetails}
-          refreshTripDetails={refreshTripDetails}
-        />
-      ) : tripDetails.bar_id ? (
-        <BarPhotoMy
-          trip_plan_id={trip_plan_id}
-          tripDetails={tripDetails}
           refreshTripDetails={refreshTripDetails}
         />
       ) : (
-        <NoContentComponent
-          trip_plan_id={trip_plan_id}
-          refreshTripDetails={refreshTripDetails}
-        />
+        tripDetailsList.map((details, index) => (
+          <div key={details.trip_detail_id || index} className="flex-shrink-0">
+            {details.movie_id ? (
+              <MoviePhotoMy
+                trip_plan_id={trip_plan_id}
+                tripDetails={details}
+                refreshTripDetails={refreshTripDetails}
+              />
+            ) : details.bar_id ? (
+              <BarPhotoMy
+                trip_plan_id={trip_plan_id}
+                tripDetails={details}
+                refreshTripDetails={refreshTripDetails}
+              />
+            ) : (
+              <NoContentComponent
+                trip_plan_id={trip_plan_id}
+                refreshTripDetails={refreshTripDetails}
+              />
+            )}
+          </div>
+        ))
       )}
-    </>
+    </div>
   );
 }
