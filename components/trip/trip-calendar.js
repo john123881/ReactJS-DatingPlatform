@@ -30,6 +30,7 @@ function truncateChinese(title, maxChineseChars = 7) {
 export default function TripCalendar() {
   const { auth } = useAuth();
   const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (auth.id === 0) return;
@@ -218,7 +219,7 @@ export default function TripCalendar() {
         closeModal();
 
         const newTripPlanId = data.tripPlanId || data.insertId || data.id;
-        const flatData = await apiClient.post('/trip/trip-plans/add', payload);
+        const flatData = await apiClient.post('/trip/trip-plans/add', fullPayload);
         if (flatData.success !== false) {
             closeModal();
             const flatId = flatData.tripPlanId || flatData.insertId || flatData.id;
