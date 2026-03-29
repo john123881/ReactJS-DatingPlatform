@@ -1,4 +1,4 @@
-import TripSidebar from '../../components/trip/sidebars/trip-sidebar';
+import TripNavigationTab from '../../components/trip/sidebars/trip-navigation-tab';
 import TripCalendar from '@/components/trip/trip-calendar';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -14,7 +14,7 @@ export default function Calendar({ onPageChange }) {
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <TripSidebar />
+      <TripNavigationTab />
       <TripCalendar />
     </>
   );

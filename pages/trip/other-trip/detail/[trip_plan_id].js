@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import TripSidebar3 from '@/components/trip/sidebars/trip-sidebar3';
+import OtherTripDetailSidebar from '@/components/trip/sidebars/other-trip-detail-sidebar';
+import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
 import OtherContentMorning from '@/components/trip/other-content/blocks/other-content-morning';
 import OtherContentNoon from '@/components/trip/other-content/blocks/other-content-noon';
 import OtherContentNight from '@/components/trip/other-content/blocks/other-content-night';
@@ -115,7 +116,10 @@ export default function OtherTripdetail({ onPageChange }) {
     <>
       <div className="flex flex-col min-h-screen">
         <PageTitle pageTitle={pageTitle} />
-        <TripSidebar3 tripName={tripName} />
+        <TripNavigationTab />
+        <OtherTripDetailSidebar
+          trip_plan_id={trip_plan_id}
+        />
         <div className="flex  sm:justify-start justify-center items-center w-full py-8">
           <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4">
             <OtherContentMorning trip_plan_id={trip_plan_id} />

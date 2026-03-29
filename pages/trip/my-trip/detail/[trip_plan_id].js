@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import TripSidebar2 from '@/components/trip/sidebars/trip-sidebar2';
-import ContentMorning from '@/components/trip/my-content/blocks/contentMorning';
-import ContentNoon from '@/components/trip/my-content/blocks/contentNoon';
-import ContentNight from '@/components/trip/my-content/blocks/contentNight';
+import MyTripDetailSidebar from '@/components/trip/sidebars/my-trip-detail-sidebar';
+import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
+import ContentMorning from '@/components/trip/my-content/blocks/content-morning';
+import ContentNoon from '@/components/trip/my-content/blocks/content-noon';
+import ContentNight from '@/components/trip/my-content/blocks/content-night';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
@@ -103,9 +104,11 @@ export default function MyTripDetail({ onPageChange }) {
     <>
       <PageTitle pageTitle={pageTitle} />
       <div className="flex flex-col min-h-screen">
-        <TripSidebar2
-          tripName={tripName}
-          trip_plan_id={tripName.trip_plan_id}
+        <TripNavigationTab />
+        <MyTripDetailSidebar
+          trip_plan_id={trip_plan_id}
+          tripDetails={tripDetails}
+          refreshTripDetails={refreshAllDetails}
         />
 
         <div className="flex justify-center items-start w-full py-8 overflow-x-hidden">

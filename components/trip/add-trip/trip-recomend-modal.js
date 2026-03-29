@@ -1,6 +1,5 @@
-import AddBar from '@/components/trip/add-trip/add-bar';
-import AddMovie from '@/components/trip/add-trip/add-movie';
-import Recomendbar from '@/components/trip/sidebars/recomendbar';
+import AddTripItem from '@/components/trip/add-trip/add-trip-item';
+import TripRecommendTabbar from '@/components/trip/sidebars/trip-recommend-tabbar';
 import { useState, useEffect, useRef } from 'react';
 import { TripService } from '@/services/trip-service';
 
@@ -75,7 +74,7 @@ export default function TripRecomendModal({
         ref={recomendModalRef}
         className="flex flex-col items-center justify-start w-full h-full gap-8"
       >
-        <Recomendbar onTabChange={setCurrentTab} />
+        <TripRecommendTabbar onTabChange={setCurrentTab} />
         {currentTab === 'addMovie' ? (
           <>
             <select
@@ -113,9 +112,10 @@ export default function TripRecomendModal({
             </label>
             {filteredMovies.length > 0 ? (
               filteredMovies.map((movie) => (
-                <AddMovie
+                <AddTripItem
                   key={movie.movie_id}
-                  movie={movie}
+                  item={movie}
+                  type="movie"
                   trip_detail_id={trip_detail_id}
                   refreshTripDetails={refreshTripDetails}
                   onClose={onClose}
@@ -178,9 +178,10 @@ export default function TripRecomendModal({
             </div>
             {filteredBars.length > 0 ? (
               filteredBars.map((bar) => (
-                <AddBar
+                <AddTripItem
                   key={bar.bar_id}
-                  bar={bar}
+                  item={bar}
+                  type="bar"
                   trip_detail_id={trip_detail_id}
                   refreshTripDetails={refreshTripDetails}
                   onClose={onClose}

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import TripSidebar from '../../../components/trip/sidebars/trip-sidebar';
-import TripCardMy from '../../../components/trip/trip-card-my';
-import TripCard from '@/components/trip/trip-card';
+import TripNavigationTab from '../../../components/trip/sidebars/trip-navigation-tab';
+import TripCard from '@/components/trip/common/trip-card';
 import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
 import { useLoader } from '@/context/use-loader';
@@ -210,9 +209,7 @@ export default function MyTrip({ onPageChange }) {
       </div>
       <div className=" mb-24 w-full flex justify-center">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
-          {otherTrips.slice(0, 5).map((otherTrip) => (
-            <TripCard key={otherTrip.trip_plan_id} otherTrip={otherTrip} />
-          ))}
+            <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
         </div>
       </div>
     </div>
@@ -223,7 +220,7 @@ export default function MyTrip({ onPageChange }) {
       <>
         <PageTitle pageTitle={pageTitle} />
         <div className="flex flex-col min-h-screen">
-          <TripSidebar />
+          <TripNavigationTab />
           {isLoading ? (
             <Loader />
           ) : (
@@ -284,13 +281,12 @@ export default function MyTrip({ onPageChange }) {
                   </dialog>
                 )}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
-                  {trips.map((trip) => (
-                    <TripCardMy
+                    <TripCard
                       key={trip.trip_plan_id}
                       trip={trip}
+                      isMyTrip={true}
                       onDeleteSuccess={onDeleteSuccess}
                     />
-                  ))}
                 </div>
               </div>
             </div>

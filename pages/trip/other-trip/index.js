@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import TripSidebarOther from '@/components/trip/sidebars/trip-sidebar-other';
-import TripCard from '../../../components/trip/trip-card';
+import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
+import TripCard from '@/components/trip/common/trip-card';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
@@ -44,7 +44,7 @@ export default function OtherTrip({ onPageChange }) {
   return (
     <div>
       <PageTitle pageTitle={pageTitle} />
-      <TripSidebarOther otherTrips={otherTrips} />
+      <TripNavigationTab />
       {isLoading ? (
         <Loader />
       ) : (
@@ -72,9 +72,7 @@ export default function OtherTrip({ onPageChange }) {
               </svg>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
-              {filteredTrips.map((otherTrip) => (
-                <TripCard key={otherTrip.trip_plan_id} otherTrip={otherTrip} />
-              ))}
+                <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
             </div>
           </div>
         </div>
