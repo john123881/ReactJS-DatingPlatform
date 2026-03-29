@@ -32,7 +32,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   //   {
   //     title: '小王',
   //     subtitle: '5',
-  //     img: 'http://119.14.42.80:3001/avatar/defaultAvatar.jpg',
+  //     img: `${API_SERVER}/avatar/defaultAvatar.jpg`,
   //     img_name: 'post_img',
   //     content:
   //       '第一次去那家話題酒吧，結果完全超出預期！服務和氛圍一流！🥂👏 #酒吧體驗 #夜生活好去處 #酒吧',

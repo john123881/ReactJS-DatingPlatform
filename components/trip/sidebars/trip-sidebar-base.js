@@ -29,19 +29,29 @@ export default function TripSidebarBase({
 
   const formattedDate = tripName?.trip_date
     ? new Date(tripName.trip_date).toLocaleDateString('en-CA')
-    : 'Loading...';
+    : '';
 
   return (
-    <div className="pt-16 pb-3 border-b-2 border-white sm:ml-20 sm:mr-20">
+    <div className="pt-16 pb-3 border-b-2 border-white max-w-7xl mx-auto px-4">
       {/* Desktop View */}
       <div className="hidden sm:block">
         <p className="mb-2 text-5xl">{titlePrefix}</p>
         <div className="flex justify-between items-center pr-2.5">
-          <div className="flex items-center">
-            <h3 className="mr-8 text-2xl tooltip" data-tip={tripName.trip_title}>
-              {truncateChinese(tripName.trip_title)}
-            </h3>
-            <h3 className="mr-8 text-2xl">{formattedDate}</h3>
+          <div className="flex items-center min-h-[40px]">
+            {tripName?.trip_title ? (
+              <h3 className="mr-8 text-2xl tooltip font-medium" data-tip={tripName.trip_title}>
+                {truncateChinese(tripName.trip_title)}
+              </h3>
+            ) : (
+              <div className="skeleton h-8 w-32 mr-8 bg-white/10"></div>
+            )}
+            
+            {tripName?.trip_date ? (
+              <h3 className="mr-8 text-2xl font-medium">{formattedDate}</h3>
+            ) : (
+              <div className="skeleton h-8 w-32 mr-8 bg-white/10"></div>
+            )}
+
             {tripName.username && (
               <h3 className="mr-8 text-2xl">{usernamePrefix}{tripName.username}</h3>
             )}
@@ -55,9 +65,18 @@ export default function TripSidebarBase({
 
       {/* Mobile View */}
       <div className="flex flex-col gap-2.5 mx-5 sm:hidden">
-        <div className="flex flex-col gap-1">
-          <div className="text-base text-white">{tripName.trip_title}</div>
-          <div className="text-base text-white">{formattedDate}</div>
+        <div className="flex flex-col gap-1 min-h-[48px]">
+          {tripName?.trip_title ? (
+            <div className="text-base text-white">{tripName.trip_title}</div>
+          ) : (
+            <div className="skeleton h-5 w-40 mb-1 bg-white/10"></div>
+          )}
+          
+          {tripName?.trip_date ? (
+            <div className="text-base text-white">{formattedDate}</div>
+          ) : (
+            <div className="skeleton h-5 w-32 bg-white/10"></div>
+          )}
         </div>
         {tripName.username && (
           <div className="text-base text-white">{usernamePrefix}{tripName.username}</div>

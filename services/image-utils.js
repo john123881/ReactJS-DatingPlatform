@@ -8,7 +8,7 @@ import { API_SERVER } from '@/configs/api-config';
  */
 export const getImageUrl = (url, type = 'avatar') => {
   if (!url) {
-    return type === 'avatar' ? '/unknown-user-image.jpg' : '/unavailable-image.jpg';
+    return type === 'avatar' ? `${API_SERVER}/avatar/defaultAvatar.jpg` : '/unavailable-image.jpg';
   }
 
   let finalUrl = url;

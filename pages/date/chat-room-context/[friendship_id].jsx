@@ -161,12 +161,16 @@ export default function ChatRoomContext() {
     };
     socket.current.on('typing', handleUserTyping);
 
-    // 在組件卸載時，關閉socket連接
+    // 在組件卸載時，關閉 socket 連接
     return () => {
-      if (!auth.token) return;
-
-      // 在組件卸載時，關閉 socket 連接
-      socket.current.off();
+      if (socket.current) {
+        socket.current.off();
+        // 如果這個頁面負責關閉連接，則調用 close()
+        // 但考慮到其他組件可能還在用，這裡通常只 off 就好
+        // 不過 chat-room-context 是獨立實例化 socket 的，所以應該 close
+        socket.current.close();
+        socket.current = null;
+      }
     };
   }, [router.isReady, auth.token, roomName]);
 
@@ -204,7 +208,9 @@ export default function ChatRoomContext() {
     };
 
     // 發送 'send_message' 事件到後端
-    socket.current.emit('send_message', { roomName, message });
+    if (socket.current) {
+      socket.current.emit('send_message', { roomName, message });
+    }
 
     /// 將新消息添加到消息列表中
     // setMessages((prevMessages) => [...prevMessages, message]);
@@ -269,10 +275,14 @@ export default function ChatRoomContext() {
   const handleInputChange = (e) => {
     const { value } = e.target;
     setInput(value);
-    socket.current.emit('typing', { isTyping: true });
-    setTimeout(() => {
-      socket.current.emit('typing', { isTyping: false });
-    }, 2000);
+    if (socket.current) {
+      socket.current.emit('typing', { isTyping: true });
+      setTimeout(() => {
+        if (socket.current) {
+          socket.current.emit('typing', { isTyping: false });
+        }
+      }, 2000);
+    }
   };
 
   // 傳送圖片
@@ -305,7 +315,9 @@ export default function ChatRoomContext() {
           sender_avatar: userAvatar,
         };
 
-        socket.current.emit('send_image', { roomName, messageData });
+        if (socket.current) {
+          socket.current.emit('send_image', { roomName, messageData });
+        }
       }
     } catch (error) {
       console.error('Error uploading file', error);

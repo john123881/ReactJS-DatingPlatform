@@ -1,16 +1,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-export default function TripNavigationTab() {
+export default function TripNavigationTab({ showTitle = true }) {
   const router = useRouter();
   const isCalendar = router.pathname === '/trip';
   const isMyTrip = router.pathname === '/trip/my-trip';
   const isOtherTrip = router.pathname === '/trip/other-trip';
 
   return (
-    <div className="pt-16 pb-3 border-b-2 border-white sm:ml-20 sm:mr-20">
+    <div className="pt-16 pb-3 border-b-2 border-white max-w-7xl mx-auto px-4">
       <div className="trip-sidebar">
-        <p className="hidden mb-8 text-5xl sm:block font-bold">行程規劃</p>
+        {showTitle && (
+          <p className="hidden mb-8 text-5xl sm:block font-bold">行程規劃</p>
+        )}
         <div className="flex justify-around sidebarOptions sm:justify-start">
           <Link
             href="/trip"

@@ -52,49 +52,48 @@ export default function ChatMsg({ searchQuery }) {
 
   const [socketId, setSocketId] = useState(null);
 
-  // 使用 socket
+  // 使用 socket & 監控對方是否在線
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   useEffect(() => {
     if (auth.token && !socket.current) {
       // 當下無連接時，建立連結
-      socket.current = io(SOCKET_SERVER, {
+      const newSocket = io(SOCKET_SERVER, {
         withCredentials: true, // 核心！允許發送 Cookie
       });
+      socket.current = newSocket;
 
       // 連結成功
-      socket.current.on('connect', () => {
-        socket.current.userId = auth.id;
+      newSocket.on('connect', () => {
+        newSocket.userId = auth.id;
         setSocketId(auth.id);
-        socket.current.emit('get_online', { isOnline: true });
+        newSocket.emit('get_online', { isOnline: true });
       });
+
+      const handleUserConnected = (userId) => {
+        setOnlineUsers((prev) => {
+          if (prev.includes(userId)) return prev;
+          return [...prev, userId];
+        });
+      };
+
+      const handleUserDisconnected = (userId) => {
+        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+      };
+
+      newSocket.on('user_connected', handleUserConnected);
+      newSocket.on('user_disconnected', handleUserDisconnected);
     }
+
     return () => {
       if (socket.current) {
+        socket.current.off('user_connected');
+        socket.current.off('user_disconnected');
         socket.current.close();
         socket.current = null;
       }
     };
-  }, [auth.id]); // 使用 auth.id 作為依賴
-
-  // 監控對方是否在線
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
-  useEffect(() => {
-    const handleUserConnected = (userId) => {
-      setOnlineUsers((prev) => [...prev, userId]); // 增加上線用戶
-    };
-
-    const handleUserDisconnected = (userId) => {
-      setOnlineUsers((prev) => prev.filter((id) => id !== userId)); // 移除下線用戶
-    };
-
-    socket.current.on('user_connected', handleUserConnected);
-    socket.current.on('user_disconnected', handleUserDisconnected);
-
-    return () => {
-      socket.current.off('user_connected', handleUserConnected);
-      socket.current.off('user_disconnected', handleUserDisconnected);
-    };
-  }, [socket.current]);
+  }, [auth.id, auth.token]); // 使用 auth.id 和 token 作為依賴
 
   return (
     <>

@@ -56,13 +56,13 @@ export default function MyTripDetail({ onPageChange }) {
     <>
       <PageTitle pageTitle={pageTitle} />
       <div className="flex flex-col min-h-screen">
-        <TripNavigationTab />
+        <TripNavigationTab showTitle={false} />
         <MyTripDetailSidebar
           tripName={tripName}
           refreshTripDetails={refreshAllDetails}
         />
 
-        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden">
+        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden max-w-7xl mx-auto">
           <div className="hidden sm:flex min-w-[300px] justify-end">
             <BarPhotoCarousel
               trip_plan_id={trip_plan_id}
