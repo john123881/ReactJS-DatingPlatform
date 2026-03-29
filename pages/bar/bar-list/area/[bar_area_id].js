@@ -114,12 +114,12 @@ export default function List({ onPageChange }) {
   // 動態路由成功
   useEffect(() => {
     if (router.isReady) {
-      //確保能得到bar_type_id
       const { bar_area_id } = router.query;
-      // bar_area_id
-      getBarListType(bar_area_id);
+      if (bar_area_id) {
+        getBarListType(bar_area_id);
+      }
     }
-  }, [router.isReady, router.query, getBarListType]);
+  }, [router.isReady, router.query?.bar_area_id, getBarListType]);
 
 
   // // 處理地區和類型的選擇

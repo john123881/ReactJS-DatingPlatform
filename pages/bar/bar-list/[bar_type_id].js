@@ -151,12 +151,12 @@ export default function List({ onPageChange }) {
   // 動態路由成功
   useEffect(() => {
     if (router.isReady) {
-      //確保能得到bar_type_id
       const { bar_type_id } = router.query;
-      // 有bar_type_id後，向伺服器要求資料
-      getBarListDynamicById(bar_type_id);
+      if (bar_type_id) {
+        getBarListDynamicById(bar_type_id);
+      }
     }
-  }, [router.isReady, router.query, getBarListDynamicById]);
+  }, [router.isReady, router.query?.bar_type_id, getBarListDynamicById]);
 
 
   // bar-area navigation

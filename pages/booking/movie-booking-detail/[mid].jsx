@@ -61,11 +61,10 @@ export default function MovieDetail({ onPageChange }) {
 
   useEffect(() => {
     const { mid } = router.query;
-
     if (mid) {
       getMovieDetail(mid);
     }
-  }, [router.query.mid, getMovieDetail]);
+  }, [router.query?.mid, getMovieDetail]);
 
   const handleSavedClick = async () => {
     if (auth.id === 0) {
@@ -81,8 +80,10 @@ export default function MovieDetail({ onPageChange }) {
     const movieId = mid;
     const userId = auth.id;
 
+    // 樂觀更新 (Optimistic Update)
     const wasSaved = isSaved;
     const newSavedState = !wasSaved;
+    setIsSaved(newSavedState);
 
     try {
       const result = wasSaved
@@ -95,7 +96,7 @@ export default function MovieDetail({ onPageChange }) {
         result.msg?.includes('成功') ||
         result.message?.includes('成功')
       ) {
-        setIsSaved(newSavedState);
+        // 操作成功，状态已在乐观更新中设置
         Swal.fire({
           title: newSavedState ? '收藏成功!' : '已取消收藏!',
           icon: 'success',
@@ -107,6 +108,8 @@ export default function MovieDetail({ onPageChange }) {
         throw new Error(result.message || result.msg || '操作失敗');
       }
     } catch (error) {
+      // 發生錯誤時還原狀態
+      setIsSaved(wasSaved);
       console.error('Error updating save status:', error);
       Swal.fire({
         title: '操作失敗!',
@@ -146,7 +149,7 @@ export default function MovieDetail({ onPageChange }) {
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
               <figure>
                 <Image
-                  className="lg:w-[300px] lg:h-[480px]"
+                  className="lg:w-[300px] lg:h-[480px] object-cover"
                   src={movie[0]?.movie_img || '/unavailable-image.jpg'}
                   alt="電影海報"
                   width={300}

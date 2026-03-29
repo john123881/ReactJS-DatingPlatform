@@ -29,27 +29,12 @@ export default function Index({ onPageChange }) {
     router.push(`/booking/movie-list/${typeId}`); // 使用 useRouter 來動態導航
   };
 
-  const getBookingMovieCard = async () => {
-    setIsLoading(true);
-    try {
-      const data = await BookingService.getMovieList();
-      const movieIds = data.map((movie) => movie.movie_id).join(',');
-      await checkMoviesStatus(movieIds);
-      setMovieCards(data);
-    } catch (error) {
-      console.error('Failed to fetch movie card', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const checkMoviesStatus = async (movieIds) => {
+  const checkMoviesStatus = useCallback(async (movieIds) => {
     const userId = auth.id;
-
+    if (userId === 0 || !movieIds) return;
 
     try {
       const data = await BookingService.checkMovieStatus(userId, movieIds);
-
 
       // 初始化兩個對象來存儲所有電影的收藏狀態
       const newSavedMoives = { ...savedMovies };
@@ -65,7 +50,23 @@ export default function Index({ onPageChange }) {
     } catch (error) {
       console.error('無法獲取電影狀態:', error);
     }
-  };
+  }, [auth.id, savedMovies]);
+
+  const getBookingMovieCard = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await BookingService.getMovieList();
+      if (data && data.length > 0) {
+        const movieIds = data.map((movie) => movie.movie_id).join(',');
+        await checkMoviesStatus(movieIds);
+      }
+      setMovieCards(data);
+    } catch (error) {
+      console.error('Failed to fetch movie card', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [checkMoviesStatus]);
 
   const handleSearchChange = async (e) => {
     getSearchMovies(e.target.value);
