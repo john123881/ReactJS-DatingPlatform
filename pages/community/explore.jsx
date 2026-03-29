@@ -8,7 +8,7 @@ import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './page.module.css';
 import PageTitle from '@/components/page-title';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 
 
 export default function Explore({ onPageChange }) {
@@ -63,7 +63,7 @@ export default function Explore({ onPageChange }) {
                 dataLength={randomPosts.length}
                 next={getCommunityExplorePost}
                 hasMore={exploreHasMore}
-                loader={<AccountLoader type="index" minHeight="200px" />}
+                loader={<PageLoader type="index" minHeight="200px" />}
                 // endMessage={<p>No more posts</p>}
                 style={{
                   display: 'flex',

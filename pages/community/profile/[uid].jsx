@@ -10,7 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from '../page.module.css';
 import PageTitle from '@/components/page-title';
 import { CommunityService } from '@/services/community-service';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 
 export default function Profile({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -107,7 +107,7 @@ export default function Profile({ onPageChange }) {
           <div className="flex flex-col md:w-10/12 items-center">
             {isLoading ? (
               <div className="w-full flex justify-center py-20">
-                <AccountLoader type="index" minHeight="500px" />
+                <PageLoader type="index" minHeight="500px" />
               </div>
             ) : (
               <>
@@ -119,7 +119,7 @@ export default function Profile({ onPageChange }) {
                     dataLength={profilePosts.length}
                     next={getCommunityUserProfilePost}
                     hasMore={userProfileHasMore}
-                    loader={<AccountLoader type="index" minHeight="200px" />}
+                    loader={<PageLoader type="index" minHeight="200px" />}
                     style={{
                       display: 'flex',
                       flexWrap: 'wrap',

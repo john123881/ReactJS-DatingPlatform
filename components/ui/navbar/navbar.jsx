@@ -15,7 +15,7 @@ import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
 import { usePostContext } from '@/context/post-context';
 import PostModal from '@/components/community/modal/postModal';
-import MovieModal from '@/components/account-center/modal/movieModal';
+import MovieModal from '@/components/ui/modal/account/movieModal';
 import { getImageUrl } from '@/services/image-utils';
 
 

@@ -8,7 +8,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
-import { useBarList } from '@/hooks/use-bar-list';
+import { useBarList } from '@/hooks/bar/use-bar-list';
 
 export default function BarList({ onPageChange }) {
   const pageTitle = '酒吧探索';

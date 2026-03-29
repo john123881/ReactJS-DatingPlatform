@@ -10,7 +10,7 @@ import { useLoader } from '@/context/use-loader';
 import { AccountService } from '@/services/account-service';
 import { API_SERVER } from '@/configs/api-config';
 import toast from 'react-hot-toast';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
 
 export default function AccountIndex({ onPageChange }) {
@@ -122,7 +122,7 @@ export default function AccountIndex({ onPageChange }) {
             <BurgerMenu currentPage={currentPage} />
             <Breadcrumbs currentPage={currentPage} />
             {isLoading ? (
-              <AccountLoader type="index" />
+              <PageLoader type="index" />
             ) : (
               <>
                 <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">

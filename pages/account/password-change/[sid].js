@@ -13,7 +13,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { AccountService } from '@/services/account-service';
 import { useNotify } from '@/context/use-notify';
 import { useLoader } from '@/context/use-loader';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 import toast from 'react-hot-toast';
 
 export default function AccountPasswordChange({ onPageChange }) {
@@ -119,7 +119,7 @@ export default function AccountPasswordChange({ onPageChange }) {
             <Breadcrumbs currentPage={currentPage} />
 
             {isLoading ? (
-              <AccountLoader type="password" />
+              <PageLoader type="password" />
             ) : (
               <>
                 <form autoComplete="on" onSubmit={handleSubmit}>

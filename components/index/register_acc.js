@@ -3,9 +3,9 @@ import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
-const IndexHeart = dynamic(() => import('@/components/ui/animation/index-heart'), { ssr: false });
-const FireworkAnimation = dynamic(() => import('@/components/ui/animation/firework-animation'), { ssr: false });
-const FireworkAnimationRight = dynamic(() => import('@/components/ui/animation/firework-animation-right'), { ssr: false });
+const IndexHeart = dynamic(() => import('@/components/ui/animation/heart/index-heart'), { ssr: false });
+const FireworkAnimation = dynamic(() => import('@/components/ui/animation/firework/firework-animation'), { ssr: false });
+const FireworkAnimationRight = dynamic(() => import('@/components/ui/animation/firework/firework-animation-right'), { ssr: false });
 
 export default function RegisterAcc() {
   const { auth, setLoginModalToggle, switchHandler, isOnLogin, setIsOnLogin } =

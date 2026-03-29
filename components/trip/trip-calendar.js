@@ -8,7 +8,7 @@ import Router from 'next/router';
 import Swal from 'sweetalert2';
 import { apiClient } from '@/services/api-client';
 import { TripService } from '@/services/trip-service';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 
 
 function truncateChinese(title, maxChineseChars = 7) {
@@ -247,7 +247,7 @@ export default function TripCalendar() {
   if (isLoading) {
     return (
       <div className="min-h-[calc(100vh-200px)] flex flex-col justify-center items-center bg-black">
-        <AccountLoader type="index" />
+        <PageLoader type="index" />
       </div>
     );
   }

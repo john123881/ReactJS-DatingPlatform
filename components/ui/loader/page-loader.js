@@ -14,11 +14,10 @@ const loaderConfigs = {
 };
 
 /**
- * 統一的會員中心載入器
- * @param {string} type - 載入類型 ('post'|'edit'|'index'|'password'|'game'|'record'|'points'|'game_record')
- * @returns 
+ * 共用頁面載入器
+ * @param {string} type - 載入類型 ('post'|'collect'|'edit'|'index'|'profile'|'password'|'game'|'record'|'points'|'game_record')
  */
-export default function AccountLoader({ type, ...props }) {
+export default function PageLoader({ type, ...props }) {
   const config = loaderConfigs[type] || { text: '正在載入資料中...' };
   return <Loader minHeight="400px" {...config} {...props} />;
 }

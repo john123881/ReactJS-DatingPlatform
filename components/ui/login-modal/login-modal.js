@@ -1,8 +1,8 @@
 import LeftLogin from '@/components/ui/login-modal/left-login';
 import RightLogin from '@/components/ui/login-modal/right-login';
 import { useAuth } from '@/context/auth-context';
-import PeopleAnimation from '@/components/account-center/animation/people-animation';
-import LoginBackgroundAnimation from '@/components/ui/animation/login-background-animation';
+import PeopleAnimation from '@/components/ui/animation/login/people-animation';
+import LoginBackgroundAnimation from '@/components/ui/animation/login/login-background-animation';
 
 export default function LoginModal() {
   const { loginModalToggle, setLoginModalToggle, switchHandler, isOnLogin } =

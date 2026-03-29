@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import PageTitle from '@/components/page-title';
 import { TripService } from '@/services/trip-service';
-import { useTripDetail } from '@/hooks/use-trip-detail';
+import { useTripDetail } from '@/hooks/trip/use-trip-detail';
 
 export default function OtherTripdetail({ onPageChange }) {
   const pageTitle = '行程規劃';

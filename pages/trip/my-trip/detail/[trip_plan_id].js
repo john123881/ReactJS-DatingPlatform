@@ -8,8 +8,8 @@ import ContentNight from '@/components/trip/my-content/blocks/content-night';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
-import AccountLoader from '@/components/account-center/loader/account-loader';
-import { useTripDetail } from '@/hooks/use-trip-detail';
+import PageLoader from '@/components/ui/loader/page-loader';
+import { useTripDetail } from '@/hooks/trip/use-trip-detail';
 
 
 export default function MyTripDetail({ onPageChange }) {
@@ -46,7 +46,7 @@ export default function MyTripDetail({ onPageChange }) {
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen justify-center items-center">
-        <AccountLoader type="index" />
+        <PageLoader type="index" />
       </div>
     );
   }

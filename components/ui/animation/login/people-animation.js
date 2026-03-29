@@ -1,5 +1,5 @@
 import { useLottie } from 'lottie-react';
-import peopleAnima from '@/components/account-center/animation/peopleData.json';
+import peopleAnima from './peopleData.json';
 
 export default function PeopleAnimation({ isOnLogin }) {
   const options = {

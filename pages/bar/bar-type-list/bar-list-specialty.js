@@ -7,8 +7,7 @@ import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mob
 // import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { useBarList } from '@/hooks/use-bar-list';
-import { BarService } from '@/services/bar-service';
+import { useBarList } from '@/hooks/bar/use-bar-list';
 
 export default function BarListSpecialty({ onPageChange }) {
   const pageTitle = '酒吧探索';

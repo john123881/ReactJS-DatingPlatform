@@ -5,7 +5,7 @@ import { usePostContext } from '@/context/post-context';
 import FollowerModal from '../modal/followerModal';
 import FollowingModal from '../modal/followingModal';
 import { CommunityService } from '@/services/community-service';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 import { getImageUrl } from '@/services/image-utils';
 
 
@@ -155,7 +155,7 @@ export default function ProfileInfo() {
   }, [uid, auth.id]);
 
   if (isLoading) {
-    return <AccountLoader type="profile" minHeight="200px" />;
+    return <PageLoader type="profile" minHeight="200px" />;
   }
 
   return (

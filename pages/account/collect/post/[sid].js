@@ -7,7 +7,7 @@ import { RxCrossCircled, RxDoubleArrowRight } from 'react-icons/rx';
 import { usePostContext } from '@/context/post-context';
 import { useCollect } from '@/context/use-collect';
 import { useLoader } from '@/context/use-loader';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 import Link from 'next/link';
 
 import { AccountService } from '@/services/account-service';
@@ -275,7 +275,7 @@ export default function AccountCollect({ onPageChange }) {
               {/* TabBar END */}
 
               {isLoading || !isFetched ? (
-                <AccountLoader type="post" />
+                <PageLoader type="post" />
               ) : (
                 <>
                   <div

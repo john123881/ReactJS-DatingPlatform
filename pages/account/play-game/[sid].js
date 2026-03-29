@@ -6,7 +6,7 @@ import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
 import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
 import GameComponent from '@/components/account-center/game-component/game-component';
 import { useLoader } from '@/context/use-loader';
-import AccountLoader from '@/components/account-center/loader/account-loader';
+import PageLoader from '@/components/ui/loader/page-loader';
 import { useAuth } from '@/context/auth-context';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
@@ -64,7 +64,7 @@ export default function AccountPlayGame({ onPageChange }) {
             <div className="relative p-1 mx-auto mockup-phone">
               <div className="absolute top-0 left-0 camera"></div>
               <div className="min-h-[582px] flex flex-col min-w-[350px]  display w-full border  bg-base-300  border-slate-700 rounded-box">
-                {isLoading ? <AccountLoader type="game" /> : <GameComponent />}
+                {isLoading ? <PageLoader type="game" /> : <GameComponent />}
               </div>
             </div>
             {/* CONTENT1 END */}
