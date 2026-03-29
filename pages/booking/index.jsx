@@ -69,7 +69,6 @@ export default function Index({ onPageChange }) {
   };
 
   const [clickedButton, setClickedButton] = useState(null);
-  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     onPageChange(pageTitle);
@@ -239,20 +238,20 @@ export default function Index({ onPageChange }) {
 
 
       {/* button */}
-      <div className="flex justify-center pt-20 lg:pt-10 ">
+      <div className="flex justify-center pt-20 lg:pt-10">
         <div
           role="tablist"
-          className="tabs tabs-boxed bg-transparent border border-neongreen/30"
+          className="tabs tabs-boxed bg-transparent border border-neongreen/30 p-0 overflow-hidden"
           style={{
             width: '240px',
+            height: '40px',
             borderRadius: '30px',
           }}
         >
           <a
             role="tab"
-            className={`tab h-full transition-all duration-300 ${activeTab === 'now' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
+            className={`tab flex-1 h-full transition-all duration-300 ${activeTab === 'now' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
             style={{
-              width: '120px',
               borderRadius: '30px',
             }}
             onClick={() => handleTabClick('now')}
@@ -261,9 +260,8 @@ export default function Index({ onPageChange }) {
           </a>
           <a
             role="tab"
-            className={`tab h-full transition-all duration-300 ${activeTab === 'soon' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
+            className={`tab flex-1 h-full transition-all duration-300 ${activeTab === 'soon' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
             style={{
-              width: '120px',
               borderRadius: '30px',
             }}
             onClick={() => handleTabClick('soon')}
@@ -275,30 +273,27 @@ export default function Index({ onPageChange }) {
 
       <div className="flex justify-end w-full mt-5 ml-[-20px] sm:ml-[-70px]">
         <Link
-          className="btn btn-outline bg-transparent mt-[10px] w-[150px] mb-[30px] rounded-[30px] hover:bg-[#A0FF1F]"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
+          className="btn btn-outline bg-transparent mt-[10px] w-[150px] mb-[30px] rounded-[30px] hover:bg-neongreen hover:text-black group active:scale-95 transition-all"
           href={'booking/movie-ticket'}
         >
           {/* 愛心圖標 */}
           <IoTicketOutline
-            className="IoTicketOutline"
+            className={`IoTicketOutline transition-colors duration-300 ${
+              clickedButton ? 'text-[#FF03FF]' : 'text-white group-hover:text-black'
+            }`}
             style={{
-              color: clickedButton ? '#FF03FF' : hovered ? '#A0FF1F' : 'white',
               cursor: 'pointer',
             }}
-            onClick={() => {
-              // 切換按鈕點擊狀態
+            onClick={(e) => {
+              e.preventDefault(); // 防止跳轉 if clicking the icon itself (if intended to toggle)
               setClickedButton(clickedButton === 'heart' ? null : 'heart');
             }}
           />
           我的電影票
         </Link>
         <Link
-          className="btn btn-outline bg-transparent mt-[10px] w-[80px] mb-[30px] rounded-[30px] hover:bg-[#A0FF1F] mx-3"
+          className="btn btn-outline bg-transparent mt-[10px] w-[80px] mb-[30px] rounded-[30px] hover:bg-neongreen hover:text-black active:scale-95 transition-all mx-3"
           href={'booking/movie-list'}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
         >
           看更多
         </Link>
