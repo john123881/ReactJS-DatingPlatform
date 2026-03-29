@@ -58,8 +58,7 @@ export default function MyTripDetail({ onPageChange }) {
       <div className="flex flex-col min-h-screen">
         <TripNavigationTab />
         <MyTripDetailSidebar
-          trip_plan_id={trip_plan_id}
-          tripDetails={tripDetails}
+          tripName={tripName}
           refreshTripDetails={refreshAllDetails}
         />
 

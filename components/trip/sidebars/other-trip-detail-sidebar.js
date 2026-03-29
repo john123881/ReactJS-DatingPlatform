@@ -1,16 +1,15 @@
 import TripSidebarBase from './trip-sidebar-base';
 
 export default function OtherTripDetailSidebar({
-  trip_plan_id,
-  tripDetails,
-  refreshTripDetails,
+  tripName,
 }) {
   return (
     <TripSidebarBase
-      trip_plan_id={trip_plan_id}
-      tripDetails={tripDetails}
-      refreshTripDetails={refreshTripDetails}
-      isMyTrip={false}
+      tripName={tripName}
+      titlePrefix="行程探索"
+      usernamePrefix="由 "
+      backLink="/trip/other-trip"
+      backLabel="查看更多行程"
     />
   );
 }

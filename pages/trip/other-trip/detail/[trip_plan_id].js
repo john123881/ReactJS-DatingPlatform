@@ -107,7 +107,7 @@ export default function OtherTripdetail({ onPageChange }) {
       <div className="flex flex-col min-h-screen">
         <PageTitle pageTitle={pageTitle} />
         <TripNavigationTab />
-        <OtherTripDetailSidebar trip_plan_id={trip_plan_id} />
+        <OtherTripDetailSidebar tripName={tripName} />
         
         <div className="flex sm:justify-start justify-center items-center w-full py-8">
           <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4">

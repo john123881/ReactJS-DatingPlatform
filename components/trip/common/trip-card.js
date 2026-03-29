@@ -58,7 +58,7 @@ const TripCard = memo(function TripCard({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-40 sm:w-64 pb-2 bg-white border-2 border-white rounded-lg h-60 sm:h-96 group">
+    <div className="relative flex flex-col items-center justify-center w-full max-w-[175px] sm:max-w-[280px] pb-2 bg-white border-2 border-white rounded-lg h-64 sm:h-96 group transition-transform hover:scale-105 shadow-lg overflow-hidden flex-shrink-0">
       {isMyTrip && (
         <>
           <RxCrossCircled

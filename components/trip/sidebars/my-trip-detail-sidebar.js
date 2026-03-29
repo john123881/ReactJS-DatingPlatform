@@ -1,16 +1,15 @@
 import TripSidebarBase from './trip-sidebar-base';
 
 export default function MyTripDetailSidebar({
-  trip_plan_id,
-  tripDetails,
+  tripName,
   refreshTripDetails,
 }) {
   return (
     <TripSidebarBase
-      trip_plan_id={trip_plan_id}
-      tripDetails={tripDetails}
-      refreshTripDetails={refreshTripDetails}
-      isMyTrip={true}
+      tripName={tripName}
+      titlePrefix="我的行程"
+      backLink="/trip/my-trip"
+      backLabel="返回行程列表"
     />
   );
 }

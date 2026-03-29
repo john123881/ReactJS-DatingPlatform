@@ -136,10 +136,10 @@ export default function TripCalendar() {
           >
             {cell.day}
             {cell.trip && (
-              <div className="sm:mt-3 flex justify-center items-center">
+              <div className="sm:mt-1 flex justify-center items-center">
                 <Link
                   href={`/trip/my-trip/detail/${cell.trip.trip_plan_id}`}
-                  className=" hidden sm:inline-block text-sm sm:mt-3 sm:text-2xl bg-black px-3 py-2 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-white tooltip"
+                  className=" hidden sm:inline-block text-sm sm:mt-1 sm:text-2xl bg-black px-3 py-1 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-white tooltip"
                   data-tip={cell.trip.trip_title}
                 >
                   {truncateChinese(cell.trip.trip_title)}

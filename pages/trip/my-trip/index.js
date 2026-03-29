@@ -207,8 +207,8 @@ export default function MyTrip({ onPageChange }) {
         </div>
         <p className="sm:text-2xl">還沒有任何想法嗎？參考看看別人的行程吧</p>
       </div>
-      <div className=" mb-24 w-full flex justify-center">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
+      <div className="mb-24 w-full max-w-7xl px-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
           {otherTrips.map((otherTrip) => (
             <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
           ))}
@@ -282,15 +282,17 @@ export default function MyTrip({ onPageChange }) {
                     </form>
                   </dialog>
                 )}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
-                  {trips.map((trip) => (
-                    <TripCard
-                      key={trip.trip_plan_id}
-                      trip={trip}
-                      isMyTrip={true}
-                      onDeleteSuccess={onDeleteSuccess}
-                    />
-                  ))}
+                <div className="w-full max-w-7xl px-4 mt-8">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+                    {trips.map((trip) => (
+                      <TripCard
+                        key={trip.trip_plan_id}
+                        trip={trip}
+                        isMyTrip={true}
+                        onDeleteSuccess={onDeleteSuccess}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

@@ -71,10 +71,12 @@ export default function OtherTrip({ onPageChange }) {
                 />
               </svg>
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
-              {filteredTrips.map((otherTrip) => (
-                <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
-              ))}
+            <div className="w-full max-w-7xl px-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+                {filteredTrips.map((otherTrip) => (
+                  <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
+                ))}
+              </div>
             </div>
           </div>
         </div>

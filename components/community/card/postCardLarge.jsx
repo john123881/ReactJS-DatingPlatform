@@ -237,7 +237,12 @@ export default function PostCardLarge({ post }) {
               </div>
             </div>
           )}
-          <p className="postContext">{post.post_context}</p>
+          <p className="postContext mb-2">{post.post_context}</p>
+          <div className="flex flex-wrap gap-2 mb-3 px-1">
+            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#a0ff1f] text-[#a0ff1f] bg-black/50"># 新年派對</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#ff03ff] text-[#ff03ff] bg-black/50"># 慶祝時刻</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#00d4ff] text-[#00d4ff] bg-black/50"># 酒吧</span>
+          </div>
           <p
             className="commentontext text-[12px] text-grayBlue cursor-pointer"
             onClick={() => {
