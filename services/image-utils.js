@@ -7,7 +7,7 @@ import { API_SERVER } from '@/configs/api-config';
  * @returns {string} - 完整可用的網址
  */
 export const getImageUrl = (url, type = 'avatar') => {
-  if (!url) {
+  if (!url || url === 'undefined' || url === 'null') {
     return type === 'avatar' ? `${API_SERVER}/avatar/defaultAvatar.jpg` : '/unavailable-image.jpg';
   }
 
@@ -44,4 +44,25 @@ export const getImageUrl = (url, type = 'avatar') => {
 export const handleImageError = (e, type = 'avatar') => {
   e.target.onerror = null; // 防止無限迴圈
   e.target.src = type === 'avatar' ? '/unknown-user-image.jpg' : '/unavailable-image.jpg';
+};
+/**
+ * 格式化聊天時間為 HH:mm
+ * @param {string} dateStr - 原始日期字串 (ISO 或其他格式)
+ * @returns {string} - 格式化後的時間
+ */
+export const formatChatTime = (dateStr) => {
+  if (!dateStr) return '';
+  try {
+    const date = new Date(dateStr);
+    // 檢查是否為有效日期
+    if (isNaN(date.getTime())) return dateStr;
+    
+    return date.toLocaleTimeString('zh-TW', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  } catch (e) {
+    return dateStr;
+  }
 };

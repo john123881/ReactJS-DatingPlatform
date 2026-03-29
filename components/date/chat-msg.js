@@ -6,6 +6,7 @@ import {
 } from '@/configs/api-config';
 import { DateService } from '@/services/date-service';
 import io from 'socket.io-client';
+import { getImageUrl, handleImageError, formatChatTime } from '@/services/image-utils';
 
 export default function ChatMsg({ searchQuery }) {
   // 假資料
@@ -120,7 +121,11 @@ export default function ChatMsg({ searchQuery }) {
             <div className="flex items-center mb-6">
               <div className={`avatar ${isOnline ? 'online' : 'offline'}`}>
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-full">
-                  <img src={displayAvatar} alt="會員照片" />
+                  <img 
+                    src={getImageUrl(displayAvatar, 'avatar')} 
+                    alt="會員照片" 
+                    onError={(e) => handleImageError(e, 'avatar')}
+                  />
                 </div>
               </div>
               {/* <img
@@ -139,7 +144,7 @@ export default function ChatMsg({ searchQuery }) {
               </div>
               {/* <div className="mr-2 text-right md:text-right flex flex-col justify-start items-start"> */}
               <p className="text-xs md:text-xs justify-start items-start">
-                {msg.sended_at}
+                {formatChatTime(msg.sended_at)}
               </p>
               {/* </div> */}
             </div>

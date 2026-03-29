@@ -49,86 +49,79 @@ export default function NewFriends() {
 
   const [selectedBarTypeId, setSelectedBarTypeId] = useState(null);
   const [selectedMovieTypeId, setSelectedMovieTypeId] = useState(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
-  // 獲取用戶的 Bar 和 Movie 類型 ID
+  // 統合抓取邏輯：確保 auth.id 有值才執行，並依序抓取偏好與推薦
   useEffect(() => {
-    const fetchUserPreferences = async () => {
+    if (!auth.id || auth.id === 0) return;
+
+    const fetchData = async () => {
       open();
       try {
-        const data = await AccountService.getProfile(auth.id);
+        // 1. 獲取用戶偏好設定
+        const profileResult = await AccountService.getProfile(auth.id);
+        let barId = selectedBarTypeId;
+        let movieId = selectedMovieTypeId;
 
-        if (data.success) {
-          setSelectedBarTypeId(data.data.bar_type_id);
-          setSelectedMovieTypeId(data.data.movie_type_id);
-          // console.log(selectedBarTypeId);
-          // console.log(selectedMovieTypeId);
-        } else {
-          console.error(data.error);
+        if (profileResult.success) {
+          barId = profileResult.data.bar_type_id;
+          movieId = profileResult.data.movie_type_id;
+          setSelectedBarTypeId(barId);
+          setSelectedMovieTypeId(movieId);
         }
-      } catch (error) {
-        console.error('Error fetching user preferences:', error);
-      }
-      close();
-    };
 
-    fetchUserPreferences();
-  }, [auth.id, getAuthHeader]);
-
-  useEffect(() => {
-    const userId = auth.id;
-
-    const getBio = async () => {
-      open(); // 開啟 loader
-      try {
-        const data = await DateService.getRecommendedFriends(
-          userId,
-          selectedBarTypeId,
-          selectedMovieTypeId,
+        // 2. 獲取推薦名單
+        const bioResult = await DateService.getRecommendedFriends(
+          auth.id,
+          barId,
+          movieId
         );
-        if (data.success && data.data.length > 0) {
-          setBio(data.data[0]);
-          setBios(data.data);
-          setSelectedUserId(data.data[0].user_id);
+
+        if (bioResult.success && bioResult.data.length > 0) {
+          setBio(bioResult.data[0]);
+          setBios(bioResult.data);
+          setSelectedUserId(bioResult.data[0].user_id);
+          setBioIndex(0);
         } else {
-          console.log(data.msg);
+          setBio(null);
+          setBios([]);
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error in NewFriends fetchData:', error);
+      } finally {
+        setHasFetched(true);
+        close(0.5);
       }
-      close(1); // 關閉 loader
     };
 
-    getBio();
-  }, [selectedBarTypeId, selectedMovieTypeId, auth.id, getAuthHeader]);
+    fetchData();
+  }, [auth.id]);
 
   useEffect(() => {
-    if (bioIndex < bios.length) {
+    if (bios.length > 0 && bioIndex < bios.length) {
       setSelectedUserId(bios[bioIndex].user_id);
       setBio(bios[bioIndex]);
-    } else {
-      setBio(null); // 沒有資料
+    } else if (hasFetched) {
+      setBio(null); // 只有在已經抓取過的情況下才設為 null
     }
-  }, [bioIndex, bios]);
+  }, [bioIndex, bios, hasFetched]);
+
+  if (!hasFetched || (isLoading && !bio)) {
+    return <NewFriendModuleLoader />;
+  }
 
   if (!bio) {
     return (
-      <>
-        {isLoading ? (
-          <NewFriendModuleLoader />
-        ) : (
-          <div className="flex flex-col items-center justify-center p-4 gap-10">
-            {/* <h1 className="text-3xl font-bold mb-6">今日新朋友</h1> */}
-            <p className="text-lg md:text-lg sm:text-base">
-              好可惜，暫時無共同興趣的朋友！
-            </p>
-            <button className="text-black border-2 rounded-full btn-primary bg-primary border-primary hover:shadow-xl3 w-40 py-1 mx-2 md:w-60 md:py-2 ">
-              <Link href="/date/select-interests" onClick={handleClearToggle}>
-                重新選擇興趣
-              </Link>
-            </button>
-          </div>
-        )}
-      </>
+      <div className="flex flex-col items-center justify-center p-4 gap-10">
+        <p className="text-lg md:text-lg sm:text-base">
+          好可惜，暫時無共同興趣的朋友！
+        </p>
+        <button className="text-black border-2 rounded-full btn-primary bg-primary border-primary hover:shadow-xl3 w-40 py-1 mx-2 md:w-60 md:py-2 mx-auto block">
+          <Link href="/date/select-interests" onClick={handleClearToggle}>
+            重新選擇興趣
+          </Link>
+        </button>
+      </div>
     );
   }
 
@@ -167,7 +160,7 @@ export default function NewFriends() {
 
     // 在成功更新後重新獲取資料
     if (result.success) {
-      toast.success('好友已拒絕！', { duration: 1500 });
+      toast.success('已跳過此對象', { duration: 1500 });
       setBioIndex(bioIndex + 1);
     } else {
       console.error('Failed to update data');

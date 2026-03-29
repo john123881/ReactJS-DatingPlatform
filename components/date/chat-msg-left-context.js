@@ -1,5 +1,5 @@
 import React from 'react';
-import { getImageUrl, handleImageError } from '@/services/image-utils';
+import { getImageUrl, handleImageError, formatChatTime } from '@/services/image-utils';
 
 export default function ChatMsgLeftContext({ messages, children }) {
   return (
@@ -17,7 +17,7 @@ export default function ChatMsgLeftContext({ messages, children }) {
         </div>
         <div className="chat-header">
           {messages.sender_id}
-          <time className="text-xs opacity-50">{messages.sended_at}</time>
+          <time className="text-xs opacity-50">{formatChatTime(messages.sended_at)}</time>
         </div>
         {children ? (
           <>

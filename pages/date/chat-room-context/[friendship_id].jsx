@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { AccountService } from '@/services/account-service';
 import { DateService } from '@/services/date-service';
 import { SOCKET_SERVER } from '@/configs/api-config';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 //DATA
 // "data": [
@@ -306,14 +307,15 @@ export default function ChatRoomContext() {
       const responseData = await DateService.uploadChatImage(formData);
 
       if (responseData.success) {
-
+        console.log('Chat debug - responseData:', responseData);
         const messageData = {
           msg_type: 'I',
-          content: responseData.content,
+          content: responseData.imgUrl || responseData.content, // 相容處理
           sender_id: auth.username,
           sended_at: formatTime(),
           sender_avatar: userAvatar,
         };
+        console.log('Chat debug - messageData:', messageData);
 
         if (socket.current) {
           socket.current.emit('send_image', { roomName, messageData });
@@ -389,22 +391,22 @@ export default function ChatRoomContext() {
               return message.sender_id === auth.username ? (
                 <ChatMsgRightContext key={index} messages={message}>
                   {message.msg_type === 'I' ? (
-                    <Image
-                      width={100}
-                      height={100}
-                      src={message.content}
+                    <img 
+                      style={{ width: '200px', height: 'auto', borderRadius: '10px' }}
+                      src={getImageUrl(message.content, 'avatar')} // 聊天圖暫用 avatar 資料夾
                       alt="Sent image"
+                      onError={handleImageError}
                     />
                   ) : null}
                 </ChatMsgRightContext>
               ) : (
                 <ChatMsgLeftContext key={index} messages={message}>
                   {message.msg_type === 'I' ? (
-                    <Image
-                      width={100}
-                      height={100}
-                      src={message.content}
+                    <img 
+                      style={{ width: '200px', height: 'auto', borderRadius: '10px' }}
+                      src={getImageUrl(message.content, 'avatar')}
                       alt="Received image"
+                      onError={handleImageError}
                     />
                   ) : null}
                 </ChatMsgLeftContext>
