@@ -12,7 +12,9 @@ export default function ProfileForm({
   favBarList = [], 
   favMovieList = [],
   sid,
-  currentDate
+  currentDate,
+  userAvatar,
+  handleFileChange,
 }) {
   const formik = useFormik({
     initialValues,
