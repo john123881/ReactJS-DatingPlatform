@@ -109,7 +109,7 @@ export default function OtherTripdetail({ onPageChange }) {
         <TripNavigationTab />
         <OtherTripDetailSidebar tripName={tripName} />
         
-        <div className="flex flex-col lg:flex-row justify-start items-start w-full py-16 max-w-screen-2xl mx-auto px-6 sm:px-12 gap-16 transition-all duration-300">
+        <div className="flex flex-col lg:flex-row justify-start items-start w-full py-16 max-w-[1450px] mx-auto px-6 sm:px-12 gap-16 transition-all duration-300">
           {/* 左側：時段內容 */}
           <div className="flex flex-col gap-16 w-full lg:flex-grow order-2 lg:order-1 max-w-6xl pb-20">
             <OtherContentMorning trip_plan_id={trip_plan_id} newDetail={newDetail} />
