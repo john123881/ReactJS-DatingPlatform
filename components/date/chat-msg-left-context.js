@@ -1,3 +1,6 @@
+import React from 'react';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
+
 export default function ChatMsgLeftContext({ messages, children }) {
   return (
     <div>
@@ -7,7 +10,8 @@ export default function ChatMsgLeftContext({ messages, children }) {
           <div className="w-10 rounded-full">
             <img
               alt="Tailwind CSS chat bubble component"
-              src={messages.sender_avatar}
+              src={getImageUrl(messages.sender_avatar, 'avatar')}
+              onError={(e) => handleImageError(e, 'avatar')}
             />
           </div>
         </div>

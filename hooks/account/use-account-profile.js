@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import { AccountService } from '@/services/account-service';
+import { getImageUrl } from '@/services/image-utils';
 import toast from 'react-hot-toast';
 
 /**
@@ -21,7 +22,7 @@ export const useAccountProfile = () => {
       if (result.success) {
         setProfile(result.data);
         if (result.data.avatar) {
-          setUserAvatar(result.data.avatar);
+          setUserAvatar(getImageUrl(result.data.avatar, 'avatar'));
         }
         return result;
       } else {

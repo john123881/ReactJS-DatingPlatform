@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useDate } from '@/context/date-context';
 import Link from 'next/link';
 import { useLoader } from '@/context/use-loader';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 import NewFriendModuleLoader from './loader/new-friend-module-loader';
 
 export default function NewFriends() {
@@ -184,8 +185,9 @@ export default function NewFriends() {
             <div className="flex flex-col items-center justify-center">
               <img
                 className="w-64 h-64 border-3 border-green-500 rounded-lg"
-                src={bio.avatar}
+                src={getImageUrl(bio.avatar, 'avatar')}
                 alt={`會員照片 ${bio.username}`}
+                onError={(e) => handleImageError(e, 'avatar')}
               />
             </div>
             <div className="flex flex-col items-center justify-center mt-[20px]">

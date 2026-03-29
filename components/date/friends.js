@@ -4,6 +4,7 @@ import Link from 'next/link';
 import io from 'socket.io-client';
 import { DateService } from '@/services/date-service';
 import { SOCKET_SERVER } from '@/configs/api-config';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 // 接收 searchQuery 作為屬性
 export default function Friends({ searchQuery }) {
@@ -120,7 +121,11 @@ export default function Friends({ searchQuery }) {
             <div className="flex justify-start items-center md:mt-4 w-400 md:w-full gap-6 mb-4 mt-2">
               <div className={`avatar ${isOnline ? 'online' : 'offline'}`}>
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full">
-                  <img src={friendAvatar} alt="會員照片" />
+                  <img 
+                    src={getImageUrl(friendAvatar, 'avatar')} 
+                    alt="會員照片" 
+                    onError={(e) => handleImageError(e, 'avatar')}
+                  />
                 </div>
               </div>
               <p className="w-[100px] flex justify-start items-start">

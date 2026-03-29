@@ -2,6 +2,7 @@ import { usePostContext } from '@/context/post-context';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from './modal.module.css';
+import { getImageUrl } from '@/services/image-utils';
 
 export default function FollowingModal({ followings, modalId }) {
   const {
@@ -66,7 +67,7 @@ export default function FollowingModal({ followings, modalId }) {
                         }}
                       >
                         <img
-                          src={user.avatar || '/unknown-user-image.jpg'}
+                          src={getImageUrl(user.avatar, 'avatar')}
                           alt={user.username || 'No Image Available'}
                         />
                       </div>

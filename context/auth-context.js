@@ -9,6 +9,7 @@ import {
 import { useRouter } from 'next/router';
 import { API_SERVER } from '@/configs/api-config';
 import { AuthService } from '@/services/auth-service';
+import { getImageUrl } from '@/services/image-utils';
 
 const AuthContext = createContext();
 const emptyAuth = {
@@ -26,7 +27,7 @@ export function AuthContextProvider({ children }) {
   const router = useRouter();
   const [loginModalToggle, setLoginModalToggle] = useState(false);
   const [userAvatar, setUserAvatar] = useState(
-    `${API_SERVER}/avatar/defaultAvatar.jpg`,
+    getImageUrl(null, 'avatar'),
   );
   const [isOnLogin, setIsOnLogin] = useState(true);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
@@ -133,7 +134,7 @@ export function AuthContextProvider({ children }) {
           if (result && result.success) {
             setAuth(data);
             if (data.avatar) {
-              setUserAvatar(data.avatar);
+              setUserAvatar(getImageUrl(data.avatar, 'avatar'));
             }
           } else {
             // Cookie 無效，清除本地資料

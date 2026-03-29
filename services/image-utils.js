@@ -13,11 +13,11 @@ export const getImageUrl = (url, type = 'avatar') => {
 
   let finalUrl = url;
 
-  // 1. 處理硬編碼的舊 IP 位址 (強化修復)
-  // 使用正則表達式匹配 119.14.x.x 系列的硬編碼網址並替換為當前的 API_SERVER
-  const ipRegex = /http:\/\/119\.14\.\d{1,3}\.\d{1,3}:3001/g;
-  if (ipRegex.test(finalUrl)) {
-    finalUrl = finalUrl.replace(ipRegex, API_SERVER);
+  // 1. 處理硬編碼的舊 IP 或 localhost 位址 (強化修復)
+  // 將舊 IP 119.14.x.x 或 localhost:3001 替換為當前的 API_SERVER
+  const legacyHostsRegex = /http:\/\/(119\.14\.\d{1,3}\.\d{1,3}|localhost):3001/g;
+  if (legacyHostsRegex.test(finalUrl)) {
+    finalUrl = finalUrl.replace(legacyHostsRegex, API_SERVER);
   }
 
   // 2. 如果已經是完整網址 (http/https) 或 Base64 資料，直接回傳
@@ -34,4 +34,14 @@ export const getImageUrl = (url, type = 'avatar') => {
   const cleanUrl = finalUrl.startsWith('/') ? finalUrl.slice(1) : finalUrl;
   
   return `${API_SERVER}/${folder}/${cleanUrl}`;
+};
+
+/**
+ * 處理圖片載入失敗 (404)，替換為本地預設圖
+ * @param {Event} e - 錯誤事件
+ * @param {string} type - 圖片類型
+ */
+export const handleImageError = (e, type = 'avatar') => {
+  e.target.onerror = null; // 防止無限迴圈
+  e.target.src = type === 'avatar' ? '/unknown-user-image.jpg' : '/unavailable-image.jpg';
 };

@@ -2,6 +2,7 @@ import RatingStar from '../bar-rating/rating-star';
 import BarRatingDeleteModal from '../modal/bar-rating-delete-modal';
 import BarRatingEditModal from '../modal/bar-rating-edit-modal';
 import Image from 'next/image';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 export default function BarReviewCard({ rating }) {
   console.log(rating);
@@ -11,10 +12,11 @@ export default function BarReviewCard({ rating }) {
         <div className="flex">
           <Image
             className="h-[71px] w-[71px] rounded-full"
-            src={rating.avatar}
+            src={getImageUrl(rating.avatar, 'avatar')}
             alt={rating.username}
             width={71}
             height={71}
+            onError={(e) => handleImageError(e, 'avatar')}
           />
           <div className="ml-4 text-white space-y-1">
             <div className="text-[15px]">{rating.username}</div>
