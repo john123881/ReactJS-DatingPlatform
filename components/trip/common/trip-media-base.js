@@ -113,7 +113,7 @@ export default function TripMediaBase({
     };
 
     fetchData();
-  }, [trip_plan_id, tripDetails.block, isOther, type]);
+  }, [trip_plan_id, tripDetails, isOther, type, config.imageProp]);
 
   // Fallback 邏輯 (僅限我的行程)
   if (!isOther && isEmpty) {

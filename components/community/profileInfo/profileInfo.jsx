@@ -156,7 +156,8 @@ export default function ProfileInfo() {
   }, [uid]); // 只有當 uid 變化時重新抓取
 
   if (isLoading) {
-    return <PageLoader type="profile" minHeight="200px" />;
+    // 預留空間避免高度塌陷，但不顯示二次 Spinner
+    return <div className="w-full min-h-[200px]"></div>;
   }
 
   return (

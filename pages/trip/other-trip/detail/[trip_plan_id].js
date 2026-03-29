@@ -112,9 +112,9 @@ export default function OtherTripdetail({ onPageChange }) {
         <div className="flex flex-col lg:flex-row justify-start items-start w-full py-16 max-w-screen-2xl mx-auto px-6 sm:px-12 gap-16 transition-all duration-300">
           {/* 左側：時段內容 */}
           <div className="flex flex-col gap-12 w-full lg:flex-grow order-2 lg:order-1 max-w-4xl">
-            <OtherContentMorning trip_plan_id={trip_plan_id} />
-            <OtherContentNoon trip_plan_id={trip_plan_id} />
-            <OtherContentNight trip_plan_id={trip_plan_id} />
+            <OtherContentMorning trip_plan_id={trip_plan_id} newDetail={newDetail} />
+            <OtherContentNoon trip_plan_id={trip_plan_id} newDetail={newDetail} />
+            <OtherContentNight trip_plan_id={trip_plan_id} newDetail={newDetail} />
           </div>
 
           {/* 右側：行程細節 (Sidebar) */}

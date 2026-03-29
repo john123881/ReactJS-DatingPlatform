@@ -104,10 +104,10 @@ export default function Profile({ onPageChange }) {
             <Sidebar />
           </div>
 
-          <div className="flex flex-col md:w-10/12 items-center min-h-[500px]">
+          <div className="flex flex-col md:w-10/12 items-center">
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center py-40">
-                <PageLoader type="index" minHeight="300px" />
+              <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+                <PageLoader type="index" />
               </div>
             ) : (
               <>

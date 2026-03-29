@@ -11,7 +11,14 @@ export default function OtherContentBase({
   const [tripDetails, setTripDetails] = useState({});
 
   useEffect(() => {
-    if (trip_plan_id) {
+    if (newDetail && Array.isArray(newDetail)) {
+      const currentBlock = newDetail.find(d => d.block === block);
+      if (currentBlock) {
+        setTripDetails(currentBlock);
+      } else {
+        setTripDetails({ block: null });
+      }
+    } else if (trip_plan_id) {
       const fetchData = async () => {
         try {
           const result = await fetchMethod(trip_plan_id);
@@ -27,7 +34,7 @@ export default function OtherContentBase({
       };
       fetchData();
     }
-  }, [trip_plan_id, fetchMethod, block]);
+  }, [newDetail, trip_plan_id, fetchMethod, block]);
 
   return (
     <>
