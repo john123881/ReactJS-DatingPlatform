@@ -93,33 +93,27 @@ export default function AccountEdit({ onPageChange }) {
   return (
     <AccountLayout currentPage={currentPage}>
       <div className="relative">
-        <div className="flex flex-col lg:flex-row bg-base-300 rounded-box overflow-hidden mb-4 p-4 lg:p-8">
-           <AvatarUpload 
-             avatar={userAvatar} 
-             onFileChange={handleFileChange} 
-           />
-           <div className="flex-1">
-             <ProfileForm 
-               sid={sid}
-               initialValues={initialValues}
-               favBarList={favBarList}
-               favMovieList={favMovieList}
-               currentDate={currentDate}
-               onSubmit={async (values) => {
-                 const fetchData = () => AccountService.updateProfile(sid, values);
-                 notifyPromise(fetchData, {
-                   loading: '正在保存...',
-                   success: (result) => {
-                     if (!result.success) throw result.error;
-                     router.push(`/account/index/${sid}`);
-                     return '修改成功';
-                   },
-                   error: (err) => `修改失敗: ${err.toString()}`
-                 });
-               }}
-             />
-           </div>
-        </div>
+        <ProfileForm 
+          sid={sid}
+          initialValues={initialValues}
+          favBarList={favBarList}
+          favMovieList={favMovieList}
+          currentDate={currentDate}
+          userAvatar={userAvatar}
+          handleFileChange={handleFileChange}
+          onSubmit={async (values) => {
+            const fetchData = () => AccountService.updateProfile(sid, values);
+            notifyPromise(fetchData, {
+              loading: '正在保存...',
+              success: (result) => {
+                if (!result.success) throw result.error;
+                router.push(`/account/index/${sid}`);
+                return '修改成功';
+              },
+              error: (err) => `修改失敗: ${err.toString()}`
+            });
+          }}
+        />
       </div>
     </AccountLayout>
   );

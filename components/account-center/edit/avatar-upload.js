@@ -28,7 +28,7 @@ export default function AvatarUpload({ avatar, onFileChange }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-full basis-1/2">
+    <div className="flex flex-col items-center justify-center rounded-full">
       <div className="mx-4 mt-4 ">
         <img
           className="object-cover w-48 h-48 rounded-full cursor-pointer hover:opacity-80 transition-opacity"

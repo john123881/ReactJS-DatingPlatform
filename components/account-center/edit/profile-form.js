@@ -1,6 +1,7 @@
 import { useFormik } from 'formik';
 import { editSchema } from '@/components/schemas';
 import Link from 'next/link';
+import AvatarUpload from './avatar-upload';
 
 /**
  * ProfileForm - 個人資料編輯表單
@@ -24,11 +25,11 @@ export default function ProfileForm({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex flex-col h-full mb-4 lg:flex-row card bg-base-300 rounded-box place-items-center p-4 lg:p-8">
-        {/* 此處預留給 AvatarUpload */}
-        <div id="avatar-container" className="basis-1/2 flex justify-center"></div>
-
-        <div className="container basis-1/2">
+      <div className="flex flex-col lg:h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center p-4 lg:p-8">
+        <div className="justify-center avatar lg:basis-1/3">
+          <AvatarUpload avatar={userAvatar} onFileChange={handleFileChange} />
+        </div>
+        <div className="container lg:basis-2/3 mt-4 lg:mt-0">
           {/* Email (Readonly) */}
           <FormInput 
             label="電子郵件" 
@@ -106,7 +107,7 @@ export default function ProfileForm({
 
       <div className="divider"></div>
 
-      <div className="flex flex-col justify-start h-full mb-20 bg-base-300 rounded-box p-4 lg:p-8">
+      <div className="flex flex-col justify-start h-full mb-20 lg:mx-1 xl:mx-1 2xl:mx-12 bg-base-100 rounded-box p-4 lg:p-8">
         <label className="text-xl text-light mb-4">關於我：</label>
         <textarea
           name="profile"
@@ -116,17 +117,17 @@ export default function ProfileForm({
           className="w-full h-48 textarea textarea-bordered textarea-lg text-light"
         ></textarea>
         
-        <div className="flex justify-end mt-8 gap-4">
+        <div className="flex justify-end mt-8 gap-4 flex-col sm:flex-row">
           <button
             disabled={isSubmitting}
             type="submit"
-            className="btn btn-primary rounded-full px-8"
+            className="btn min-h-[40px] h-[40px] w-full sm:w-[140px] rounded-full border-dark btn-primary bg-primary hover:bg-primary hover:shadow-xl3 hover:border-primary font-bold"
           >
             編輯完成
           </button>
           <Link
             href={`/account/index/${sid}`}
-            className="btn btn-outline rounded-full px-8"
+            className="btn min-h-[40px] h-[40px] w-full sm:w-[140px] sm:ml-4 rounded-full btn-outline bg-dark hover:bg-dark text-primary hover:text-primary hover:shadow-xl3 hover:border-dark"
           >
             取消編輯
           </Link>

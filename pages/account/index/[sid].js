@@ -1,9 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from 'react';
-import Sidebar from '@/components/account-center/sidebar/sidebar';
-import PageTitle from '@/components/page-title';
-import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
-import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
+import AccountLayout from '@/components/account-center/account-layout';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
@@ -113,14 +110,7 @@ export default function AccountIndex({ onPageChange }) {
   }, [router.query]);
 
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="flex min-h-screen pt-10 bg-dark">
-        <Sidebar currentPage={currentPage} />
-        <div className="w-screen px-4 py-12 sm:px-6 md:px-8 lg:ps-14 lg:pe-44 xl:pe-60">
-          <div className="flex flex-col w-full ">
-            <BurgerMenu currentPage={currentPage} />
-            <Breadcrumbs currentPage={currentPage} />
+    <AccountLayout currentPage={currentPage}>
             {isLoading ? (
               <PageLoader type="index" />
             ) : (
@@ -314,9 +304,6 @@ export default function AccountIndex({ onPageChange }) {
                 </div>
               </>
             )}
-          </div>
-        </div>
-      </div>
-    </>
+    </AccountLayout>
   );
 }

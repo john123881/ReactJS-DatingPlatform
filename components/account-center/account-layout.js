@@ -20,7 +20,7 @@ export default function AccountLayout({
       <div className="flex min-h-screen pt-10 bg-dark ">
         <Sidebar currentPage={currentPage} />
 
-        <div className="w-screen px-4 py-12 sm:px-6 md:px-8 lg:ps-14 lg:pe-44 xl:pe-60">
+        <div className="flex-1 w-full max-w-full px-4 py-12 sm:px-6 md:px-8 lg:ps-14 lg:pe-44 xl:pe-60">
           <div className="flex flex-col w-full ">
             <BurgerMenu currentPage={currentPage} />
             <Breadcrumbs currentPage={currentPage} />
