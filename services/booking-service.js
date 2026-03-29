@@ -23,8 +23,10 @@ export const BookingService = {
   getIndexMovies: () => apiClient(BOOKING_INDEX_MOVIE_LIST),
 
   /**
-   * 獲取電影清單
+   * 獲取完整電影清單
    */
+  getMovieList: () => apiClient(BOOKING_MOVIE_LIST),
+
   /**
    * 根據類型獲取電影
    * @param {string|number} typeId
@@ -49,9 +51,7 @@ export const BookingService = {
    * @param {string} movieIds - 逗號分隔的 ID 字串
    */
   checkMovieStatus: (userId, movieIds) =>
-    apiClient(
-      `${BOOKING_CHECK_MOVIE_STATUS}?userId=${userId}&movieIds=${movieIds}`,
-    ),
+    apiClient.post(BOOKING_CHECK_MOVIE_STATUS, { userId, movieIds }),
 
   /**
    * 收藏電影

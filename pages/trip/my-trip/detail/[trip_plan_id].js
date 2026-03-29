@@ -63,13 +63,13 @@ export default function MyTripDetail({ onPageChange }) {
         />
 
         <div className="flex justify-center items-start w-full py-8 overflow-x-hidden max-w-7xl mx-auto">
-          <div className="hidden sm:flex min-w-[300px] justify-end">
+          <div className="hidden lg:flex w-[250px] justify-end flex-shrink-0">
             <BarPhotoCarousel
               trip_plan_id={trip_plan_id}
               refreshAllDetails={refreshAllDetails}
             />
           </div>
-          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4 flex-shrink-0">
+          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-3xl px-4">
             <ContentMorning
               newDetail={newDetail}
               tripDetails={tripDetails}
@@ -86,7 +86,7 @@ export default function MyTripDetail({ onPageChange }) {
               trip_plan_id={trip_plan_id}
             />
           </div>
-          <div className="hidden sm:flex min-w-[300px] justify-start">
+          <div className="hidden lg:flex w-[250px] justify-start flex-shrink-0">
             <MoviePhotoCarousel2
               trip_plan_id={trip_plan_id}
               refreshAllDetails={refreshAllDetails}

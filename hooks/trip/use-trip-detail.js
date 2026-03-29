@@ -35,7 +35,7 @@ export function useTripDetail(trip_plan_id) {
       
       // 設置行程基本資訊 (標題, 日期, 描述, 筆記)
       if (nameData) {
-        setTripName(nameData);
+        setTripName(Array.isArray(nameData) ? nameData[0] : nameData);
       }
 
       // 設置全天行程內容

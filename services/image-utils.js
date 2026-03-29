@@ -22,6 +22,10 @@ export const getImageUrl = (url, type = 'avatar') => {
 
   // 2. 如果已經是完整網址 (http/https) 或 Base64 資料，直接回傳
   if (finalUrl.startsWith('http') || finalUrl.startsWith('data:')) {
+    // 額外檢查：如果 API_SERVER 是 https，則強制將回傳的 http 升級為 https (解決 mixed-content)
+    if (API_SERVER.startsWith('https') && finalUrl.startsWith('http:')) {
+      return finalUrl.replace('http:', 'https:');
+    }
     return finalUrl;
   }
 
@@ -29,6 +33,7 @@ export const getImageUrl = (url, type = 'avatar') => {
   let folder = 'avatar';
   if (type === 'post') folder = 'community/post-img';
   if (type === 'event') folder = 'community/event-img';
+  if (type === 'chat') folder = 'chat';
 
   // 確保路徑開頭沒有多餘的斜線
   const cleanUrl = finalUrl.startsWith('/') ? finalUrl.slice(1) : finalUrl;

@@ -133,17 +133,16 @@ export default function ChatMsg({ searchQuery }) {
                 src={displayAvatar}
                 alt="會員照片"
               /> */}
-              <div className="flex flex-col flex-grow p-2">
-                <p className="w-[100px] text-xs md:text-base">{displayName}</p>
+              <div className="flex flex-col flex-grow p-2 overflow-hidden">
+                <p className="w-full text-xs md:text-base font-semibold truncate text-white">{displayName}</p>
                 <p
-                  className="w-[100px] text-xs md:text-base truncate "
-                  style={{ width: '15em' }}
+                  className="w-full text-xs md:text-gray-400 truncate"
                 >
-                  {msg.content}
+                  {msg.msg_type === 'I' ? '[圖片訊息]' : msg.content}
                 </p>
               </div>
               {/* <div className="mr-2 text-right md:text-right flex flex-col justify-start items-start"> */}
-              <p className="text-xs md:text-xs justify-start items-start">
+              <p className="text-[10px] md:text-xs text-gray-500 whitespace-nowrap ml-auto">
                 {formatChatTime(msg.sended_at)}
               </p>
               {/* </div> */}

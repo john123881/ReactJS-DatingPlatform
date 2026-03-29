@@ -8,6 +8,8 @@ import PostModal from '../modal/postModal';
 import EditModal from '../modal/editModal';
 import styles from './card.module.css';
 
+import { getImageUrl, handleImageError } from '@/services/image-utils';
+
 export default function PostCardLarge({ post }) {
   const { auth } = useAuth();
 
@@ -99,8 +101,9 @@ export default function PostCardLarge({ post }) {
               <div className="avatar">
                 <div className="w-10 rounded-full">
                   <img
-                    src={post.avatar || '/unknown-user-image.jpg'}
+                    src={getImageUrl(post.avatar, 'avatar')}
                     alt={post.photo_name || 'No Image Available'}
+                    onError={(e) => handleImageError(e, 'avatar')}
                   />
                 </div>
               </div>
@@ -171,9 +174,10 @@ export default function PostCardLarge({ post }) {
               <div className={styles.parallaxContent}>
                 <div className="parallaxContentBack">
                   <img
-                    src={post.img || '/unavailable-image.jpg'}
+                    src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo w-[480px] h-[480px] object-cover`}
+                    onError={(e) => handleImageError(e, 'post')}
                   />
                 </div>
               </div>

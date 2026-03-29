@@ -28,11 +28,11 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
         onChange={(e) => onAreaSelected(e.target.value)}
         defaultValue=""
       >
-        <option disabled value="">
+        <option disabled value="" className="text-black">
           酒吧區域
         </option>
         {areas.map((area) => (
-          <option key={area.bar_area_id} value={area.bar_area_id}>
+          <option key={area.bar_area_id} value={area.bar_area_id} className="text-black">
             {area.bar_area_name}
           </option>
         ))}
@@ -42,11 +42,11 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
         onChange={(e) => onTypeSelected(e.target.value)}
         defaultValue=""
       >
-        <option disabled value="">
+        <option disabled value="" className="text-black">
           酒吧種類
         </option>
         {types.map((type) => (
-          <option key={type.bar_type_id} value={type.bar_type_id}>
+          <option key={type.bar_type_id} value={type.bar_type_id} className="text-black">
             {type.bar_type_name}
           </option>
         ))}

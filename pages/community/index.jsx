@@ -63,7 +63,7 @@ export default function Index({ onPageChange }) {
             <Sidebar />
           </div>
           <div className="flex justify-center w-full md:basis-6/12">
-            <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+            <div className="flex flex-col items-center justify-start min-h-screen gap-8 pt-10">
               <div className="filterBtn flex gap-5 justify-between sm:w-[330px] md:w-[480px] md:mx-auto sm:mx-5">
                 <button
                   className={`${

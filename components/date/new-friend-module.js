@@ -168,45 +168,59 @@ export default function NewFriends() {
   };
 
   return (
-    <>
+    <div className="w-full max-w-[800px] mx-auto min-h-[600px] flex items-center justify-center border border-gray-500 rounded-xl bg-[#2C2C2C] shadow-lg overflow-hidden">
       {isLoading ? (
-        <NewFriendModuleLoader />
+        <NewFriendModuleLoader minHeight="600px" />
       ) : (
-        <div className="flex flex-col items-center justify-center p-4">
-          <h1 className="text-3xl font-bold mb-6">今日新朋友</h1>
-          <div>
-            <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center p-8 w-full animate-fade-in">
+          <h1 className="text-3xl font-bold mb-8 text-white">今日新朋友</h1>
+          <div className="w-full flex flex-col items-center">
+            <div className="relative group">
               <img
-                className="w-64 h-64 border-3 border-green-500 rounded-lg"
+                className="w-64 h-64 md:w-80 md:h-80 border-2 border-primary rounded-2xl object-cover shadow-2xl transition-transform duration-300 group-hover:scale-105"
                 src={getImageUrl(bio.avatar, 'avatar')}
                 alt={`會員照片 ${bio.username}`}
                 onError={(e) => handleImageError(e, 'avatar')}
               />
+              <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10"></div>
             </div>
-            <div className="flex flex-col items-center justify-center mt-[20px]">
-              <p className="mb-3 text-lg md:text-lg sm:text-base">
-                {bio.username}，
-                {bio.birthday
-                  ? Math.floor(
-                      (new Date() - new Date(bio.birthday)) /
-                        (1000 * 60 * 60 * 24 * 365.25),
-                    )
-                  : '未知'}
-              </p>
-              <p className="mb-3 text-lg md:text-lg sm:text-base">
-                {bio.bar_type?.bar_type_name}、{bio.movie_type?.movie_type}
-              </p>
-              <p className="mb-6 text-center text-lg md:text-lg sm:text-base">
-                {bio.profile_content}
+            
+            <div className="flex flex-col items-center justify-center mt-8 text-center">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl md:text-3xl font-bold text-white">{bio.username}</span>
+                <span className="text-xl md:text-2xl text-gray-400">
+                  {bio.birthday
+                    ? Math.floor(
+                        (new Date() - new Date(bio.birthday)) /
+                          (1000 * 60 * 60 * 24 * 365.25),
+                      )
+                    : '未知'} 歲
+                </span>
+              </div>
+              
+              <div className="flex gap-2 mb-4">
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium border border-primary/30">
+                  {bio.bar_type?.bar_type_name}
+                </span>
+                <span className="px-3 py-1 bg-secondary/20 text-secondary rounded-full text-sm font-medium border border-secondary/30">
+                  {bio.movie_type?.movie_type}
+                </span>
+              </div>
+
+              <p className="max-w-md text-gray-300 leading-relaxed text-lg italic mt-2">
+                "{bio.profile_content}"
               </p>
             </div>
           </div>
-          <SelectBtn
-            onAcceptClick={handleAcceptClick} // 接受
-            onRejectClick={handleRejectClick} // 拒絕
-          />
+
+          <div className="mt-10 w-full flex justify-center">
+            <SelectBtn
+              onAcceptClick={handleAcceptClick}
+              onRejectClick={handleRejectClick}
+            />
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

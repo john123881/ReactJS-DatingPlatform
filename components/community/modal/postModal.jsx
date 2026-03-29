@@ -7,7 +7,7 @@ import ShareModal from '../modal/shareModal';
 import EditModal from '../modal/editModal';
 import { FiSend, FiMessageCircle, FiMoreHorizontal } from 'react-icons/fi';
 import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
-import { getImageUrl } from '@/services/image-utils';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 
 export default function PostModal({ post, modalId, isOpen }) {
@@ -147,11 +147,12 @@ export default function PostModal({ post, modalId, isOpen }) {
                 }
               }}
             >
-              <img
-                src={getImageUrl(post.img, 'post')}
-                alt={post.photo_name || 'No Image Available'}
-                className="object-contain h-full w-full"
-              />
+                <img
+                  src={getImageUrl(post.img, 'post')}
+                  alt={post.photo_name || 'No Image Available'}
+                  className={`h-full w-full object-cover`}
+                  onError={(e) => handleImageError(e, 'post')}
+                />
             </figure>
 
             <div className="flex flex-col card-body h-full w-full md:w-1/2 overflow-auto mx-3">

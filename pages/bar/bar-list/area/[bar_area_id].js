@@ -7,9 +7,10 @@ import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import Loader from '@/components/ui/loader/loader';
 
 export default function List({ onPageChange }) {
-  const pageTitle = '社群媒體';
+  const pageTitle = '酒吧探索';
   const router = useRouter();
   useEffect(() => {
     onPageChange(pageTitle);
@@ -17,6 +18,7 @@ export default function List({ onPageChange }) {
 
   const { auth, getAuthHeader } = useAuth();
   const [bars, setBars] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [barsPerPage] = useState(8);
   const [savedBars, setSavedBars] = useState({});
@@ -68,12 +70,19 @@ export default function List({ onPageChange }) {
     if (!bar_area_id) return; // 確保 bar_area_id 存在
 
     try {
+      setIsLoading(true);
       const result = await BarService.getBars({ bar_area_id });
-      const barIds = result.map((bar) => bar.bar_id).join(',');
-      checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
-      setBars(result); // 確認數據是否為預期格式
+      
+      if (result && result.length > 0) {
+        const barIds = result.map((bar) => bar.bar_id).join(',');
+        checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
+      }
+      
+      setBars(result || []); // 確認數據是否為預期格式
     } catch (error) {
       console.error('Failed to fetch bar area:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,10 +133,15 @@ export default function List({ onPageChange }) {
   //   updateBarsList(selectedAreaId, typeId);
   // };
 
-  // bar-type sidebar
+  // bar-area navigation
+  const onAreaSelected = (areaId) => {
+    router.push(`/bar/bar-list/area/${areaId}`);
+  };
+
+  // bar-type sidebar navigation
   const onTypeSelected = (typeId) => {
     // 使用 useRouter 的 push 方法
-    router.push(`/bar/${typeId}`);
+    router.push(`/bar/bar-list/${typeId}`);
   };
 
   return (
@@ -137,8 +151,7 @@ export default function List({ onPageChange }) {
         <div className="hidden md:flex flex-col items-center md:w-2/12">
           {/* <BarListSidebar onAreaSelected={handleAreaSelected} /> */}
           <BarListSidebar
-            // onAreaSelected={onAreaSelected}
-            // onTypeSelected={onTypeSelected}
+            onAreaSelected={onAreaSelected}
             onTypeSelected={onTypeSelected}
           />
         </div>
@@ -150,7 +163,7 @@ export default function List({ onPageChange }) {
             <div className="md:text-h5 text-white font-bold">
               {/* 特色酒吧 */}
               {/* {bars?.bar_type_name} */}
-              {bars.length > 0 ? bars[0].bar_area_name : '加載中...'}
+              {isLoading ? '正在搜尋驚喜...' : (bars.length > 0 ? bars[0].bar_area_name : '特色酒吧')}
             </div>
             <BarListDropdownMobile />
             <label className="hidden input input-bordered md:flex items-center gap-2 h-[32px] rounded-xl border-white bg-transparent hover:border-[#A0FF1F] text-white">
@@ -175,8 +188,10 @@ export default function List({ onPageChange }) {
               </svg>
             </label>
           </div>
-          <div className="flex flex-wrap mx-auto w-full gap-4 justify-center items-center">
-            {hasSearched ? (
+          <div className="flex flex-wrap mx-auto w-full gap-4 justify-center items-center min-h-[400px]">
+            {isLoading ? (
+              <Loader minHeight="400px" text="正在載入酒吧清單..." />
+            ) : hasSearched ? (
               searchResults.length > 0 ? (
                 searchResults.map((bar) => (
                   <BarCard
@@ -225,7 +240,7 @@ export default function List({ onPageChange }) {
                   }`}
                   onClick={() => handlePageChange(minPageNumberLimit + index)}
                   style={{
-                    backgroundColor: currentPage === index + 1 ? '#A0FF1F' : '',
+                    backgroundColor: currentPage === minPageNumberLimit + index ? '#A0FF1F' : '',
                   }}
                 >
                   {minPageNumberLimit + index}

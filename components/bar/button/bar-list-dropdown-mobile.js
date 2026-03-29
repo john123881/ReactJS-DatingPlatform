@@ -35,21 +35,21 @@ export default function BarListDropdownMobile() {
               onChange={handleAreaChange} // 為 select 元素添加 onChange 處理器
               defaultValue=""
             >
-              <option disabled value="">
+              <option disabled value="" className="text-black">
                 酒吧區域
               </option>
-              <option value="1">松山區</option>
-              <option value="2">信義區</option>
-              <option value="3">大安區</option>
-              <option value="4">中山區</option>
-              <option value="5">中正區</option>
-              <option value="6">大同區</option>
-              <option value="7">萬華區</option>
-              <option value="8">文山區</option>
-              <option value="9">南港區</option>
-              <option value="10">內湖區</option>
-              <option value="11">士林區</option>
-              <option value="12">北投區</option>
+              <option value="1" className="text-black">松山區</option>
+              <option value="2" className="text-black">信義區</option>
+              <option value="3" className="text-black">大安區</option>
+              <option value="4" className="text-black">中山區</option>
+              <option value="5" className="text-black">中正區</option>
+              <option value="6" className="text-black">大同區</option>
+              <option value="7" className="text-black">萬華區</option>
+              <option value="8" className="text-black">文山區</option>
+              <option value="9" className="text-black">南港區</option>
+              <option value="10" className="text-black">內湖區</option>
+              <option value="11" className="text-black">士林區</option>
+              <option value="12" className="text-black">北投區</option>
             </select>
           </li>
           <li>
@@ -58,14 +58,14 @@ export default function BarListDropdownMobile() {
               onChange={handleTypeChange} // 為 select 元素添加 onChange 處理器
               defaultValue=""
             >
-              <option disabled value="">
+              <option disabled value="" className="text-black">
                 酒吧種類
               </option>
-              <option value="1">運動酒吧</option>
-              <option value="2">音樂酒吧</option>
-              <option value="3">異國酒吧</option>
-              <option value="4">特色酒吧</option>
-              <option value="5">其他酒吧</option>
+              <option value="1" className="text-black">運動酒吧</option>
+              <option value="2" className="text-black">音樂酒吧</option>
+              <option value="3" className="text-black">異國酒吧</option>
+              <option value="4" className="text-black">特色酒吧</option>
+              <option value="5" className="text-black">其他酒吧</option>
             </select>
           </li>
         </ul>

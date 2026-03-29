@@ -13,6 +13,7 @@ import {
 } from 'react-icons/md';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
+import Loader from '@/components/ui/loader/loader';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -24,15 +25,19 @@ export default function Index({ onPageChange }) {
   const [randomBars, setRandomBars] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [barRender, setBarRender] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const displayCount = 3; // Number of bars to display at once
 
   // random bar
   const getBarListRandom = useCallback(async () => {
     try {
+      setIsLoading(true);
       const result = await BarService.getRandomBars();
       setRandomBars(Array.isArray(result) ? result : (result.data || []));
     } catch (error) {
       console.error('Failed to fetch bar random:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -72,60 +77,66 @@ export default function Index({ onPageChange }) {
       </div>
       <div className="container flex items-center justify-center w-full pt-24 mx-auto bar md:w-8/12">
         <div className="flex flex-col bar-index-content">
-          <div className="mt-4 search-zone md:mt-12">
-            <div className="flex items-center justify-center font-bold text-center text-white text-h5 md:text-h1">
-              今晚想去哪約會？
-              <div className="hidden md:m-5 md:flex md:justify-center">
-                {/* <Search /> */}
-                <Link href={`/bar/bar-list/`}>
-                  <button className="btn btn-outline rounded-xl border-white bg-transparent hover:bg-[#A0FF1F] text-white">
-                    探索全部
+          {isLoading ? (
+            <Loader minHeight="400px" text="正在探索驚喜酒吧..." />
+          ) : (
+            <>
+              <div className="mt-4 search-zone md:mt-12">
+                <div className="flex items-center justify-center font-bold text-center text-white text-h5 md:text-h1">
+                  今晚想去哪約會？
+                  <div className="hidden md:m-5 md:flex md:justify-center">
+                    {/* <Search /> */}
+                    <Link href={`/bar/bar-list/`}>
+                      <button className="btn btn-outline rounded-xl border-white bg-transparent hover:bg-[#A0FF1F] text-white">
+                        探索全部
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-10 bar-cards">
+                <div className="bar-type-card-mobile flex flex-col justify-center items-center mx-auto w-[340px] md:hidden">
+                  <BarTypeCardsMobile />
+                </div>
+                <div className="hidden md:flex md:justify-center md:items-center">
+                  <BarTypeCards />
+                  {/* <BarTypeCards />
+                  <BarTypeCards /> */}
+                </div>
+                <div className="hidden md:flex md:justify-center md:items-center">
+                  <BarTypeCards2 />
+                  {/* <BarTypeCards2 /> */}
+                </div>
+              </div>
+
+              <div className="text-[18px] md:text-[28px] text-white font-bold text-center mb-4">
+                熱門酒吧
+              </div>
+              <div className="hidden player-wall md:flex md:justify-center md:items-center">
+                <div className="flex items-center justify-center gap-16">
+                  <button onClick={prevBars}>
+                    <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
                   </button>
-                </Link>
+                  {displayedBars.map((randomBar) => (
+                    <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
+                  ))}
+                  <button onClick={prevBars}>
+                    <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div className="mb-10 bar-cards">
-            <div className="bar-type-card-mobile flex flex-col justify-center items-center mx-auto w-[340px] md:hidden">
-              <BarTypeCardsMobile />
-            </div>
-            <div className="hidden md:flex md:justify-center md:items-center">
-              <BarTypeCards />
-              {/* <BarTypeCards />
-              <BarTypeCards /> */}
-            </div>
-            <div className="hidden md:flex md:justify-center md:items-center">
-              <BarTypeCards2 />
-              {/* <BarTypeCards2 /> */}
-            </div>
-          </div>
-
-          <div className="text-[18px] md:text-[28px] text-white font-bold text-center mb-4">
-            熱門酒吧
-          </div>
-          <div className="hidden player-wall md:flex md:justify-center md:items-center">
-            <div className="flex items-center justify-center gap-16">
-              <button onClick={prevBars}>
-                <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
-              </button>
-              {displayedBars.map((randomBar) => (
-                <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
-              ))}
-              <button onClick={prevBars}>
-                <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center justify-center w-100 md:hidden">
-            <div className="gap-5 carousel rounded-box">
-              <div className="gap-5 carousel-item">
-                {randomBars.slice(0, 2).map((randomBar) => (
-                  <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
-                ))}
+              <div className="flex items-center justify-center w-100 md:hidden">
+                <div className="gap-5 carousel rounded-box">
+                  <div className="gap-5 carousel-item">
+                    {randomBars.slice(0, 2).map((randomBar) => (
+                      <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </>

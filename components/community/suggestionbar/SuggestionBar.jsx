@@ -3,6 +3,8 @@ import { usePostContext } from '@/context/post-context';
 import { useRouter } from 'next/router';
 import { CommunityService } from '@/services/community-service';
 
+import { getImageUrl, handleImageError } from '@/services/image-utils';
+
 export default function SuggestionBar() {
   const { setProfilePosts, setProfilePage, setUserProfileHasMore } =
     usePostContext();
@@ -49,8 +51,9 @@ export default function SuggestionBar() {
               >
                 <div className="w-10 rounded-full">
                   <img
-                    src={user.avatar || '/unknown-user-image.jpg'}
+                    src={getImageUrl(user.avatar, 'avatar')}
                     alt={user.username || 'No Image Available'}
+                    onError={(e) => handleImageError(e, 'avatar')}
                   />
                 </div>
               </div>

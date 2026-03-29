@@ -109,7 +109,7 @@ export const BarService = {
    * @param {string} barIds - 逗號分隔的 ID 字串
    */
   checkBarStatus: (userId, barIds) =>
-    apiClient(`/bar/check-bar-status?userId=${userId}&barIds=${barIds}`),
+    apiClient.post(`/bar/check-bar-status`, { userId, barIds }),
 
   /**
    * 收藏酒吧

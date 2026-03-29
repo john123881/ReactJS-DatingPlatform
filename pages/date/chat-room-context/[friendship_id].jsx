@@ -310,7 +310,7 @@ export default function ChatRoomContext() {
         console.log('Chat debug - responseData:', responseData);
         const messageData = {
           msg_type: 'I',
-          content: responseData.imgUrl || responseData.content, // 相容處理
+          content: responseData.imgUrl, 
           sender_id: auth.username,
           sended_at: formatTime(),
           sender_avatar: userAvatar,
@@ -393,7 +393,7 @@ export default function ChatRoomContext() {
                   {message.msg_type === 'I' ? (
                     <img 
                       style={{ width: '200px', height: 'auto', borderRadius: '10px' }}
-                      src={getImageUrl(message.content, 'avatar')} // 聊天圖暫用 avatar 資料夾
+                      src={getImageUrl(message.content, 'chat')} 
                       alt="Sent image"
                       onError={handleImageError}
                     />
@@ -404,7 +404,7 @@ export default function ChatRoomContext() {
                   {message.msg_type === 'I' ? (
                     <img 
                       style={{ width: '200px', height: 'auto', borderRadius: '10px' }}
-                      src={getImageUrl(message.content, 'avatar')}
+                      src={getImageUrl(message.content, 'chat')}
                       alt="Received image"
                       onError={handleImageError}
                     />

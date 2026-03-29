@@ -109,8 +109,8 @@ export default function OtherTripdetail({ onPageChange }) {
         <TripNavigationTab />
         <OtherTripDetailSidebar tripName={tripName} />
         
-        <div className="flex sm:justify-start justify-center items-center w-full py-8">
-          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4">
+        <div className="flex justify-center items-start w-full py-8 max-w-7xl mx-auto px-4">
+          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-2xl px-4">
             <OtherContentMorning trip_plan_id={trip_plan_id} />
             <OtherContentNoon trip_plan_id={trip_plan_id} />
             <OtherContentNight trip_plan_id={trip_plan_id} />
@@ -123,7 +123,7 @@ export default function OtherTripdetail({ onPageChange }) {
             </button>
           </div>
 
-          <div className="hidden sm:flex flex-col justify-start items-center h-[700px] w-[600px] border border-white rounded-xl">
+          <div className="hidden sm:flex flex-col justify-start items-center h-auto min-h-[500px] w-full max-w-[400px] border border-white rounded-xl py-6 flex-shrink-0">
             <h3 className="mt-3 text-3xl text-white">行程筆記</h3>
             <p className="mt-4 mb-4 text-xl">行程描述</p>
             <div className="w-[550px] h-[200px] border border-white rounded-xl p-4 overflow-y-auto">

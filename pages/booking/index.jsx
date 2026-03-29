@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import IndexMovieCard from '@/components/booking/card/indexMovieCard';
@@ -6,6 +6,7 @@ import PageTitle from '@/components/page-title';
 import { BookingService } from '@/services/booking-service';
 import Link from 'next/link';
 import { IoTicketOutline } from 'react-icons/io5';
+import Loader from '@/components/ui/loader/loader';
 
 // const mockData1 = [
 //   { movieName: '奧本海默' },
@@ -21,18 +22,49 @@ import { IoTicketOutline } from 'react-icons/io5';
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
+  const carouselRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('now'); // 'now' or 'soon'
   const [movieCards, setMovieCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const totalSlides = 4;
+
+  const scrollToSlide = (index) => {
+    if (carouselRef.current) {
+      const scrollAmount = carouselRef.current.offsetWidth * index;
+      carouselRef.current.scrollTo({
+        left: scrollAmount,
+        behavior: 'smooth',
+      });
+      setCurrentSlide(index);
+    }
+  };
+
+  // 自動輪播
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextSlide = (currentSlide + 1) % totalSlides;
+      scrollToSlide(nextSlide);
+    }, 5000); // 5秒換一次
+
+    return () => clearInterval(interval);
+  }, [currentSlide]);
 
   const getBookingMovieCard = useCallback(async () => {
     try {
+      setIsLoading(true);
       const data = await BookingService.getIndexMovies();
       setMovieCards(data);
     } catch (error) {
       console.error('Failed to fetch movie card', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const handleTabClick = () => {
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
     getBookingMovieCard(); // 點擊標籤時重新 fetch 電影卡片數據
   };
 
@@ -53,10 +85,11 @@ export default function Index({ onPageChange }) {
       {/* 輪播圖片 */}
       <div className="relative mt-20">
         <div
-          className="hidden lg:carousel lg:w-full"
+          ref={carouselRef}
+          className="hidden lg:flex overflow-x-hidden scroll-smooth w-full"
           style={{ height: '530px' }}
         >
-          <div id="slide1" className="relative w-full carousel-item">
+          <div className="relative inline-block w-full flex-shrink-0 h-full">
             <Image
               src="/00000.jpeg"
               className="w-full h-full"
@@ -66,8 +99,8 @@ export default function Index({ onPageChange }) {
               alt="電影海報 1"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-              <a
-                href="#slide4"
+              <button
+                onClick={() => scrollToSlide(3)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -76,9 +109,9 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❮
-              </a>
-              <a
-                href="#slide2"
+              </button>
+              <button
+                onClick={() => scrollToSlide(1)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -87,13 +120,10 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❯
-              </a>
+              </button>
             </div>
           </div>
-          <div
-            id="slide2"
-            className="carousel-item relative w-full h-full"
-          >
+          <div className="relative inline-block w-full flex-shrink-0 h-full">
             <Image
               src="/1111.jpeg"
               className="w-full h-full"
@@ -103,8 +133,8 @@ export default function Index({ onPageChange }) {
               alt="電影海報 2"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-              <a
-                href="#slide1"
+              <button
+                onClick={() => scrollToSlide(0)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -113,9 +143,9 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❮
-              </a>
-              <a
-                href="#slide3"
+              </button>
+              <button
+                onClick={() => scrollToSlide(2)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -124,10 +154,10 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❯
-              </a>
+              </button>
             </div>
           </div>
-          <div id="slide3" className="relative w-full carousel-item">
+          <div className="relative inline-block w-full flex-shrink-0 h-full">
             <Image
               src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg"
               className="w-full h-full"
@@ -137,8 +167,8 @@ export default function Index({ onPageChange }) {
               alt="電影海報 3"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-              <a
-                href="#slide2"
+              <button
+                onClick={() => scrollToSlide(1)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -147,9 +177,9 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❮
-              </a>
-              <a
-                href="#slide4"
+              </button>
+              <button
+                onClick={() => scrollToSlide(3)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -158,10 +188,10 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❯
-              </a>
+              </button>
             </div>
           </div>
-          <div id="slide4" className="relative w-full carousel-item">
+          <div className="relative inline-block w-full flex-shrink-0 h-full">
             <Image
               src="https://daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg"
               className="w-full h-full"
@@ -171,8 +201,8 @@ export default function Index({ onPageChange }) {
               alt="電影海報 4"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-              <a
-                href="#slide3"
+              <button
+                onClick={() => scrollToSlide(2)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -181,9 +211,9 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❮
-              </a>
-              <a
-                href="#slide1"
+              </button>
+              <button
+                onClick={() => scrollToSlide(0)}
                 className="btn btn-circle"
                 style={{
                   color: 'white',
@@ -192,75 +222,51 @@ export default function Index({ onPageChange }) {
                 }}
               >
                 ❯
-              </a>
+              </button>
             </div>
           </div>
         </div>
         <div className="absolute bottom-0 justify-center hidden w-full gap-3 py-2 pt-10 pb-10 lg:flex">
-          <a href="#slide1" className="btn btn-xs"></a>
-          <a href="#slide2" className="btn btn-xs"></a>
-          <a href="#slide3" className="btn btn-xs"></a>
-          <a href="#slide4" className="btn btn-xs"></a>
+          {[0, 1, 2, 3].map((idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollToSlide(idx)}
+              className={`btn btn-xs ${currentSlide === idx ? 'bg-neongreen border-neongreen' : ''}`}
+            ></button>
+          ))}
         </div>
       </div>
+
 
       {/* button */}
       <div className="flex justify-center pt-20 lg:pt-10 ">
         <div
           role="tablist"
-          className="tabs tabs-boxed"
+          className="tabs tabs-boxed bg-transparent border border-neongreen/30"
           style={{
-            width: '200px',
-            borderRadius: '30px', // 將外框設置為圓形
-            borderColor: 'rgba(12, 255, 31, 0.5)',
+            width: '240px',
+            borderRadius: '30px',
           }}
         >
           <a
             role="tab"
-            className="tab"
+            className={`tab h-full transition-all duration-300 ${activeTab === 'now' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
             style={{
-              width: '100px',
+              width: '120px',
               borderRadius: '30px',
-              transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-              transform: 'translateX(0px)',
             }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateX(-2px)'; // 鼠标移入时左移5像素
-              e.target.style.backgroundColor = '#A0FF1F'; // 鼠标移入时改变颜色
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateX(0)'; // 鼠标移出时回到原始位置
-              e.target.style.backgroundColor = 'transparent'; // 鼠标移出时恢复原始颜色
-            }}
-            onClick={handleTabClick}
+            onClick={() => handleTabClick('now')}
           >
             現正熱播
           </a>
           <a
             role="tab"
-            className="tab"
+            className={`tab h-full transition-all duration-300 ${activeTab === 'soon' ? 'bg-neongreen text-black' : 'text-white hover:text-neongreen'}`}
             style={{
-              width: '100px',
+              width: '120px',
               borderRadius: '30px',
-              transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-              transform: 'translateX(0px)',
             }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateX(2px)'; // 鼠标移入时左移5像素
-              e.target.style.backgroundColor = '#A0FF1F'; // 鼠标移入时改变颜色
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateX(0)'; // 鼠标移出时回到原始位置
-              e.target.style.backgroundColor = 'transparent'; // 鼠标移出时恢复原始颜色
-            }}
-            onClick={handleTabClick}
-
-            // style={{
-            //   width: '100px',
-            //   // backgroundColor: '#A0FF1F',
-            //   transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-            //   ':hover': { transform: 'translateX(5px)' } // 悬停时向右移动5像素
-            // }}
+            onClick={() => handleTabClick('soon')}
           >
             即將上映
           </a>
@@ -298,10 +304,14 @@ export default function Index({ onPageChange }) {
         </Link>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 mx-4 sm:justify-between">
-        {movieCards.map((movie, index) => (
-          <IndexMovieCard movie={movie} key={index} />
-        ))}
+      <div className="flex flex-wrap justify-center gap-6 mx-4 sm:justify-between min-h-[400px]">
+        {isLoading ? (
+          <Loader minHeight="400px" text="正在載入熱門電影..." />
+        ) : (
+          movieCards.map((movie, index) => (
+            <IndexMovieCard movie={movie} key={index} />
+          ))
+        )}
       </div>
     </>
   );
