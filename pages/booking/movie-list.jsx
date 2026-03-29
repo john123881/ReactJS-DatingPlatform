@@ -4,6 +4,7 @@ import { useAuth } from '@/context/auth-context';
 import { BookingService } from '@/services/booking-service';
 import MovieCard from '@/components/booking/card/movieCard';
 import PageTitle from '@/components/page-title';
+import Loader from '@/components/ui/loader/loader';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
@@ -29,16 +30,16 @@ export default function Index({ onPageChange }) {
   };
 
   const getBookingMovieCard = async () => {
+    setIsLoading(true);
     try {
       const data = await BookingService.getMovieList();
-
       const movieIds = data.map((movie) => movie.movie_id).join(',');
-
-      await checkMoviesStatus(movieIds); // 檢查電影狀態
-
+      await checkMoviesStatus(movieIds);
       setMovieCards(data);
     } catch (error) {
       console.error('Failed to fetch movie card', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +82,7 @@ export default function Index({ onPageChange }) {
 
     // 確保空字串不會觸發
     if (value.trim()) {
+      setIsLoading(true);
       try {
         const data = await BookingService.searchMovies(value);
         setSearchResults(data);
@@ -147,14 +149,14 @@ export default function Index({ onPageChange }) {
 
       <div className="flex flex-wrap justify-center sm:justify-between gap-6 mx-10">
         {isLoading ? (
-          <p>Loading...</p> // 正在加載提示
+          <Loader minHeight="400px" text="正在搜尋電影..." />
         ) : hasSearched && searchResults.length === 0 ? (
-          <p>未找到结果</p> // 搜索后无结果提示
+          <p className="text-white py-20 text-center w-full">未找到結果</p>
         ) : (
           (hasSearched ? searchResults : movieCards).map((movie, index) => (
             <MovieCard
               movie={movie}
-              key={index}
+              key={movie.movie_id || index}
               isSaved={savedMovies[movie.movie_id] || false}
             />
           ))

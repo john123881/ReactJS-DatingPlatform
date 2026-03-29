@@ -39,6 +39,7 @@ export default function BarList({ onPageChange }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
 
   // 檢查儲存酒吧狀態
@@ -113,12 +114,15 @@ export default function BarList({ onPageChange }) {
 
     // 確保空字串不會觸發
     if (value.trim()) {
+      setIsSearching(true);
       try {
         const data = await BarService.searchBars(value);
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {
         console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
       }
     }
   };
@@ -167,7 +171,7 @@ export default function BarList({ onPageChange }) {
             </label>
           </div>
           <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto min-h-[400px]">
-            {isLoading && !hasSearched ? (
+            {isLoading || isSearching ? (
               <Loader minHeight="400px" text="正在探索酒吧..." />
             ) : hasSearched ? (
               searchResults.length > 0 ? (

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { TripService } from '@/services/trip-service';
 import WithContent from './with-content';
 import { useLoader } from '@/context/use-loader';
+import NoContentMorning from './no-content-morning';
+import NoContentNoon from './no-content-noon';
+import NoContentNight from './no-content-night';
 
 // 輔助函式：將Buffer轉換成base64
 function bufferToBase64(buffer) {
@@ -22,6 +25,7 @@ export default function MoviePhotoMy({
   const [imageSrc2, setImageSrc2] = useState('');
   const [movieDetails, setMovieDetails] = useState({}); //用於保存取得的電影資訊
   const [showDetails, setShowDetails] = useState(false); // 控制顯示電影細節的狀態
+  const [isEmpty, setIsEmpty] = useState(false); // 是否無內容
   const { open, close, isLoading } = useLoader();
 
   useEffect(() => {
@@ -43,14 +47,16 @@ export default function MoviePhotoMy({
           const base64String = bufferToBase64(imageData.movie_img.data);
           setImageSrc2(`data:image/jpeg;base64,${base64String}`);
           setMovieDetails({
-            title: imageData.title,
             description: imageData.movie_description,
           });
+          setIsEmpty(false);
         } else {
-          // No movie_img found - could be console.warn or just silent
+          // No movie_img found
+          setIsEmpty(true);
         }
       } catch (error) {
         console.error('Error fetching the image:', error);
+        setIsEmpty(true);
       }
       close();
     };
@@ -63,6 +69,31 @@ export default function MoviePhotoMy({
     setShowDetails(!showDetails);
   };
 
+  if (isEmpty) {
+    if (tripDetails.block === 1) {
+      return (
+        <NoContentMorning
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    } else if (tripDetails.block === 2) {
+      return (
+        <NoContentNoon
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    } else {
+      return (
+        <NoContentNight
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    }
+  }
+
   return (
     <div className="flex gap-2">
       <WithContent
@@ -72,7 +103,7 @@ export default function MoviePhotoMy({
         tripDetails={tripDetails}
         refreshTripDetails={refreshTripDetails}
       />
-      {showDetails && (
+      {showDetails && movieDetails.description && (
         <div className="hidden h-32 overflow-y-auto w-96 line-clamp-4 sm:block">
           {movieDetails.description}
         </div>

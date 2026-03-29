@@ -1,60 +1,54 @@
 import { useState, useEffect } from 'react';
-import { TripService } from '@/services/trip-service';
-import NoContentMorning from './no-content-morning';
 import BarPhotoMy from './bar-photo-my';
 import MoviePhotoMy from './movie-photo-my';
-import { useLoader } from '@/context/use-loader';
 
-export default function ContentMorning({ trip_plan_id, newDetail }) {
+export default function ContentBase({
+  trip_plan_id,
+  newDetail,
+  block,
+  fetchMethod,
+  NoContentComponent,
+}) {
   const [tripDetails, setTripDetails] = useState({});
-  const { close, isLoading } = useLoader();
 
   useEffect(() => {
     if (trip_plan_id) {
-      const fetchTripDetails = async () => {
+      const fetchData = async () => {
         try {
-          const result = await TripService.getMorningContent(trip_plan_id);
+          const result = await fetchMethod(trip_plan_id);
           if (result && result.length > 0) {
             setTripDetails(result[0]);
           } else {
-            // 設置一個明確的“沒有內容”的狀態
             setTripDetails({ block: null });
           }
         } catch (error) {
-          console.error('Fetching trip details error:', error);
-          // 在錯誤情況下也設置一個明確狀態
+          console.error(`Fetching trip details error (block ${block}):`, error);
           setTripDetails({ block: null });
         }
       };
-
-      fetchTripDetails();
+      fetchData();
     }
-  }, [newDetail, trip_plan_id]);
+  }, [newDetail, trip_plan_id, fetchMethod, block]);
 
-  //傳遞給子元件的函數 用於重新渲染頁面 刪除和新增都適用
   const refreshTripDetails = async () => {
     try {
-      const result = await TripService.getMorningContent(trip_plan_id);
+      const result = await fetchMethod(trip_plan_id);
       if (result && result.length > 0) {
         setTripDetails(result[0]);
       } else {
         setTripDetails({ block: null });
       }
     } catch (error) {
-      console.error('Fetching trip details error:', error);
+      console.error(`Fetching trip details error (block ${block}):`, error);
       setTripDetails({ block: null });
     }
   };
-  // 根據 block 值來決定顯示哪個組件
-  //   const content =
-  //     tripDetails.block === 1 ? <TripPhotoMy /> : <NoContentMorning />;
 
   return (
     <>
-      {tripDetails.block !== 1 ? (
-        <NoContentMorning
+      {tripDetails.block !== block ? (
+        <NoContentComponent
           trip_plan_id={trip_plan_id}
-          tripDetails={tripDetails}
           refreshTripDetails={refreshTripDetails}
         />
       ) : tripDetails.movie_id ? (
@@ -70,7 +64,7 @@ export default function ContentMorning({ trip_plan_id, newDetail }) {
           refreshTripDetails={refreshTripDetails}
         />
       ) : (
-        <NoContentMorning
+        <NoContentComponent
           trip_plan_id={trip_plan_id}
           refreshTripDetails={refreshTripDetails}
         />

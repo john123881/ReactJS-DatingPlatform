@@ -25,7 +25,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
       open();
       try {
         const result = await TripService.getBarPhoto(trip_plan_id);
-        const filteredData = data.filter(
+        const filteredData = result.filter(
           (trip) => trip.block == tripDetails.block,
         );
         const imageData = filteredData.find(

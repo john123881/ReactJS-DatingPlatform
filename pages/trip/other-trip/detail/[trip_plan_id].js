@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import TripSidebar3 from '@/components/trip/sidebars/trip-sidebar3';
-import OtherContentMorning from '@/components/trip/other-content/other-content-morning';
-import OtherContentNoon from '@/components/trip/other-content/other-content-noon';
-import OtherContentNight from '@/components/trip/other-content/other-content-night';
+import OtherContentMorning from '@/components/trip/other-content/blocks/other-content-morning';
+import OtherContentNoon from '@/components/trip/other-content/blocks/other-content-noon';
+import OtherContentNight from '@/components/trip/other-content/blocks/other-content-night';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';

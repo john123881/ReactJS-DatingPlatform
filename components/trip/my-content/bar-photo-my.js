@@ -3,6 +3,9 @@ import WithContent from './with-content';
 import { TripService } from '@/services/trip-service';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
+import NoContentMorning from './no-content-morning';
+import NoContentNoon from './no-content-noon';
+import NoContentNight from './no-content-night';
 
 // 輔助函式：將Buffer轉換成base64
 function bufferToBase64(buffer) {
@@ -23,6 +26,7 @@ export default function BarPhotoMy({
   const [imageSrc1, setImageSrc1] = useState(''); //儲存第一支api取得的數據
   const [barDetails, setBarDetails] = useState({}); //儲存第二支api取得的數據
   const [showDetails, setShowDetails] = useState(false); // 控制顯示 Bar 細節的狀態
+  const [isEmpty, setIsEmpty] = useState(false); // 是否無內容
   const { open, close, isLoading } = useLoader();
 
   useEffect(() => {
@@ -30,9 +34,7 @@ export default function BarPhotoMy({
       open();
       try {
         const result = await TripService.getBarPhoto(trip_plan_id);
-        // console.log('Received JSON:', data);
-        ////用以區分每個block所顯示的內容////////
-        const filteredData = data.filter(
+        const filteredData = result.filter(
           (trip) => trip.block == tripDetails.block,
         );
 
@@ -43,11 +45,16 @@ export default function BarPhotoMy({
         if (imageData && imageData.bar_img && imageData.bar_img.data) {
           const base64String = bufferToBase64(imageData.bar_img.data);
           setImageSrc1(`data:image/jpeg;base64,${base64String}`);
+          setIsEmpty(false);
         } else {
           // No bar_img found
+          if (!barDetails.name) {
+            setIsEmpty(true);
+          }
         }
       } catch (error) {
         console.error('Error fetching the image:', error);
+        setIsEmpty(true);
       }
       close();
     };
@@ -60,9 +67,7 @@ export default function BarPhotoMy({
     const fetchBarName = async () => {
       try {
         const result = await TripService.getBarName(trip_plan_id);
-        // console.log('Received JSON:', data);
-        ////用以區分每個block所顯示的內容////////
-        const filteredData = data.filter(
+        const filteredData = result.filter(
           (trip) => trip.block == tripDetails.block,
         );
 
@@ -71,11 +76,16 @@ export default function BarPhotoMy({
             name: filteredData[0].bar_name,
             description: filteredData[0].bar_description,
           });
+          setIsEmpty(false);
         } else {
           // No bar_name found
+          if (!imageSrc1) {
+            setIsEmpty(true);
+          }
         }
       } catch (error) {
         console.error('Error fetching the bar_name:', error);
+        setIsEmpty(true);
       }
     };
 
@@ -88,6 +98,31 @@ export default function BarPhotoMy({
     setShowDetails(!showDetails);
   };
 
+  if (isEmpty) {
+    if (tripDetails.block === 1) {
+      return (
+        <NoContentMorning
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    } else if (tripDetails.block === 2) {
+      return (
+        <NoContentNoon
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    } else {
+      return (
+        <NoContentNight
+          trip_plan_id={trip_plan_id}
+          refreshTripDetails={refreshTripDetails}
+        />
+      );
+    }
+  }
+
   return (
     <div className="flex gap-2">
       <WithContent
@@ -97,7 +132,7 @@ export default function BarPhotoMy({
         tripDetails={tripDetails}
         refreshTripDetails={refreshTripDetails}
       />
-      {showDetails && (
+      {showDetails && barDetails.description && (
         <div className="hidden h-32 overflow-y-auto w-96 line-clamp-4 sm:block">
           {barDetails.description}
         </div>

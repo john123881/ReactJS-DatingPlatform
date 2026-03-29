@@ -69,7 +69,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     if (trip_plan_id) {
       const fetchTrip = async () => {
         try {
-          const data = await TripService.getTripPlan(trip_plan_id);
+          const data = await TripService.getTripPlanInfo(trip_plan_id);
           if (data) {
             setTrip(data);
           }

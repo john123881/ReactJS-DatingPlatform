@@ -51,18 +51,18 @@ export default function Index({ onPageChange }) {
     <>
       <PageTitle pageTitle={pageTitle} />
       {/* 輪播圖片 */}
-      <div className="relative">
+      <div className="relative mt-20">
         <div
           className="hidden lg:carousel lg:w-full"
           style={{ height: '530px' }}
         >
-          <div id="slide1" className="relative w-full mt-20 carousel-item">
+          <div id="slide1" className="relative w-full carousel-item">
             <Image
               src="/00000.jpeg"
-              className="w-full"
+              className="w-full h-full"
               width={1920}
               height={530}
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               alt="電影海報 1"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -92,13 +92,14 @@ export default function Index({ onPageChange }) {
           </div>
           <div
             id="slide2"
-            className="carousel-item relative w-full mt-20 h-[550px]"
+            className="carousel-item relative w-full h-full"
           >
             <Image
               src="/1111.jpeg"
-              className="w-full"
+              className="w-full h-full"
               width={1920}
               height={530}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               alt="電影海報 2"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -129,9 +130,10 @@ export default function Index({ onPageChange }) {
           <div id="slide3" className="relative w-full carousel-item">
             <Image
               src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg"
-              className="w-full"
+              className="w-full h-full"
               width={1920}
               height={530}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               alt="電影海報 3"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -162,9 +164,10 @@ export default function Index({ onPageChange }) {
           <div id="slide4" className="relative w-full carousel-item">
             <Image
               src="https://daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg"
-              className="w-full"
+              className="w-full h-full"
               width={1920}
               height={530}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               alt="電影海報 4"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">

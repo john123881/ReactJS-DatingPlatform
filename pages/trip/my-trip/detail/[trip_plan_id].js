@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import TripSidebar2 from '@/components/trip/sidebars/trip-sidebar2';
-import ContentMorning from '@/components/trip/my-content/contentMorning';
-import ContentNoon from '@/components/trip/my-content/contentNoon';
-import ContentNight from '@/components/trip/my-content/contentNight';
+import ContentMorning from '@/components/trip/my-content/blocks/contentMorning';
+import ContentNoon from '@/components/trip/my-content/blocks/contentNoon';
+import ContentNight from '@/components/trip/my-content/blocks/contentNight';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
@@ -108,12 +108,14 @@ export default function MyTripDetail({ onPageChange }) {
           trip_plan_id={tripName.trip_plan_id}
         />
 
-        <div className="flex justify-center items-center w-full py-8">
-          <BarPhotoCarousel
-            trip_plan_id={trip_plan_id}
-            refreshAllDetails={refreshAllDetails}
-          />
-          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4">
+        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden">
+          <div className="hidden sm:flex min-w-[300px] justify-end">
+            <BarPhotoCarousel
+              trip_plan_id={trip_plan_id}
+              refreshAllDetails={refreshAllDetails}
+            />
+          </div>
+          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-5xl px-4 flex-shrink-0">
             <ContentMorning
               newDetail={newDetail}
               tripDetails={tripDetails}
@@ -130,10 +132,12 @@ export default function MyTripDetail({ onPageChange }) {
               trip_plan_id={trip_plan_id}
             />
           </div>
-          <MoviePhotoCarousel2
-            trip_plan_id={trip_plan_id}
-            refreshAllDetails={refreshAllDetails}
-          />
+          <div className="hidden sm:flex min-w-[300px] justify-start">
+            <MoviePhotoCarousel2
+              trip_plan_id={trip_plan_id}
+              refreshAllDetails={refreshAllDetails}
+            />
+          </div>
         </div>
       </div>
     </>

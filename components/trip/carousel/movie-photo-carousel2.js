@@ -13,14 +13,13 @@ export default function MoviePhotoCarousel2({
   const photoCount = 10; // 假設總共有10張海報，這個應根據實際獲取的數據調整
 
   useEffect(() => {
-    console.log('refreshAllDetails in MoviePhotoCarousel:', refreshAllDetails);
+    // refreshAllDetails is used by child components
   }, [refreshAllDetails]);
 
   useEffect(() => {
     const fetchMovie = async () => {
       try {
         const data = await TripService.getRecommendMovies();
-        console.log(data);
         setMovies(data);
       } catch (error) {
         console.error('Fetching Bar saved error:', error);
