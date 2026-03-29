@@ -5,6 +5,7 @@ import {
   useRef,
   useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
