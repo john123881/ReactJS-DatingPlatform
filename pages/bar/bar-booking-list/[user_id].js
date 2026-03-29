@@ -3,7 +3,7 @@ import TabBar from '@/components/bar/bar/tab-bar';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function Booking({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -19,26 +19,16 @@ export default function Booking({ onPageChange }) {
   useEffect(() => {
     // 定義取得資料的函數
     const fetchData = async () => {
-      // 檢查路由中是否有 user_id
       if (!router.query.user_id) return;
 
-      // 構建 API 請求 URL
-      const url = `${API_BASE_URL}/bar/bar-booking-list/${router.query.user_id}`;
       try {
-        // 發送 GET 請求並等待回應
-        const response = await fetch(url);
-        // 解析回應為 JSON 格式
-        const data = await response.json();
-        // 檢查資料是否為陣列
+        const data = await BarService.getUserBookings(router.query.user_id);
         if (Array.isArray(data)) {
-          // 更新狀態中的訂位紀錄
           setBookings(data);
         } else {
-          // 如果資料不是陣列，則將其轉換為陣列
           setBookings([data]);
         }
       } catch (error) {
-        // 如果發生錯誤，輸出錯誤訊息到控制台
         console.error('Failed to fetch bar booking list:', error);
       }
     };

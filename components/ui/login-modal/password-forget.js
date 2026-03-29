@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { forgetPasswordSchema } from '@/components/schemas';
-import { SENDOTP_FORGETPWD_POST, FORGETPWD_PUT } from '@/configs/api-config';
+import { AuthService } from '@/services/auth-service';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
 import { useNotify } from '@/context/use-notify';
@@ -31,12 +31,7 @@ export default function PasswordForget({
 
   const sendOTPForForgetPWD = async () => {
     try {
-      const r = await fetch(SENDOTP_FORGETPWD_POST, {
-        method: 'POST',
-        body: JSON.stringify({ email: values.email }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const result = await r.json();
+      const result = await AuthService.sendForgetPwdOtp(values.email);
       return result;
     } catch (error) {
       console.error('發信時發生錯誤:', error);
@@ -81,13 +76,7 @@ export default function PasswordForget({
     validationSchema: forgetPasswordSchema,
     onSubmit: async (values) => {
       const fetchChangeForgetPWD = async () => {
-        const r = await fetch(FORGETPWD_PUT, {
-          method: 'PUT',
-          body: JSON.stringify(values),
-          headers: { 'Content-Type': 'application/json' },
-        });
-        const result = await r.json();
-        return result;
+        return await AuthService.resetPassword(values);
       };
 
       notifyPromise(fetchChangeForgetPWD, {

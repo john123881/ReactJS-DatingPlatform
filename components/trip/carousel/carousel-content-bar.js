@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function CarouselContentBar({
   barSaved,
@@ -26,28 +26,17 @@ export default function CarouselContentBar({
   const handleSubmit = async () => {
     console.log('Sending block as:', timeOfDay);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/add-bar/${trip_plan_id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            bar_id: barSaved.bar_id,
-            block: timeOfDay,
-          }),
-        },
-      );
-
-      const result = await response.json();
+      const result = await TripService.addBarToTripBlock(trip_plan_id, {
+        bar_id: barSaved.bar_id,
+        block: timeOfDay,
+      });
 
       if (result.success) {
         console.log('Bar added to trip successfully!');
         document.getElementById(modalId).close(); // 關閉彈跳視窗
         refreshAllDetails();
       } else {
-        alert('失敗了失敗了時間不多囉：' + result.message);
+        alert('失敗了失敗了時間不多囉：' + (result.message || '未知錯誤'));
       }
     } catch (error) {
       console.error('Error adding bar to trip:', error);

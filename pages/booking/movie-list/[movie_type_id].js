@@ -2,7 +2,7 @@ import MovieCard from '@/components/booking/card/movieCard';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useCallback } from 'react';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BookingService } from '@/services/booking-service';
 
 // const mockData1 = [
 //   { movieName: '奧本海默' },
@@ -55,10 +55,7 @@ export default function Index({ onPageChange }) {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/booking/search-movies?searchTerm=${value}`,
-        );
-        const data = await response.json();
+        const data = await BookingService.searchMovies(value);
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {
@@ -77,11 +74,10 @@ export default function Index({ onPageChange }) {
   const getMovieListType = useCallback(async (movie_type_id) => {
     if (!movie_type_id) return; // 確保 bar_type_id 存在
 
-    const url = `${API_BASE_URL}/booking/movie-list/${movie_type_id}`;
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      setMovieCards(data); // 確認數據是否為預期格式
+      const result = await BookingService.getMoviesByCategory(movie_type_id);
+      setMovieCards(result);
+ // 確認數據是否為預期格式
     } catch (error) {
       console.error('Failed to fetch movie list:', error);
     }

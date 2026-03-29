@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function OtherTripdetail({ onPageChange }) {
   const pageTitle = '行程規劃';
@@ -50,14 +50,7 @@ export default function OtherTripdetail({ onPageChange }) {
       })),
     };
 
-    fetch(`${API_BASE_URL}/trip/other-plans/add`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tripPlanData),
-    })
-      .then((response) => response.json())
+    TripService.addOtherPlan(tripPlanData)
       .then((data) => {
         if (data.success) {
           closeModal();
@@ -86,14 +79,9 @@ export default function OtherTripdetail({ onPageChange }) {
     if (trip_plan_id) {
       const fetchTripDetails = async () => {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/allday-content/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          setTripDetails(data.slice(0, 3));
+          const result = await TripService.getAlldayDetails(trip_plan_id);
+          // 如果回傳是陣列，取第一筆 (相容舊邏輯)
+          setTripDetails(Array.isArray(result) ? result.slice(0, 3) : [result]);
         } catch (error) {
           console.error('Fetching trip details error:', error);
         }
@@ -110,18 +98,12 @@ export default function OtherTripdetail({ onPageChange }) {
     if (trip_plan_id) {
       const fetchTripName = async () => {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
+          const data = await TripService.getTripPlanInfo(trip_plan_id);
           if (data) {
             setTripName(data);
           }
         } catch (error) {
-          console.error('Fetching trip details error:', error);
+          console.error('Fetching trip name error:', error);
         }
       };
 

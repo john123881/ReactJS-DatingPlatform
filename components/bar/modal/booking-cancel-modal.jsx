@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRef } from 'react';
 import Swal from 'sweetalert2';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function BookingCancelModal({ booking, modalId, setBookings }) {
   const bookingCancelModalRef = useRef(null);
@@ -19,32 +19,23 @@ export default function BookingCancelModal({ booking, modalId, setBookings }) {
 
   const handleBookingDelete = async (barBookingId) => {
     try {
-      const url = `${API_BASE_URL}/bar/delete-bar`;
-      const r = await fetch(url, {
-        method: 'DELETE',
-        body: JSON.stringify({ barBookingId }),
-        headers: { 'Content-type': 'application/json' },
+      const result = await BarService.deleteBarBooking(barBookingId);
+
+      // 檢查是否成功刪除
+      setBookings((prevBookings) =>
+        prevBookings.filter(
+          (booking) => booking.bar_booking_id !== barBookingId,
+        ),
+      );
+      console.log(result);
+
+      Swal.fire({
+        title: '刪除成功!',
+        icon: 'success',
+        confirmButtonText: '關閉',
+        confirmButtonColor: '#A0FF1F',
+        background: 'rgba(0, 0, 0, 0.85)',
       });
-
-      const result = await r.json();
-
-      if (r.ok) {
-        // 檢查是否成功刪除
-        setBookings((prevBookings) =>
-          prevBookings.filter(
-            (booking) => booking.bar_booking_id !== barBookingId,
-          ),
-        );
-        console.log(result);
-
-        Swal.fire({
-          title: '刪除成功!',
-          icon: 'success',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
-      }
 
       bookingCancelModalRef.current?.close();
 

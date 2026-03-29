@@ -21,12 +21,13 @@ function truncateChinese(title, maxChineseChars = 7) {
 
 const TripCard = memo(function TripCard({ otherTrip }) {
   // 使用動態生成路徑
-  const detailPagePath = `/trip/other-trip/detail/${otherTrip.trip_plan_id}`;
+  const detailPageId = otherTrip?.trip_plan_id || '';
+  const detailPagePath = `/trip/other-trip/detail/${detailPageId}`;
 
   const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
-    if (otherTrip.trip_pic) {
+    if (otherTrip?.trip_pic) {
       const modifiedImageUrl = `${otherTrip.trip_pic}`;
       setImageUrl(modifiedImageUrl);
     }
@@ -69,9 +70,9 @@ const TripCard = memo(function TripCard({ otherTrip }) {
         <div className="flex flex-col items-center justify-center">
           <p
             className="text-black text-lg sm:text-2xl mb-2 tooltip"
-            data-tip={otherTrip.trip_title}
+            data-tip={otherTrip?.trip_title || '無標題'}
           >
-            {truncateChinese(otherTrip.trip_title)}
+            {truncateChinese(otherTrip?.trip_title || '無標題')}
           </p>
           <Link
             href={detailPagePath}

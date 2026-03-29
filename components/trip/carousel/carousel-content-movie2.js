@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function CarouselContentMovie2({
   movies,
@@ -28,21 +28,10 @@ export default function CarouselContentMovie2({
   };
   const handleSubmit = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/add-movie/${trip_plan_id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            movie_id: movies.movie_id,
-            block: timeOfDay,
-          }),
-        },
-      );
-
-      const result = await response.json();
+      const result = await TripService.addMovieToTripBlock(trip_plan_id, {
+        movie_id: movies.movie_id,
+        block: timeOfDay,
+      });
 
       if (result.success) {
         console.log('Moive added to trip successfully!');
@@ -50,7 +39,7 @@ export default function CarouselContentMovie2({
         document.getElementById(modalId).close(); // 關閉彈跳視窗
         refreshAllDetails();
       } else {
-        alert('失敗了失敗了時間不多囉：' + result.message);
+        alert('失敗了失敗了時間不多囉：' + (result.message || '未知錯誤'));
       }
     } catch (error) {
       console.error('Error adding movie to trip:', error);

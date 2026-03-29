@@ -3,6 +3,7 @@ import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import io from 'socket.io-client';
 import { DateService } from '@/services/date-service';
+import { SOCKET_SERVER } from '@/configs/api-config';
 
 // 接收 searchQuery 作為屬性
 export default function Friends({ searchQuery }) {
@@ -72,7 +73,6 @@ export default function Friends({ searchQuery }) {
           return [...prev, userId];
         });
       };
-
       const handleUserDisconnected = (userId) => {
         setOnlineUsers((prev) => prev.filter((id) => id !== userId));
       };

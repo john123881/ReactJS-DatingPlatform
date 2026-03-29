@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 import { useAuth } from '@/context/auth-context';
 import TabBar from '@/components/bar/bar/tab-bar';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
@@ -20,20 +20,22 @@ export default function BarBookingList({ onPageChange }) {
   const [bookingsPerPage] = useState(4); // 每頁顯示的訂位紀錄數量
 
   const getBarBookingList = async () => {
-    const url = `${API_BASE_URL}/bar/bar-booking-list`;
-    const response = await fetch(url);
-    const data = await response.json();
-    setBookings(data);
+    try {
+      const data = await BarService.getGlobalBookingList();
+      setBookings(data);
+    } catch (error) {
+      console.error('Fetching booking list error:', error);
+    }
   };
 
   const deleteBooking = async (id) => {
-    const url = `${API_BASE_URL}/bar/delete-bar-booking/${id}`;
-    const response = await fetch(url, {
-      method: 'DELETE',
-    });
-    const result = await response.json();
-    if (result.success) {
-      getBarBookingList();
+    try {
+      const result = await BarService.deleteBarBookingItem(id);
+      if (result.success) {
+        getBarBookingList();
+      }
+    } catch (error) {
+      console.error('Deleting booking error:', error);
     }
   };
 

@@ -1,7 +1,7 @@
 import { useDate } from '@/context/date-context';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { DATE_GET_BAR_TYPE, DATE_EDIT_BAR_TYPE } from '@/configs/api-config';
+import { DateService } from '@/services/date-service';
 
 export default function SelectBarModal() {
   const { toggleBar, setToggleBar } = useDate();
@@ -11,12 +11,10 @@ export default function SelectBarModal() {
   const [selectedBar, setSelectedBar] = useState(null); // 用來記錄用戶的選項
 
   const getType = async () => {
-    const url = `${DATE_GET_BAR_TYPE}`;
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      if (Array.isArray(data.data)) {
-        setType(data.data);
+      const result = await DateService.getBarTypes();
+      if (Array.isArray(result)) {
+        setType(result);
       }
     } catch (e) {
       console.log(e);
@@ -41,18 +39,8 @@ export default function SelectBarModal() {
         });
 
         const sid = auth.id;
-        const urlEdit = `${DATE_EDIT_BAR_TYPE}/${sid}`;
-        console.log(urlEdit);
-
-        const response = await fetch(urlEdit, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader(),
-          },
-          body: JSON.stringify({
-            bar_type_name: selectedBar.bar_type_name,
-          }),
+        await DateService.editBarInterest(sid, {
+          bar_type_name: selectedBar.bar_type_name,
         });
       }
     } catch (error) {

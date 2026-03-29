@@ -2,7 +2,7 @@ import AddBar from '@/components/trip/add-trip/add-bar';
 import AddMovie from '@/components/trip/add-trip/add-movie';
 import Recomendbar from '@/components/trip/sidebars/recomendbar';
 import { useState, useEffect, useRef } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function TripRecomendModal({
   trip_detail_id,
@@ -32,11 +32,7 @@ export default function TripRecomendModal({
   const recomendModalRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/trip/my-details/recommend/bar`)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
+    TripService.getRecommendBars()
       .then((data) => {
         setBarSaved(data);
         const uniqueAreas = Array.from(
@@ -52,11 +48,7 @@ export default function TripRecomendModal({
   }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/trip/my-details/recommend/movie`)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
+    TripService.getRecommendMovies()
       .then((data) => {
         setMovie(data);
       })

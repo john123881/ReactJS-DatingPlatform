@@ -6,7 +6,7 @@ import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function List({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -77,15 +77,7 @@ export default function List({ onPageChange }) {
       }
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
-          {
-            headers: {
-              ...getAuthHeader(),
-            },
-          },
-        );
-        const data = await response.json();
+        const data = await BarService.checkBarStatus(userId, barIds);
 
         // 更新 React 狀態以觸發界面更新，以顯示最新的收藏狀態
         setSavedBars((prevSavedBars) => {
@@ -107,15 +99,16 @@ export default function List({ onPageChange }) {
     async (bar_type_id) => {
       if (!bar_type_id) return; // 確保 bar_type_id 存在
 
-      const url = `${API_BASE_URL}/bar/bar-list/${bar_type_id}`;
       try {
-        const res = await fetch(url);
-        const data = await res.json();
+        // 使用特殊的分類端點，或者通用 getBars
+        // 這裡後端路徑是 /bar/bar-list/:bar_type_id
+        // 我們映射到 BarService.getBars({ bar_type_id })
+        const result = await BarService.getBars({ bar_type_id });
 
-        const barIds = data.map((bar) => bar.bar_id).join(',');
+        const barIds = result.map((bar) => bar.bar_id).join(',');
         checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
 
-        setBars(data); // 確認數據是否為預期格式
+        setBars(result); 
       } catch (error) {
         console.error('Failed to fetch bar list:', error);
       }
@@ -139,11 +132,8 @@ export default function List({ onPageChange }) {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`,
-        );
-        const data = await response.json();
-        setSearchResults(data);
+        const result = await BarService.searchBars(value);
+        setSearchResults(result);
         setHasSearched(true);
       } catch (error) {
         console.error('Search error:', error);

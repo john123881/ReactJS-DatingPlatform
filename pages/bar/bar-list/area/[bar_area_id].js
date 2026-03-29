@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
@@ -45,15 +45,7 @@ export default function List({ onPageChange }) {
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/bar/check-bar-status?userId=${userId}&barIds=${barIds}`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-        },
-      );
-      const data = await response.json();
+      const data = await BarService.checkBarStatus(userId, barIds);
 
       // 初始化來存儲所有酒吧的收藏狀態
       const newSavedBars = { ...savedBars };
@@ -75,14 +67,11 @@ export default function List({ onPageChange }) {
   const getBarListType = async (bar_area_id) => {
     if (!bar_area_id) return; // 確保 bar_area_id 存在
 
-    const url = `${API_BASE_URL}/bar/bar-list/area/${bar_area_id}`;
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-
-      const barIds = data.map((bar) => bar.bar_id).join(',');
+      const result = await BarService.getBars({ bar_area_id });
+      const barIds = result.map((bar) => bar.bar_id).join(',');
       checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
-      setBars(data); // 確認數據是否為預期格式
+      setBars(result); // 確認數據是否為預期格式
     } catch (error) {
       console.error('Failed to fetch bar area:', error);
     }
@@ -104,11 +93,8 @@ export default function List({ onPageChange }) {
     // 確保空字串不會觸發
     if (value.trim()) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/bar/search-bars?searchTerm=${value}`,
-        );
-        const data = await response.json();
-        setSearchResults(data);
+        const result = await BarService.searchBars(value);
+        setSearchResults(result);
         setHasSearched(true);
       } catch (error) {
         console.error('Search error:', error);

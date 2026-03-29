@@ -7,6 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
 import Swal from 'sweetalert2';
 import { apiClient } from '@/services/api-client';
+import { TripService } from '@/services/trip-service';
 import AccountLoader from '@/components/account-center/loader/account-loader';
 
 
@@ -40,7 +41,7 @@ export default function TripCalendar() {
   const fetchTrips = async () => {
     try {
       setIsLoading(true);
-      const data = await apiClient.get('/trip/trip-plans');
+      const data = await TripService.getTripPlans();
       setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
@@ -198,18 +199,18 @@ export default function TripCalendar() {
       let data;
       try {
         // 根據您的分析，後端目前直接將 req.body 丟給 Service，因此我們預設發送 FLAT 結構
-        data = await apiClient.post('/trip/trip-plans/add', fullPayload);
+        data = await TripService.addTripPlan(fullPayload);
         
         // 重要：如果後端回傳 200 但 success 為 false，手動切換到 nested 嘗試
         if (data && data.success === false) {
            console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
-           data = await apiClient.post('/trip/trip-plans/add', {
+           data = await TripService.addTripPlan({
              tripPlan: fullPayload
            });
         }
       } catch (e) {
         console.warn('First attempt failed with error, retrying with Nested payload...', e);
-        data = await apiClient.post('/trip/trip-plans/add', {
+        data = await TripService.addTripPlan({
           tripPlan: fullPayload
         });
       }
@@ -218,14 +219,11 @@ export default function TripCalendar() {
         console.log('Trip plan created successfully:', data);
         closeModal();
 
-        const newTripPlanId = data.tripPlanId || data.insertId || data.id;
-        const flatData = await apiClient.post('/trip/trip-plans/add', fullPayload);
-        if (flatData.success !== false) {
-            closeModal();
-            const flatId = flatData.tripPlanId || flatData.insertId || flatData.id;
-            Router.push(`/trip/my-trip/detail/${flatId}`);
+        const newTripPlanId = data.tripPlanId || data.insertId || data.id || (Array.isArray(data) ? data[0]?.trip_plan_id : data.data?.[0]?.trip_plan_id);
+        if (newTripPlanId) {
+          Router.push(`/trip/my-trip/detail/${newTripPlanId}`);
         } else {
-            throw new Error(flatData.message || flatData.error || '新增資料到資料庫時出錯');
+          fetchTrips();
         }
       }
     } catch (error) {

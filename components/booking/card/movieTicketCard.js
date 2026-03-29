@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BookingService } from '@/services/booking-service';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import dayjs from 'dayjs';
@@ -28,13 +28,7 @@ export default function MovieCard({ movie, index }) {
 
   const handleBookingDelete = async (bookingId) => {
     try {
-      const url = `${API_BASE_URL}/booking/delete-movie-booking`;
-      const r = await fetch(url, {
-        method: 'DELETE',
-        body: JSON.stringify({ bookingId }),
-        headers: { 'Content-type': 'application/json' },
-      });
-      const result = await r.json();
+      const result = await BookingService.deleteMovieBooking(bookingId);
 
       Swal.fire({
         title: '刪除成功!',

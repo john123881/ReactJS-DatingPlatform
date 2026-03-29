@@ -8,6 +8,7 @@ import {
   BOOKING_SEARCH_MOVIES,
   BOOKING_MOVIE_DETAIL,
   BOOKING_GET_BOOKING_SYSTEM,
+  BOOKING_DELETE_MOVIE_BOOKING,
 } from '@/configs/api-config';
 
 export const BookingService = {
@@ -24,7 +25,11 @@ export const BookingService = {
   /**
    * 獲取電影清單
    */
-  getMovieList: () => apiClient(BOOKING_MOVIE_LIST),
+  /**
+   * 根據類型獲取電影
+   * @param {string|number} typeId
+   */
+  getMoviesByCategory: (typeId) => apiClient(`${BOOKING_MOVIE_LIST}/${typeId}`),
 
   /**
    * 搜尋電影
@@ -63,4 +68,11 @@ export const BookingService = {
    */
   unsaveMovie: (userId, movieId) =>
     apiClient.delete(BOOKING_UNSAVE_MOVIE, { body: { userId, movieId } }),
+
+  /**
+   * 刪除電影訂位
+   * @param {string|number} bookingId
+   */
+  deleteMovieBooking: (bookingId) =>
+    apiClient.delete(BOOKING_DELETE_MOVIE_BOOKING, { body: { bookingId } }),
 };

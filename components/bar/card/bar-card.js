@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 import { IoMdStar } from 'react-icons/io';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import Link from 'next/link';
@@ -27,21 +27,16 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
     const newSavedState = !wasSaved;
 
     try {
-      const url = wasSaved ? '/unsaved-bar' : '/saved-bar';
-      const method = wasSaved ? 'DELETE' : 'POST';
-      const res = await fetch(`${API_BASE_URL}/bar${url}`, {
-        method: method,
-        headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ barId, userId }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-        setRerender(!rerender);
-        console.log('Save status updated:', data);
+      let result;
+      if (wasSaved) {
+        result = await BarService.unsaveBar(userId, barId);
       } else {
-        throw new Error(data.message || data.msg || 'Failed to update save status');
+        result = await BarService.saveBar(userId, barId);
       }
+
+      setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+      setRerender(!rerender);
+      console.log('Save status updated:', result);
     } catch (error) {
       console.error('Error updating save status:', error);
       setError(error.message);

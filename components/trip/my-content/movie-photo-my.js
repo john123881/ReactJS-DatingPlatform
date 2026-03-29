@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import WithContent from './with-content';
 import { useLoader } from '@/context/use-loader';
 
@@ -28,16 +28,10 @@ export default function MoviePhotoMy({
     const fetchMovieImage = async () => {
       open();
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/movie-photo/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 電影圖片失敗');
-        }
-        const data = await response.json();
+        const result = await TripService.getMoviePhoto(trip_plan_id);
         // console.log('Received JSON:', data);
         ////用以區分每個block所顯示的內容////////
-        const filteredData = data.filter(
+        const filteredData = result.filter(
           (trip) => trip.block == tripDetails.block,
         );
 

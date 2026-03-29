@@ -2,9 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import {
-  DATE_FRIENDSHIPS_MESSAGE_SENDER,
   SOCKET_SERVER,
 } from '@/configs/api-config';
+import { DateService } from '@/services/date-service';
 import io from 'socket.io-client';
 
 export default function ChatMsg({ searchQuery }) {
@@ -28,17 +28,14 @@ export default function ChatMsg({ searchQuery }) {
 
   //TODO: URL 依照登入使用者變動
   const [msg, setMsg] = useState([]);
-  const { auth, getAuthHeader, rerender } = useAuth();
+  const { auth, rerender } = useAuth();
   const socket = useRef(null);
 
   const getMsg = async () => {
-    const url = `${DATE_FRIENDSHIPS_MESSAGE_SENDER}/${auth.id}`;
     try {
-      const res = await fetch(url, { headers: { ...getAuthHeader() } });
-      const data = await res.json();
-
-      if (Array.isArray(data.data)) {
-        setMsg(data.data);
+      const result = await DateService.getMessagesBySender(auth.id);
+      if (Array.isArray(result)) {
+        setMsg(result);
       }
     } catch (e) {
       console.error('Failed to fetch messages:', e);
@@ -84,7 +81,6 @@ export default function ChatMsg({ searchQuery }) {
   useEffect(() => {
     const handleUserConnected = (userId) => {
       setOnlineUsers((prev) => [...prev, userId]); // 增加上線用戶
-      console.log(userId);
     };
 
     const handleUserDisconnected = (userId) => {

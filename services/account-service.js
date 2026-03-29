@@ -7,6 +7,8 @@ import {
   ACCOUNT_COLLECT_MOVIE,
   ACCOUNT_COLLECT_MOVIE_DELETE,
   ACCOUNT_GAME_RECORD_POST,
+  ACCOUNT_RECORD_POINT_GET,
+  ACCOUNT_RECORD_GAME,
 } from '@/configs/api-config';
 
 export const AccountService = {
@@ -40,9 +42,10 @@ export const AccountService = {
 
   /**
    * 更改密碼
+   * @param {string|number} sid
    * @param {object} data
    */
-  changePassword: (data) => apiClient.put('/account/change-password', data),
+  changePassword: (sid, data) => apiClient.put(`/account/change-password/${sid}`, data),
 
   /**
    * 上傳遊戲紀錄
@@ -55,12 +58,14 @@ export const AccountService = {
   /**
    * 讀取點數紀錄
    */
-  getPointRecord: () => apiClient('/account/record-point'),
+  getPointRecord: (sid, query = '') => 
+    apiClient(`${ACCOUNT_RECORD_POINT_GET}/${sid}${query}`),
 
   /**
    * 讀取遊戲紀錄
    */
-  getGameRecord: () => apiClient('/account/record-game'),
+  getGameRecord: (sid, query = '') => 
+    apiClient(`${ACCOUNT_RECORD_GAME}/${sid}${query}`),
 
   getCollectList: (sid) =>
     apiClient(sid ? `/account/collect-list/${sid}` : '/account/collect-list'),

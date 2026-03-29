@@ -3,9 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { AiFillPicture } from 'react-icons/ai';
 import Swal from 'sweetalert2';
-import { API_BASE_URL } from '@/configs/api-config';
-import { apiClient } from '@/services/api-client';
 import { getImageUrl } from '@/services/image-utils';
+import { TripService } from '@/services/trip-service';
 
 
 function truncateChinese(title, maxChineseChars = 7) {
@@ -70,18 +69,12 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     if (trip_plan_id) {
       const fetchTrip = async () => {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/trip-plan/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
+          const data = await TripService.getTripPlan(trip_plan_id);
           if (data) {
             setTrip(data);
           }
         } catch (error) {
-          console.error('Fetching trip  error:', error);
+          console.error('Fetching trip error:', error);
         }
       };
       fetchTrip();
@@ -90,7 +83,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
   const shareTrip = async () => {
     try {
-      const data = await apiClient.post(`/trip/my-details/share/${trip_plan_id}`);
+      const data = await TripService.shareTrip(trip_plan_id);
       if (data.success !== false) {
         setTrip((prev) => ({ ...prev, trip_draft: 1 }));
       } else {
@@ -104,7 +97,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
 
   const UnShareTrip = async () => {
     try {
-      const data = await apiClient.post(`/trip/my-details/unshare/${trip_plan_id}`);
+      const data = await TripService.unshareTrip(trip_plan_id);
       if (data.success !== false) {
         setTrip((prev) => ({ ...prev, trip_draft: 0 }));
       } else {
@@ -133,8 +126,8 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     formData.append('tripPic', selectedFile);
 
     try {
-      // apiClient 會自動處理 FormData 並移除 Content-Type
-      const result = await apiClient.post(`/trip/my-details/photo/${trip_plan_id}`, formData);
+      // TripService.uploadTripPhoto 會調用 apiClient.post，它會自動處理 FormData
+      const result = await TripService.uploadTripPhoto(trip_plan_id, formData);
 
       if (result.success !== false) {
         // 更新本地 state 以便即時顯示新圖片
@@ -167,7 +160,7 @@ export default function TripSidebar2({ tripName, trip_plan_id }) {
     event.preventDefault();
 
     try {
-      const result = await apiClient.post(`/trip/my-details/DnN/${trip_plan_id}`, {
+      const result = await TripService.updateTripDetails(trip_plan_id, {
         trip_description: tripDescription,
         trip_notes: tripNote,
       });

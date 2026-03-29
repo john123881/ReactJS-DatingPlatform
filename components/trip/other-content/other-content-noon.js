@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import OtherNoContentNoon from './other-no-content-noon';
 import NoContentNoon from '../my-content/no-content-noon';
 import MoviePhotoOther from './movie-photo-other';
@@ -12,16 +12,10 @@ export default function OtherContentNoon({ trip_plan_id }) {
     if (trip_plan_id) {
       const fetchTripDetails = async () => {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/noon-content/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
+          const result = await TripService.getNoonContent(trip_plan_id);
           // 假設 data 是數組或需要訪問特定屬性
-          if (data && data.length > 0) {
-            setTripDetails(data[0]);
+          if (result && result.length > 0) {
+            setTripDetails(result[0]);
           } else {
             // 設置一個明確的“沒有內容”的狀態
             setTripDetails({ block: null });

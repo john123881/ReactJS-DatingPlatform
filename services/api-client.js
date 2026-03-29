@@ -75,11 +75,9 @@ async function processResponse(response) {
   if (result && typeof result === 'object' && 'success' in result) {
     if (result.success) {
       // 核心相容性邏輯 (Ghost Wrapper Pattern):
-      // 為了不破壞舊有直接預期 Array 的組件 (如 SuggestionBar)，
-      // 又要維持對 .success 和 .data 的檢查支援，
-      // 我們在資料物件/陣列上定義「隱形」(non-enumerable) 的屬性。
-      
-      const finalData = result.data !== undefined ? result.data : result;
+      // 我們確保 finalData 至少是一個空陣列 (除非原本就是物件型態的工作)
+      // 但在大多數情況下，回傳 [] 比回傳 null 對組件更具防禦性。
+      const finalData = result.data !== undefined ? (result.data ?? []) : result;
       
       // 如果 finalData 是 null，我們需要建立一個包裝物件以便定義 .success 屬性，
       // 否則前端執行 if (result.success) 時會噴出 TypeError: Cannot read properties of null

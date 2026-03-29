@@ -1,4 +1,10 @@
 import { apiClient } from './api-client';
+import {
+  BAR_DELETE_BOOKING,
+  BAR_BOOKING_LIST_GET,
+  BAR_DELETE_BOOKING_ITEM,
+  BAR_RATING_GET,
+} from '@/configs/api-config';
 
 export const BarService = {
   /**
@@ -14,7 +20,7 @@ export const BarService = {
   /**
    * 獲取隨機酒吧列表
    */
-  getRandomBars: () => apiClient('/bar/bar-list-radom'),
+  getRandomBars: () => apiClient('/bar/bar-list-random'),
 
   /**
    * 搜尋酒吧
@@ -55,10 +61,13 @@ export const BarService = {
   // --- 評分相關 ---
 
   /**
-   * 獲取酒吧評分列表
-   * @param {string|number} barId
+   * 獲取酒吧評分列表 (所有或單一酒吧)
+   * @param {string|number} [barId]
    */
-  getBarRatings: (barId) => apiClient(`/bar/bar-rating/${barId}`),
+  getBarRatings: (barId) => {
+    const endpoint = barId ? `/bar/bar-rating/${barId}` : BAR_RATING_GET;
+    return apiClient(endpoint);
+  },
 
   /**
    * 獲取酒吧平均評分
@@ -117,4 +126,22 @@ export const BarService = {
    */
   unsaveBar: (userId, barId) =>
     apiClient.delete('/bar/unsaved-bar', { body: { userId, barId } }),
+
+  /**
+   * 刪除訂位
+   * @param {string|number} barBookingId
+   */
+  deleteBarBooking: (barBookingId) =>
+    apiClient.delete(BAR_DELETE_BOOKING, { body: { barBookingId } }),
+
+  /**
+   * 獲取所有訂位 (Session-based)
+   */
+  getGlobalBookingList: () => apiClient(BAR_BOOKING_LIST_GET),
+
+  /**
+   * 刪除特定訂位
+   */
+  deleteBarBookingItem: (id) =>
+    apiClient.delete(`${BAR_DELETE_BOOKING_ITEM}/${id}`),
 };

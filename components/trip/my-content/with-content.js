@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import { FaTrash } from 'react-icons/fa';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
@@ -43,19 +43,12 @@ export default function WithContent({
 
   const onConfirmDelete = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/delete/${tripDetails.trip_detail_id}`,
-        { method: 'DELETE' },
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok.');
-      }
-      const data = await response.json();
-      if (data.success) {
+      const result = await TripService.deleteTripDetail(tripDetails.trip_detail_id);
+      if (result.success) {
         closeDeleteModal();
         refreshTripDetails();
       } else {
-        alert('刪除失敗: ' + data.message);
+        alert('刪除失敗: ' + result.message);
       }
     } catch (error) {
       alert('發生錯誤: ' + error.message);

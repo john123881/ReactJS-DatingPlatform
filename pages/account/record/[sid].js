@@ -13,6 +13,7 @@ import {
 import toast from 'react-hot-toast';
 import { useLoader } from '@/context/use-loader';
 import AccountLoader from '@/components/account-center/loader/account-loader';
+import { AccountService } from '@/services/account-service';
 
 export default function AccountRecord({ onPageChange }) {
   const pageTitle = '會員中心';
@@ -241,23 +242,22 @@ export default function AccountRecord({ onPageChange }) {
           return;
         }
 
-        const r = await fetch(
-          `${ACCOUNT_RECORD_POINT_GET}/${router.query.sid}${location.search}`,
-          { headers: { ...getAuthHeader() } },
-        );
-        const result = await r.json();
+        const result = await AccountService.getPointRecord(router.query.sid, location.search);
         if (!isSubscribed) return;
 
-        if (result.output?.error === '無相關紀錄') {
-          setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
-          toast.error(result.output.error, { duration: 1500 });
-        } else if (result.success) {
-          setRecordListPoint((prev) => ({
-            ...prev,
-            rows: result.output.data,
-            page: result.page,
-            totalPages: result.totalPages,
-          }));
+        if (result.success) {
+          const pointData = result.output || result;
+          if (pointData.error === '無相關紀錄') {
+            setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
+            toast.error(pointData.error, { duration: 1500 });
+          } else {
+            setRecordListPoint((prev) => ({
+              ...prev,
+              rows: pointData.data || result.data || [],
+              page: result.page || 0,
+              totalPages: result.totalPages || 0,
+            }));
+          }
         }
       } catch (error) {
         console.error('loadData error:', error);
@@ -295,23 +295,22 @@ export default function AccountRecord({ onPageChange }) {
           return;
         }
 
-        const r = await fetch(
-          `${ACCOUNT_RECORD_GAME}/${router.query.sid}${location.search}`,
-          { headers: { ...getAuthHeader() } },
-        );
-        const result = await r.json();
+        const result = await AccountService.getGameRecord(router.query.sid, location.search);
         if (!isSubscribed) return;
 
-        if (result.output?.error === '無相關紀錄') {
-          setRecordListGame({ rows: [], page: 0, totalPages: 0 });
-          toast.error(result.output.error, { duration: 1500 });
-        } else if (result.success) {
-          setRecordListGame((prev) => ({
-            ...prev,
-            rows: result.output.data,
-            page: result.page,
-            totalPages: result.totalPages,
-          }));
+        if (result.success) {
+          const gameData = result.output || result;
+          if (gameData.error === '無相關紀錄') {
+            setRecordListGame({ rows: [], page: 0, totalPages: 0 });
+            toast.error(gameData.error, { duration: 1500 });
+          } else {
+            setRecordListGame((prev) => ({
+              ...prev,
+              rows: gameData.data || result.data || [],
+              page: result.page || 0,
+              totalPages: result.totalPages || 0,
+            }));
+          }
         }
       } catch (error) {
         console.error('fetchGameRecord error:', error);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import CarouselContentBar from './carousel-content-bar';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
   const [barSaved, setBarSaved] = useState([]);
@@ -12,13 +12,7 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
   useEffect(() => {
     const fetchBarSaved = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/recommend/bar`,
-        );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const data = await TripService.getRecommendBars();
         setBarSaved(data);
       } catch (error) {
         console.error('Fetching Bar saved error:', error);

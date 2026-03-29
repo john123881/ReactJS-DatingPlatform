@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import WithContent from './with-content';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 // 輔助函式：將Buffer轉換成base64
 function bufferToBase64(buffer) {
@@ -23,13 +23,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
   useEffect(() => {
     const fetchBarImage = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧圖片失敗');
-        }
-        const data = await response.json();
+        const data = await TripService.getBarPhoto(trip_plan_id);
         console.log('Received JSON:', data);
 
         // 檢查所有獲得的 data ，至多3個，找到第一個包含 bar_img的項目
@@ -58,13 +52,7 @@ export default function BarPhotoMy({ trip_plan_id }) {
   useEffect(() => {
     const fetchBarName = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧名稱失败');
-        }
-        const data = await response.json();
+        const data = await TripService.getBarName(trip_plan_id);
         console.log('Received JSON:', data);
 
         if (data && data.length > 0) {

@@ -1,10 +1,7 @@
 import { useDate } from '@/context/date-context';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import {
-  DATE_GET_MOVIE_TYPE,
-  DATE_EDIT_MOVIE_TYPE,
-} from '@/configs/api-config';
+import { DateService } from '@/services/date-service';
 
 export default function SelectMovieModal() {
   // // 來自資料庫
@@ -23,16 +20,10 @@ export default function SelectMovieModal() {
   const [selectMovie, setSelectedMovie] = useState(null); // 用來記錄用戶的選項
 
   const getType = async () => {
-    const url = `${DATE_GET_MOVIE_TYPE}`;
-
     try {
-      const res = await fetch(url);
-      console.log(res);
-      const data = await res.json();
-      console.log(data);
-
-      if (Array.isArray(data.data)) {
-        setType(data.data);
+      const result = await DateService.getMovieTypes();
+      if (Array.isArray(result)) {
+        setType(result);
       }
     } catch (e) {
       console.log(e);
@@ -57,17 +48,8 @@ export default function SelectMovieModal() {
         });
 
         const sid = auth.id;
-        const urlEdit = `${DATE_EDIT_MOVIE_TYPE}/${sid}`;
-
-        const response = await fetch(urlEdit, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader(),
-          },
-          body: JSON.stringify({
-            movie_type: selectMovie.movie_type,
-          }),
+        await DateService.editMovieInterest(sid, {
+          movie_type: selectMovie.movie_type,
         });
       }
     } catch (error) {

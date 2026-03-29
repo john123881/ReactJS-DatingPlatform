@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import OtherTripContent from './other-tripcontent';
 import { useLoader } from '@/context/use-loader';
 
@@ -24,13 +24,7 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
     const fetchBarImage = async () => {
       open();
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧圖片失敗');
-        }
-        const data = await response.json();
+        const result = await TripService.getBarPhoto(trip_plan_id);
         const filteredData = data.filter(
           (trip) => trip.block == tripDetails.block,
         );
@@ -57,15 +51,9 @@ export default function BarPhotoOther({ trip_plan_id, tripDetails }) {
   useEffect(() => {
     const fetchBarName = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧名稱失败');
-        }
-        const data = await response.json();
-        // console.log(data);
-        const filteredData = data.filter(
+        const result = await TripService.getBarName(trip_plan_id);
+        // console.log(result);
+        const filteredData = result.filter(
           (trip) => trip.block == tripDetails.block,
         );
         if (filteredData.length > 0) {

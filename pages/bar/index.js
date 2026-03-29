@@ -12,7 +12,7 @@ import {
   MdOutlineArrowForwardIos,
 } from 'react-icons/md';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -29,9 +29,8 @@ export default function Index({ onPageChange }) {
   // random bar
   const getBarListRandom = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/bar/bar-list-random`);
-      const data = await res.json();
-      setRandomBars(data);
+      const result = await BarService.getRandomBars();
+      setRandomBars(Array.isArray(result) ? result : (result.data || []));
     } catch (error) {
       console.error('Failed to fetch bar random:', error);
     }

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { useState, useEffect } from 'react';
+import { TripService } from '@/services/trip-service';
 import _ from 'lodash';
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
 import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
@@ -9,36 +9,23 @@ import Router from 'next/router';
 import Swal from 'sweetalert2';
 
 export default function TripCalendarModal({ tripName }) {
-  const { auth, getAuthHeader } = useAuth();
+  const { auth } = useAuth();
   const [trips, setTrips] = useState([]);
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans`, {
-        headers: { ...getAuthHeader() },
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+      const data = await TripService.getTripPlans();
       setTrips(data);
     } catch (error) {
       console.error('Fetching trips error:', error);
     }
   };
-  const tripDates = trips.map((trip) => {
-    const date = new Date(trip.trip_date);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1; // 月份是從0開始，所以要 +1
-    const day = date.getDate();
-    return { year, month, day };
-  });
 
-  // 以 useState 控制 modal 的開關
+  useEffect(() => {
+    fetchTrips();
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // 開啟modal
-  const openModal = () => setIsModalOpen(true);
 
   // 關閉modal
   const closeModal = () => setIsModalOpen(false);
@@ -159,24 +146,13 @@ export default function TripCalendarModal({ tripName }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/trip-plans/add`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeader(),
-          'Content-Type': 'application/json',
+      const data = await TripService.addTripPlan({
+        tripPlan: {
+          user_id: auth.id,
+          trip_date: modalDate,
+          trip_title: tripTitle,
         },
-        body: JSON.stringify({
-          tripPlan: {
-            user_id: auth.id,
-            trip_date: modalDate,
-            trip_title: tripTitle,
-          },
-        }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.msg || 'Network response was not ok');
-      }
       closeModal();
 
       const newTripPlanId = data.tripPlanId;

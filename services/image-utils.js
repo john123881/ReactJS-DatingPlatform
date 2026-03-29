@@ -20,8 +20,8 @@ export const getImageUrl = (url, type = 'avatar') => {
     finalUrl = finalUrl.replace(ipRegex, API_SERVER);
   }
 
-  // 2. 如果已經是完整網址 (http/https)，直接回傳
-  if (finalUrl.startsWith('http')) {
+  // 2. 如果已經是完整網址 (http/https) 或 Base64 資料，直接回傳
+  if (finalUrl.startsWith('http') || finalUrl.startsWith('data:')) {
     return finalUrl;
   }
 

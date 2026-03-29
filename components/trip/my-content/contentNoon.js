@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import NoContentNoon from './no-content-noon';
 import BarPhotoMy from './bar-photo-my';
 import MoviePhotoMy from './movie-photo-my';
@@ -11,15 +11,9 @@ export default function ContentNoon({ trip_plan_id, newDetail }) {
     if (trip_plan_id) {
       const fetchTripDetails = async () => {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/trip/my-details/noon-content/${trip_plan_id}`,
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          if (data && data.length > 0) {
-            setTripDetails(data[0]);
+          const result = await TripService.getNoonContent(trip_plan_id);
+          if (result && result.length > 0) {
+            setTripDetails(result[0]);
           } else {
             // 設置一個明確的“沒有內容”的狀態
             setTripDetails({ block: null });
@@ -38,15 +32,9 @@ export default function ContentNoon({ trip_plan_id, newDetail }) {
   //傳遞給子元件的函數 用於重新渲染頁面
   const refreshTripDetails = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/noon-content/${trip_plan_id}`,
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      if (data && data.length > 0) {
-        setTripDetails(data[0]);
+      const result = await TripService.getNoonContent(trip_plan_id);
+      if (result && result.length > 0) {
+        setTripDetails(result[0]);
       } else {
         setTripDetails({ block: null });
       }

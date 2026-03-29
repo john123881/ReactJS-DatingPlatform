@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 
 export default function AddMovie({
   movie,
@@ -8,24 +8,11 @@ export default function AddMovie({
 }) {
   const updateMovieInTrip = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/my-details/addmovie`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trip_detail_id: trip_detail_id,
-          movie_id: movie.movie_id,
-        }),
+      await TripService.addMovieToTrip({
+        trip_detail_id: trip_detail_id,
+        movie_id: movie.movie_id,
       });
 
-      const data = await response.json();
-
-      if (!response.ok || data.success === false) {
-        throw new Error(
-          data.message || data.error || data.msg || 'Update trip detail failed',
-        );
-      }
       refreshTripDetails();
       onClose();
       //alert('Movie added to the trip successfully!'); //換成sweet alert

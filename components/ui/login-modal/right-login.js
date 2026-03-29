@@ -5,7 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
-import { SENDOTP_POST } from '@/configs/api-config';
+import { AuthService } from '@/services/auth-service';
 import toast from 'react-hot-toast';
 
 import Link from 'next/link';
@@ -76,12 +76,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
 
   const sendValidCode = async () => {
     try {
-      const r = await fetch(SENDOTP_POST, {
-        method: 'POST',
-        body: JSON.stringify({ email: values.email }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const result = await r.json();
+      const result = await AuthService.sendRegisterOtp(values.email);
       return result;
     } catch (error) {
       console.error('發信時發生錯誤:', error);

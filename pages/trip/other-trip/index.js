@@ -7,6 +7,7 @@ import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import { API_BASE_URL } from '@/configs/api-config';
 import PageTitle from '@/components/page-title';
+import { TripService } from '@/services/trip-service';
 
 export default function OtherTrip({ onPageChange }) {
   const pageTitle = '行程規劃';
@@ -22,14 +23,8 @@ export default function OtherTrip({ onPageChange }) {
   const fetchTrips = useCallback(async () => {
     open();
     try {
-      const response = await fetch(`${API_BASE_URL}/trip/other-plans`, {
-        headers: { ...getAuthHeader() },
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setOtherTrips(data);
+      const result = await TripService.getOtherPlans();
+      setOtherTrips(result);
     } catch (error) {
       console.error('Fetching trips error:', error);
     }
@@ -42,8 +37,8 @@ export default function OtherTrip({ onPageChange }) {
   }, [auth.id, fetchTrips]);
 
   // 以 filter 的方式過濾，只顯示標題之中包含關鍵字的行程
-  const filteredTrips = otherTrips.filter((trip) =>
-    trip.trip_title.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredTrips = (otherTrips || []).filter((trip) =>
+    (trip?.trip_title || '').toLowerCase().includes((searchTerm || '').toLowerCase()),
   );
 
   return (

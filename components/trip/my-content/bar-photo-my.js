@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import WithContent from './with-content';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 
@@ -29,13 +29,7 @@ export default function BarPhotoMy({
     const fetchBarImage = async () => {
       open();
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-photo/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧圖片失敗');
-        }
-        const data = await response.json();
+        const result = await TripService.getBarPhoto(trip_plan_id);
         // console.log('Received JSON:', data);
         ////用以區分每個block所顯示的內容////////
         const filteredData = data.filter(
@@ -65,13 +59,7 @@ export default function BarPhotoMy({
   useEffect(() => {
     const fetchBarName = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/trip/my-details/bar-name/${trip_plan_id}`,
-        );
-        if (!response.ok) {
-          throw new Error('fetch 酒吧名稱失败');
-        }
-        const data = await response.json();
+        const result = await TripService.getBarName(trip_plan_id);
         // console.log('Received JSON:', data);
         ////用以區分每個block所顯示的內容////////
         const filteredData = data.filter(

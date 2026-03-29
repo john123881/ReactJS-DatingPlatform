@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
   const [areas, setAreas] = useState([]); // 存儲從API獲取的地區數據
@@ -7,21 +7,19 @@ export default function BarListSidebar({ onAreaSelected, onTypeSelected }) {
 
   // 依照 sql 出現下拉式選單項目
   useEffect(() => {
-    // 使用 Promise.all 來並行加載地區和類型數據
-    Promise.all([
-      fetch(`${API_BASE_URL}/bar/bar-area`),
-      fetch(`${API_BASE_URL}/bar/bar-type`),
-    ])
-      .then(([areaResponse, typeResponse]) => {
-        if (!areaResponse.ok) throw new Error('Failed to load areas');
-        if (!typeResponse.ok) throw new Error('Failed to load types');
-        return Promise.all([areaResponse.json(), typeResponse.json()]);
-      })
-      .then(([areaData, typeData]) => {
+    const fetchData = async () => {
+      try {
+        const [areaData, typeData] = await Promise.all([
+          BarService.getBarAreas(),
+          BarService.getBarTypes(),
+        ]);
         setAreas(areaData);
         setTypes(typeData);
-      })
-      .catch((error) => console.error('Error loading data:', error));
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    fetchData();
   }, []);
 
   return (

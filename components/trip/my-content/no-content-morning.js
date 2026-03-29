@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { TripService } from '@/services/trip-service';
 import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
 import TripRecomendModal from '@/components/trip/add-trip/trip-recomend-modal';
 import { useRouter } from 'next/router';
@@ -28,20 +28,11 @@ export default function NoContentMorning({
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/trip/my-details/add-morning/${trip_plan_id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      const data = await response.json();
-      if (response.ok && data.success !== false) {
-        setNewTripDetailId(data.trip_detail_id || data.insertId || data.id); // 更新 trip_detail_id
+      const result = await TripService.addMorningBlock(trip_plan_id);
+      if (result && result.success !== false) {
+        setNewTripDetailId(result.trip_detail_id || result.insertId || result.id); // 更新 trip_detail_id
       } else {
-        throw new Error(data.error || data.message || data.msg || 'Set block = 1 失敗');
+        throw new Error(result?.error || result?.message || result?.msg || 'Set block = 1 失敗');
       }
     } catch (error) {
       console.error('錯誤:', error);

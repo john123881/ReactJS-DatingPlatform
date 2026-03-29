@@ -12,15 +12,9 @@ import BlockModal from '@/components/date/modal/block-modal';
 import { TiThMenu } from 'react-icons/ti';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
-import {
-  ACCOUNT_GET,
-  DATE_FRIENDSHIPS,
-  DATE_FRIENDSHIPS_EDIT,
-  DATE_FRIENDSHIPS_MESSAGE,
-  DATE_FRIENDSHIPS_MESSAGE_NEW_MSG,
-  DATE_FRIENDSHIPS_MESSAGE_NEW_IMG,
-  SOCKET_SERVER,
-} from '@/configs/api-config';
+import { AccountService } from '@/services/account-service';
+import { DateService } from '@/services/date-service';
+import { SOCKET_SERVER } from '@/configs/api-config';
 
 //DATA
 // "data": [
@@ -73,11 +67,10 @@ export default function ChatRoomContext() {
     const controller = new AbortController();
     const getUserAvatar = async () => {
       try {
-        const res = await fetch(`${ACCOUNT_GET}/${auth.id}`, {
-          headers: { ...getAuthHeader() },
+        const result = await AccountService.getProfile(auth.id, {
           signal: controller.signal,
         });
-        const result = await res.json();
+
         if (result.success) {
           const { avatar } = result.data;
           setUserAvatar(avatar);
@@ -102,11 +95,7 @@ export default function ChatRoomContext() {
 
     const fetchFriendIdAndName = async () => {
       try {
-        const response = await fetch(`${DATE_FRIENDSHIPS}/${friendship_id}`, {
-          headers: { ...getAuthHeader() },
-        });
-
-        const result = await response.json();
+        const result = await DateService.getFriendshipDetail(friendship_id);
         // TODO error handler
         if (!result.success) {
           return;
@@ -121,10 +110,8 @@ export default function ChatRoomContext() {
     };
 
     const fetchMessages = async () => {
-      const url = `${DATE_FRIENDSHIPS_MESSAGE}/${friendship_id}`;
       try {
-        const response = await fetch(url, { headers: { ...getAuthHeader() } });
-        const result = await response.json();
+        const result = await DateService.getChatMessages(friendship_id);
 
         if (Array.isArray(result.data)) {
           setMessages(result.data);
@@ -226,24 +213,15 @@ export default function ChatRoomContext() {
     setInput('');
     setRerender(!rerender);
 
-    // 同時將傳送訊息存到資料庫
-    const url = `${DATE_FRIENDSHIPS_MESSAGE_NEW_MSG}`;
     try {
       // 發送 'send_message' 事件到後端
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: getAuthHeader(),
-        },
-        body: JSON.stringify({
-          friendship_id: roomName,
-          sender_id: auth.id,
-          content: input,
-        }),
+      const result = await DateService.sendChatMessage({
+        friendship_id: roomName,
+        sender_id: auth.id,
+        content: input,
       });
 
-      if (response.ok === false) {
+      if (!result.success) {
         // throw Error();
         console.error('訊息發送失敗');
 
@@ -257,22 +235,18 @@ export default function ChatRoomContext() {
 
   // 封鎖好友
   const handleBlockingClick = async () => {
-    // TODO try catch
-    const response = await fetch(`${DATE_FRIENDSHIPS_EDIT}/${friendship_id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify({
+    try {
+      const result = await DateService.updateFriendshipStatus(friendship_id, {
         friendship_status: 'blocking',
-      }),
-    });
-    if (response.ok) {
-      toast.success('好友已封鎖！', { duration: 1500 });
-      router.push('/date/friends-list');
-    } else {
-      console.error('Failed to update data');
+      });
+      if (result.success) {
+        toast.success('好友已封鎖！', { duration: 1500 });
+        router.push('/date/friends-list');
+      } else {
+        console.error('Failed to update data');
+      }
+    } catch (error) {
+      console.error('Failed to update data', error);
     }
   };
 
@@ -318,16 +292,10 @@ export default function ChatRoomContext() {
     formData.append('content', '');
     formData.append('file', file);
 
-    const url = `${DATE_FRIENDSHIPS_MESSAGE_NEW_IMG}`;
-
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        body: formData,
-      });
+      const responseData = await DateService.uploadChatImage(formData);
 
-      if (response.ok) {
-        const responseData = await response.json();
+      if (responseData.success) {
 
         const messageData = {
           msg_type: 'I',

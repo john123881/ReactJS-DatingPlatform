@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import BarReviewCard from '@/components/bar/card/bar-review-card';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function Rating({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -37,11 +37,12 @@ export default function Rating({ onPageChange }) {
   };
 
   const getBarRatingById = async (bar_id) => {
-    const url = `${API_BASE_URL}/bar/bar-rating/${bar_id}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    setRatings(data);
-    // setBar({ bar_name :'fake data', aaaa: '', xxxx:''});
+    try {
+      const data = await BarService.getBarRatings(bar_id);
+      setRatings(data);
+    } catch (error) {
+      console.error('Fetching ratings error:', error);
+    }
   };
   useEffect(() => {
     if (router.isReady) {

@@ -132,13 +132,14 @@ export default function NewFriends() {
   }
 
   const handleAcceptClick = async () => {
-    if (!selectedUserId) {
+    const targetId = selectedUserId || bio?.user_id;
+    if (!targetId) {
       console.log('Selected user id is not available yet');
       return;
     }
     const result = await DateService.sendFriendRequest({
       user_id1: auth.id,
-      user_id2: selectedUserId,
+      user_id2: targetId,
       friendship_status: 'accepted',
     });
 
@@ -152,13 +153,14 @@ export default function NewFriends() {
   };
 
   const handleRejectClick = async () => {
-    if (!selectedUserId) {
+    const targetId = selectedUserId || bio?.user_id;
+    if (!targetId) {
       console.log('Selected user id is not available yet');
       return;
     }
     const result = await DateService.sendFriendRequest({
       user_id1: auth.id,
-      user_id2: selectedUserId,
+      user_id2: targetId,
       friendship_status: 'rejected',
     });
 

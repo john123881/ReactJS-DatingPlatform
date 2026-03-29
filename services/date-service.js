@@ -1,4 +1,13 @@
 import { apiClient } from './api-client';
+import {
+  DATE_FRIENDSHIPS,
+  DATE_FRIENDSHIPS_MESSAGE,
+  DATE_FRIENDSHIPS_MESSAGE_NEW_MSG,
+  DATE_FRIENDSHIPS_MESSAGE_NEW_IMG,
+  DATE_EDIT_BAR_TYPE,
+  DATE_EDIT_MOVIE_TYPE,
+  DATE_FRIENDSHIPS_EDIT,
+} from '@/configs/api-config';
 
 export const DateService = {
   /**
@@ -24,15 +33,15 @@ export const DateService = {
    * 編輯感興趣的酒吧類型
    * @param {object} data
    */
-  editBarInterest: (data) =>
-    apiClient.put('/date/user_interest/edit_bar_type', data),
+  editBarInterest: (sid, data) =>
+    apiClient.put(`${DATE_EDIT_BAR_TYPE}/${sid}`, data),
 
   /**
    * 編輯感興趣的電影類型
    * @param {object} data
    */
-  editMovieInterest: (data) =>
-    apiClient.put('/date/user_interest/edit_movie_type', data),
+  editMovieInterest: (sid, data) =>
+    apiClient.put(`${DATE_EDIT_MOVIE_TYPE}/${sid}`, data),
 
   /**
    * 根據發送者 ID 獲取好友關係訊息
@@ -76,6 +85,31 @@ export const DateService = {
    * @param {object} data - { user_id1, user_id2, friendship_status }
    */
   sendFriendRequest: (data) => apiClient.post('/date/friends-list', data),
+
+  /**
+   * 拿取特定好友關係詳情
+   */
+  getFriendshipDetail: (friendshipId) => apiClient(`${DATE_FRIENDSHIPS}/${friendshipId}`),
+
+  /**
+   * 拿取聊天訊息
+   */
+  getChatMessages: (friendshipId) => apiClient(`${DATE_FRIENDSHIPS_MESSAGE}/${friendshipId}`),
+
+  /**
+   * 傳送聊天訊息
+   */
+  sendChatMessage: (data) => apiClient.post(DATE_FRIENDSHIPS_MESSAGE_NEW_MSG, data),
+
+  /**
+   * 修改好友狀態 (如封鎖)
+   */
+  updateFriendshipStatus: (friendshipId, data) => apiClient.put(`${DATE_FRIENDSHIPS_EDIT}/${friendshipId}`, data),
+
+  /**
+   * 上傳聊天圖片
+   */
+  uploadChatImage: (formData) => apiClient.post(DATE_FRIENDSHIPS_MESSAGE_NEW_IMG, formData),
 
   /**
    * 獲取已接受的好友列表

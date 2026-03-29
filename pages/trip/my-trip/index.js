@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import Swal from 'sweetalert2';
 import { apiClient } from '@/services/api-client';
+import { TripService } from '@/services/trip-service';
 
 
 export default function MyTrip({ onPageChange }) {
@@ -32,7 +33,7 @@ export default function MyTrip({ onPageChange }) {
   const fetchTrips = useCallback(async () => {
     open();
     try {
-      const data = await apiClient.get('/trip/trip-plans');
+      const data = await TripService.getTripPlans();
       setTrips(data || []);
     } catch (error) {
       console.error('Fetching trips error:', error);
@@ -50,7 +51,7 @@ export default function MyTrip({ onPageChange }) {
   const fetchOtherTrips = useCallback(async () => {
     open();
     try {
-      const data = await apiClient.get('/trip/other-plans');
+      const data = await TripService.getOtherPlans();
       setOtherTrips(data || []);
     } catch (error) {
       console.error('Fetching other trips error:', error);
@@ -97,17 +98,17 @@ export default function MyTrip({ onPageChange }) {
       let data;
       try {
         // 預設發送 FLAT 結構
-        data = await apiClient.post('/trip/trip-plans/add', fullPayload);
+        data = await TripService.addTripPlan(fullPayload);
         
         if (data && data.success === false) {
            console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
-           data = await apiClient.post('/trip/trip-plans/add', {
+           data = await TripService.addTripPlan({
              tripPlan: fullPayload
            });
         }
       } catch (e) {
         console.warn('First attempt failed, retrying with Nested payload...', e);
-        data = await apiClient.post('/trip/trip-plans/add', {
+        data = await TripService.addTripPlan({
           tripPlan: fullPayload
         });
       }
@@ -116,7 +117,7 @@ export default function MyTrip({ onPageChange }) {
       if (data && (data.success !== false && data.success !== 'false')) {
         closeModal();
 
-        const newTripPlanId = data.tripPlanId || data.insertId || data.id;
+        const newTripPlanId = data.tripPlanId || data.insertId || data.id || (Array.isArray(data) ? data[0]?.trip_plan_id : data.data?.[0]?.trip_plan_id);
         if (newTripPlanId) {
           router.push(`/trip/my-trip/detail/${newTripPlanId}`);
         } else {

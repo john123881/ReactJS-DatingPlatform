@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoMdStar } from 'react-icons/io';
@@ -13,11 +13,12 @@ export default function BarDetailCard() {
 
   const getBarList = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/bar/bar-list`);
-      const data = await res.json();
+      const data = await BarService.getBars();
+      // 注意：這組件似乎預期單一對象或在JSX中處理數組，
+      // 保持原始邏輯但使用 Service。
       setBars(data);
     } catch (error) {
-      console.log('Failed to fetch bar list:', error);
+      console.error('Failed to fetch bar list:', error);
     }
   };
 

@@ -4,7 +4,7 @@ import BarReviewCard from '@/components/bar/card/bar-review-card';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import { API_BASE_URL } from '@/configs/api-config';
+import { BarService } from '@/services/bar-service';
 
 export default function BarRatingList({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -38,10 +38,12 @@ export default function BarRatingList({ onPageChange }) {
   };
 
   const getBarRating = async () => {
-    const url = `${API_BASE_URL}/bar/bar-rating`;
-    const response = await fetch(url);
-    const data = await response.json();
-    setRatings(data);
+    try {
+      const data = await BarService.getBarRatings();
+      setRatings(data);
+    } catch (error) {
+      console.error('Fetching ratings error:', error);
+    }
   };
 
   useEffect(() => {
