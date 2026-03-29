@@ -32,67 +32,89 @@ export default function TripSidebarBase({
     : '';
 
   return (
-    <div className="pt-16 pb-3 border-b-2 border-white max-w-screen-2xl mx-auto px-4 sm:px-12">
+    <div className="pt-20 pb-8 border-b border-white/20 max-w-screen-2xl mx-auto px-6 sm:px-12 transition-all duration-500">
       {/* Desktop View */}
       <div className="hidden sm:block">
-        <p className="mb-2 text-5xl">{titlePrefix}</p>
-        <div className="flex justify-between items-center pr-2.5">
-          <div className="flex items-center min-h-[40px]">
-            {tripName?.trip_title ? (
-              <h3 className="mr-8 text-2xl tooltip font-medium" data-tip={tripName.trip_title}>
-                {truncateChinese(tripName.trip_title)}
-              </h3>
-            ) : (
-              <div className="skeleton h-8 w-32 mr-8 bg-white/10"></div>
-            )}
-            
-            {tripName?.trip_date ? (
-              <h3 className="mr-8 text-2xl font-medium">{formattedDate}</h3>
-            ) : (
-              <div className="skeleton h-8 w-32 mr-8 bg-white/10"></div>
-            )}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
+          <div className="flex flex-col">
+            <h1 className="text-7xl font-black text-white tracking-tighter mb-4 drop-shadow-glow-white">
+              {titlePrefix}
+            </h1>
+            <div className="flex items-center gap-6">
+              {tripName?.trip_title ? (
+                <div className="relative group">
+                  <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-neongreen group-hover:to-white transition-all duration-300">
+                    {truncateChinese(tripName.trip_title, 12)}
+                  </h3>
+                  <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-neongreen group-hover:w-full transition-all duration-300"></div>
+                </div>
+              ) : (
+                <div className="skeleton animate-pulse h-10 w-48 bg-white/5 rounded-lg"></div>
+              )}
 
-            {tripName.username && (
-              <h3 className="mr-8 text-2xl">{usernamePrefix}{tripName.username}</h3>
-            )}
+              <div className="h-8 w-px bg-white/20 mx-2"></div>
+
+              {tripName?.trip_date ? (
+                <div className="px-6 py-2 border border-neongreen/50 bg-neongreen/5 rounded-full shadow-[0_0_15px_rgba(160,255,31,0.1)]">
+                  <h3 className="text-2xl font-black text-neongreen tracking-widest">{formattedDate}</h3>
+                </div>
+              ) : (
+                <div className="skeleton animate-pulse h-10 w-40 bg-white/5 rounded-full"></div>
+              )}
+
+              {tripName.username && (
+                <h3 className="text-2xl text-gray-400 font-medium">
+                  {usernamePrefix}<span className="text-white ml-2">{tripName.username}</span>
+                </h3>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-4">
+            <Link 
+              className="flex items-center gap-2 text-xl font-bold text-gray-400 hover:text-neongreen transition-colors group" 
+              href={backLink}
+            >
+              <span className="group-hover:-translate-x-1 transition-transform">←</span> {backLabel}
+            </Link>
             {children}
           </div>
-          <Link className="hover:text-[#a0ff1f] text-2xl" href={backLink}>
-            {backLabel}
-          </Link>
         </div>
       </div>
 
       {/* Mobile View */}
-      <div className="flex flex-col gap-2.5 mx-5 sm:hidden">
-        <div className="flex flex-col gap-1 min-h-[48px]">
+      <div className="flex flex-col gap-6 sm:hidden">
+        <h1 className="text-5xl font-black text-white">{titlePrefix}</h1>
+        <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-3xl border border-white/10">
           {tripName?.trip_title ? (
-            <div className="text-base text-white">{tripName.trip_title}</div>
+            <div className="text-2xl font-bold text-neongreen">{tripName.trip_title}</div>
           ) : (
-            <div className="skeleton h-5 w-40 mb-1 bg-white/10"></div>
+            <div className="skeleton animate-pulse h-6 w-full bg-white/10 rounded"></div>
           )}
           
           {tripName?.trip_date ? (
-            <div className="text-base text-white">{formattedDate}</div>
+            <div className="text-xl font-medium text-white/80">{formattedDate}</div>
           ) : (
-            <div className="skeleton h-5 w-32 bg-white/10"></div>
+            <div className="skeleton animate-pulse h-6 w-32 bg-white/10 rounded"></div>
+          )}
+          
+          {tripName.username && (
+            <div className="text-lg text-gray-400">{usernamePrefix}{tripName.username}</div>
           )}
         </div>
-        {tripName.username && (
-          <div className="text-base text-white">{usernamePrefix}{tripName.username}</div>
-        )}
-        <div className="flex gap-5">
+
+        <div className="flex flex-wrap gap-4 items-center justify-between">
            <button
             onClick={() => setIsNoteOpen(true)}
-            className="text-xs bg-black px-2 py-1 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black"
+            className="text-base font-bold bg-neongreen text-black px-6 py-2 rounded-full hover:shadow-glow-green transition-all"
           >
             閱讀行程筆記
           </button>
           {children}
+          <Link className="text-lg font-bold text-neongreen border-b border-neongreen" href={backLink}>
+            {backLabel}
+          </Link>
         </div>
-        <Link className="hover:text-[#a0ff1f] self-end" href={backLink}>
-          {backLabel}
-        </Link>
       </div>
 
       <TripNoteModal 

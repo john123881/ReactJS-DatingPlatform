@@ -137,7 +137,8 @@ export default function ProfileInfo() {
   };
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null && uid) {
+    // 只要有 uid 就應該抓取基本資訊 (公開頁面不需要 auth.id)
+    if (uid) {
       // 不要在組件內部再次觸發 setIsLoading(true)，因為父組件已經在處理了
       // 除非是 uid 以外的異步更新，否則應保持流暢
       Promise.all([
@@ -152,7 +153,7 @@ export default function ProfileInfo() {
     } else {
       setIsLoading(false);
     }
-  }, [uid, auth.id]);
+  }, [uid]); // 只有當 uid 變化時重新抓取
 
   if (isLoading) {
     return <PageLoader type="profile" minHeight="200px" />;
@@ -169,6 +170,7 @@ export default function ProfileInfo() {
                 <img
                   src={getImageUrl(localUserInfo.avatar, 'avatar')}
                   alt={localUserInfo.username || 'No Image Available'}
+                  onError={(e) => handleImageError(e, 'avatar')}
                 />
               </div>
             </div>
@@ -188,7 +190,8 @@ export default function ProfileInfo() {
                 {userId !== 0 &&
                   userId !== null &&
                   uid &&
-                  userId !== parseInt(uid, 10) && (
+                  auth.id &&
+                  parseInt(auth.id, 10) !== parseInt(uid, 10) && (
                     <button
                       className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-primary"
                       onClick={() => {

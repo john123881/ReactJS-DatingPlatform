@@ -98,16 +98,16 @@ export default function Profile({ onPageChange }) {
         <TabbarMobile />
       </div>
 
-      <div className="flex flex-col w-full items-center justify-center pt-28">
-        <div className="flex flex-wrap justify-center w-full min-h-screen">
-          <div className="hidden md:flex md:w-2/12">
+      <div className="flex flex-col w-full items-center justify-center pt-28 min-h-screen">
+        <div className="flex flex-wrap justify-center w-full grow">
+          <div className="hidden md:flex md:w-2/12 h-fit">
             <Sidebar />
           </div>
 
-          <div className="flex flex-col md:w-10/12 items-center">
+          <div className="flex flex-col md:w-10/12 items-center min-h-[500px]">
             {isLoading ? (
-              <div className="w-full flex justify-center py-20">
-                <PageLoader type="index" minHeight="500px" />
+              <div className="w-full h-full flex items-center justify-center py-40">
+                <PageLoader type="index" minHeight="300px" />
               </div>
             ) : (
               <>

@@ -25,23 +25,18 @@ export function useTripDetail(trip_plan_id) {
         TripService.getAlldayDetails(trip_plan_id)
       ]);
 
-      // 設置基礎詳情 (例如 bar_id, movie_id 等)
-      if (detailsData && detailsData.length > 0) {
-        setTripDetails(detailsData[0]);
-      } else if (detailsData) {
-        setTripDetails(detailsData);
+      // 設置行程詳情 (首筆內容備用)
+      if (allDayData && allDayData.length > 0) {
+        setTripDetails(allDayData[0]);
+        setNewDetail(allDayData);
+      } else {
+        setTripDetails({});
+        setNewDetail({ block: null });
       }
       
       // 設置行程基本資訊 (標題, 日期, 描述, 筆記)
       if (nameData) {
         setTripName(Array.isArray(nameData) ? nameData[0] : nameData);
-      }
-
-      // 設置全天行程內容
-      if (allDayData && allDayData.length > 0) {
-        setNewDetail(allDayData);
-      } else {
-        setNewDetail({ block: null });
       }
     } catch (error) {
       console.error('Error fetching trip detail data:', error);

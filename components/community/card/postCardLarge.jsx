@@ -184,7 +184,7 @@ export default function PostCardLarge({ post }) {
             </div>
           </div>
         </figure>
-        <div className="card-body w-full p-0 overflow-auto max-w-[480px] px-3 py-3">
+        <div className="card-body w-full p-0 overflow-auto hide-scrollbar max-w-[480px] px-3 py-3">
           {/* 只有當用戶登入時顯示這些元件 */}
           {userId !== 0 && userId !== null && (
             <div className="card-iconList text-h4 flex flex-row justify-between">

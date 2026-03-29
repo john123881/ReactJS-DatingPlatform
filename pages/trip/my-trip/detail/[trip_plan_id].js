@@ -62,14 +62,14 @@ export default function MyTripDetail({ onPageChange }) {
           refreshTripDetails={refreshAllDetails}
         />
 
-        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden max-w-screen-2xl mx-auto">
+        <div className="flex justify-start items-start w-full py-8 overflow-x-hidden max-w-screen-2xl mx-auto px-6 sm:px-12 gap-8 lg:gap-16">
           <div className="hidden lg:flex w-[250px] justify-end flex-shrink-0">
             <BarPhotoCarousel
               trip_plan_id={trip_plan_id}
               refreshAllDetails={refreshAllDetails}
             />
           </div>
-          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-8 w-full max-w-3xl px-4">
+          <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-12 w-full max-w-5xl px-4">
             <ContentMorning
               newDetail={newDetail}
               tripDetails={tripDetails}

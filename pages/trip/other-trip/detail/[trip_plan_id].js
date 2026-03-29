@@ -109,61 +109,48 @@ export default function OtherTripdetail({ onPageChange }) {
         <TripNavigationTab />
         <OtherTripDetailSidebar tripName={tripName} />
         
-        <div className="flex flex-col lg:flex-row justify-center items-start w-full py-12 max-w-screen-2xl mx-auto px-6 sm:px-12 gap-12 transition-all duration-300">
-          <div className="flex flex-col justify-center items-center gap-12 w-full lg:max-w-4xl px-4 flex-grow">
+        <div className="flex flex-col lg:flex-row justify-start items-start w-full py-16 max-w-screen-2xl mx-auto px-6 sm:px-12 gap-16 transition-all duration-300">
+          {/* 左側：時段內容 */}
+          <div className="flex flex-col gap-12 w-full lg:flex-grow order-2 lg:order-1 max-w-4xl">
             <OtherContentMorning trip_plan_id={trip_plan_id} />
             <OtherContentNoon trip_plan_id={trip_plan_id} />
             <OtherContentNight trip_plan_id={trip_plan_id} />
-            
-            <button
-              className="sm:hidden text-black text-xl px-12 py-5 bg-neongreen rounded-full border border-black flex justify-center items-center cursor-pointer hover:shadow-glow-green hover:scale-105 transition-all w-full"
-              onClick={openModal}
-            >
-              加入我的日曆
-            </button>
           </div>
 
-          <div className="flex flex-col justify-start items-center h-auto min-h-[600px] w-full lg:max-w-[500px] border border-white/30 rounded-3xl py-10 px-6 flex-shrink-0 bg-white/5 backdrop-blur-xl shadow-2xl">
-            <h3 className="mb-8 text-4xl font-black text-white text-center tracking-tight">行程細節</h3>
-            
-            <div className="w-full mb-8">
-              <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4">行程描述</p>
-              <div className="w-full min-h-[150px] max-h-[300px] border border-white/20 rounded-2xl p-6 overflow-y-auto bg-black/20 text-lg leading-relaxed">
-                {tripName.trip_description ? (
-                  <div className="text-gray-200">{tripName.trip_description}</div>
-                ) : (
-                  <p className="text-gray-500 italic text-center py-4">用戶並未為此行程添加細節</p>
-                )}
-              </div>
-            </div>
+          {/* 右側：行程細節 (Sidebar) */}
+          <div className="flex flex-col justify-start items-center h-auto w-full lg:w-[450px] border border-white/10 rounded-3xl py-12 px-8 flex-shrink-0 bg-white/5 backdrop-blur-3xl shadow-2xl order-1 lg:order-2">
+            <h3 className="mb-10 text-4xl font-black text-neongreen text-center tracking-tighter">行程細節</h3>
             
             <div className="w-full mb-10">
-              <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4">行程筆記</p>
-              <div className="w-full min-h-[200px] max-h-[400px] border border-white/20 rounded-2xl p-6 overflow-y-auto bg-black/20 text-lg leading-relaxed">
-                {tripName.trip_notes ? (
-                  <div className="text-gray-200">{tripName.trip_notes}</div>
+              <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4 text-white">行程描述</p>
+              <div className="w-full min-h-[120px] max-h-[250px] border border-white/10 rounded-2xl p-6 overflow-y-auto bg-black/40 text-lg leading-relaxed text-gray-300">
+                {tripName.trip_description ? (
+                  <div>{tripName.trip_description}</div>
                 ) : (
-                  <p className="text-gray-500 italic text-center py-4">用戶並未為此行程添加筆記</p>
+                  <p className="text-gray-500 italic text-center py-4 text-sm">此行程尚未填寫描述</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="w-full mb-12 flex-grow">
+              <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4 text-white">行程筆記</p>
+              <div className="w-full min-h-[150px] max-h-[300px] border border-white/10 rounded-2xl p-6 overflow-y-auto bg-black/40 text-lg leading-relaxed text-gray-300">
+                {tripName.trip_notes ? (
+                  <div>{tripName.trip_notes}</div>
+                ) : (
+                  <p className="text-gray-500 italic text-center py-4 text-sm">此行程尚未填寫筆記</p>
                 )}
               </div>
             </div>
 
             <button
-              className="hidden lg:flex text-black text-xl px-12 py-5 w-full bg-neongreen rounded-full border border-black cursor-pointer hover:shadow-glow-green hover:scale-105 transition-all font-black justify-center items-center"
+              className="group relative flex items-center justify-center w-full bg-neongreen hover:bg-white text-black font-black text-2xl py-6 rounded-2xl transition-all duration-300 shadow-glow-green hover:shadow-glow-white overflow-hidden"
               onClick={openModal}
             >
-              加入我的日曆
+              <span className="relative z-10">加入我的日曆</span>
+              <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
           </div>
-        </div>
-
-        <div className="hidden sm:flex justify-center pb-12">
-          <button
-            className="text-black text-lg px-9 py-4 w-[350px] bg-[#a0ff1f] rounded-full border border-black cursor-pointer hover:shadow-xl3 hover:animate-pulse font-bold"
-            onClick={openModal}
-          >
-            加入我的日曆
-          </button>
         </div>
       </div>
 

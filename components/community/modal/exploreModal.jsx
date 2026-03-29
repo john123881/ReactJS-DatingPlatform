@@ -122,7 +122,7 @@ export default function ExploreModal({ post, modalId, isOpen }) {
         style={{ pointerEvents: 'auto' }}
       >
         <div
-          className="flex modal-box w-[90vw] max-w-[90vw] h-[90vh] overflow-auto"
+          className="flex modal-box w-[90vw] max-w-[90vw] h-[90vh] overflow-auto hide-scrollbar"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
         >
           <button
@@ -152,7 +152,7 @@ export default function ExploreModal({ post, modalId, isOpen }) {
               />
             </figure>
 
-            <div className="flex flex-col card-body h-full w-full md:w-1/2 overflow-auto mx-3">
+            <div className="flex flex-col card-body h-full w-full md:w-1/2 overflow-auto hide-scrollbar mx-3">
               <div className="flex flex-row first-letter:card-user h-10  items-center gap-2 m-2 justify-between">
                 <div className="flex justify-start items-center gap-2">
                   <div className="avatar">
