@@ -139,16 +139,17 @@ export default function TripCalendar() {
               <div className="sm:mt-1 flex justify-center items-center">
                 <Link
                   href={`/trip/my-trip/detail/${cell.trip.trip_plan_id}`}
-                  className=" hidden sm:inline-block text-sm sm:mt-1 sm:text-2xl bg-black px-3 py-1 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-white tooltip"
+                  className="hidden sm:inline-flex items-center justify-center text-xs sm:text-sm font-bold bg-neongreen/10 backdrop-blur-sm px-3 py-1 border border-neongreen/30 rounded-full text-neongreen shadow-[0_0_10px_rgba(160,255,31,0.2)] hover:shadow-[0_0_20px_rgba(160,255,31,0.5)] hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300 tooltip"
                   data-tip={cell.trip.trip_title}
+                  style={{ minWidth: '80px', maxWidth: '140px' }}
                 >
                   {truncateChinese(cell.trip.trip_title)}
                 </Link>
                 <Link
                   href={`/trip/my-trip/detail/${cell.trip.trip_plan_id}`}
-                  className="block sm:hidden text-white text-lg "
+                  className="block sm:hidden text-neongreen text-xl active:scale-125 transition-transform"
                 >
-                  <IoHeartCircleOutline className=" text-[#ff03ff] hover:text-[#a0ff1f]" />
+                  <IoHeartCircleSharp className="drop-shadow-[0_0_5px_rgba(160,255,31,0.8)]" />
                 </Link>
               </div>
             )}

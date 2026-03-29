@@ -13,8 +13,11 @@ export function useBarList(category) {
   const [selectedAreaId, setSelectedAreaId] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState('');
 
-  // SWR 快取金鑰
-  const swrKey = ['bar-list', category, selectedAreaId, selectedTypeId];
+  // SWR 快取金鑰 - 使用 useMemo 確保金鑰穩定
+  const swrKey = useMemo(
+    () => ['bar-list', category, selectedAreaId, selectedTypeId],
+    [category, selectedAreaId, selectedTypeId]
+  );
 
   // 使用 SWR 進行抓取與快取
   const { data, error, isLoading, mutate } = useSWR(
@@ -28,8 +31,8 @@ export function useBarList(category) {
     }
   );
 
-  // 取得資料陣列 (相容 Ghost Wrapper)
-  const bars = data || [];
+  // 取得資料陣列 (使用 useMemo 確保空陣列 [] 的參考穩定)
+  const bars = useMemo(() => data || [], [data]);
 
   // 計算分頁資訊
   const totalPages = Math.ceil(bars.length / barsPerPage);

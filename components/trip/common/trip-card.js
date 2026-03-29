@@ -58,7 +58,7 @@ const TripCard = memo(function TripCard({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full max-w-[175px] sm:max-w-[280px] pb-2 bg-white border-2 border-white rounded-lg h-64 sm:h-96 group transition-transform hover:scale-105 shadow-lg overflow-hidden flex-shrink-0">
+    <div className="relative flex flex-col items-center justify-center w-full max-w-[220px] sm:max-w-[340px] pb-4 bg-black/60 backdrop-blur-md border border-neongreen/30 rounded-2xl h-72 sm:h-[480px] group transition-all duration-500 hover:scale-105 hover:border-neongreen/80 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(160,255,31,0.3)] overflow-hidden flex-shrink-0">
       {isMyTrip && (
         <>
           <RxCrossCircled
@@ -105,13 +105,13 @@ const TripCard = memo(function TripCard({
         />
       )}
       
-      <p className="mb-2 text-lg sm:text-2xl text-black tooltip" data-tip={trip.trip_title}>
+      <p className="mb-3 text-lg sm:text-2xl font-bold text-white group-hover:text-neongreen transition-colors tooltip" data-tip={trip.trip_title}>
         {truncateChinese(trip.trip_title)}
       </p>
       
       <Link
         href={detailPagePath}
-        className="border-black bg-black hover:bg-[#a0ff1f] text-white hover:text-black border font-medium py-1 px-2 sm:py-2 sm:px-3 rounded-full text-sm sm:text-xl transition-colors"
+        className="bg-neongreen text-black hover:bg-white font-bold py-1.5 px-4 sm:py-2.5 sm:px-6 rounded-full text-sm sm:text-lg transition-all shadow-[0_0_10px_rgba(160,255,31,0.4)]"
       >
         檢視行程
       </Link>
