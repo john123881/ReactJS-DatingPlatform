@@ -11,6 +11,7 @@ import { AccountService } from '@/services/account-service';
 import { API_SERVER } from '@/configs/api-config';
 import toast from 'react-hot-toast';
 import AccountLoader from '@/components/account-center/loader/account-loader';
+import { BsEmojiHeartEyes } from 'react-icons/bs';
 
 export default function AccountIndex({ onPageChange }) {
   const pageTitle = '會員中心';

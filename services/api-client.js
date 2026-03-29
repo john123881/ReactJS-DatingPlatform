@@ -81,31 +81,36 @@ async function processResponse(response) {
       
       const finalData = result.data !== undefined ? result.data : result;
       
-      if (finalData && typeof finalData === 'object') {
+      // 如果 finalData 是 null，我們需要建立一個包裝物件以便定義 .success 屬性，
+      // 否則前端執行 if (result.success) 時會噴出 TypeError: Cannot read properties of null
+      const isNull = finalData === null;
+      const wrapper = isNull ? {} : finalData;
+
+      if (wrapper && typeof wrapper === 'object') {
         // 定義 .success 屬性
-        Object.defineProperty(finalData, 'success', {
+        Object.defineProperty(wrapper, 'success', {
           value: true,
-          enumerable: false, // 隱形成員，不影響 JSON.stringify 或 loops
+          enumerable: false,
           configurable: true,
         });
 
-        // 定義 .data 屬性，回傳自己 (達成 res.data === res)
-        Object.defineProperty(finalData, 'data', {
-          value: finalData,
+        // 定義 .data 屬性
+        Object.defineProperty(wrapper, 'data', {
+          value: isNull ? null : wrapper,
           enumerable: false,
           configurable: true,
         });
 
         // 定義 .message
-        Object.defineProperty(finalData, 'message', {
+        Object.defineProperty(wrapper, 'message', {
           value: result.message || 'Success',
           enumerable: false,
           configurable: true,
         });
 
-        // 如果有分頁資訊，也塞入隱形屬性
+        // 如果有分頁資訊
         if (result.pagination) {
-          Object.defineProperty(finalData, 'pagination', {
+          Object.defineProperty(wrapper, 'pagination', {
             value: result.pagination,
             enumerable: false,
             configurable: true,
@@ -113,7 +118,7 @@ async function processResponse(response) {
         }
       }
 
-      return finalData;
+      return wrapper;
     }
     // 失敗時，拋出後端給的 message
     throw new Error(result.message || '操作失敗');
