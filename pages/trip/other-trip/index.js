@@ -48,13 +48,13 @@ export default function OtherTrip({ onPageChange }) {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-center items-center ">
-          <div className="flex flex-col items-center  min-h-screen  my-10 space-y-12">
-            <label className="input input-bordered hidden sm:flex items-center gap-2">
+        <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12 py-10 transition-all duration-300">
+          <div className="flex flex-col items-center sm:items-start min-h-screen space-y-12">
+            <label className="input input-bordered hidden sm:flex items-center gap-3 h-14 bg-white/5 border-white/20 rounded-2xl px-6 w-full max-w-md focus-within:border-neongreen transition-all">
               <input
                 type="text"
-                className="grow"
-                placeholder="搜尋行程"
+                className="grow bg-transparent text-white text-lg outline-none"
+                placeholder="搜尋精彩行程..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -62,7 +62,7 @@ export default function OtherTrip({ onPageChange }) {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                className="w-4 h-4 opacity-70"
+                className="w-6 h-6 text-gray-400"
               >
                 <path
                   fillRule="evenodd"
@@ -71,8 +71,8 @@ export default function OtherTrip({ onPageChange }) {
                 />
               </svg>
             </label>
-            <div className="w-full max-w-7xl px-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+            <div className="w-full mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 sm:gap-12 justify-items-center sm:justify-items-start">
                 {filteredTrips.map((otherTrip) => (
                   <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
                 ))}

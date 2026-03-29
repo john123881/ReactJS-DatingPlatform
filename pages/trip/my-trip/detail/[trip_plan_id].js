@@ -62,7 +62,7 @@ export default function MyTripDetail({ onPageChange }) {
           refreshTripDetails={refreshAllDetails}
         />
 
-        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden max-w-7xl mx-auto">
+        <div className="flex justify-center items-start w-full py-8 overflow-x-hidden max-w-screen-2xl mx-auto">
           <div className="hidden lg:flex w-[250px] justify-end flex-shrink-0">
             <BarPhotoCarousel
               trip_plan_id={trip_plan_id}

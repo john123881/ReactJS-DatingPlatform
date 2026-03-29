@@ -226,13 +226,13 @@ export default function MyTrip({ onPageChange }) {
           {isLoading ? (
             <Loader />
           ) : (
-            <div className="flex-grow ">
-              <div className="flex flex-col items-center justify-center">
+            <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12">
+              <div className="flex flex-col items-center sm:items-start justify-start">
                 <button
-                  className="mt-5 mb-5 bg-black sm:text-2xl text-white border border-white rounded-full px-5 py-2.5 hover:bg-[#a0ff1f] hover:text-black hover:border-black"
+                  className="mt-12 mb-8 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95"
                   onClick={openModal}
                 >
-                  新增行程
+                  + 新增行程
                 </button>
                 {/* 以 useState 來控制<dialog> */}
                 {isModalOpen && (
@@ -282,8 +282,8 @@ export default function MyTrip({ onPageChange }) {
                     </form>
                   </dialog>
                 )}
-                <div className="w-full max-w-7xl px-4 mt-8">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+                <div className="w-full mt-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 sm:gap-12 justify-items-center sm:justify-items-start">
                     {trips.map((trip) => (
                       <TripCard
                         key={trip.trip_plan_id}

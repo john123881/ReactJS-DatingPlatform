@@ -20,8 +20,7 @@ export function useTripDetail(trip_plan_id) {
     
     try {
       setIsLoading(true);
-      const [detailsData, nameData, allDayData] = await Promise.all([
-        TripService.getTripContent(trip_plan_id),
+      const [nameData, allDayData] = await Promise.all([
         TripService.getTripPlanInfo(trip_plan_id),
         TripService.getAlldayDetails(trip_plan_id)
       ]);

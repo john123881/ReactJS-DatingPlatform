@@ -32,7 +32,7 @@ export default function TripSidebarBase({
     : '';
 
   return (
-    <div className="pt-16 pb-3 border-b-2 border-white max-w-7xl mx-auto px-4">
+    <div className="pt-16 pb-3 border-b-2 border-white max-w-screen-2xl mx-auto px-4 sm:px-12">
       {/* Desktop View */}
       <div className="hidden sm:block">
         <p className="mb-2 text-5xl">{titlePrefix}</p>
