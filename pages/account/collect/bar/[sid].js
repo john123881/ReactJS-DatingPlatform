@@ -94,22 +94,24 @@ export default function AccountCollect({ onPageChange }) {
       if (auth.id === 0 || !router.isReady) return;
 
       try {
-      const result = await AccountService.collectBar.get(
-        router.query.sid,
-        `?page=${router.query.page || 1}`,
-      );
+        const result = await AccountService.collectBar.get(
+          router.query.sid,
+          `?page=${router.query.page || 1}`,
+        );
 
-        if (result.output.error === '無收藏') {
+        const data = result.data || (Array.isArray(result) ? result : []);
+
+        if (data.length === 0) {
           setBars([]); //重置收藏
-          // toast.error('無酒吧收藏', { duration: 1500 }); // 不要報錯，因為這是正常狀態
         } else {
-          setBars(result.output.data);
-          setPages({ page: result.page, totalPages: result.totalPages });
+          setBars(data);
+          setPages({
+            page: result.page || 1,
+            totalPages: result.totalPages || 1,
+          });
         }
-        setIsFetched(true);
       } catch (error) {
         console.error('Failed to fetch bar collection:', error);
-        setIsFetched(true);
       }
     };
 
@@ -132,6 +134,7 @@ export default function AccountCollect({ onPageChange }) {
       } catch (error) {
         console.error('fetchCheck error:', error);
       } finally {
+        setIsFetched(true);
         close(0.5);
       }
     };

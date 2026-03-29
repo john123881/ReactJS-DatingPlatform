@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 // 1. 建立context
@@ -14,11 +14,13 @@ export function DateProvider({ children }) {
     id: 0,
     name: '請選擇一種喜愛的電影類型',
   });
+  const value = useMemo(
+    () => ({ toggleBar, setToggleBar, toggleMovie, setToggleMovie }),
+    [toggleBar, toggleMovie],
+  );
+
   return (
-    <DateContext.Provider
-      // 使用value屬性提供資料給提供者階層以下的所有後代元件
-      value={{ toggleBar, setToggleBar, toggleMovie, setToggleMovie }}
-    >
+    <DateContext.Provider value={value}>
       {children}
     </DateContext.Provider>
   );

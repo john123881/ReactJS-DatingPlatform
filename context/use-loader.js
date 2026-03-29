@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 // 1. 建立context
 const LoaderContext = createContext();
@@ -17,9 +17,11 @@ export const LoaderProvider = ({ children }) => {
     setIsLoading(true);
   }, []);
 
+  const value = useMemo(() => ({ isLoading, close, open }), [isLoading, close, open]);
+
   return (
     // 使用value屬性提供資料給提供者階層以下的所有後代元件
-    <LoaderContext.Provider value={{ isLoading, close, open }}>
+    <LoaderContext.Provider value={value}>
       {children}
     </LoaderContext.Provider>
   );

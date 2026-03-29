@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import { useRouter } from 'next/router';
 import { API_SERVER } from '@/configs/api-config';
@@ -149,29 +150,44 @@ export function AuthContextProvider({ children }) {
     initAuth();
   }, [checkAuth]);
 
+  const value = useMemo(
+    () => ({
+      storageKey,
+      auth,
+      checkAuth,
+      setAuth,
+      register,
+      login,
+      logout,
+      getAuthHeader,
+      loginModalToggle,
+      setLoginModalToggle,
+      userAvatar,
+      setUserAvatar,
+      switchHandler,
+      isOnLogin,
+      setIsOnLogin,
+      rerender,
+      setRerender,
+      isAuthLoaded,
+    }),
+    [
+      auth,
+      checkAuth,
+      register,
+      login,
+      logout,
+      getAuthHeader,
+      loginModalToggle,
+      userAvatar,
+      isOnLogin,
+      rerender,
+      isAuthLoaded,
+    ],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        storageKey,
-        auth,
-        checkAuth,
-        setAuth,
-        register,
-        login,
-        logout,
-        getAuthHeader,
-        loginModalToggle,
-        setLoginModalToggle,
-        userAvatar,
-        setUserAvatar,
-        switchHandler,
-        isOnLogin,
-        setIsOnLogin,
-        rerender,
-        setRerender,
-        isAuthLoaded,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

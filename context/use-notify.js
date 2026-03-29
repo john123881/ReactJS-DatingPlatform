@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 // 1. 建立context
@@ -30,17 +30,19 @@ export function NotifyProvider({ children }) {
     return toast.promise(promise(), options);
   };
 
+  const value = useMemo(
+    () => ({
+      notify,
+      notifySuccess,
+      notifyError,
+      notifyPromise,
+      notifyLoading,
+    }),
+    [notify, notifySuccess, notifyError, notifyPromise, notifyLoading],
+  );
+
   return (
-    <NotifyContext.Provider
-      // 使用value屬性提供資料給提供者階層以下的所有後代元件
-      value={{
-        notify,
-        notifySuccess,
-        notifyError,
-        notifyPromise,
-        notifyLoading,
-      }}
-    >
+    <NotifyContext.Provider value={value}>
       {children}
     </NotifyContext.Provider>
   );

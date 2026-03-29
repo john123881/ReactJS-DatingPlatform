@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useMemo } from 'react';
 
 const CollectContext = createContext(null);
 
@@ -22,26 +22,36 @@ export function CollectProvider({ children }) {
   const [modalId, setModalId] = useState('');
   const [movieModalToggle, setMovieModalToggle] = useState(false);
 
+  const value = useMemo(
+    () => ({
+      bars,
+      setBars,
+      movies,
+      setMovies,
+      movieV,
+      setMovieV,
+      dropDownCollectOpen,
+      setDropDownCollectOpen,
+      p,
+      setP,
+      modalId,
+      setModalId,
+      movieModalToggle,
+      setMovieModalToggle,
+    }),
+    [
+      bars,
+      movies,
+      movieV,
+      dropDownCollectOpen,
+      p,
+      modalId,
+      movieModalToggle,
+    ],
+  );
+
   return (
-    <CollectContext.Provider
-      // 使用value屬性提供資料給提供者階層以下的所有後代元件
-      value={{
-        bars,
-        setBars,
-        movies,
-        setMovies,
-        movieV,
-        setMovieV,
-        dropDownCollectOpen,
-        setDropDownCollectOpen,
-        p,
-        setP,
-        modalId,
-        setModalId,
-        movieModalToggle,
-        setMovieModalToggle,
-      }}
-    >
+    <CollectContext.Provider value={value}>
       {children}
     </CollectContext.Provider>
   );

@@ -111,23 +111,26 @@ export default function AccountCollect({ onPageChange }) {
         `?page=${router.query.page || 1}`,
       );
 
-      if (result.output.error === '無收藏') {
+      // 由於 apiClient 已自動解包，result 可能是資料陣列或原本的物件
+      // 這裡做防禦性檢查
+      const data = result.data || (Array.isArray(result) ? result : []);
+      
+      if (data.length === 0) {
         setPosts([]);
       } else {
-        const postIds = result.output.data
-          .map((post) => post.post_id)
-          .join(',');
+        const postIds = data.map((post) => post.post_id).join(',');
 
         await checkPostsStatus(postIds); // 檢查貼文狀態
         await getPostComments(postIds);
 
-        setPosts(result.output.data); // 更新posts狀態
-        setPages({ page: result.page, totalPages: result.totalPages });
+        setPosts(data); // 更新posts狀態
+        setPages({
+          page: result.page || 1,
+          totalPages: result.totalPages || 1,
+        });
       }
-      setIsFetched(true);
     } catch (error) {
       console.error('Failed to fetch post collection:', error);
-      setIsFetched(true);
     }
   };
 
@@ -152,6 +155,7 @@ export default function AccountCollect({ onPageChange }) {
       } catch (error) {
         console.error('fetchCheck error:', error);
       } finally {
+        setIsFetched(true);
         close(0.5);
       }
     };

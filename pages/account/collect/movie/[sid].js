@@ -117,15 +117,20 @@ export default function AccountCollect({ onPageChange }) {
           `?page=${router.query.page || 1}`,
         );
 
-        if (result.output.error === '無收藏') {
+        const data = result.data || (Array.isArray(result) ? result : []);
+
+        if (data.length === 0) {
           setMovies([]); //重置收藏
         } else {
-          setMovies(result.output.data);
-          setPages({ page: result.page, totalPages: result.totalPages });
+          setMovies(data);
+          setPages({
+            page: result.page || 1,
+            totalPages: result.totalPages || 1,
+          });
         }
-        setIsFetched(true);
       } catch (error) {
         console.error('Failed to fetch movie collection:', error);
+      } finally {
         setIsFetched(true);
       }
     };
@@ -149,6 +154,7 @@ export default function AccountCollect({ onPageChange }) {
       } catch (error) {
         console.error('fetchCheck error:', error);
       } finally {
+        setIsFetched(true);
         close(0.5);
       }
     };
