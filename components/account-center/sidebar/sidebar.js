@@ -35,7 +35,7 @@ export default function Sidebar({ currentPage }) {
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <ul className="w-64 min-h-full bg-dark py-28 pe-4 ps-4 sm:w-36 lg:w-80 sm:py-12 sm:ps-18 sm:pe-0 md:ps-12 md:w-44 lg:ps-44 xl:w-96 xl:ps-60 menu text-base-content">
+            <ul className="w-64 min-h-full bg-dark py-28 pe-4 ps-4 sm:w-36 lg:w-64 xl:w-80 sm:py-12 sm:ps-12 menu text-base-content border-r border-white/5">
               {/* Sidebar content here */}
               <li className="mt-3 border-b border-solid sm:mt-0 menu-title">
                 <p className="text-2xl text-light">會員中心</p>

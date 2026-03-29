@@ -13,7 +13,7 @@ export default function OtherContentBase({
   useEffect(() => {
     if (newDetail && Array.isArray(newDetail)) {
       const filtered = newDetail.filter(d => d.block === block);
-      setTripDetailsList(filtered.length > 0 ? filtered : []);
+      setTripDetailsList(filtered.length > 0 ? [filtered[filtered.length - 1]] : []);
     } else if (trip_plan_id) {
       const fetchData = async () => {
         try {

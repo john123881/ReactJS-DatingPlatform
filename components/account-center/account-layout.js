@@ -17,16 +17,18 @@ export default function AccountLayout({
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <div className="flex min-h-screen pt-10 bg-dark ">
-        <Sidebar currentPage={currentPage} />
+      <div className="bg-dark min-h-screen">
+        <div className="flex w-full max-w-[1440px] mx-auto pt-10">
+          <Sidebar currentPage={currentPage} />
 
-        <div className="flex-1 w-full max-w-full px-4 py-12 sm:px-6 md:px-8 lg:ps-14 lg:pe-44 xl:pe-60">
-          <div className="flex flex-col w-full ">
-            <BurgerMenu currentPage={currentPage} />
-            <Breadcrumbs currentPage={currentPage} />
-            
-            <div className="mt-4">
-              {children}
+          <div className="flex-1 w-full max-w-full px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-20">
+            <div className="flex flex-col w-full ">
+              <BurgerMenu currentPage={currentPage} />
+              <Breadcrumbs currentPage={currentPage} />
+              
+              <div className="mt-4">
+                {children}
+              </div>
             </div>
           </div>
         </div>

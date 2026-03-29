@@ -8,7 +8,7 @@ export default function TripNavigationTab({ showTitle = true }) {
   const isOtherTrip = router.pathname === '/trip/other-trip';
 
   return (
-    <div className="pt-16 pb-3 border-b-2 border-white/50 w-full max-w-[1450px] mx-auto px-6 sm:px-12 transition-all duration-300">
+    <div className="pt-16 pb-3 border-b-2 border-white/50 w-full mx-auto px-6 sm:px-20 transition-all duration-300">
       <div className="trip-sidebar">
         {showTitle && (
           <p className="hidden mb-12 text-5xl sm:text-7xl sm:block font-black tracking-tighter text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">

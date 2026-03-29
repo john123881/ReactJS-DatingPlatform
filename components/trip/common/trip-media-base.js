@@ -134,21 +134,27 @@ export default function TripMediaBase({
   }
 
   return (
-    <div className="flex gap-2">
-      <ContentComponent
-        imageSrc={imageSrc}
-        altText={details.name}
-        onClick={isOther ? null : () => setShowDetails(!showDetails)}
-        tripDetails={tripDetails}
-        refreshTripDetails={refreshTripDetails}
-      />
-      {(showDetails || isOther) && details.description && (
-        <div
-          className={`hidden overflow-y-auto w-96 line-clamp-4 sm:block ${isOther ? 'h-48 pt-4' : 'h-32'}`}
-        >
-          {details.description}
-        </div>
-      )}
+    <div className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-700 ease-in-out">
+      <div className="transition-all duration-700 ease-in-out flex-shrink-0">
+        <ContentComponent
+          imageSrc={imageSrc}
+          altText={details.name}
+          onClick={isOther ? null : () => setShowDetails(!showDetails)}
+          tripDetails={tripDetails}
+          refreshTripDetails={refreshTripDetails}
+        />
+      </div>
+      <div
+        className={`overflow-hidden transition-all duration-700 ease-in-out flex items-center ${
+          showDetails || isOther ? 'max-w-[400px] opacity-100 ml-6' : 'max-w-0 opacity-0 ml-0'
+        }`}
+      >
+        {details.description && (
+          <div className="w-80 lg:w-96 text-gray-300 leading-relaxed line-clamp-4 overflow-y-auto max-h-32 lg:max-h-48">
+            {details.description}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function ContentBase({
   useEffect(() => {
     if (newDetail && Array.isArray(newDetail)) {
       const filtered = newDetail.filter(d => d.block === block);
-      setTripDetailsList(filtered.length > 0 ? filtered : []);
+      setTripDetailsList(filtered.length > 0 ? [filtered[filtered.length - 1]] : []);
     } else if (!newDetail || (typeof newDetail === 'object' && Object.keys(newDetail).length === 0)) {
       if (trip_plan_id) {
         const fetchData = async () => {
@@ -41,7 +41,7 @@ export default function ContentBase({
   };
 
   return (
-    <div className="flex flex-wrap gap-8 justify-center lg:justify-start w-full transition-all duration-300">
+    <div className="flex flex-wrap gap-10 justify-center lg:justify-start w-full transition-all duration-300">
       {tripDetailsList.length === 0 ? (
         <NoContentComponent
           trip_plan_id={trip_plan_id}
@@ -49,7 +49,7 @@ export default function ContentBase({
         />
       ) : (
         tripDetailsList.map((details, index) => (
-          <div key={details.trip_detail_id || index} className="flex-shrink-0">
+          <div key={details.trip_detail_id || index} className="flex-shrink-0 hover:scale-105 transition-transform duration-300">
             {details.movie_id ? (
               <MoviePhotoMy
                 trip_plan_id={trip_plan_id}
