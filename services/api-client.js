@@ -116,6 +116,21 @@ async function processResponse(response) {
             configurable: true,
           });
         }
+
+        // 核心修正：保留所有原始回應中的額外 Key (如 barType, movieType, hasPlay 等)
+        // 這些 Key 可能不在 data 內部，但在與 data 同級的根路徑
+        Object.keys(result).forEach((key) => {
+          if (!['success', 'data', 'message', 'pagination'].includes(key)) {
+            // 如果 wrapper 本身沒有該屬性，則補上去 (不覆蓋 wrapper 本有的)
+            if (!(key in wrapper)) {
+              Object.defineProperty(wrapper, key, {
+                value: result[key],
+                enumerable: false, // 設為 false 避免破壞 Array 遍歷或對應舊邏輯
+                configurable: true,
+              });
+            }
+          }
+        });
       }
 
       return wrapper;

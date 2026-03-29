@@ -173,11 +173,22 @@ export default function AccountEdit({ onPageChange }) {
             profile: profile_content,
           });
 
-          //把喜好類型列表抓下來放入狀態
-          setFavBarList([...result.barType[0].map((obj) => obj.bar_type_name)]);
-          setFavMovieList([
-            ...result.movieType[0].map((obj) => obj.movie_type),
-          ]);
+          // 把喜好類型列表抓下來放入狀態
+          if (result.barType && result.barType[0]) {
+            setFavBarList([...result.barType[0].map((obj) => obj.bar_type_name)]);
+          } else if (Array.isArray(result.barType)) {
+             setFavBarList([...result.barType.map((obj) => obj.bar_type_name)]);
+          }
+
+          if (result.movieType && result.movieType[0]) {
+            setFavMovieList([
+              ...result.movieType[0].map((obj) => obj.movie_type),
+            ]);
+          } else if (Array.isArray(result.movieType)) {
+             setFavMovieList([
+               ...result.movieType.map((obj) => obj.movie_type),
+             ]);
+          }
 
           //把大頭照抓下來放入狀態
           setUserAvatar(avatar);
