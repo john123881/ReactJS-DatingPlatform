@@ -228,19 +228,19 @@ export default function AccountRecord({ onPageChange }) {
     let isSubscribed = true;
 
     const loadData = async () => {
+      if (!isSubscribed) return;
       setRecordListPoint({ rows: [], page: 0, totalPages: 0 });
       open();
-      const authResult = await checkAuth(router.query.sid);
-      if (!authResult.success) {
-        if (isSubscribed) {
-          router.push('/');
-          toast.error(authResult.error, { duration: 1500 });
-        }
-        close(0);
-        return;
-      }
-
       try {
+        const authResult = await checkAuth(router.query.sid);
+        if (!authResult.success) {
+          if (isSubscribed) {
+            router.push('/');
+            toast.error(authResult.message || '驗證失敗', { duration: 1500 });
+          }
+          return;
+        }
+
         const r = await fetch(
           `${ACCOUNT_RECORD_POINT_GET}/${router.query.sid}${location.search}`,
           { headers: { ...getAuthHeader() } },
@@ -260,10 +260,10 @@ export default function AccountRecord({ onPageChange }) {
           }));
         }
       } catch (error) {
-        console.error(error);
+        console.error('loadData error:', error);
+      } finally {
+        if (isSubscribed) close(0.5);
       }
-      
-      if (isSubscribed) close(0.5);
     };
 
     loadData();
@@ -282,19 +282,19 @@ export default function AccountRecord({ onPageChange }) {
     let isSubscribed = true;
 
     const loadData = async () => {
+      if (!isSubscribed) return;
       setRecordListGame({ rows: [], page: 0, totalPages: 0 });
       open();
-      const authResult = await checkAuth(router.query.sid);
-      if (!authResult.success) {
-        if (isSubscribed) {
-          router.push('/');
-          toast.error(authResult.error, { duration: 1500 });
-        }
-        close(0);
-        return;
-      }
-
       try {
+        const authResult = await checkAuth(router.query.sid);
+        if (!authResult.success) {
+          if (isSubscribed) {
+            router.push('/');
+            toast.error(authResult.message || '驗證失敗', { duration: 1500 });
+          }
+          return;
+        }
+
         const r = await fetch(
           `${ACCOUNT_RECORD_GAME}/${router.query.sid}${location.search}`,
           { headers: { ...getAuthHeader() } },
@@ -314,10 +314,10 @@ export default function AccountRecord({ onPageChange }) {
           }));
         }
       } catch (error) {
-        console.error('fetchGameRecord has error:', error);
+        console.error('fetchGameRecord error:', error);
+      } finally {
+        if (isSubscribed) close(0.5);
       }
-
-      if (isSubscribed) close(0.5);
     };
 
     loadData();

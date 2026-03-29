@@ -134,21 +134,26 @@ export default function AccountCollect({ onPageChange }) {
   //渲染-貼文收藏
   useEffect(() => {
     const fetchCheck = async () => {
+      if (!router.isReady || !router.query.sid) return;
+
       open();
       setIsFetched(false);
-      if (auth.id === 0 || !router.isReady) {
-        close();
-        return;
+      try {
+        if (auth.id === 0) {
+          return;
+        }
+        const result = await checkAuth(router.query.sid);
+        if (!result.success) {
+          router.push('/');
+          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          return;
+        }
+        await getSavePostData();
+      } catch (error) {
+        console.error('fetchCheck error:', error);
+      } finally {
+        close(0.5);
       }
-      const result = await checkAuth(router.query.sid);
-      if (!result.success) {
-        router.push('/');
-        toast.error(result.error, { duration: 1500 });
-        close();
-        return;
-      }
-      await getSavePostData();
-      close(0.5);
     };
 
     fetchCheck();

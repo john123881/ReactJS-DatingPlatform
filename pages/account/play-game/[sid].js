@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useEffect } from 'react';
 import Sidebar from '@/components/account-center/sidebar/sidebar';
 import PageTitle from '@/components/page-title';
@@ -19,26 +20,30 @@ export default function AccountPlayGame({ onPageChange }) {
   const currentPage = '遊玩遊戲';
 
   useEffect(() => {
-    if (!router.isReady) return;
+    if (!router.isReady || !router.query.sid) return;
+
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
       open();
-      if (auth.id === 0 || !router.isReady) {
-        close();
-        return;
+      try {
+        if (auth.id === 0) {
+          return;
+        }
+        const result = await checkAuth(router.query.sid);
+        if (!result.success) {
+          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          router.push('/');
+          return;
+        }
+      } catch (error) {
+        console.error('fetchCheck error:', error);
+      } finally {
+        close(0.5);
       }
-      const result = await checkAuth(router.query.sid);
-      if (!result.success) {
-        toast.error(result.error, { duration: 1500 });
-        router.push('/');
-        close();
-        return;
-      }
-      close(0.5);
     };
     
     fetchCheck();
-  }, [router.isReady, router.query.sid, checkAuth, close, router]);
+  }, [router.isReady, router.query.sid, checkAuth, close, open, auth.id, router]);
 
   useEffect(() => {
     onPageChange(pageTitle);

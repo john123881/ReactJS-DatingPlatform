@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/account-center/sidebar/sidebar';
-import { BsEmojiHeartEyes } from 'react-icons/bs';
 import PageTitle from '@/components/page-title';
 import Breadcrumbs from '@/components/account-center/breadcrumbs/breadcrumbs';
 import BurgerMenu from '@/components/account-center/burgermenu/burger-menu';
-import { ACCOUNT_GET, API_SERVER } from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
+import { AccountService } from '@/services/account-service';
+import { API_SERVER } from '@/configs/api-config';
 import toast from 'react-hot-toast';
 import AccountLoader from '@/components/account-center/loader/account-loader';
 
@@ -35,15 +35,11 @@ export default function AccountIndex({ onPageChange }) {
   });
 
   const getUserInf = async () => {
-
     try {
-      const res = await fetch(`${ACCOUNT_GET}/${router.query.sid}`, {
-        headers: { ...getAuthHeader() },
-      });
-      const result = await res.json();
-      if (result.success) {
+      const data = await AccountService.getProfile(router.query.sid);
+      
+      if (data) {
         const {
-          user_id,
           email,
           username,
           avatar,
@@ -54,35 +50,30 @@ export default function AccountIndex({ onPageChange }) {
           movie_type,
           total_points,
           profile_content,
-        } = result.data;
+        } = data;
 
         setUserInf({
           ...userInf,
-          email: email,
-          name: username,
-          gender: gender,
-          mobile: mobile,
-          birthday: birthday,
-          fav1: bar_type_name,
-          fav2: movie_type,
-          point: total_points,
-          profile: profile_content,
-          hasLogin: result.hasLogin,
-          hasPlay: result.hasPlay,
+          email: email || '',
+          name: username || '',
+          gender: gender || '',
+          mobile: mobile || '',
+          birthday: birthday || '',
+          fav1: bar_type_name || '',
+          fav2: movie_type || '',
+          point: total_points || 0,
+          profile: profile_content || '',
+          hasLogin: data.hasLogin,
+          hasPlay: data.hasPlay,
         });
-        setUserAvatar(avatar);
-      } else {
-        router.push('/');
-        toast.error(result.error, {
-          duration: 1500,
-        });
-        return;
+
+        if (avatar) {
+          setUserAvatar(avatar);
+        }
       }
     } catch (ex) {
-      toast.error(ex, {
-        duration: 1500,
-      });
-      console.error({ ex });
+      console.error('getUserInf error:', ex);
+      toast.error('無法載入會員資料', { duration: 1500 });
     }
   };
 
@@ -92,20 +83,27 @@ export default function AccountIndex({ onPageChange }) {
 
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
+      if (!router.isReady || !router.query.sid) return;
+      
       open();
-      if (auth.id === 0 || !router.isReady) {
-        close();
-        return;
+      try {
+        if (auth.id === 0) {
+          return;
+        }
+
+        const result = await checkAuth(router.query.sid);
+        if (!result.success) {
+          router.push('/');
+          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          return;
+        }
+        
+        await getUserInf();
+      } catch (error) {
+        console.error('fetchCheck error:', error);
+      } finally {
+        close(0.5);
       }
-      const result = await checkAuth(router.query.sid);
-      if (!result.success) {
-        router.push('/');
-        toast.error(result.error, { duration: 1500 });
-        close();
-        return;
-      }
-      await getUserInf();
-      close(0.5);
     };
     
     fetchCheck();

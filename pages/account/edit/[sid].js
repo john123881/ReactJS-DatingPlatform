@@ -194,22 +194,27 @@ export default function AccountEdit({ onPageChange }) {
 
     //進頁面做授權確認，router的query有改會調用fetchCheck
     const fetchCheck = async () => {
-      open();
-      if (auth.id === 0 || !router.isReady) {
-        close();
-        return;
-      }
-      const result = await checkAuth(router.query.sid);
-      if (!result.success) {
-        router.push('/');
-        toast.error(result.error, { duration: 1500 });
-        close();
-        return;
-      }
+      if (!router.isReady || !router.query.sid) return;
 
-      //進頁面做授權確認，授權通過，接收user的待編輯資料
-      await fetchEditData();
-      close(0.5);
+      open();
+      try {
+        if (auth.id === 0) {
+          return;
+        }
+        const result = await checkAuth(router.query.sid);
+        if (!result.success) {
+          router.push('/');
+          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          return;
+        }
+
+        //進頁面做授權確認，授權通過，接收user的待編輯資料
+        await fetchEditData();
+      } catch (error) {
+        console.error('fetchCheck error:', error);
+      } finally {
+        close(0.5);
+      }
     };
     
     fetchCheck();
