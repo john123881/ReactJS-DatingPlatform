@@ -8,18 +8,21 @@ import ContentNight from '@/components/trip/my-content/blocks/content-night';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
 import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
-import { apiClient } from '@/services/api-client';
 import AccountLoader from '@/components/account-center/loader/account-loader';
+import { useTripDetail } from '@/hooks/use-trip-detail';
 
 
 export default function MyTripDetail({ onPageChange }) {
   const router = useRouter();
 
   const { trip_plan_id } = router.query;
-  const [tripDetails, setTripDetails] = useState({}); //用於儲存從trip_calendar中獲獲取的值
-  const [tripName, setTripName] = useState({}); //用於儲存從trip_plans中獲獲取的值
-  const [newDetail, setNewDetail] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    tripDetails,
+    tripName,
+    newDetail,
+    isLoading,
+    refresh: refreshAllDetails,
+  } = useTripDetail(trip_plan_id);
 
   const pageTitle = '行程規劃';
   useEffect(() => {
@@ -31,57 +34,6 @@ export default function MyTripDetail({ onPageChange }) {
       router.replace('/trip/my-trip');
     }
   }, [trip_plan_id, router]);
-
-  // 整合資料獲取
-  useEffect(() => {
-    if (!trip_plan_id || trip_plan_id === 'undefined') return;
-
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [detailsData, nameData, allDayData] = await Promise.all([
-          apiClient.get(`/trip/my-details/${trip_plan_id}`),
-          apiClient.get(`/trip/my-details/trip-plan/${trip_plan_id}`),
-          apiClient.get(`/trip/my-details/allday-content/${trip_plan_id}`)
-        ]);
-
-        if (detailsData && detailsData.length > 0) {
-          setTripDetails(detailsData[0]);
-        }
-        
-        if (nameData) {
-          setTripName(nameData);
-        }
-
-        if (allDayData && allDayData.length > 0) {
-          setNewDetail(allDayData);
-        } else {
-          setNewDetail({ block: null });
-        }
-      } catch (error) {
-        console.error('Fetching trip detail data error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [trip_plan_id]);
-
-  // 為子元件保留的刷新函數
-  const refreshAllDetails = useCallback(async () => {
-    if (!trip_plan_id) return;
-    try {
-      const data = await apiClient.get(`/trip/my-details/allday-content/${trip_plan_id}`);
-      if (data && data.length > 0) {
-        setNewDetail(data);
-      } else {
-        setNewDetail({ block: null });
-      }
-    } catch (error) {
-      console.error('Refreshing trip details error:', error);
-    }
-  }, [trip_plan_id]);
 
 
 

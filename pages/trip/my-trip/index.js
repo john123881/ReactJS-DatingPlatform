@@ -209,7 +209,9 @@ export default function MyTrip({ onPageChange }) {
       </div>
       <div className=" mb-24 w-full flex justify-center">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
+          {otherTrips.map((otherTrip) => (
             <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
+          ))}
         </div>
       </div>
     </div>
@@ -281,12 +283,14 @@ export default function MyTrip({ onPageChange }) {
                   </dialog>
                 )}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 sm:gap-14 my-4 justify-center">
+                  {trips.map((trip) => (
                     <TripCard
                       key={trip.trip_plan_id}
                       trip={trip}
                       isMyTrip={true}
                       onDeleteSuccess={onDeleteSuccess}
                     />
+                  ))}
                 </div>
               </div>
             </div>
@@ -298,7 +302,7 @@ export default function MyTrip({ onPageChange }) {
     return (
       <>
         <PageTitle pageTitle={pageTitle} />
-        <TripSidebar />
+        <TripNavigationTab />
         {isLoading ? <Loader /> : recommend}
       </>
     );
