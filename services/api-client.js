@@ -86,51 +86,53 @@ async function processResponse(response) {
       const isNull = finalData === null;
       const wrapper = isNull ? {} : finalData;
 
-      if (wrapper && typeof wrapper === 'object') {
+      if (wrapper && (typeof wrapper === 'object' || Array.isArray(wrapper))) {
         // 定義 .success 屬性
-        Object.defineProperty(wrapper, 'success', {
-          value: true,
-          enumerable: false,
-          configurable: true,
-        });
-
-        // 定義 .data 屬性
-        Object.defineProperty(wrapper, 'data', {
-          value: isNull ? null : wrapper,
-          enumerable: false,
-          configurable: true,
-        });
-
-        // 定義 .message
-        Object.defineProperty(wrapper, 'message', {
-          value: result.message || 'Success',
-          enumerable: false,
-          configurable: true,
-        });
-
-        // 如果有分頁資訊
-        if (result.pagination) {
-          Object.defineProperty(wrapper, 'pagination', {
-            value: result.pagination,
+        try {
+          Object.defineProperty(wrapper, 'success', {
+            value: true,
             enumerable: false,
             configurable: true,
           });
-        }
 
-        // 核心修正：保留所有原始回應中的額外 Key (如 barType, movieType, hasPlay 等)
-        // 這些 Key 可能不在 data 內部，但在與 data 同級的根路徑
-        Object.keys(result).forEach((key) => {
-          if (!['success', 'data', 'message', 'pagination'].includes(key)) {
-            // 如果 wrapper 本身沒有該屬性，則補上去 (不覆蓋 wrapper 本有的)
-            if (!(key in wrapper)) {
-              Object.defineProperty(wrapper, key, {
-                value: result[key],
-                enumerable: false, // 設為 false 避免破壞 Array 遍歷或對應舊邏輯
-                configurable: true,
-              });
-            }
+          // 定義 .data 屬性
+          Object.defineProperty(wrapper, 'data', {
+            value: isNull ? null : wrapper,
+            enumerable: false,
+            configurable: true,
+          });
+
+          // 定義 .message
+          Object.defineProperty(wrapper, 'message', {
+            value: result.message || 'Success',
+            enumerable: false,
+            configurable: true,
+          });
+
+          // 如果有分頁資訊
+          if (result.pagination) {
+            Object.defineProperty(wrapper, 'pagination', {
+              value: result.pagination,
+              enumerable: false,
+              configurable: true,
+            });
           }
-        });
+
+          // 核心修正：保留所有原始回應中的額外 Key (如 barType, movieType, hasPlay 等)
+          Object.keys(result).forEach((key) => {
+            if (!['success', 'data', 'message', 'pagination'].includes(key)) {
+              if (!(key in wrapper)) {
+                Object.defineProperty(wrapper, key, {
+                  value: result[key],
+                  enumerable: false,
+                  configurable: true,
+                });
+              }
+            }
+          });
+        } catch (e) {
+          console.warn('API Client: Could not define ghost properties on response', e);
+        }
       }
 
       return wrapper;
@@ -140,7 +142,7 @@ async function processResponse(response) {
   }
 
   // 針對舊有 API (沒有 success 欄位的)，直接返回原始 JSON
-  return result;
+  return result ?? {};
 }
 
 /**
