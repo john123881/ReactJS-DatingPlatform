@@ -25,8 +25,8 @@ export default function Sidebar({ currentPage }) {
 
   return (
     <>
-      <div className="z-40 sm:z-0 sm:block">
-        <div className="drawer sm:drawer-open">
+      <div className="z-40 sm:z-0 lg:block">
+        <div className="drawer lg:drawer-open">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
           <div className="drawer-side">

@@ -6,7 +6,7 @@ import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import { AccountService } from '@/services/account-service';
 import { API_SERVER } from '@/configs/api-config';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
 
@@ -71,7 +71,7 @@ export default function AccountIndex({ onPageChange }) {
       }
     } catch (ex) {
       console.error('getUserInf error:', ex);
-      toast.error('無法載入會員資料', { duration: 1500 });
+      customToast.error('無法載入會員資料');
     }
   };
 
@@ -92,7 +92,7 @@ export default function AccountIndex({ onPageChange }) {
         const result = await checkAuth(router.query.sid);
         if (!result.success) {
           router.push('/');
-          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          customToast.error(result.message || '驗證失敗');
           return;
         }
         

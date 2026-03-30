@@ -4,7 +4,7 @@ import styles from './game-page.module.css';
 import { ACCOUNT_GAME_RECORD_POST } from '@/configs/api-config';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import { FaArrowRotateRight } from 'react-icons/fa6';
 
 const GRID_SIZE = 18;
@@ -39,6 +39,23 @@ const GameComponent = () => {
   const startTimeRef = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTiming, setIsTiming] = useState(false); // 新增計時狀態
+  const [viewScale, setViewScale] = useState(1);
+
+  // 監聽視窗寬度以自動縮放遊戲介面，防止手機版溢出
+  useEffect(() => {
+    const handleResize = () => {
+      // 如果寬度小於 375px，則按比例縮放
+      if (window.innerWidth < 375) {
+        const scale = (window.innerWidth - 20) / 360;
+        setViewScale(Math.max(scale, 0.75));
+      } else {
+        setViewScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleStartGame = useCallback(() => {
     setGameStarted(true); // click遊戲開始後設定開始狀態為 true
@@ -269,7 +286,7 @@ const GameComponent = () => {
     const gameScore = score;
     const gameTime = endTime;
     if (gameTime === 0) {
-      toast.error('時間不能為0', { duration: 1500 });
+      customToast.error('保存失敗', '時間不能為 0');
       return;
     }
     //ms轉換格式 00:00:00 hh:mm:ss
@@ -287,29 +304,32 @@ const GameComponent = () => {
     // console.log('Saving game record:', record);
     try {
       const sid = auth.id || router.query.sid;
-      toast.promise(GameRecord(sid, record), {
-        loading: '紀錄儲存中...',
-        success: (result) => {
-          // console.log('Save record result:', result);
-          if (!result || !result.success) {
-            throw new Error(result?.msg || '新增時出現錯誤');
-          }
-          if (result.getPointPlay) {
-            toast.success('每日遊戲獲得10積分', { duration: 1500 });
-          }
-          // 重置狀態
-          setEndTime(0);
-          setScore(0);
-          setBtnDisabled(false);
-          return '新增紀錄成功';
-        },
-        error: (e) => {
-          console.error('Save record error:', e);
-          return `儲存失敗: ${e.message || e}`;
-        },
-      });
+      
+      customToast.loading('紀錄儲存中...');
+      
+      const result = await GameRecord(sid, record);
+      
+      if (!result || !result.success) {
+        customToast.error('儲存失敗', result?.msg || '新增時出現錯誤');
+        setBtnDisabled(false);
+        return;
+      }
+
+      if (result.getPointPlay) {
+        customToast.success('每日遊戲獲得10積分');
+      } else {
+        customToast.success('新增紀錄成功');
+      }
+
+      // 重置狀態
+      setEndTime(0);
+      setScore(0);
+      setBtnDisabled(false);
+      
     } catch (ex) {
-      console.error('Error:', ex);
+      console.error('Save record error:', ex);
+      customToast.error('系統錯誤', `儲存失敗: ${ex.message || ex}`);
+      setBtnDisabled(false);
     }
   };
 
@@ -441,13 +461,13 @@ const GameComponent = () => {
   return (
     <>
       {/* Header 記錄區 */}
-      <div className="container flex justify-between items-center  border-dark max-h-[53px] pt-4 pb-3">
+      <div className="container flex justify-between items-center border-dark max-h-[53px] pt-4 pb-3 px-2">
         <div
           style={{
             fontFamily: 'monospace',
             textShadow: '2px 2px 2px hsla(0,0%,0%,1)',
           }}
-          className="flex flex-col text-[14px] text-center text-white basis-1/4 ms-4"
+          className="flex flex-col text-[14px] text-center text-white basis-1/4"
         >
           分數{' '}
           <span
@@ -466,7 +486,7 @@ const GameComponent = () => {
             fontFamily: 'monospace',
             textShadow: '2px 2px 2px hsla(0,0%,0%,1)',
           }}
-          className="flex flex-col text-[14px] text-center text-white basis-1/4 me-2"
+          className="flex flex-col text-[14px] text-center text-white basis-1/4"
         >
           {' '}
           時間
@@ -496,7 +516,7 @@ const GameComponent = () => {
         </div>
       </div>
       {/* Body 遊戲區 */}
-      <div className="container relative w-full min-h-[527px]  ">
+      <div className="container relative w-full min-h-[527px] transition-transform duration-300 origin-top" style={{ transform: `scale(${viewScale})` }}>
         <div
           className="bg-slate-700"
           ref={gameRef}

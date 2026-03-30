@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TripService } from '@/services/trip-service';
+import { toast } from '@/lib/toast';
 
 export default function CarouselContentMovie2({
   movies,
@@ -7,6 +8,7 @@ export default function CarouselContentMovie2({
   onClick,
   trip_plan_id,
   refreshAllDetails,
+  newDetail = []
 }) {
   const [showDetails, setShowDetails] = useState(false);
   const modalId = `modal_movie_${movies.movie_id}`; // 確保彈跳視窗的 id 是唯一值
@@ -27,6 +29,16 @@ export default function CarouselContentMovie2({
     setTimeOfDay(event.target.value); // 更新選擇的時段
   };
   const handleSubmit = async () => {
+    // 檢查該時段是否已存在「有效內容」的項目
+    const isExist = Array.isArray(newDetail) && newDetail.some(item => {
+        return String(item.block) === String(timeOfDay) && (Boolean(item.movie_id) || Boolean(item.bar_id));
+    });
+    
+    if (isExist) {
+        toast.warning('時段重複', '該時段已有安排其它行程囉！請先刪除原行程再加入新的行程～');
+        return;
+    }
+    
     try {
       const result = await TripService.addMovieToTripBlock(trip_plan_id, {
         movie_id: movies.movie_id,
@@ -34,16 +46,15 @@ export default function CarouselContentMovie2({
       });
 
       if (result.success) {
-        console.log('Moive added to trip successfully!');
-
+        toast.success(`成功加入: ${movies.title}`);
         document.getElementById(modalId).close(); // 關閉彈跳視窗
         refreshAllDetails();
       } else {
-        alert('失敗了失敗了時間不多囉：' + (result.message || '未知錯誤'));
+        toast.error('發生錯誤', result.message || '未知錯誤');
       }
     } catch (error) {
       console.error('Error adding movie to trip:', error);
-      alert('Failed to add movie to trip: ' + error.message);
+      toast.error('連線失敗', error.message);
     }
   };
 
@@ -78,10 +89,10 @@ export default function CarouselContentMovie2({
               src={`/movie_img/${movies.poster_img}`}
               alt={`Image of ${movies.title}`}
             />
-            <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12">
-              <h2 className="text-white text-base mb-5">{movies.title}</h2>
-              <h2 className="text-white text-base ">{movies.movie_type}片</h2>
-              <div className="mt-4">
+            <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12 flex-grow min-w-0">
+              <h2 className="text-white text-base mb-2 truncate w-full">{movies.title}</h2>
+              <h2 className="text-white text-sm opacity-80 mb-3">{movies.movie_type}片</h2>
+              <div className="mt-1 flex items-center whitespace-nowrap">
                 <label htmlFor="timeOfDay" className="text-white text-sm mr-2">
                   選擇時段：
                 </label>
@@ -99,7 +110,7 @@ export default function CarouselContentMovie2({
             </div>
             <button
               onClick={handleSubmit}
-              className="text-white hover:text-black text-xs px-6 py-2 bg-black hover:bg-[#a0ff1f] rounded-full border border-white flex justify-center items-center mt-4"
+              className="text-white hover:text-black text-xs px-6 py-2 bg-black hover:bg-[#a0ff1f] rounded-full border border-white flex justify-center items-center mt-4 whitespace-nowrap flex-shrink-0 min-w-[100px]"
             >
               加入行程
             </button>

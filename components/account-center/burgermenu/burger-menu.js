@@ -4,8 +4,8 @@ export default function BurgerMenu({ currentPage }) {
   return (
     <>
       <div className="flex border-b border-solid item-center menu-title ps-0">
-        <div className="flex items-center drawer-content sm:hidden">
-          <label htmlFor="my-drawer-2" className="drawer-button lg:hidden">
+        <div className="flex items-center drawer-content lg:hidden">
+          <label htmlFor="my-drawer-2" className="drawer-button">
             <BsList className="text-2xl" />
           </label>
         </div>

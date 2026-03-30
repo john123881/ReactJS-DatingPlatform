@@ -91,12 +91,7 @@ module.exports = {
       btn: {
         primary: '#A0FF1F',
       },
-      padding: {
-        sm: '8px',
-        md: '16px',
-        lg: '24px',
-        xl: '48px',
-      },
+
     },
   },
   plugins: [require('daisyui')],

@@ -3,6 +3,7 @@ import { TripService } from '@/services/trip-service';
 import { FaTrash } from 'react-icons/fa';
 import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
+import { toast } from '@/lib/toast';
 
 export default function WithContent({
   imageSrc,
@@ -11,13 +12,8 @@ export default function WithContent({
   tripDetails,
   refreshTripDetails,
 }) {
-  const [deleteContent, setDeleteContent] = useState(false);
-  const [barName, setBarName] = useState('');
-  const [movieTitle, setMovieTitle] = useState('');
-  const { open, close, isLoading } = useLoader();
-
+  const { isLoading } = useLoader();
   const openDeleteModal = () => {
-    setDeleteContent(true);
     // 調用 showModal 方法以開啟對話框
     const dialog = document.getElementById(
       `delete-dialog-${tripDetails.trip_detail_id}`,
@@ -28,7 +24,6 @@ export default function WithContent({
   };
 
   const closeDeleteModal = () => {
-    setDeleteContent(false);
     const dialog = document.getElementById(
       `delete-dialog-${tripDetails.trip_detail_id}`,
     );
@@ -43,15 +38,18 @@ export default function WithContent({
 
   const onConfirmDelete = async () => {
     try {
-      const result = await TripService.deleteTripDetail(tripDetails.trip_detail_id);
+      const result = await TripService.deleteTripDetail(
+        tripDetails.trip_detail_id,
+      );
       if (result.success) {
+        toast.success(`成功移除: ${altText}`);
         closeDeleteModal();
         refreshTripDetails();
       } else {
-        alert('刪除失敗: ' + result.message);
+        toast.error('刪除失敗', result.message);
       }
     } catch (error) {
-      alert('發生錯誤: ' + error.message);
+      toast.error('發生錯誤', error.message);
     }
   };
 
@@ -84,46 +82,44 @@ export default function WithContent({
         <button onClick={openDeleteModal} className="pb-2">
           <FaTrash className="text-2xl hover:text-[#a0ff1f]" />
         </button>
-        {deleteContent && (
-          <dialog
-            id={`delete-dialog-${tripDetails.trip_detail_id}`}
-            className="modal"
-          >
-            <div className="modal-box w-96 flex flex-col justify-center items-center">
-              <h3 className="font-bold text-lg mb-4 text-white text-center">
-                確定要刪除 <span className="text-[#a0ff1f]">{altText} </span>
-                嗎？
-              </h3>
-              <h3 className="font-bold text-base mb-4 text-white">
-                行程時段：
-                {tripDetails.block === 1
-                  ? '早上'
-                  : tripDetails.block === 2
-                    ? '下午'
-                    : tripDetails.block === 3
-                      ? '晚上'
-                      : ''}
-              </h3>
+        <dialog
+          id={`delete-dialog-${tripDetails.trip_detail_id}`}
+          className="modal"
+        >
+          <div className="modal-box w-96 flex flex-col justify-center items-center">
+            <h3 className="font-bold text-lg mb-4 text-white text-center">
+              確定要刪除 <span className="text-[#a0ff1f]">{altText} </span>
+              嗎？
+            </h3>
+            <h3 className="font-bold text-base mb-4 text-white">
+              行程時段：
+              {tripDetails.block === 1
+                ? '早上'
+                : tripDetails.block === 2
+                  ? '下午'
+                  : tripDetails.block === 3
+                    ? '晚上'
+                    : ''}
+            </h3>
 
-              <div className="modal-action">
-                <button
-                  type="button"
-                  className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                  onClick={closeDeleteModal}
-                >
-                  取消
-                </button>
-                <button
-                  type="button"
-                  className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                  onClick={onConfirmDelete}
-                >
-                  確定
-                </button>
-              </div>
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
+                onClick={closeDeleteModal}
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
+                onClick={onConfirmDelete}
+              >
+                確定
+              </button>
             </div>
-          </dialog>
-        )}
+          </div>
+        </dialog>
       </div>
     </>
   );

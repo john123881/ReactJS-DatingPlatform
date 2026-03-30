@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import CarouselContentBar from './carousel-content-bar';
 import { TripService } from '@/services/trip-service';
 
-export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
+export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails, newDetail }) {
   const [barSaved, setBarSaved] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -52,6 +52,7 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
           barSaved={bar}
           altText={bar.bar_name}
           trip_plan_id={trip_plan_id}
+          newDetail={newDetail}
           refreshAllDetails={refreshAllDetails}
         />
       ))}

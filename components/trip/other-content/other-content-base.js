@@ -7,6 +7,7 @@ export default function OtherContentBase({
   block,
   fetchMethod,
   OtherNoContentComponent,
+  newDetail
 }) {
   const [tripDetailsList, setTripDetailsList] = useState([]);
 
@@ -20,7 +21,6 @@ export default function OtherContentBase({
           const result = await fetchMethod(trip_plan_id);
           setTripDetailsList(result && result.length > 0 ? result : []);
         } catch (error) {
-          console.error(`Fetching trip details error (block ${block}):`, error);
           setTripDetailsList([]);
         }
       };

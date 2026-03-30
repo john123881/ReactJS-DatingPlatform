@@ -7,28 +7,29 @@ import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
-import Swal from 'sweetalert2';
 import { apiClient } from '@/services/api-client';
 import { TripService } from '@/services/trip-service';
-
+import { toast } from '@/lib/toast';
 
 export default function MyTrip({ onPageChange }) {
   const pageTitle = '行程規劃';
   const router = useRouter();
+  
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
-  const { auth, getAuthHeader } = useAuth();
+
+  const { auth } = useAuth();
   const [trips, setTrips] = useState([]);
-  const [userId, setUserId] = useState(null); // 添加 user_id 狀態
   const [tripDate, setTripDate] = useState('');
   const [tripTitle, setTripTitle] = useState('');
   const [otherTrips, setOtherTrips] = useState([]);
   const { open, close, isLoading } = useLoader();
-  //為日期選擇設下限制，不能選擇今天以前的日期
+
   const today = new Date();
-  today.setHours(today.getHours() + 8); // 加八個小時
+  today.setHours(today.getHours() + 8);
   const localDate = today.toISOString().split('T')[0];
+
   const fetchTrips = useCallback(async () => {
     open();
     try {
@@ -40,13 +41,6 @@ export default function MyTrip({ onPageChange }) {
     close();
   }, [open, close]);
 
-  useEffect(() => {
-    if (auth.id === 0) return;
-    fetchTrips();
-    // 這裡原本有 jwt 解碼邏輯，但 auth.id 已經可用，故移除。
-  }, [auth.id, fetchTrips]);
-
-  /////////////在尚無行程時顯示其他人的推薦行程//////////////////////
   const fetchOtherTrips = useCallback(async () => {
     open();
     try {
@@ -60,28 +54,21 @@ export default function MyTrip({ onPageChange }) {
 
   useEffect(() => {
     if (auth.id === 0) return;
+    fetchTrips();
     fetchOtherTrips();
-  }, [auth.id, fetchOtherTrips]);
+  }, [auth.id, fetchTrips, fetchOtherTrips]);
 
-  ////////////////////////////////////////////////////////
   const onDeleteSuccess = useCallback((tripPlanId) => {
-    // 過濾掉被刪除的行程
     setTrips((prev) => prev.filter((trip) => trip.trip_plan_id !== tripPlanId));
   }, []);
 
-  // 以 useState 控制 modal 的開關
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // 開啟modal
   const openModal = () => setIsModalOpen(true);
-
-  // 關閉modal
   const closeModal = () => setIsModalOpen(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // 建立完整承載，補齊所有可能的資料庫欄位，避免 NOT NULL 約束衝突
       const fullPayload = {
         user_id: auth.id,
         trip_date: tripDate,
@@ -93,29 +80,10 @@ export default function MyTrip({ onPageChange }) {
         trip_draft: 0
       };
 
-
-      let data;
-      try {
-        // 預設發送 FLAT 結構
-        data = await TripService.addTripPlan(fullPayload);
-        
-        if (data && data.success === false) {
-           console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
-           data = await TripService.addTripPlan({
-             tripPlan: fullPayload
-           });
-        }
-      } catch (e) {
-        console.warn('First attempt failed, retrying with Nested payload...', e);
-        data = await TripService.addTripPlan({
-          tripPlan: fullPayload
-        });
-      }
-
-
+      let data = await TripService.addTripPlan(fullPayload);
+      
       if (data && (data.success !== false && data.success !== 'false')) {
         closeModal();
-
         const newTripPlanId = data.tripPlanId || data.insertId || data.id || (Array.isArray(data) ? data[0]?.trip_plan_id : data.data?.[0]?.trip_plan_id);
         if (newTripPlanId) {
           router.push(`/trip/my-trip/detail/${newTripPlanId}`);
@@ -127,85 +95,18 @@ export default function MyTrip({ onPageChange }) {
       }
     } catch (error) {
       console.error('Creating trip plan error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: '新增失敗',
-        text: error.message || '連線錯誤或資料結構不符',
-        background: '#2a303c',
-        color: '#ffffff',
-        confirmButtonColor: '#a0ff1f',
-        customClass: {
-          confirmButton: 'text-black font-bold border-none px-6 py-2',
-          popup: 'border-2 border-[#a0ff1f] rounded-box shadow-[0_0_20px_rgba(160,255,31,0.3)]'
-        }
-      });
+      toast.error('新增失敗', error.message || '連線錯誤');
     }
   };
 
-  const recommend = (
-    <div className="flex flex-wrap justify-center mx-5 my-5 min-h-screen">
-      <div className="flex flex-col items-center justify-start w-full max-w-4xl sm:mt-24">
-        <p className="mb-12 sm:text-2xl text-center">
+  // 推薦區塊組件
+  const RecommendBlock = () => (
+    <div className="flex flex-col items-center justify-start w-full transition-all duration-500 delay-200">
+      <div className="flex flex-col items-center justify-start w-full max-w-4xl py-12">
+        <p className="mb-12 sm:text-2xl text-center text-white/80">
           立即規劃屬於自己的專屬行程
         </p>
-        <div className="mb-16">
-          {/* 更新按鈕的onClick處理函式，以開啟彈出視窗 */}
-          <button
-            className="mt-5 mb-5 bg-black sm:text-2xl text-white border border-white rounded-full px-5 py-2.5 hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-            onClick={openModal}
-          >
-            新增行程
-          </button>
-          {/* 以 useState 來控制<dialog> */}
-          {isModalOpen && (
-            <dialog open id="my_modal_1" className="modal">
-              <form onSubmit={handleSubmit}>
-                <div className="modal-box w-96">
-                  <h3 className="font-bold text-lg mb-4 text-white">
-                    建立行程
-                  </h3>
-                  <input type="hidden" name="user_id" value={auth.id} />
-                  <p className="text-white">行程日期</p>
-                  <input
-                    type="date"
-                    name="trip_date"
-                    className="mt-4 mb-4 px-2 py-1 w-full"
-                    value={tripDate}
-                    onChange={(event) => setTripDate(event.target.value)}
-                    min={localDate}
-                    required
-                  />
-                  <p className="text-white">行程名稱</p>
-                  <input
-                    type="text"
-                    name="trip_title"
-                    className="mt-4 mb-4 px-2 py-1 w-full"
-                    placeholder="請輸入行程名稱"
-                    value={tripTitle}
-                    onChange={(event) => setTripTitle(event.target.value)}
-                    required
-                  />
-                  <div className="modal-action">
-                    <button
-                      type="button"
-                      className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                      onClick={closeModal}
-                    >
-                      取消
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                    >
-                      完成
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </dialog>
-          )}
-        </div>
-        <p className="sm:text-2xl">還沒有任何想法嗎？參考看看別人的行程吧</p>
+        <p className="sm:text-2xl text-white/80 mb-12">還沒有任何想法嗎？參考看看別人的行程吧</p>
       </div>
       <div className="mb-24 w-full max-w-7xl px-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
@@ -217,72 +118,77 @@ export default function MyTrip({ onPageChange }) {
     </div>
   );
 
-  if (trips.length > 0) {
-    return (
-      <>
-        <PageTitle pageTitle={pageTitle} />
-        <div className="flex flex-col min-h-screen">
-          <TripNavigationTab />
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12">
-              <div className="flex flex-col items-center sm:items-start justify-start">
-                <button
-                  className="mt-12 mb-8 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95"
-                  onClick={openModal}
-                >
-                  + 新增行程
-                </button>
-                {/* 以 useState 來控制<dialog> */}
-                {isModalOpen && (
-                  <dialog open id="my_modal_1" className="modal">
-                    <form onSubmit={handleSubmit}>
-                      <div className="modal-box w-96">
-                        <h3 className="font-bold text-lg mb-4 text-white">
-                          建立行程
-                        </h3>
-                        <input type="hidden" name="user_id" value={auth.id} />
-                        <p className="text-white">行程日期</p>
-                        <input
-                          type="date"
-                          name="trip_date"
-                          className="mt-4 mb-4 px-2 py-1 w-full"
-                          value={tripDate}
-                          onChange={(event) => setTripDate(event.target.value)}
-                          min={localDate}
-                          required
-                        />
-                        <p className="text-white">行程名稱</p>
-                        <input
-                          type="text"
-                          name="trip_title"
-                          className="mt-4 mb-4 px-2 py-1 w-full"
-                          placeholder="請輸入行程名稱"
-                          value={tripTitle}
-                          onChange={(event) => setTripTitle(event.target.value)}
-                          required
-                        />
-                        <div className="modal-action">
-                          <button
-                            type="button"
-                            className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                            onClick={closeModal}
-                          >
-                            取消
-                          </button>
-                          <button
-                            type="submit"
-                            className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                          >
-                            完成
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  </dialog>
-                )}
-                <div className="w-full mt-8">
+  return (
+    <div className="flex flex-col min-h-screen">
+      <PageTitle pageTitle={pageTitle} />
+      <TripNavigationTab />
+      
+      {/* 建立行程 Modal (穩定 Shell 的一部分，位置固定) */}
+      {isModalOpen && (
+        <dialog open className="modal">
+          <form onSubmit={handleSubmit}>
+            <div className="modal-box w-96 text-white bg-[#1a1a1a] border border-white/20 shadow-2xl rounded-2xl">
+              <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                <span className="w-2 h-6 bg-neongreen rounded-full"></span>
+                建立行程
+              </h3>
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-gray-400">行程日期</span>
+                  </label>
+                  <input
+                    type="date"
+                    className="input input-bordered w-full bg-white/5 border-white/10 focus:border-neongreen transition-all"
+                    value={tripDate}
+                    onChange={(e) => setTripDate(e.target.value)}
+                    min={localDate}
+                    required
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-gray-400">行程名稱</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full bg-white/5 border-white/10 focus:border-neongreen transition-all"
+                    placeholder="請輸入行程名稱"
+                    value={tripTitle}
+                    onChange={(e) => setTripTitle(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-action mt-8 flex gap-3">
+                <button type="button" className="btn btn-ghost rounded-full px-8" onClick={closeModal}>取消</button>
+                <button type="submit" className="btn bg-neongreen text-black border-none rounded-full px-8 hover:bg-[#8edb1a]">完成</button>
+              </div>
+            </div>
+          </form>
+        </dialog>
+      )}
+
+      {/* 主體內容區：確保 Shell 穩定 */}
+      <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12">
+        <div className="flex flex-col items-center sm:items-start justify-start">
+          {/* 將新增按鈕提拔到 Shell 層級，不再隨資料切換而跳動 */}
+          <button
+            className="mt-12 mb-8 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95 disabled:opacity-50"
+            onClick={openModal}
+            disabled={isLoading}
+          >
+            {isLoading ? "正在讀取..." : "+ 新增行程"}
+          </button>
+          
+          <div className="w-full mt-4 min-h-[500px]">
+            {isLoading ? (
+              <div className="flex justify-center items-center h-[400px] animate__animated animate__fadeIn">
+                <Loader text="加載中..." minHeight="300px" />
+              </div>
+            ) : (
+              <div className="animate__animated animate__fadeIn">
+                {trips.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 sm:gap-12 justify-items-center sm:justify-items-start">
                     {trips.map((trip) => (
                       <TripCard
@@ -293,30 +199,14 @@ export default function MyTrip({ onPageChange }) {
                       />
                     ))}
                   </div>
-                </div>
+                ) : (
+                  <RecommendBlock />
+                )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <PageTitle pageTitle={pageTitle} />
-        <TripNavigationTab />
-        {isLoading ? <Loader /> : recommend}
-      </>
-    );
-  }
+      </div>
+    </div>
+  );
 }
-
-// if (noContent) {
-//   return (
-//     <>
-//       <TripSidebar />
-//       {recomend}
-//       <Footer />
-//     </>
-//   );
-// } else {

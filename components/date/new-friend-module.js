@@ -3,7 +3,7 @@ import { useAuth } from '@/context/auth-context';
 import SelectBtn from '@/components/date/select-btn';
 import { AccountService } from '@/services/account-service';
 import { DateService } from '@/services/date-service';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import { useDate } from '@/context/date-context';
 import Link from 'next/link';
 import { useLoader } from '@/context/use-loader';
@@ -139,7 +139,7 @@ export default function NewFriends() {
 
     // 在成功更新後重新獲取資料
     if (result.success) {
-      toast.success('好友已送出！', { duration: 1500 });
+      customToast.success('好友已送出！');
       setBioIndex(bioIndex + 1);
     } else {
       console.error('Failed to update data');
@@ -160,7 +160,7 @@ export default function NewFriends() {
 
     // 在成功更新後重新獲取資料
     if (result.success) {
-      toast.success('已跳過此對象', { duration: 1500 });
+      customToast.success('已跳過此對象');
       setBioIndex(bioIndex + 1);
     } else {
       console.error('Failed to update data');

@@ -76,7 +76,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="sidebar ml-8 right-6 hidden md:flex md:w-2/12 top-[112px] left-0 fixed">
+      <div className="sidebar hidden md:flex sticky top-[112px] self-start ml-8">
         <div className="sidebarWrapper">
           <ul className="sidebarList grid">
             <li

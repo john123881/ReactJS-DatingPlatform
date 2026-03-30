@@ -1,33 +1,21 @@
-import { createContext, useContext, useState, useMemo } from 'react';
-import toast from 'react-hot-toast';
+import { createContext, useContext, useMemo } from 'react';
+import { toast as customToast } from '@/lib/toast';
 
 // 1. 建立context
 const NotifyContext = createContext(null);
 
 // 2. 建立一個Context Provider元件
 export function NotifyProvider({ children }) {
-  const notify = (msg) =>
-    toast(msg, {
-      duration: 1500,
-    });
+  const notify = (msg) => customToast.info(msg);
 
-  const notifySuccess = (msg) =>
-    toast.success(msg, {
-      duration: 1500,
-    });
+  const notifySuccess = (msg) => customToast.success(msg);
 
-  const notifyError = (msg) =>
-    toast.error(msg, {
-      duration: 1500,
-    });
+  const notifyError = (msg) => customToast.error(msg);
 
-  const notifyLoading = (msg) =>
-    toast.loading(msg, {
-      duration: 1500,
-    });
+  const notifyLoading = (msg) => customToast.loading(msg);
 
-  const notifyPromise = (promise, options) => {
-    return toast.promise(promise(), options);
+  const notifyPromise = (promiseFunc, options) => {
+    return customToast.promise(promiseFunc, options);
   };
 
   const value = useMemo(

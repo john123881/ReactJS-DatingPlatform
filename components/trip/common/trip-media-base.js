@@ -123,6 +123,8 @@ export default function TripMediaBase({
         <NC
           trip_plan_id={trip_plan_id}
           refreshTripDetails={refreshTripDetails}
+          trip_detail_id={tripDetails.trip_detail_id}
+          isGhost={true}
         />
       );
     }
@@ -134,8 +136,12 @@ export default function TripMediaBase({
   }
 
   return (
-    <div className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-500 ease-in-out">
-      <div className="transition-all duration-500 ease-out flex-shrink-0 hover:translate-y-[-4px]">
+    <div
+      className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-500 ease-in-out group/media"
+      onMouseEnter={() => !isOther && setShowDetails(true)}
+      onMouseLeave={() => !isOther && setShowDetails(false)}
+    >
+      <div className="transition-all duration-500 ease-out flex-shrink-0 hover:translate-y-[-10px]">
         <ContentComponent
           imageSrc={imageSrc}
           altText={details.name}
@@ -146,11 +152,13 @@ export default function TripMediaBase({
       </div>
       <div
         className={`overflow-hidden transition-all duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] flex items-center ${
-          showDetails || isOther ? 'max-w-[400px] opacity-100 ml-6 transform translate-x-0' : 'max-w-0 opacity-0 ml-0 transform translate-x-[-10px]'
+          showDetails || isOther
+            ? 'max-w-[400px] opacity-100 ml-6 transform translate-x-0'
+            : 'max-w-0 opacity-0 ml-0 transform translate-x-[-20px]'
         }`}
       >
         {details.description && (
-          <div className="w-80 lg:w-96 text-gray-300 leading-relaxed line-clamp-4 overflow-y-auto max-h-32 lg:max-h-48">
+          <div className="w-80 lg:w-96 flex-shrink-0 text-gray-300 leading-relaxed line-clamp-4 overflow-y-auto max-h-32 lg:max-h-48 drop-shadow-lg">
             {details.description}
           </div>
         )}

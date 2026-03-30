@@ -32,7 +32,7 @@ export default function TripSidebarBase({
     : '';
 
   return (
-    <div className="pt-20 pb-8 border-b border-white/20 w-full max-w-7xl mx-auto px-6 sm:px-20 transition-all duration-500">
+    <div className="pt-20 pb-8 border-b border-white/20 w-full max-w-[1600px] mx-auto px-6 sm:px-10 transition-all duration-500">
       {/* Desktop View */}
       <div className="hidden sm:block">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">

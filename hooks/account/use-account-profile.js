@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import { AccountService } from '@/services/account-service';
 import { getImageUrl } from '@/services/image-utils';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 /**
  * useAccountProfile - 處理會員中心共用的授權與資料拉取邏輯
@@ -26,7 +26,7 @@ export const useAccountProfile = () => {
         }
         return result;
       } else {
-        toast.error(result.error || '獲取資料失敗');
+        customToast.error(result.error || '獲取資料失敗');
         router.push('/');
       }
     } catch (error) {
@@ -45,7 +45,7 @@ export const useAccountProfile = () => {
           await fetchProfile(router.query.sid);
         } else {
           router.push('/');
-          toast.error(authResult.message || '驗證失敗');
+          customToast.error(authResult.message || '驗證失敗');
         }
       } catch (error) {
         console.error('Account init error:', error);

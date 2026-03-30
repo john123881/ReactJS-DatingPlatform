@@ -11,7 +11,7 @@ import { AccountService } from '@/services/account-service';
 import { useNotify } from '@/context/use-notify';
 import { useLoader } from '@/context/use-loader';
 import PageLoader from '@/components/ui/loader/page-loader';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 export default function AccountPasswordChange({ onPageChange }) {
   const [showOldPWD, setOldShowPWD] = useState(false);
@@ -55,21 +55,31 @@ export default function AccountPasswordChange({ onPageChange }) {
     },
     validationSchema: changePasswordSchema,
     onSubmit: async (values) => {
-      const fetchChangePWD = async () => {
-        return await AccountService.changePassword(auth.id, values);
-      };
-
-      notifyPromise(fetchChangePWD, {
-        loading: '正在保存...',
-        success: (result) => {
-          if (!result.success) {
-            throw result.error;
-          }
+      customToast.loading('正在保存...');
+      
+      try {
+        // 發送所有欄位，後端要求包含 confirmNewPassword 進行驗證
+        const { password, newPassword, confirmNewPassword } = values;
+        const result = await AccountService.changePassword(auth.id, { 
+          password, 
+          newPassword, 
+          confirmNewPassword 
+        });
+        if (!result.success) {
+          throw new Error(result.error || '更改密碼失敗');
+        }
+        
+        customToast.success('更改密碼成功', '即將跳轉回個人首頁');
+        
+        // 清除表單數據以確保安全
+        resetForm();
+        
+        setTimeout(() => {
           router.push(`/account/index/${auth.id}`);
-          return result.msg;
-        },
-        error: (error) => `${error.toString()}`,
-      });
+        }, 1500);
+      } catch (error) {
+        customToast.error('更改密碼失敗', error.message || error.toString());
+      }
     },
   });
 
@@ -87,7 +97,7 @@ export default function AccountPasswordChange({ onPageChange }) {
         const result = await checkAuth(router.query.sid);
         if (!result.success) {
           router.push('/');
-          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          customToast.error('驗證失敗', result.message || '請重新登入');
           return;
         }
       } catch (error) {
@@ -126,7 +136,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                     <div className="container">
                       <div className="flex flex-row items-center justify-center mx-4 me-4 sm:me-16 lg:justify-start mt-7 ">
                         <p className="text-center ms-2 basis-1/2 lg:ms-0 ">
-                          舊密碼：
+                          目前密碼：
                         </p>
                         <div className="relative basis-1/2">
                           <input
@@ -204,7 +214,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                       </div>
                       <div className="flex flex-row items-center justify-center mx-4 lg:justify-start mt-7 me-4 sm:me-16">
                         <p className="text-center ms-2 basis-1/2 lg:ms-0 ">
-                          密碼確認：
+                          新密碼確認：
                         </p>
                         <div className="relative basis-1/2">
                           <input

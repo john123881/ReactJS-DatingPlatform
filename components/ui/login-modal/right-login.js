@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
 import { AuthService } from '@/services/auth-service';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 import Link from 'next/link';
 
@@ -46,8 +46,8 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
     validationSchema: registerSchema,
     onSubmit: async (values) => {
       try {
-        toast.promise(
-          register(
+        customToast.promise(
+          () => register(
             values.email,
             values.validCode,
             values.name,
@@ -69,7 +69,7 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
           },
         );
       } catch (e) {
-        console.error('error:', e);
+        // console.error('error:', e);
       }
     },
   });
@@ -89,13 +89,13 @@ export default function RightLogin({ isOnLogin, switchHandler }) {
     try {
       const result = await sendValidCode(); // 使用 await 等待 sendValidCode 函數的返回結果
       if (!result.success) {
-        toast.error(result.error, { duration: 1500 });
+        customToast.error(result.error);
         return;
       }
       // 檢查是否成功發送驗證碼
       if (!hasSent && result.success) {
         setHasSent(true);
-        toast.success(result.message, { duration: 1500 });
+        customToast.success(result.message);
       }
     } catch (error) {
       console.error('按下發信按鍵時發生錯誤:', error);

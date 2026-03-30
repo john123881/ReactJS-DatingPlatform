@@ -76,147 +76,161 @@ export default function CreateEventModal() {
         className="modal modal-bottom sm:modal-middle "
       >
         <div
-          className="modal-box w-[500px] h-[500px] flex flex-col"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className={`modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 ${
+            selectedFile ? 'max-w-5xl w-[95%] h-[650px]' : 'max-w-md w-full h-[500px]'
+          }`}
+          style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
-          <p
-            className={`${styles['createModalListItemText']} font-bold text-lg mb-5 text-h5 flex justify-center`}
-          >
-            創建新活動
-          </p>
+          {/* Header */}
+          <div className="p-4 border-b border-white/10 flex justify-center items-center relative">
+            <p className={`${styles['createModalListItemText']} font-bold text-xl text-neongreen`}>
+              {selectedFile ? '設定活動詳情' : '建立新活動'}
+            </p>
+          </div>
 
-          {!selectedFile && (
-            <>
+          <div className="flex-grow flex flex-col sm:flex-row overflow-hidden">
+            {!selectedFile ? (
               <Dropzone onDrop={onDrop}>
                 {({ getRootProps, getInputProps }) => (
                   <div
                     {...getRootProps()}
-                    className="flex-grow flex flex-col items-center justify-center"
+                    className="flex-grow flex flex-col items-center justify-center p-10 cursor-pointer hover:bg-white/5 transition-colors"
                   >
                     <input {...getInputProps()} ref={fileInputRef} />
-                    {!selectedFile && (
-                      <>
-                        <FaPhotoVideo
-                          className={`${styles['createModalListItemIcon']} text-6xl mb-4`}
-                        />
-                        <p
-                          className={`${styles['createModalListItemText']} text-h6 mb-3`}
-                        >
-                          請拖曳照片
-                        </p>
-
-                        <button
-                          onClick={handleFilePicker}
-                          htmlFor="photo-upload"
-                          className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 cursor-pointer flex justify-center`}
-                        >
-                          從圖庫瀏覽
-                        </button>
-                      </>
-                    )}
+                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-primary`} />
+                    <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
+                      請將活動照片拖曳至此處
+                    </p>
+                    <button className="btn btn-primary rounded-full px-8 shadow-neon">
+                      從圖庫瀏覽
+                    </button>
                   </div>
                 )}
               </Dropzone>
-            </>
-          )}
-          {selectedFile && (
-            <>
-              <div className="flex flex-col items-center gap-2">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-full max-h-full object-cover mb-4"
-                />
-                <div className="flex flex-col inputFrom w-full gap-2">
-                  <label className="input input-bordered flex items-center rounded-full">
-                    <input
-                      type="text"
-                      className="grow"
-                      name="title"
-                      placeholder="活動名稱"
-                      onChange={handleEventContentChange}
-                    />
-                  </label>
-                  <label className="input input-bordered flex items-center rounded-full">
-                    <input
-                      type="text"
-                      className="grow"
-                      name="description"
-                      placeholder="活動描述"
-                      onChange={handleEventContentChange}
-                    />
-                  </label>
-                  <label className="input input-bordered flex items-center rounded-full">
-                    <input
-                      type="text"
-                      className="grow"
-                      name="location"
-                      placeholder="活動地點"
-                      onChange={handleEventContentChange}
-                    />
-                  </label>
-                  <div className="flex w-full justify-between gap-2">
-                    <label className="input input-bordered flex items-center rounded-full w-1/2">
-                      <input
-                        type="text"
-                        name="startDate"
-                        min={minDate}
-                        placeholder="開始日期"
-                        onFocus={handleDateFocus}
-                        onBlur={handleBlur}
-                        className="grow"
-                        onChange={handleEventContentChange}
-                      />
-                    </label>
-                    <label className="input input-bordered flex items-center rounded-full w-1/2">
-                      <input
-                        type="text"
-                        name="startTime"
-                        placeholder="開始時間"
-                        onFocus={handleTimeFocus}
-                        onBlur={handleBlur}
-                        className="grow"
-                        onChange={handleEventContentChange}
-                      />
-                    </label>
-                  </div>
-
-                  <div className="flex w-full justify-between gap-2">
-                    <label className="input input-bordered flex items-center rounded-full w-1/2">
-                      <input
-                        type="text"
-                        name="endDate"
-                        min={minEndDate}
-                        placeholder="結束日期"
-                        onFocus={handleDateFocus}
-                        onBlur={handleBlur}
-                        className="grow"
-                        onChange={handleEventContentChange}
-                      />
-                    </label>
-                    <label className="input input-bordered flex items-center rounded-full w-1/2">
-                      <input
-                        type="text"
-                        name="endTime"
-                        placeholder="結束時間"
-                        onFocus={handleTimeFocus}
-                        onBlur={handleBlur}
-                        className="grow"
-                        onChange={handleEventContentChange}
-                      />
-                    </label>
-                  </div>
+            ) : (
+              <>
+                {/* Left Side: Image Preview */}
+                <div className="flex-[1.2] bg-black/40 flex items-center justify-center overflow-hidden border-r border-white/10">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
 
-                <button
-                  className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3`}
-                  onClick={handleEventFileUpload}
-                >
-                  分享
-                </button>
-              </div>
-            </>
-          )}
+                {/* Right Side: Activity Details Area */}
+                <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto custom-scrollbar">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+                      <FaPhotoVideo className="text-primary text-xl" />
+                    </div>
+                    <span className="text-white font-medium italic">讓大家知道活動資訊</span>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <label className="form-control w-full">
+                      <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動名稱</span>
+                      <input
+                        type="text"
+                        name="title"
+                        placeholder="替你的活動取個響亮的名字..."
+                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                        onChange={handleEventContentChange}
+                      />
+                    </label>
+
+                    <label className="form-control w-full">
+                      <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動描述</span>
+                      <textarea
+                        name="description"
+                        placeholder="描述一下活動內容吧..."
+                        className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-primary transition-all text-white h-24 resize-none"
+                        onChange={handleEventContentChange}
+                      />
+                    </label>
+
+                    <label className="form-control w-full">
+                      <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動地點</span>
+                      <input
+                        type="text"
+                        name="location"
+                        placeholder="在哪裡舉行？"
+                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                        onChange={handleEventContentChange}
+                      />
+                    </label>
+
+                    <div className="divider opacity-20 my-1">時間設定</div>
+
+                    <div className="flex gap-4">
+                      <label className="form-control flex-1">
+                        <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">開始日期</span>
+                        <input
+                          type="text"
+                          name="startDate"
+                          min={minDate}
+                          placeholder="選擇日期"
+                          onFocus={handleDateFocus}
+                          onBlur={handleBlur}
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          onChange={handleEventContentChange}
+                        />
+                      </label>
+                      <label className="form-control flex-1">
+                        <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">開始時間</span>
+                        <input
+                          type="text"
+                          name="startTime"
+                          placeholder="選擇時間"
+                          onFocus={handleTimeFocus}
+                          onBlur={handleBlur}
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          onChange={handleEventContentChange}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex gap-4 mb-4">
+                      <label className="form-control flex-1">
+                        <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">結束日期</span>
+                        <input
+                          type="text"
+                          name="endDate"
+                          min={minEndDate}
+                          placeholder="選擇日期"
+                          onFocus={handleDateFocus}
+                          onBlur={handleBlur}
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          onChange={handleEventContentChange}
+                        />
+                      </label>
+                      <label className="form-control flex-1">
+                        <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">結束時間</span>
+                        <input
+                          type="text"
+                          name="endTime"
+                          placeholder="選擇時間"
+                          onFocus={handleTimeFocus}
+                          onBlur={handleBlur}
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          onChange={handleEventContentChange}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
+                    <button
+                      className="btn btn-primary btn-wide rounded-full shadow-neon font-bold text-lg"
+                      onClick={handleEventFileUpload}
+                    >
+                      建立活動
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <form method="dialog" className="modal-backdrop">

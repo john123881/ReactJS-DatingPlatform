@@ -11,7 +11,7 @@ import SideBar from '@/components/date/side-bar';
 import BlockModal from '@/components/date/modal/block-modal';
 import { TiThMenu } from 'react-icons/ti';
 import io from 'socket.io-client';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import { AccountService } from '@/services/account-service';
 import { DateService } from '@/services/date-service';
 import { SOCKET_SERVER } from '@/configs/api-config';
@@ -247,7 +247,7 @@ export default function ChatRoomContext() {
         friendship_status: 'blocking',
       });
       if (result.success) {
-        toast.success('好友已封鎖！', { duration: 1500 });
+        customToast.success('好友已封鎖！');
         router.push('/date/friends-list');
       } else {
         console.error('Failed to update data');

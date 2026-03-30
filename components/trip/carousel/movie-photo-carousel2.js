@@ -5,6 +5,7 @@ import { TripService } from '@/services/trip-service';
 export default function MoviePhotoCarousel2({
   trip_plan_id,
   refreshAllDetails,
+  newDetail
 }) {
   const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -58,6 +59,7 @@ export default function MoviePhotoCarousel2({
           key={movies.movie_id || index}
           movies={movies}
           trip_plan_id={trip_plan_id}
+          newDetail={newDetail}
           refreshAllDetails={refreshAllDetails}
         />
       ))}

@@ -4,8 +4,7 @@ import { forgetPasswordSchema } from '@/components/schemas';
 import { AuthService } from '@/services/auth-service';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
-import { useNotify } from '@/context/use-notify';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import Link from 'next/link';
 
 export default function PasswordForget({
@@ -20,7 +19,6 @@ export default function PasswordForget({
   const [isFocused1, setIsFocused1] = useState(false);
   const [showPWD2, setShowPWD2] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
-  const { notifyPromise } = useNotify();
 
   const handleShowNewPWD = () => {
     setShowPWD(!showPWD);
@@ -44,13 +42,13 @@ export default function PasswordForget({
     try {
       const result = await sendOTPForForgetPWD(); // 使用 await 等待 sendValidCode 函數的返回結果
       if (!result.success) {
-        toast.error(result.error, { duration: 1500 });
+        customToast.error(result.error);
         return;
       }
       // 檢查是否成功發送驗證碼
       if (!hasSentOTP && result.success) {
         setHasSentOTP(true);
-        toast.success(result.message, { duration: 1500 });
+        customToast.success(result.message);
       }
     } catch (error) {
       console.error('按下發信按鍵時發生錯誤:', error);
@@ -79,7 +77,7 @@ export default function PasswordForget({
         return await AuthService.resetPassword(values);
       };
 
-      notifyPromise(fetchChangeForgetPWD, {
+      customToast.promise(fetchChangeForgetPWD, {
         loading: '正在保存...',
         success: (result) => {
           if (!result.success) {

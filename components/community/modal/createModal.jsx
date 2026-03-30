@@ -55,74 +55,77 @@ export default function CreateModal() {
         className="modal modal-bottom sm:modal-middle "
       >
         <div
-          className="modal-box w-[500px] h-[500px] flex flex-col"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className={`modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 ${
+            selectedFile ? 'max-w-4xl w-[90%] h-[600px]' : 'max-w-md w-full h-[500px]'
+          }`}
+          style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
-          <p
-            className={`${styles['createModalListItemText']} font-bold text-lg mb-5 text-h5 flex justify-center`}
-          >
-            創建新貼文
-          </p>
+          {/* Header */}
+          <div className="p-4 border-b border-white/10 flex justify-center items-center relative">
+            <p className={`${styles['createModalListItemText']} font-bold text-xl text-neongreen`}>
+              {selectedFile ? '預覽貼文' : '建立新貼文'}
+            </p>
+          </div>
 
-          {!selectedFile && (
-            <>
+          <div className="flex-grow flex flex-col sm:flex-row overflow-hidden">
+            {!selectedFile ? (
               <Dropzone onDrop={onDrop}>
                 {({ getRootProps, getInputProps }) => (
                   <div
                     {...getRootProps()}
-                    className="flex-grow flex flex-col items-center justify-center"
+                    className="flex-grow flex flex-col items-center justify-center p-10 cursor-pointer hover:bg-white/5 transition-colors"
                   >
                     <input {...getInputProps()} ref={fileInputRef} />
-                    {!selectedFile && (
-                      <>
-                        <FaPhotoVideo
-                          className={`${styles['createModalListItemIcon']} text-6xl mb-4`}
-                        />
-                        <p
-                          className={`${styles['createModalListItemText']} text-h6 mb-3`}
-                        >
-                          請拖曳照片
-                        </p>
-                        <button
-                          onClick={handleFilePicker}
-                          htmlFor="photo-upload"
-                          className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 cursor-pointer flex justify-center`}
-                        >
-                          從圖庫瀏覽
-                        </button>
-                      </>
-                    )}
+                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-primary`} />
+                    <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
+                      請將照片拖曳至此處
+                    </p>
+                    <button className="btn btn-primary rounded-full px-8 shadow-neon">
+                      從圖庫瀏覽
+                    </button>
                   </div>
                 )}
               </Dropzone>
-            </>
-          )}
-          {selectedFile && (
-            <>
-              <div className="flex flex-col items-center">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-full max-h-full object-cover mb-4"
-                />
-                <textarea
-                  className="textarea textarea-ghost w-full h-32 resize-none my-3"
-                  placeholder="貼文內容"
-                  onChange={handlePostContentChange}
-                  onKeyDown={(e) =>
-                    // 使用 onKeyDown 並檢查是否按下 Enter 鍵
-                    handleKeyPress(e, () => handleFileUpload())
-                  }
-                />
-                <button
-                  className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3`}
-                  onClick={handleFileUpload}
-                >
-                  分享
-                </button>
-              </div>
-            </>
-          )}
+            ) : (
+              <>
+                {/* Left Side: Image Preview */}
+                <div className="flex-[1.2] bg-black/40 flex items-center justify-center overflow-hidden border-r border-white/10">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+
+                {/* Right Side: Content Area */}
+                <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+                      <FaPhotoVideo className="text-primary text-xl" />
+                    </div>
+                    <span className="text-white font-medium">編輯貼文內容</span>
+                  </div>
+
+                  <textarea
+                    className="textarea textarea-ghost w-full flex-grow text-lg leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
+                    placeholder="撰寫貼文內容..."
+                    autoFocus
+                    onChange={handlePostContentChange}
+                    onKeyDown={(e) => handleKeyPress(e, () => handleFileUpload())}
+                  />
+
+                  <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
+                    <button
+                      className="btn btn-primary btn-wide rounded-full shadow-neon font-bold text-lg"
+                      onClick={handleFileUpload}
+                    >
+                      分享貼文
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <form method="dialog" className="modal-backdrop">

@@ -7,7 +7,8 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
+import Swal from 'sweetalert2';
 import { getAuthGoogle } from '@/context/firebase-config';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -70,10 +71,15 @@ export default function LeftLogin({ switchHandler }) {
       }
     };
 
-    const toastId = toast.loading('登入中...');
+    customToast.loading('登入中...');
     const timeoutId = setTimeout(() => {
-      toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
-        id: toastId,
+      customToast.fire({
+        title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
+        background: '#1a1d23',
+        color: '#ffffff',
+        didOpen: () => {
+          Swal.showLoading();
+        },
       });
     }, 5000);
 
@@ -83,12 +89,12 @@ export default function LeftLogin({ switchHandler }) {
 
       if (jsonResult && jsonResult.success) {
         if (jsonResult.data.getPointLogin) {
-          toast.success('登入獲得10積分', { duration: 1500 });
+          customToast.success('登入獲得10積分');
         }
         setShowPWD(false);
         setLoginModalToggle(false);
         router.push('/');
-        toast.success('登入成功', { id: toastId });
+        customToast.success('登入成功');
       } else {
         throw new Error('登入時出現錯誤');
       }
@@ -99,7 +105,7 @@ export default function LeftLogin({ switchHandler }) {
         message: e.message,
         fullError: e
       });
-      toast.error(`登入錯誤: ${e.code || e.message || e}`, { id: toastId });
+      customToast.error(`登入錯誤: ${e.code || e.message || e}`);
     }
 
     // fetchGoogleLogin(user);
@@ -124,10 +130,15 @@ export default function LeftLogin({ switchHandler }) {
     },
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-      const toastId = toast.loading('登入中...');
+      customToast.loading('登入中...');
       const timeoutId = setTimeout(() => {
-        toast.loading('登入中... (因首次登入須等伺服器冷啟動，須耐心等候)', {
-          id: toastId,
+        customToast.fire({
+          title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
+          background: '#1a1d23',
+          color: '#ffffff',
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
       }, 5000);
 
@@ -140,7 +151,7 @@ export default function LeftLogin({ switchHandler }) {
           setShowPWD(false);
           setLoginModalToggle(false);
           if (result.data.getPointLogin) {
-            toast.success('登入獲得10積分', { duration: 1500 });
+            customToast.success('登入獲得10積分');
           }
           router.push(
             {
@@ -149,14 +160,13 @@ export default function LeftLogin({ switchHandler }) {
             undefined,
             { scroll: false },
           );
-          toast.success('登入成功', { id: toastId });
+          customToast.success('登入成功');
         } else {
           throw new Error(result?.error || '登入失敗');
         }
       } catch (e) {
         clearTimeout(timeoutId);
-        toast.error(`error when logging: ${e.message || e}`, { id: toastId });
-        console.error('error:', e);
+        customToast.error(`登入錯誤: ${e.message || e}`);
       }
     },
   });

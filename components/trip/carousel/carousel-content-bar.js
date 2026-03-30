@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TripService } from '@/services/trip-service';
+import { toast } from '@/lib/toast';
 
 export default function CarouselContentBar({
   barSaved,
@@ -7,6 +8,7 @@ export default function CarouselContentBar({
   onClick,
   trip_plan_id,
   refreshAllDetails,
+  newDetail = []
 }) {
   const [showDetails, setShowDetails] = useState(false);
   const modalId = `modal_${barSaved.bar_id}`; // 確保每個對話框的 ID 是唯一的
@@ -24,7 +26,16 @@ export default function CarouselContentBar({
   };
 
   const handleSubmit = async () => {
-    console.log('Sending block as:', timeOfDay);
+    // 檢查該時段是否已存在「有效內容」的項目
+    const isExist = Array.isArray(newDetail) && newDetail.some(item => {
+        return String(item.block) === String(timeOfDay) && (Boolean(item.bar_id) || Boolean(item.movie_id));
+    });
+    
+    if (isExist) {
+      toast.warning('時段重複', '該時段已有安排其它行程囉！請先刪除原行程再加入新的行程～');
+      return;
+    }
+
     try {
       const result = await TripService.addBarToTripBlock(trip_plan_id, {
         bar_id: barSaved.bar_id,
@@ -32,15 +43,15 @@ export default function CarouselContentBar({
       });
 
       if (result.success) {
-        console.log('Bar added to trip successfully!');
+        toast.success(`成功加入: ${barSaved.bar_name}`);
         document.getElementById(modalId).close(); // 關閉彈跳視窗
         refreshAllDetails();
       } else {
-        alert('失敗了失敗了時間不多囉：' + (result.message || '未知錯誤'));
+        toast.error('發生錯誤', result.message || '未知錯誤');
       }
     } catch (error) {
       console.error('Error adding bar to trip:', error);
-      alert('Failed to add bar to trip: ' + error.message);
+      toast.error('連線失敗', error.message);
     }
   };
 
@@ -73,17 +84,17 @@ export default function CarouselContentBar({
               }
               alt={`Image of ${barSaved.bar_name}`}
             />
-            <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12">
-              <h2 className="text-white text-base mb-5">{barSaved.bar_name}</h2>
-              <div className="flex">
-                <div className="text-white text-sm mr-4">
+            <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12 flex-grow min-w-0">
+              <h2 className="text-white text-base mb-5 truncate w-full">{barSaved.bar_name}</h2>
+              <div className="flex gap-2">
+                <div className="text-white text-sm whitespace-nowrap">
                   {barSaved.bar_area_name}
                 </div>
-                <div className="text-white text-sm">
+                <div className="text-white text-sm whitespace-nowrap">
                   {barSaved.bar_type_name}
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex items-center whitespace-nowrap">
                 <label htmlFor="timeOfDay" className="text-white text-sm mr-2">
                   選擇時段：
                 </label>
@@ -101,7 +112,7 @@ export default function CarouselContentBar({
             </div>
             <button
               onClick={handleSubmit}
-              className="text-white hover:text-black text-xs px-6 py-2 bg-black hover:bg-[#a0ff1f] rounded-full border border-white flex justify-center items-center mt-4"
+              className="text-white hover:text-black text-xs px-6 py-2 bg-black hover:bg-[#a0ff1f] rounded-full border border-white flex justify-center items-center mt-4 whitespace-nowrap flex-shrink-0 min-w-[100px]"
             >
               加入行程
             </button>

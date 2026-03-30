@@ -1,8 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
 import { RxCrossCircled } from 'react-icons/rx';
 import Link from 'next/link';
-import Swal from 'sweetalert2';
 import { TripService } from '@/services/trip-service';
+import { toast } from '@/lib/toast';
 
 function truncateChinese(title, maxChineseChars = 7) {
   if (typeof title !== 'string') return '無標題';
@@ -39,13 +39,7 @@ const TripCard = memo(function TripCard({
       const result = await TripService.deleteTripPlan(trip.trip_plan_id);
       if (result.success) {
         onDeleteSuccess && onDeleteSuccess(trip.trip_plan_id);
-        Swal.fire({
-          icon: 'success',
-          title: '成功',
-          text: `成功將 ${trip.trip_title} 刪除!`,
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0,0,0,0.85)',
-        });
+        toast.success(`成功刪除: ${trip.trip_title}`);
       } else {
         setErrorMessage('刪除失敗。');
       }

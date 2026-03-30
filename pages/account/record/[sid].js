@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import AccountLayout from '@/components/account-center/account-layout';
 import RecordToggle from '@/components/account-center/record/record-toggle';
 import RecordFilterBar from '@/components/account-center/record/record-filter-bar';
@@ -8,6 +9,7 @@ import { useAccountRecords } from '@/hooks/account/use-account-records';
 import { MdArrowDropUp, MdArrowDropDown } from 'react-icons/md';
 
 export default function AccountRecord({ onPageChange }) {
+  const router = useRouter();
   const currentPage = '紀錄查詢';
   const {
     isLoading,
@@ -35,28 +37,22 @@ export default function AccountRecord({ onPageChange }) {
   const pointColumns = [
     { 
       key: 'created_at', 
-      label: (
-        <span className="flex items-center justify-center gap-1">
-          日期
-          <div className="relative w-4 h-4">
-            <MdArrowDropUp className={`absolute top-[-2px] ${dateSortToggle ? 'text-slate-600' : ''}`} />
-            <MdArrowDropDown className={`absolute top-[6px] ${dateSortToggle ? '' : 'text-slate-600'}`} />
-          </div>
-        </span>
-      ),
-      sortable: true
+      label: '日期',
+      sortable: true,
+      className: 'w-[35%]'
     },
-    { key: 'points_increase', label: '紅利積分' },
-    { key: 'reason', label: '獲得來源' }
+    { key: 'points_increase', label: '紅利積分', className: 'w-[30%]' },
+    { key: 'reason', label: '獲得來源', className: 'w-[35%]' }
   ];
 
   const gameColumns = [
-    { key: 'created_at', label: '日期', sortable: true },
-    { key: 'game_score', label: '遊戲分數', sortable: true },
+    { key: 'created_at', label: '日期', sortable: true, className: 'w-[35%]' },
+    { key: 'game_score', label: '遊戲分數', sortable: true, className: 'w-[30%]' },
     { 
       key: 'game_time', 
       label: '遊戲時間', 
       sortable: true,
+      className: 'w-[35%]',
       render: (row) => row.game_time?.includes('T') ? row.game_time.split('T')[1].substring(0, 8) : row.game_time
     }
   ];
@@ -95,20 +91,30 @@ export default function AccountRecord({ onPageChange }) {
         currentDate={currentDate}
       />
 
-      <div className="mt-4 flex flex-col justify-between w-full h-[580px] lg:mx-1 xl:mx-1 bg-base-300 rounded-box place-items-center">
-        <RecordTable 
-          columns={gameRecordOpen ? gameColumns : pointColumns}
-          rows={gameRecordOpen ? gameRecords.rows : pointRecords.rows}
-          isLoading={isLoading}
-          type={gameRecordOpen ? 'game_record' : 'points'}
-          onSort={() => {
-            if (!gameRecordOpen) {
-              const newSort = !dateSortToggle;
-              setDateSortToggle(newSort);
-              updateQuery({ sortDate: newSort ? 'ASC' : 'DESC', page: 1 });
-            }
-          }}
-        />
+      <div className="mt-4 flex flex-col justify-between w-full h-[640px] pb-6 lg:mx-1 xl:mx-1 bg-base-300 rounded-box items-center">
+        <div className="flex-1 w-full">
+          <RecordTable 
+            columns={gameRecordOpen ? gameColumns : pointColumns}
+            rows={gameRecordOpen ? gameRecords.rows : pointRecords.rows}
+            isLoading={isLoading}
+            type={gameRecordOpen ? 'game_record' : 'points'}
+            sortKey={router.query.sortKey}
+            sortOrder={router.query.sortOrder}
+            onSort={(key) => {
+              // 支援多欄位排序 (日期, 分數, 時間)
+              const isSameKey = router.query.sortKey === key;
+              const newOrder = isSameKey && router.query.sortOrder === 'DESC' ? 'ASC' : 'DESC';
+              
+              updateQuery({ 
+                sortKey: key, 
+                sortOrder: newOrder,
+                // 向下相容舊有的 sortDate 參數
+                sortDate: key === 'created_at' ? newOrder : undefined, 
+                page: 1 
+              });
+            }}
+          />
+        </div>
 
         <RecordPagination 
           page={gameRecordOpen ? gameRecords.page : pointRecords.page}

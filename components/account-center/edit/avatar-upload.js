@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { API_SERVER } from '@/configs/api-config';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 /**
  * AvatarUpload - 處理大頭照選取與上傳預覽
@@ -16,11 +16,11 @@ export default function AvatarUpload({ avatar, onFileChange }) {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 1024 * 1024) {
-        toast.error('文件大小不能超過1MB');
+        customToast.error('文件大小不能超過1MB');
         return;
       }
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        toast.error('文件類型必須是JPG、JPEG或PNG');
+        customToast.error('文件類型必須是JPG、JPEG或PNG');
         return;
       }
       onFileChange(file);

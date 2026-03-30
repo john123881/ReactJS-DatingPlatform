@@ -108,8 +108,8 @@ export const BarService = {
    * @param {string|number} userId
    * @param {string} barIds - 逗號分隔的 ID 字串
    */
-  checkBarStatus: (userId, barIds) =>
-    apiClient.post(`/bar/check-bar-status`, { userId, barIds }),
+  checkBarStatus: (userId, barId) =>
+    apiClient.post(`/bar/check-bar-status`, { user_id: userId, bar_id: barId }),
 
   /**
    * 收藏酒吧
@@ -117,7 +117,7 @@ export const BarService = {
    * @param {string|number} barId
    */
   saveBar: (userId, barId) =>
-    apiClient.post('/bar/saved-bar', { userId, barId }),
+    apiClient.post('/bar/saved-bar', { user_id: userId, bar_id: barId }),
 
   /**
    * 取消收藏酒吧
@@ -125,7 +125,7 @@ export const BarService = {
    * @param {string|number} barId
    */
   unsaveBar: (userId, barId) =>
-    apiClient.delete('/bar/unsaved-bar', { body: { userId, barId } }),
+    apiClient.delete('/bar/unsaved-bar', { body: { user_id: userId, bar_id: barId } }),
 
   /**
    * 刪除訂位

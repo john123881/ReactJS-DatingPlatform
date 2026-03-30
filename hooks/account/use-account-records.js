@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { useLoader } from '@/context/use-loader';
 import { AccountService } from '@/services/account-service';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 /**
  * useAccountRecords - 處理積分紀錄與遊戲紀錄的狀態與分頁
@@ -37,15 +37,15 @@ export const useAccountRecords = () => {
     
     open();
     try {
-      const authResult = await checkAuth(router.query.sid);
-      if (!authResult.success) {
-        router.push('/');
-        toast.error(authResult.message || '驗證失敗');
-        return;
-      }
+      // 移除冗餘的 checkAuth 呼叫，避免分頁/排序時的效能損耗與潛在驗證失敗
+      const queryString = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(router.query).filter(([k, v]) => k !== 'sid' && v !== undefined && v !== '')
+        )
+      ).toString();
 
       if (gameRecordOpen) {
-        const result = await AccountService.getGameRecord(router.query.sid, location.search);
+        const result = await AccountService.getGameRecord(router.query.sid, `?${queryString}`);
         if (result.success) {
           setGameRecords({
             rows: result.data || [],
@@ -54,7 +54,7 @@ export const useAccountRecords = () => {
           });
         }
       } else {
-        const result = await AccountService.getPointRecord(router.query.sid, location.search);
+        const result = await AccountService.getPointRecord(router.query.sid, `?${queryString}`);
         if (result.success) {
           setPointRecords({
             rows: result.data || [],
@@ -68,11 +68,11 @@ export const useAccountRecords = () => {
     } finally {
       close(0.5);
     }
-  }, [router.isReady, router.query.sid, auth.id, gameRecordOpen, checkAuth, open, close]);
+  }, [router.isReady, router.query, auth.id, gameRecordOpen, checkAuth, open, close]);
 
   useEffect(() => {
     loadData();
-  }, [loadData, router.query.page, router.query.selectedValue, router.query.date_begin, router.query.date_end, router.query.sortDate]);
+  }, [loadData, router.query.page, router.query.selectedValue, router.query.date_begin, router.query.date_end, router.query.sortDate, router.query.sortKey, router.query.sortOrder]);
 
   return {
     isLoading,

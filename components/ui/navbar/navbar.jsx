@@ -25,7 +25,7 @@ import {
 import { CommunityService } from '@/services/community-service';
 import { AccountService } from '@/services/account-service';
 import { useRouter } from 'next/router';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 
 export default function Header({ currentPageTitle, handlePageChange }) {
   // const fakeData = [
@@ -251,12 +251,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       socket.on('getNotification', (data) => {
         setNotifications((prev) => [data, ...prev]); // 更新通知列表
         setUnreadCount((prevCount) => prevCount + 1); // 增加未讀計數
-        toast('收到新通知', {
-          style: {
-            background: '#A0FF1F',
-            color: '#000',
-          },
-        });
+        customToast.info('收到新通知');
       });
 
       return () => socket.off('getNotification'); // 清理監聽器
@@ -610,7 +605,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                   <Link
                     onClick={async (e) => {
                       setDropDownOpen(false);
-                      toast.success('已登出', { duration: 1500 });
+                      customToast.success('已登出');
                       logout();
                     }}
                     href="/"

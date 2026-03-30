@@ -1,4 +1,5 @@
 import PageLoader from '@/components/ui/loader/page-loader';
+import { MdArrowDropUp, MdArrowDropDown } from 'react-icons/md';
 
 /**
  * RecordTable - 通用紀錄表格
@@ -13,10 +14,12 @@ export default function RecordTable({
   columns = [], 
   isLoading = false, 
   type = 'records',
-  onSort
+  onSort,
+  sortKey: currentSortKey,
+  sortOrder: currentSortOrder
 }) {
   return (
-    <table className="container table py-4 bg-base-300">
+    <table className="container table table-fixed py-4 bg-base-300">
       <thead className="w-full ">
         <tr className="border-b border-slate-500 min-h-[52px]">
           {columns.map((col) => (
@@ -25,12 +28,15 @@ export default function RecordTable({
               onClick={() => col.sortable && onSort && onSort(col.key)}
               className={`text-lg text-center text-light ${col.sortable ? 'cursor-pointer hover:text-neongreen' : ''} ${col.className || ''}`}
             >
-              {col.label}
-              {col.sortable && (
-                <span className="relative ml-1">
-                  {/* 可以加入排序圖示 */}
-                </span>
-              )}
+              <div className="flex items-center justify-center min-h-[40px]">
+                {col.label}
+                {col.sortable && (
+                  <div className="relative w-4 h-4 ml-1 flex-shrink-0">
+                    <MdArrowDropUp className={`absolute top-[-2px] text-lg ${currentSortKey === col.key && currentSortOrder === 'ASC' ? 'text-neongreen opacity-100' : 'opacity-30'}`} />
+                    <MdArrowDropDown className={`absolute top-[6px] text-lg ${currentSortKey === col.key && currentSortOrder === 'DESC' ? 'text-neongreen opacity-100' : 'opacity-30'}`} />
+                  </div>
+                )}
+              </div>
             </th>
           ))}
         </tr>

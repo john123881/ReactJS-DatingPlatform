@@ -5,7 +5,7 @@ import GameComponent from '@/components/account-center/game-component/game-compo
 import { useLoader } from '@/context/use-loader';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { useAuth } from '@/context/auth-context';
-import toast from 'react-hot-toast';
+import { toast as customToast } from '@/lib/toast';
 import { useRouter } from 'next/router';
 
 export default function AccountPlayGame({ onPageChange }) {
@@ -28,7 +28,7 @@ export default function AccountPlayGame({ onPageChange }) {
         }
         const result = await checkAuth(router.query.sid);
         if (!result.success) {
-          toast.error(result.message || '驗證失敗', { duration: 1500 });
+          customToast.error(result.message || '驗證失敗');
           router.push('/');
           return;
         }
@@ -48,15 +48,16 @@ export default function AccountPlayGame({ onPageChange }) {
 
   return (
     <AccountLayout currentPage={currentPage}>
-
-            {/* CONTENT1 START */}
-            <div className="relative p-1 mx-auto mockup-phone">
-              <div className="absolute top-0 left-0 camera"></div>
-              <div className="min-h-[582px] flex flex-col min-w-[350px]  display w-full border  bg-base-300  border-slate-700 rounded-box">
-                {isLoading ? <PageLoader type="game" /> : <GameComponent />}
-              </div>
-            </div>
-            {/* CONTENT1 END */}
+      <div className="flex justify-center w-full">
+        {/* CONTENT1 START */}
+        <div className="relative p-1 mx-auto mockup-phone">
+          <div className="absolute top-0 left-0 camera"></div>
+          <div className="min-h-[582px] flex flex-col min-w-[350px]  display w-full border  bg-base-300  border-slate-700 rounded-box">
+            {isLoading ? <PageLoader type="game" /> : <GameComponent />}
+          </div>
+        </div>
+        {/* CONTENT1 END */}
+      </div>
     </AccountLayout>
   );
 }

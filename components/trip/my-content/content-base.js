@@ -41,7 +41,7 @@ export default function ContentBase({
   };
 
   return (
-    <div className="flex flex-wrap gap-10 justify-center lg:justify-start w-full transition-all duration-300">
+    <div className="flex flex-wrap gap-10 justify-center w-full transition-all duration-300">
       {tripDetailsList.length === 0 ? (
         <NoContentComponent
           trip_plan_id={trip_plan_id}

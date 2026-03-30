@@ -58,11 +58,11 @@ export default function Index({ onPageChange }) {
       </div>
 
       <div className="flex flex-col w-full pt-28">
-        <div className="flex flex-wrap min-h-screen">
-          <div className="hidden md:flex md:basis-3/12">
+        <div className="flex flex-wrap min-h-screen max-w-[1440px] mx-auto w-full">
+          <div className="hidden md:flex md:basis-2/12">
             <Sidebar />
           </div>
-          <div className="flex justify-center w-full md:basis-6/12">
+          <div className="flex justify-center w-full md:basis-7/12 lg:basis-7/12">
             <div className="flex flex-col items-center justify-start min-h-screen gap-8 pt-10">
               <div className="filterBtn flex gap-5 justify-between sm:w-[330px] md:w-[480px] md:mx-auto sm:mx-5">
                 <button
@@ -113,12 +113,12 @@ export default function Index({ onPageChange }) {
                     : getCommunityIndexPost
                 }
                 hasMore={isFilterActive ? indexFilteredHasMore : indexHasMore}
-                loader={<PageLoader type="index" minHeight="200px" />}
+                loader={<PageLoader type="index" minHeight="500px" />}
                 // endMessage={<p>No more posts</p>}
                 style={{
                   display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                   gap: '1.25rem',
                 }}
               >
