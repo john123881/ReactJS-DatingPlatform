@@ -48,7 +48,7 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails }) {
       <h3 className="text-center text-2xl">熱門酒吧</h3>
       {currentBars.map((bar, index) => (
         <CarouselContentBar
-          key={index}
+          key={bar.bar_id || index}
           barSaved={bar}
           altText={bar.bar_name}
           trip_plan_id={trip_plan_id}

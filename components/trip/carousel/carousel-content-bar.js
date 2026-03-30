@@ -45,7 +45,7 @@ export default function CarouselContentBar({
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group animate__animated animate__fadeIn">
       <img
         src={
           barSaved.bar_pic_name

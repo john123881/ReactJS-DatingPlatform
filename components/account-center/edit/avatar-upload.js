@@ -29,9 +29,9 @@ export default function AvatarUpload({ avatar, onFileChange }) {
 
   return (
     <div className="flex flex-col items-center justify-center rounded-full">
-      <div className="mx-4 mt-4 ">
+      <div className="relative w-48 h-48 mx-4 overflow-hidden rounded-full border-4 border-slate-700 shadow-xl">
         <img
-          className="object-cover w-48 h-48 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+          className="absolute inset-0 object-cover object-center w-full h-full cursor-pointer hover:opacity-80 transition-opacity"
           src={avatar ? avatar : `${API_SERVER}/avatar/defaultAvatar.jpg`}
           alt="會員大頭照"
           onClick={handleImageClick}

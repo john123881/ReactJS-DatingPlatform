@@ -49,7 +49,7 @@ export default function ContentBase({
         />
       ) : (
         tripDetailsList.map((details, index) => (
-          <div key={details.trip_detail_id || index} className="flex-shrink-0 hover:scale-105 transition-transform duration-300">
+          <div key={details.trip_detail_id || index} className="flex-shrink-0 hover:scale-105 transition-transform duration-300 animate__animated animate__fadeInUp">
             {details.movie_id ? (
               <MoviePhotoMy
                 trip_plan_id={trip_plan_id}

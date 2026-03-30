@@ -134,8 +134,8 @@ export default function TripMediaBase({
   }
 
   return (
-    <div className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-700 ease-in-out">
-      <div className="transition-all duration-700 ease-in-out flex-shrink-0">
+    <div className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-500 ease-in-out">
+      <div className="transition-all duration-500 ease-out flex-shrink-0 hover:translate-y-[-4px]">
         <ContentComponent
           imageSrc={imageSrc}
           altText={details.name}
@@ -145,8 +145,8 @@ export default function TripMediaBase({
         />
       </div>
       <div
-        className={`overflow-hidden transition-all duration-700 ease-in-out flex items-center ${
-          showDetails || isOther ? 'max-w-[400px] opacity-100 ml-6' : 'max-w-0 opacity-0 ml-0'
+        className={`overflow-hidden transition-all duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] flex items-center ${
+          showDetails || isOther ? 'max-w-[400px] opacity-100 ml-6 transform translate-x-0' : 'max-w-0 opacity-0 ml-0 transform translate-x-[-10px]'
         }`}
       >
         {details.description && (

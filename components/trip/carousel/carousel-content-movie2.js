@@ -48,7 +48,7 @@ export default function CarouselContentMovie2({
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group animate__animated animate__fadeIn">
       <img
         src={`/movie_img/${movies.poster_img}`}
         alt={altText}

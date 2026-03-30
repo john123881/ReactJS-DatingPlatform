@@ -28,7 +28,7 @@ export default function ProfileForm({
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="flex flex-col lg:h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center p-4 lg:p-8">
-        <div className="justify-center avatar lg:basis-1/3">
+        <div className="flex justify-center items-center w-full lg:basis-1/3 mb-6 lg:mb-0">
           <AvatarUpload avatar={userAvatar} onFileChange={handleFileChange} />
         </div>
         <div className="container lg:basis-2/3 mt-4 lg:mt-0">

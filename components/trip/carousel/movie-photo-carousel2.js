@@ -55,7 +55,7 @@ export default function MoviePhotoCarousel2({
       <h3 className="text-center text-2xl">熱門電影</h3>
       {currentMovies.map((movies, index) => (
         <CarouselContentMovie2
-          key={index}
+          key={movies.movie_id || index}
           movies={movies}
           trip_plan_id={trip_plan_id}
           refreshAllDetails={refreshAllDetails}
