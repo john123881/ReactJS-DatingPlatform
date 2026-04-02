@@ -19,12 +19,19 @@ export default function MyTrip({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { auth } = useAuth();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
   const [trips, setTrips] = useState([]);
   const [tripDate, setTripDate] = useState('');
   const [tripTitle, setTripTitle] = useState('');
   const [otherTrips, setOtherTrips] = useState([]);
-  const { open, close, isLoading } = useLoader();
+  const { open, close, isLoading: isContextLoading } = useLoader();
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
   const today = new Date();
   today.setHours(today.getHours() + 8);
@@ -118,6 +125,14 @@ export default function MyTrip({ onPageChange }) {
     </div>
   );
 
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <PageTitle pageTitle={pageTitle} />
@@ -176,13 +191,13 @@ export default function MyTrip({ onPageChange }) {
           <button
             className="mt-12 mb-8 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95 disabled:opacity-50"
             onClick={openModal}
-            disabled={isLoading}
+            disabled={isContextLoading}
           >
-            {isLoading ? "正在讀取..." : "+ 新增行程"}
+            {isContextLoading ? "正在讀取..." : "+ 新增行程"}
           </button>
           
           <div className="w-full mt-4 min-h-[500px]">
-            {isLoading ? (
+            {isContextLoading ? (
               <div className="flex justify-center items-center h-[400px] animate__animated animate__fadeIn">
                 <Loader text="加載中..." minHeight="300px" />
               </div>

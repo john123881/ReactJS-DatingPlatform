@@ -36,6 +36,8 @@ export default function BarList({ onPageChange }) {
     maxPageNumberLimit,
     minPageNumberLimit,
     handlePageChange,
+    onAreaSelected,
+    onTypeSelected,
   } = useBarList();
 
   // 檢查儲存酒吧狀態 - 使用 useCallback 確保參考穩定
@@ -164,7 +166,7 @@ export default function BarList({ onPageChange }) {
           </div>
           <div className="flex flex-wrap items-center justify-center w-full gap-4 mx-auto min-h-[400px]">
             {isLoading || isSearching ? (
-              <Loader minHeight="400px" text="正在探索酒吧..." />
+              <Loader minHeight="100vh" text="正在探索酒吧..." />
             ) : hasSearched ? (
               searchResults.length > 0 ? (
                 searchResults.map((bar) => (

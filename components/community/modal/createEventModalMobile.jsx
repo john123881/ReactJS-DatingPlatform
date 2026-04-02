@@ -93,7 +93,7 @@ export default function CreateEventModalMobile() {
                 <button
                   onClick={handleFilePicker}
                   htmlFor="photo-upload"
-                  className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 cursor-pointer flex justify-center`}
+                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 cursor-pointer flex justify-center`}
                 >
                   從圖庫瀏覽
                 </button>
@@ -197,7 +197,7 @@ export default function CreateEventModalMobile() {
                 </div>
 
                 <button
-                  className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3`}
+                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3`}
                   onClick={handleEventFileUpload}
                 >
                   分享

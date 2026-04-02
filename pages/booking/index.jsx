@@ -24,7 +24,7 @@ export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
   const carouselRef = useRef(null);
-  const { auth } = useAuth();
+  const { auth, setLoginModalToggle } = useAuth();
   const [activeTab, setActiveTab] = useState('now'); // 'now' or 'soon'
   const [movieCards, setMovieCards] = useState([]);
   const [savedMovies, setSavedMovies] = useState({});
@@ -118,7 +118,8 @@ export default function Index({ onPageChange }) {
               className="w-full h-full"
               width={1920}
               height={530}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              sizes="100vw"
+              style={{ objectFit: 'cover', objectPosition: 'top' }}
               alt="電影海報 1"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -146,13 +147,14 @@ export default function Index({ onPageChange }) {
               </button>
             </div>
           </div>
-          <div className="relative inline-block w-full flex-shrink-0 h-full">
+          <div className="relative inline-block w-full flex-shrink-0 h-full bg-black">
             <Image
               src="/1111.jpeg"
               className="w-full h-full"
               width={1920}
               height={530}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              sizes="100vw"
+              style={{ objectFit: 'contain', objectPosition: 'center' }}
               alt="電影海報 2"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -180,13 +182,13 @@ export default function Index({ onPageChange }) {
               </button>
             </div>
           </div>
-          <div className="relative inline-block w-full flex-shrink-0 h-full">
+          <div className="relative inline-block w-full flex-shrink-0 h-full bg-black">
             <Image
               src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg"
               className="w-full h-full"
               width={1920}
               height={530}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'contain', objectPosition: 'center' }}
               alt="電影海報 3"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -220,7 +222,7 @@ export default function Index({ onPageChange }) {
               className="w-full h-full"
               width={1920}
               height={530}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'cover', objectPosition: 'top' }}
               alt="電影海報 4"
             />
             <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -299,6 +301,12 @@ export default function Index({ onPageChange }) {
         <Link
           className="btn btn-outline bg-transparent mt-[10px] w-[150px] mb-[30px] rounded-[30px] hover:bg-neongreen hover:text-black group active:scale-95 transition-all"
           href={'booking/movie-ticket'}
+          onClick={(e) => {
+            if (auth.id === 0) {
+              e.preventDefault();
+              setLoginModalToggle(true);
+            }
+          }}
         >
           {/* 愛心圖標 */}
           <IoTicketOutline
@@ -310,14 +318,18 @@ export default function Index({ onPageChange }) {
             }}
             onClick={(e) => {
               e.preventDefault(); // 防止跳轉 if clicking the icon itself (if intended to toggle)
-              setClickedButton(clickedButton === 'heart' ? null : 'heart');
+              if (auth.id === 0) {
+                setLoginModalToggle(true);
+              } else {
+                setClickedButton(clickedButton === 'heart' ? null : 'heart');
+              }
             }}
           />
           我的電影票
         </Link>
         <Link
           className="btn btn-outline bg-transparent mt-[10px] w-[80px] mb-[30px] rounded-[30px] hover:bg-neongreen hover:text-black active:scale-95 transition-all mx-3"
-          href={'booking/movie-list'}
+          href={'/booking/movie-list'}
         >
           看更多
         </Link>

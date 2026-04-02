@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import { BarService } from '@/services/bar-service';
+import { useRouter } from 'next/router';
 
 /**
  * 自定義 Hook: 處理酒吧列表邏輯 (SWR 快取版)
@@ -8,10 +9,23 @@ import { BarService } from '@/services/bar-service';
  * @returns {object} bars 相關狀態與處理函數
  */
 export function useBarList(category) {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [barsPerPage] = useState(8);
+  
+  // 從 router.query 初始化或預設為空字串
   const [selectedAreaId, setSelectedAreaId] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState('');
+
+  // 監聽 URL 參數變化並同步到本地狀態
+  useEffect(() => {
+    if (router.isReady) {
+      const area = router.query.bar_area_id || '';
+      const type = router.query.bar_type_id || '';
+      setSelectedAreaId(area);
+      setSelectedTypeId(type);
+    }
+  }, [router.isReady, router.query.bar_area_id, router.query.bar_type_id]);
 
   // SWR 快取金鑰 - 使用 useMemo 確保金鑰穩定
   const swrKey = useMemo(

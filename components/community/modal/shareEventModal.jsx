@@ -11,14 +11,19 @@ export default function ShareEventModal({ event, eventId, modalId }) {
 
   // React 複製連結到剪貼板的函數
   const copyToClipboard = () => {
+    if (!shareUrl) return;
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {
-        shareEventModalRef.current.close();
+        if (shareEventModalRef.current) {
+          shareEventModalRef.current.close();
+        }
         customToast.success('複製連結成功!');
       })
       .catch((err) => {
-        shareEventModalRef.current.close();
+        if (shareEventModalRef.current) {
+          shareEventModalRef.current.close();
+        }
         console.error('無法複製連結: ', err);
         customToast.error('複製連結失敗!');
       });

@@ -201,7 +201,7 @@ export default function List({ onPageChange }) {
           </div>
           <div className="flex flex-wrap mx-auto w-full gap-4 justify-center items-center min-h-[400px]">
             {isLoading ? (
-              <Loader minHeight="400px" text="正在載入酒吧清單..." />
+              <Loader minHeight="100vh" text="正在載入酒吧清單..." />
             ) : hasSearched ? (
               searchResults.length > 0 ? (
                 searchResults.map((bar) => (

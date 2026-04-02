@@ -15,7 +15,7 @@ import Loader from '@/components/ui/loader/loader';
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
-  const { auth } = useAuth();
+  const { auth, setLoginModalToggle } = useAuth();
   const [savedBars, setSavedBars] = useState({});
 
   const { bar_id } = router.query;
@@ -33,7 +33,10 @@ export default function Detail({ onPageChange }) {
   const isSaved = bar && savedBars[bar?.bar_id];
 
   const handleSavedClick = async () => {
-    if (auth.id == 0) return;
+    if (auth.id == 0) {
+      setLoginModalToggle(true);
+      return;
+    }
     const barId = bar.bar_id;
     const userId = auth.id;
 
@@ -89,6 +92,10 @@ export default function Detail({ onPageChange }) {
   }, [onPageChange, pageTitle]);
 
   const handleLeaveReviewClick = () => {
+    if (auth.id === 0) {
+      setLoginModalToggle(true);
+      return;
+    }
     document.getElementById('bar-rating-modal').showModal();
   };
 
@@ -182,7 +189,17 @@ export default function Detail({ onPageChange }) {
                     </div>
                   </div>
                   <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
-                    <Link href={`/bar/bar-booking/${bar?.bar_id}`}>立即訂位</Link>
+                    <Link 
+                      href={`/bar/bar-booking/${bar?.bar_id}`}
+                      onClick={(e) => {
+                        if (auth.id === 0) {
+                          e.preventDefault();
+                          setLoginModalToggle(true);
+                        }
+                      }}
+                    >
+                      立即訂位
+                    </Link>
                   </button>
                 </div>
                 <div className="bar-detail-img">

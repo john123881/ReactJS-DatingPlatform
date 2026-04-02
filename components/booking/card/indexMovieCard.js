@@ -11,7 +11,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const { auth } = useAuth();
+  const { auth, setLoginModalToggle } = useAuth();
 
   useEffect(() => {
     setIsSaved(initialSaved);
@@ -23,7 +23,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     const userId = auth.id;
 
     if (userId === 0) {
-      toast.warning('請先登入!');
+      setLoginModalToggle(true);
       return;
     }
 
@@ -126,9 +126,13 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                         marginBottom: '10px',
                         borderRadius: '30px',
                       }}
-                      onClick={() =>
-                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`)
-                      }
+                      onClick={() => {
+                        if (auth.id === 0) {
+                          setLoginModalToggle(true);
+                        } else {
+                          router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
+                        }
+                      }}
                     >
                       立即訂票
                     </button>
@@ -139,9 +143,13 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                         height: '40px',
                         borderRadius: '30px',
                       }}
-                      onClick={() =>
-                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`)
-                      }
+                      onClick={() => {
+                        if (auth.id === 0) {
+                          setLoginModalToggle(true);
+                        } else {
+                          router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
+                        }
+                      }}
                     >
                       電影資訊
                     </button>

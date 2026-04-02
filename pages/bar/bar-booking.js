@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 
+import { useAuth } from '@/context/auth-context';
+import Loader from '@/components/ui/loader/loader';
+
 const BookingConfirmModal = dynamic(
   () => import('@/components/bar/modal/booking-confirm-modal'),
   { ssr: false },
@@ -13,9 +16,18 @@ const BookingConfirmModal = dynamic(
 export default function BarBooking({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
+  
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
   const currentPage = '訂位';
   const [selectedTime, setSelectedTime] = useState('');
@@ -24,6 +36,14 @@ export default function BarBooking({ onPageChange }) {
   const handleTimeSelect = (time) => {
     setSelectedTime(time); // Update the selected time state
   };
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
   return (
     <>
       <PageTitle pageTitle={pageTitle} />

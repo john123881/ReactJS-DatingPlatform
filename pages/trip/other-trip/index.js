@@ -12,13 +12,21 @@ import { TripService } from '@/services/trip-service';
 export default function OtherTrip({ onPageChange }) {
   const pageTitle = '行程規劃';
   const router = useRouter();
+  const { auth, getAuthHeader, isAuthLoaded, setLoginModalToggle } = useAuth();
+  const [otherTrips, setOtherTrips] = useState([]);
+  const { open, close, isLoading: isContextLoading } = useLoader();
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
-  const { auth, getAuthHeader } = useAuth();
-  const [otherTrips, setOtherTrips] = useState([]);
-  const { open, close, isLoading } = useLoader();
-  const [searchTerm, setSearchTerm] = useState('');
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
   const fetchTrips = useCallback(async () => {
     open();
@@ -40,6 +48,14 @@ export default function OtherTrip({ onPageChange }) {
   const filteredTrips = (otherTrips || []).filter((trip) =>
     (trip?.trip_title || '').toLowerCase().includes((searchTerm || '').toLowerCase()),
   );
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -69,7 +85,7 @@ export default function OtherTrip({ onPageChange }) {
             </svg>
           </label>
           <div className="w-full mt-8 min-h-[500px]">
-            {isLoading ? (
+            {isContextLoading ? (
               <div className="flex justify-center items-center h-[500px] animate__animated animate__fadeIn">
                 <Loader text="獲取分享行程中..." />
               </div>

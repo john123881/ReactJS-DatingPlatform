@@ -97,7 +97,7 @@ export default function CreateEventModal() {
                     className="flex-grow flex flex-col items-center justify-center p-10 cursor-pointer hover:bg-white/5 transition-colors"
                   >
                     <input {...getInputProps()} ref={fileInputRef} />
-                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-primary`} />
+                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-neongreen`} />
                     <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
                       請將活動照片拖曳至此處
                     </p>
@@ -121,8 +121,8 @@ export default function CreateEventModal() {
                 {/* Right Side: Activity Details Area */}
                 <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto custom-scrollbar">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
-                      <FaPhotoVideo className="text-primary text-xl" />
+                    <div className="w-10 h-10 rounded-full bg-neongreen/20 flex items-center justify-center overflow-hidden border border-neongreen/30">
+                      <FaPhotoVideo className="text-neongreen text-xl" />
                     </div>
                     <span className="text-white font-medium italic">讓大家知道活動資訊</span>
                   </div>
@@ -134,7 +134,7 @@ export default function CreateEventModal() {
                         type="text"
                         name="title"
                         placeholder="替你的活動取個響亮的名字..."
-                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
                         onChange={handleEventContentChange}
                       />
                     </label>
@@ -144,7 +144,7 @@ export default function CreateEventModal() {
                       <textarea
                         name="description"
                         placeholder="描述一下活動內容吧..."
-                        className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-primary transition-all text-white h-24 resize-none"
+                        className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-neongreen transition-all text-white h-24 resize-none"
                         onChange={handleEventContentChange}
                       />
                     </label>
@@ -155,7 +155,7 @@ export default function CreateEventModal() {
                         type="text"
                         name="location"
                         placeholder="在哪裡舉行？"
-                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                        className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
                         onChange={handleEventContentChange}
                       />
                     </label>
@@ -172,7 +172,7 @@ export default function CreateEventModal() {
                           placeholder="選擇日期"
                           onFocus={handleDateFocus}
                           onBlur={handleBlur}
-                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                           onChange={handleEventContentChange}
                         />
                       </label>
@@ -184,7 +184,7 @@ export default function CreateEventModal() {
                           placeholder="選擇時間"
                           onFocus={handleTimeFocus}
                           onBlur={handleBlur}
-                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                           onChange={handleEventContentChange}
                         />
                       </label>
@@ -200,7 +200,7 @@ export default function CreateEventModal() {
                           placeholder="選擇日期"
                           onFocus={handleDateFocus}
                           onBlur={handleBlur}
-                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                           onChange={handleEventContentChange}
                         />
                       </label>
@@ -212,7 +212,7 @@ export default function CreateEventModal() {
                           placeholder="選擇時間"
                           onFocus={handleTimeFocus}
                           onBlur={handleBlur}
-                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                          className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                           onChange={handleEventContentChange}
                         />
                       </label>

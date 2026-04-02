@@ -76,7 +76,7 @@ export default function CreateModal() {
                     className="flex-grow flex flex-col items-center justify-center p-10 cursor-pointer hover:bg-white/5 transition-colors"
                   >
                     <input {...getInputProps()} ref={fileInputRef} />
-                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-primary`} />
+                    <FaPhotoVideo className={`${styles['createModalListItemIcon']} text-8xl mb-6 text-neongreen`} />
                     <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
                       請將照片拖曳至此處
                     </p>
@@ -100,8 +100,8 @@ export default function CreateModal() {
                 {/* Bottom: Content Area */}
                 <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
-                      <FaPhotoVideo className="text-primary text-base" />
+                    <div className="w-8 h-8 rounded-full bg-neongreen/20 flex items-center justify-center overflow-hidden border border-neongreen/30">
+                      <FaPhotoVideo className="text-neongreen text-base" />
                     </div>
                     <span className="text-white font-medium text-sm">編輯貼文內容</span>
                   </div>

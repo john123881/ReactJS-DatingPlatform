@@ -7,9 +7,9 @@ import { useAuth } from '@/context/auth-context';
 import { changePasswordSchema } from '@/components/schemas';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
+import { useAccountAuth } from '@/hooks/use-account-auth';
 import { AccountService } from '@/services/account-service';
 import { useNotify } from '@/context/use-notify';
-import { useLoader } from '@/context/use-loader';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { toast as customToast } from '@/lib/toast';
 
@@ -20,8 +20,7 @@ export default function AccountPasswordChange({ onPageChange }) {
   const [isFocused2, setIsFocused2] = useState(false);
   const [showConfirmNewPWD, setConfirmNewShowPWD] = useState(false);
   const [isFocused3, setIsFocused3] = useState(false);
-  const { open, close, isLoading } = useLoader();
-  const { auth, getAuthHeader, checkAuth } = useAuth();
+  const { auth } = useAuth();
   const { notifyPromise } = useNotify();
   const router = useRouter();
 
@@ -83,32 +82,9 @@ export default function AccountPasswordChange({ onPageChange }) {
     },
   });
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    //進頁面做授權確認，router的query有改會調用fetchCheck
-    const fetchCheck = async () => {
-      if (!router.isReady || !router.query.sid) return;
-
-      open();
-      try {
-        if (auth.id === 0) {
-          return;
-        }
-        const result = await checkAuth(router.query.sid);
-        if (!result.success) {
-          router.push('/');
-          customToast.error('驗證失敗', result.message || '請重新登入');
-          return;
-        }
-      } catch (error) {
-        console.error('fetchCheck error:', error);
-      } finally {
-        close(0.5);
-      }
-    };
-    
-    fetchCheck();
-  }, [router.query]);
+  useAccountAuth(async () => {
+    onPageChange(pageTitle);
+  });
 
   useEffect(() => {
     onPageChange(pageTitle);

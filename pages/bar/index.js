@@ -67,7 +67,7 @@ export default function Index({ onPageChange }) {
   const initialTabs = [
     { title: '酒吧地圖', path: '/bar/bar-map', active: false },
     { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false },
+    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false, isProtected: true },
   ];
   return (
     <>
@@ -78,7 +78,7 @@ export default function Index({ onPageChange }) {
       <div className="container flex items-center justify-center w-full pt-24 mx-auto bar md:w-8/12">
         <div className="flex flex-col bar-index-content">
           {isLoading ? (
-            <Loader minHeight="400px" text="正在探索驚喜酒吧..." />
+            <Loader minHeight="100vh" text="正在探索驚喜酒吧..." />
           ) : (
             <>
               <div className="mt-4 search-zone md:mt-12">

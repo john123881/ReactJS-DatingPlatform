@@ -32,6 +32,7 @@ export default function MovieModal({ movie, modalId, isOpen }) {
                 src={movie.img || '/unavailable-image.jpg'}
                 alt={movie.img_name || 'No Image Available'}
                 fill
+                sizes="(max-width: 768px) 90vw, 45vw"
                 className="object-contain"
               />
             </figure>

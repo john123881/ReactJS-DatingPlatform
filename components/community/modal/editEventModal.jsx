@@ -156,8 +156,8 @@ export default function EditEventModal({ event, modalId }) {
             {/* Right Side: Activity Details Area */}
             <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto custom-scrollbar">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                  <div className="text-primary font-bold text-xs uppercase">Edit</div>
+                <div className="w-10 h-10 rounded-full bg-neongreen/20 flex items-center justify-center border border-neongreen/30">
+                  <div className="text-neongreen font-bold text-xs uppercase">Edit</div>
                 </div>
                 <span className="text-white font-medium italic text-sm">更新活動資訊</span>
               </div>
@@ -170,7 +170,7 @@ export default function EditEventModal({ event, modalId }) {
                     name="title"
                     placeholder="活動名稱"
                     value={localEventDetails.title}
-                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
                     onChange={handleEventContentChange}
                   />
                 </label>
@@ -181,7 +181,7 @@ export default function EditEventModal({ event, modalId }) {
                     name="description"
                     placeholder="活動描述"
                     value={localEventDetails.description}
-                    className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-primary transition-all text-white h-24 resize-none"
+                    className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-neongreen transition-all text-white h-24 resize-none"
                     onChange={handleEventContentChange}
                   />
                 </label>
@@ -193,7 +193,7 @@ export default function EditEventModal({ event, modalId }) {
                     name="location"
                     placeholder="活動地點"
                     value={localEventDetails.location}
-                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
                     onChange={handleEventContentChange}
                   />
                 </label>
@@ -209,7 +209,7 @@ export default function EditEventModal({ event, modalId }) {
                       min={minDate}
                       placeholder="開始日期"
                       value={localEventDetails.startDate}
-                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                       onChange={handleEventContentChange}
                     />
                   </label>
@@ -222,7 +222,7 @@ export default function EditEventModal({ event, modalId }) {
                       value={localEventDetails.startTime}
                       onFocus={handleTimeFocus}
                       onBlur={handleBlur}
-                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                       onChange={handleEventContentChange}
                     />
                   </label>
@@ -239,7 +239,7 @@ export default function EditEventModal({ event, modalId }) {
                       value={localEventDetails.endDate}
                       onFocus={handleDateFocus}
                       onBlur={handleBlur}
-                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                       onChange={handleEventContentChange}
                     />
                   </label>
@@ -252,7 +252,7 @@ export default function EditEventModal({ event, modalId }) {
                       value={localEventDetails.endTime}
                       onFocus={handleTimeFocus}
                       onBlur={handleBlur}
-                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12 text-center"
                       onChange={handleEventContentChange}
                     />
                   </label>

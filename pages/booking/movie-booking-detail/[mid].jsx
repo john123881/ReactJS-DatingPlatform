@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
@@ -31,6 +31,13 @@ export default function MovieDetail({ onPageChange }) {
 
   const [hovered, setHovered] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const descriptionRef = useRef(null);
+
+  const scrollToDescription = () => {
+    if (descriptionRef.current) {
+      descriptionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const checkMoviesStatus = useCallback(async (movieId) => {
     const userId = auth.id;
@@ -131,7 +138,14 @@ export default function MovieDetail({ onPageChange }) {
               <figure className="lg:flex-shrink-0">
                 <Image
                   className="lg:w-[300px] lg:h-[480px] object-cover rounded-xl"
-                  src={movie[0]?.movie_img || '/unavailable-image.jpg'}
+                  src={
+                    movie[0]?.poster_img
+                      ? `/movie_img/${movie[0]?.poster_img}`
+                      : '/unavailable-image.jpg'
+                  }
+                  onError={(e) => {
+                    e.target.src = '/unavailable-image.jpg';
+                  }}
                   alt="電影海報"
                   width={300}
                   height={480}
@@ -200,6 +214,7 @@ export default function MovieDetail({ onPageChange }) {
                   </div>
                 </div>
                 <p
+                  ref={descriptionRef}
                   style={{
                     maxHeight: showFullDescription ? 'none' : '3em',
                     overflow: 'hidden',
@@ -246,8 +261,11 @@ export default function MovieDetail({ onPageChange }) {
                           全票
                         </label>
                         <br />
-                        <select className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2">
-                          <option disabled selected>
+                        <select 
+                          className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
                             選擇張數
                           </option>
                           <option>1</option>
@@ -274,8 +292,11 @@ export default function MovieDetail({ onPageChange }) {
                           電影時刻
                         </label>
                         <br />
-                        <select className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2">
-                          <option disabled selected>
+                        <select 
+                          className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
                             選擇時刻
                           </option>
                           <option>14:30 </option>

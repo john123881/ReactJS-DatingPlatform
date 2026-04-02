@@ -10,11 +10,14 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
   // save bar
   // const [savedBars, setSavedBars] = useState({});
   const [error, setError] = useState('');
-  const { auth, getAuthHeader, rerender, setRerender } = useAuth();
+  const { auth, getAuthHeader, rerender, setRerender, setLoginModalToggle } = useAuth();
   const isSaved = savedBars && savedBars[bar.bar_id];
 
   const handleSavedClick = async () => {
-    if (auth.id == 0) return;
+    if (auth.id == 0) {
+      setLoginModalToggle(true);
+      return;
+    }
     const barId = bar.bar_id;
     const userId = auth.id; // Ensure user is defined and has an id
 
@@ -159,6 +162,12 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
             <button className="flex relative rounded-[30px] bg-black hover:bg-[#A0FF1F]">
               <Link
                 className="text-[10px] lg:text-[12px] text-white hover:text-black m-0.5 mx-3"
+                onClick={(e) => {
+                  if (auth.id === 0) {
+                    e.preventDefault();
+                    setLoginModalToggle(true);
+                  }
+                }}
                 href={`/bar/bar-booking/${bar.bar_id}`}
               >
                 立即訂位

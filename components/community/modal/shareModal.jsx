@@ -84,14 +84,14 @@ export default function ShareModal({ post, postId, modalId }) {
           </div>
           <div className="flex justify-center">
             <button
-              className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3"
+              className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3"
               onClick={copyToClipboard} // 點擊按鈕以複製連結
             >
               複製連結
             </button>
           </div>
           {/* <div className="flex justify-center">
-            <button className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3">
+            <button className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3">
               <span>傳送</span>
             </button>
           </div> */}

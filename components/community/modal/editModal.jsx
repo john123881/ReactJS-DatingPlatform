@@ -98,8 +98,8 @@ export default function EditModal({ post, modalId }) {
             {/* Bottom: Edit Area */}
             <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                   <div className="text-primary font-bold text-[10px]">EDIT</div>
+                <div className="w-8 h-8 rounded-full bg-neongreen/20 flex items-center justify-center border border-neongreen/30">
+                  <div className="text-neongreen font-bold text-[10px]">EDIT</div>
                 </div>
                 <span className="text-white font-medium text-sm">修改貼文內容</span>
               </div>

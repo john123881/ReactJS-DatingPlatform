@@ -89,7 +89,7 @@ export default function Booking({ onPageChange }) {
 
           {isLoading || !bar ? (
             <div className="lg:col-span-12">
-              <Loader minHeight="400px" text="正在為您預留座位..." />
+              <Loader minHeight="100vh" text="正在為您預留座位..." />
             </div>
           ) : (
             <>

@@ -4,13 +4,32 @@ import { RiDrinks2Line } from 'react-icons/ri';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import PageTitle from '@/components/page-title';
+import { useAuth } from '@/context/auth-context';
+import Loader from '@/components/ui/loader/loader';
 
 export default function MovieSeatSelection({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
+  
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
 
   // 假设这是您的电影座位数据
   const [selectedSeats, setSelectedSeats] = useState([]);

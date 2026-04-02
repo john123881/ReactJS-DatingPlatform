@@ -2,8 +2,11 @@ import { useAuth } from '@/context/auth-context';
 import { usePostContext } from '@/context/post-context';
 import { useState } from 'react';
 import { FiSend, FiMoreHorizontal } from 'react-icons/fi';
-import ShareEventModal from '../modal/shareEventModal';
 import EditEventModal from '../modal/editEventModal';
+import Link from 'next/link';
+import Image from 'next/image';
+import { toast as customToast } from '@/lib/toast';
+import { handleImageError } from '@/services/image-utils';
 import styles from './card.module.css';
 
 export default function EventCard({ event }) {
@@ -26,8 +29,23 @@ export default function EventCard({ event }) {
     setIsFlipped(!isFlipped);
   };
 
+  const handleQuickCopy = (e) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/community/event/${event?.comm_event_id}`;
+    navigator.clipboard
+      .writeText(shareUrl)
+      .then(() => {
+        customToast.success('複製連結成功!');
+      })
+      .catch((err) => {
+        console.error('無法複製連結: ', err);
+        customToast.error('複製連結失敗!');
+      });
+  };
+
   // 於前端處理地點顯示
   const formatLocation = (location) => {
+    if (!location) return '';
     // 檢查 location 是否有足夠長度, 如果沒有直接返回原字串
     return location.length > 6 ? location.substring(0, 6) : location;
   };
@@ -43,12 +61,15 @@ export default function EventCard({ event }) {
           <div
             className={`${styles['flip-card-front']} eventCard card md:w-[330px] md:h-[480px] flex flex-col items-center justify-start border-grayBorder overflow-hidden`}
           >
-            <figure className="card-photo">
-              <img
+            <figure className="relative card-photo w-[330px] h-[330px] overflow-hidden rounded-2xl">
+              <Image
                 src={event.img || '/unavailable-image.jpg'}
                 alt={event.photo_name || 'No Image Available'}
-                className="card-photo w-[330px] h-[330px] object-cover rounded-2xl"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
                 loading="lazy"
+                onError={(e) => handleImageError(e, 'event')}
               />
             </figure>
             <div className="card-body h-auto w-[330px] p-0 overflow-auto flex flex-col justify-between">
@@ -56,7 +77,12 @@ export default function EventCard({ event }) {
                 <div className="flex flex-row justify-between items-start">
                   <div className="card-infoLeft flex flex-row gap-2 px-1 py-1">
                     <div className="flex flex-col gap-3">
-                      <p className="text-h5 font-bold">{event.title}</p>
+                      <Link 
+                        href={`/community/event/${event?.comm_event_id}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <p className="text-h5 font-bold hover:text-neongreen transition-colors">{event.title}</p>
+                      </Link>
                       <p className="text-h6">
                         {formatLocation(event.location)}
                       </p>
@@ -69,16 +95,7 @@ export default function EventCard({ event }) {
                   <div className="card-iconListRight flex justify-end items-center px-1 py-1 ">
                     <FiSend
                       className="card-icon hover:text-neongreen"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        document.getElementById(shareEventModalId).showModal();
-                      }}
-                    />
-                    <ShareEventModal
-                      event={event}
-                      key={event.post_id}
-                      eventId={event.comm_event_id}
-                      modalId={shareEventModalId}
+                      onClick={handleQuickCopy}
                     />
                     {userId === event.user_id ? (
                       <div className="dropdown dropdown-end">
@@ -130,7 +147,7 @@ export default function EventCard({ event }) {
               {userId !== 0 && userId !== null && (
                 <div className="card-actions flex justify-center px-1 py-1 ">
                   <button
-                    className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3"
+                    className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleAttendedClick(event);

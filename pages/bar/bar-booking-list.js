@@ -5,15 +5,23 @@ import TabBar from '@/components/bar/bar/tab-bar';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import Loader from '@/components/ui/loader/loader';
 
 export default function BarBookingList({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
+
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { auth } = useAuth();
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
   const [bookings, setBookings] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +74,7 @@ export default function BarBookingList({ onPageChange }) {
   const initialTabs = [
     { title: '酒吧地圖', path: '/bar/bar-map', active: false },
     { title: '酒吧首頁', path: '/bar', active: false },
-    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: true },
+    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: true, isProtected: true },
   ];
   return (
     <>

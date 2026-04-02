@@ -1,13 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
+import { useAuth } from '@/context/auth-context';
+import Loader from '@/components/ui/loader/loader';
 
 export default function MovieSeatSelection({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
+
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -50,9 +69,13 @@ export default function MovieSeatSelection({ onPageChange }) {
           color: '#A0FF1F',
           borderColor: '#A0FF1F',
         }}
-        onClick={() =>
-          router.push('/booking/booking-ticket-select')
-        }
+        onClick={() => {
+          if (auth.id === 0) {
+            setLoginModalToggle(true);
+          } else {
+            router.push('/booking/movie-ticket-select');
+          }
+        }}
       >
         我已同意，前往票卷選擇
       </button>

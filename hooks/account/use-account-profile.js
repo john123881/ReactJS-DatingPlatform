@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
-import { useLoader } from '@/context/use-loader';
+import { useAccountAuth } from '@/hooks/use-account-auth';
 import { AccountService } from '@/services/account-service';
 import { getImageUrl } from '@/services/image-utils';
 import { toast as customToast } from '@/lib/toast';
@@ -12,8 +12,7 @@ import { toast as customToast } from '@/lib/toast';
  */
 export const useAccountProfile = () => {
   const router = useRouter();
-  const { auth, checkAuth, userAvatar, setUserAvatar, rerender } = useAuth();
-  const { open, close, isLoading } = useLoader();
+  const { auth, userAvatar, setUserAvatar } = useAuth();
   const [profile, setProfile] = useState(null);
 
   const fetchProfile = useCallback(async (sid) => {
@@ -34,28 +33,9 @@ export const useAccountProfile = () => {
     }
   }, [router, setUserAvatar]);
 
-  useEffect(() => {
-    if (!router.isReady || !router.query.sid || auth.id === 0) return;
-
-    const init = async () => {
-      open();
-      try {
-        const authResult = await checkAuth(router.query.sid);
-        if (authResult.success) {
-          await fetchProfile(router.query.sid);
-        } else {
-          router.push('/');
-          customToast.error(authResult.message || '驗證失敗');
-        }
-      } catch (error) {
-        console.error('Account init error:', error);
-      } finally {
-        close(0.5);
-      }
-    };
-
-    init();
-  }, [router.isReady, router.query.sid, auth.id, rerender, checkAuth, open, close, fetchProfile]);
+  const { isLoading } = useAccountAuth(async (sid) => {
+    await fetchProfile(sid);
+  });
 
   return {
     profile,

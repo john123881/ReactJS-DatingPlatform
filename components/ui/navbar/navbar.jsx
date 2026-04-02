@@ -351,18 +351,22 @@ export default function Header({ currentPageTitle, handlePageChange }) {
               {
                 title: '社群媒體',
                 href: '/community',
+                isProtected: false,
               },
               {
                 title: '行程規劃',
                 href: '/trip',
+                isProtected: true,
               },
               {
                 title: '酒吧探索',
                 href: '/bar',
+                isProtected: false,
               },
               {
                 title: '電影探索',
                 href: '/booking',
+                isProtected: false,
               },
             ].map((page, index) => (
               <li key={index}>
@@ -371,6 +375,12 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                     handleTitleEnter(page.title, true);
                   }}
                   onMouseLeave={() => handleTitleLeave(page.title, false)}
+                  onClick={(e) => {
+                    if (page.isProtected && auth.id === 0) {
+                      e.preventDefault();
+                      setLoginModalToggle(true);
+                    }
+                  }}
                   href={`${page.href}`}
                   className={`sm:text-sm text-light focus:text-neongreen hover:shadow-xl3 hover:animate-pulse sm:px-1 md:px-4 lg:px-8 ${
                     currentPageTitle === page.title ? ' text-primary' : ''
@@ -608,21 +618,25 @@ export default function Header({ currentPageTitle, handlePageChange }) {
             title: '社群媒體',
             icon: <BsGlobe2 className="text-h5" />,
             href: '/community',
+            isProtected: false,
           },
           {
             title: '行程規劃',
             icon: <FiCalendar className="text-h5" />,
             href: '/trip',
+            isProtected: true,
           },
           {
             title: '酒吧探索',
             icon: <BiSolidDrink className="text-h5" />,
             href: '/bar',
+            isProtected: false,
           },
           {
             title: '電影探索',
             icon: <BsTicketPerforated className="text-h5" />,
             href: '/booking',
+            isProtected: false,
           },
         ].map((button, index) => (
           <button
@@ -637,6 +651,12 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                   ? 'text-primary'
                   : 'text-light'
               } sm:px-0.5 lg:px-8 flex flex-col items-center hover:text-primary hover:active:text-primary`}
+              onClick={(e) => {
+                if (button.isProtected && auth.id === 0) {
+                  e.preventDefault();
+                  setLoginModalToggle(true);
+                }
+              }}
               href={button.href}
             >
               {button.icon}

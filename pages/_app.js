@@ -16,6 +16,8 @@ export default function App({ Component, pageProps }) {
   const handlePageChange = (pageTitle) => {
     setCurrentPageTitle(pageTitle);
   };
+  const getLayout = Component.getLayout || ((page) => page);
+
   return (
     <>
       <AuthContextProvider>
@@ -24,11 +26,20 @@ export default function App({ Component, pageProps }) {
             <NotifyProvider>
               <CollectProvider>
                 <PostProvider>
-                  <Navbar currentPageTitle={currentPageTitle} />
-                  <LoginModal />
-                  <Component {...pageProps} onPageChange={handlePageChange} />
-                  <SpeedInsights />
-                  <Footer />
+                  <div className="flex flex-col min-h-screen">
+                    <Navbar currentPageTitle={currentPageTitle} />
+                    <LoginModal />
+                    <main className="flex-grow">
+                      {getLayout(
+                        <Component
+                          {...pageProps}
+                          onPageChange={handlePageChange}
+                        />
+                      )}
+                    </main>
+                    <SpeedInsights />
+                    <Footer />
+                  </div>
                 </PostProvider>
               </CollectProvider>
             </NotifyProvider>

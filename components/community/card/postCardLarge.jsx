@@ -9,6 +9,7 @@ import EditModal from '../modal/editModal';
 import styles from './card.module.css';
 
 import { getImageUrl, handleImageError } from '@/services/image-utils';
+import CommunityTag from '../ui/CommunityTag';
 
 export default function PostCardLarge({ post }) {
   const { auth } = useAuth();
@@ -203,9 +204,11 @@ export default function PostCardLarge({ post }) {
           )}
           <p className="postContext mb-2">{post.post_context}</p>
           <div className="flex flex-wrap gap-2 mb-3 px-1">
-            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#a0ff1f] text-[#a0ff1f] bg-black/50"># 新年派對</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#ff03ff] text-[#ff03ff] bg-black/50"># 慶祝時刻</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#00d4ff] text-[#00d4ff] bg-black/50"># 酒吧</span>
+          <div className="flex flex-wrap gap-2 mb-3 px-1">
+            <CommunityTag text="愛情" />
+            <CommunityTag text="酒吧" />
+            <CommunityTag text="電影" />
+          </div>
           </div>
           <p
             className="commentontext text-[12px] text-grayBlue cursor-pointer"
@@ -227,7 +230,7 @@ export default function PostCardLarge({ post }) {
                 className="textarea textarea-ghost w-full h-16 resize-none rounded-full mb-3"
                 placeholder="新增回覆"
               />
-              <button className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 flex justify-center">
+              <button className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 flex justify-center">
                 分享
               </button>
             </div>

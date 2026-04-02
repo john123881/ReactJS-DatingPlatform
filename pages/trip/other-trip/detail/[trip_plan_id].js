@@ -11,16 +11,20 @@ import { TripService } from '@/services/trip-service';
 import { useTripDetail } from '@/hooks/trip/use-trip-detail';
 import { toast } from '@/lib/toast';
 import PageLoader from '@/components/ui/loader/page-loader';
+import Loader from '@/components/ui/loader/loader';
 
 export default function OtherTripdetail({ onPageChange }) {
   const pageTitle = '行程規劃';
   const router = useRouter();
-  const { auth } = useAuth();
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
   const { trip_plan_id } = router.query;
 
+  // Auth Guard
   useEffect(() => {
-    onPageChange(pageTitle);
-  }, [onPageChange, pageTitle]);
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
   const {
     tripDetails,
@@ -75,6 +79,14 @@ export default function OtherTripdetail({ onPageChange }) {
       toast.error('失敗', '無法加入行程，請稍後再試。');
     }
   };
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

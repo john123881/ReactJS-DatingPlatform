@@ -96,12 +96,6 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
         style={{
           width: '280px',
           height: '500px',
-          '@media (min-width: 768px)': {
-            // 响应式媒体查询
-            width: '50%',
-            height: '20px',
-            backgroundColor: 'red',
-          },
         }}
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
@@ -110,14 +104,15 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           <div className="shadow-xl card bg-base-100 w-72">
             <figure>
               <img
-                // src={movie.movie_img}
                 src={
-                  `/movie_img/${movie.poster_img}` || '/unavailable-image.jpg'
+                  movie.poster_img ? `/movie_img/${movie.poster_img}` : '/unavailable-image.jpg'
                 }
-                // src="https://upload.wikimedia.org/wikipedia/zh/7/7a/Oppenheimer_%28film%29_poster.jpg"
-                alt={movie.title} // 使用動態的 movieName
+                onError={(e) => {
+                  e.target.src = '/unavailable-image.jpg';
+                }}
+                alt={movie.title}
                 style={{
-                  height: ' 400px ',
+                  height: '400px',
                   objectFit: 'cover',
                   filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
                   transition: 'filter 0.3s',
@@ -148,7 +143,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                       // onClick={() =>
                       //   (window.location.href = `../../../booking/movie-booking-detail/${movie.movie_id}`)
                       // }
-                      href={`movie-booking-detail/${movie.movie_id}`}
+                      href={`/booking/movie-booking-detail/${movie.movie_id}`}
                     >
                       立即訂票
                     </Link>

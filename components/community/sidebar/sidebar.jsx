@@ -36,6 +36,13 @@ export default function Sidebar() {
     if (pathname === '/community/profile') {
       return router.pathname.startsWith('/community/profile/');
     }
+    // 加入活動頁面的子路徑判斷
+    if (pathname === '/community/events') {
+      return (
+        router.pathname === '/community/events' ||
+        router.pathname.startsWith('/community/event')
+      );
+    }
     return router.pathname === pathname;
   };
 

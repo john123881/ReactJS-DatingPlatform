@@ -58,7 +58,7 @@ export default function SuggestionBar() {
                 </div>
               </div>
               <span
-                className="recbarListItemText text-h6 cursor-pointer hover:text-primary"
+                className="recbarListItemText text-h6 cursor-pointer hover:text-neongreen"
                 onClick={() => handleUserClick(user.user_id)}
               >
                 {/* 處理從 member_user 拿到的 email, 僅保留 @ 之前的 id */}

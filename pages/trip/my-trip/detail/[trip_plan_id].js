@@ -10,11 +10,21 @@ import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel
 import PageTitle from '@/components/page-title';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { useTripDetail } from '@/hooks/trip/use-trip-detail';
+import { useAuth } from '@/context/auth-context';
+import Loader from '@/components/ui/loader/loader';
 
 export default function MyTripDetail({ onPageChange }) {
   const router = useRouter();
-
+  const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
   const { trip_plan_id } = router.query;
+
+  // Auth Guard
+  useEffect(() => {
+    if (isAuthLoaded && auth.id === 0) {
+      setLoginModalToggle(true);
+    }
+  }, [isAuthLoaded, auth.id, setLoginModalToggle]);
+
   const {
     tripDetails,
     tripName,
@@ -33,6 +43,14 @@ export default function MyTripDetail({ onPageChange }) {
       router.replace('/trip/my-trip');
     }
   }, [trip_plan_id, router]);
+
+  if (!isAuthLoaded) {
+    return <Loader text="確認登入狀態中..." minHeight="80vh" />;
+  }
+
+  if (auth.id === 0) {
+    return null;
+  }
 
   return (
     <>

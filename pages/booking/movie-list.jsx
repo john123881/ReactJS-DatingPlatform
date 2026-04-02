@@ -26,7 +26,9 @@ export default function Index({ onPageChange }) {
   //movie type下拉式選單
   const handleTypeChange = (event) => {
     const typeId = event.target.value; // 這裡獲得的將是如 "1", "2", 等的字符串
-    router.push(`/booking/movie-list/${typeId}`); // 使用 useRouter 來動態導航
+    if (typeId) {
+      router.push(`/booking/movie-list/${typeId}`); // 使用 useRouter 來動態導航
+    }
   };
 
   const checkMoviesStatus = useCallback(async (movieIds) => {
@@ -112,7 +114,7 @@ export default function Index({ onPageChange }) {
           onChange={handleTypeChange} // 為 select 元素添加 onChange 處理器
           defaultValue=""
         >
-          <option disabled selected>
+          <option value="" disabled>
             想找哪類的電影
           </option>
           <option value="1">劇情</option>
@@ -148,7 +150,7 @@ export default function Index({ onPageChange }) {
         </label>
       </div>
 
-      <div className="flex flex-wrap justify-center sm:justify-between gap-6 mx-10">
+      <div className="flex flex-wrap justify-center md:justify-start gap-6 lg:gap-10 mx-4 md:mx-10">
         {isLoading ? (
           <Loader minHeight="400px" text="正在搜尋電影..." />
         ) : hasSearched && searchResults.length === 0 ? (

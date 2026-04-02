@@ -324,7 +324,7 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                       }
                     />
                     <button
-                      className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 flex justify-center"
+                      className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 flex justify-center"
                       onClick={() => {
                         handleCommentUpload(post, newComment);
                       }}

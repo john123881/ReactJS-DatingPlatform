@@ -160,7 +160,7 @@ export default function ProfileInfo({ onReady }) {
                   auth.id &&
                   parseInt(auth.id, 10) !== parseInt(uid, 10) && (
                     <button
-                      className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-primary"
+                      className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-neongreen"
                       onClick={() => {
                         handleFollowClick(uid);
                       }}

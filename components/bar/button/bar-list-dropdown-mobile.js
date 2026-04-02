@@ -24,16 +24,38 @@ export default function BarListDropdownMobile() {
     fetchData();
   }, []);
 
-  //bar-area 動態路由
+  //bar-area 動態路由 - 優化為組合過濾
   const handleAreaChange = (event) => {
-    const areaId = event.target.value; 
-    router.push(`/bar/bar-list/area/${areaId}`); 
+    const areaId = event.target.value;
+    const newQuery = { ...router.query };
+    
+    if (areaId) {
+      newQuery.bar_area_id = areaId;
+    } else {
+      delete newQuery.bar_area_id;
+    }
+
+    router.push({
+      pathname: '/bar/bar-list',
+      query: newQuery,
+    });
   };
 
-  //bar-type 動態路由
+  //bar-type 動態路由 - 優化為組合過濾
   const handleTypeChange = (event) => {
-    const typeId = event.target.value; 
-    router.push(`/bar/bar-list/${typeId}`); 
+    const typeId = event.target.value;
+    const newQuery = { ...router.query };
+
+    if (typeId) {
+      newQuery.bar_type_id = typeId;
+    } else {
+      delete newQuery.bar_type_id;
+    }
+
+    router.push({
+      pathname: '/bar/bar-list',
+      query: newQuery,
+    });
   };
 
   return (

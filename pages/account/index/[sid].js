@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import AccountLayout from '@/components/account-center/account-layout';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
-import { useLoader } from '@/context/use-loader';
+import { useAccountAuth } from '@/hooks/use-account-auth';
 import { AccountService } from '@/services/account-service';
 import { API_SERVER } from '@/configs/api-config';
 import { toast as customToast } from '@/lib/toast';
@@ -14,9 +14,8 @@ export default function AccountIndex({ onPageChange }) {
   const pageTitle = '會員中心';
   const currentPage = '個人資料';
   const router = useRouter();
-  const { auth, userAvatar, setUserAvatar, getAuthHeader, checkAuth } =
+  const { auth, userAvatar, setUserAvatar } =
     useAuth();
-  const { open, close, isLoading } = useLoader();
 
   const [userInf, setUserInf] = useState({
     email: '',
@@ -32,9 +31,9 @@ export default function AccountIndex({ onPageChange }) {
     hasPlay: false,
   });
 
-  const getUserInf = async () => {
+  const getUserInf = async (sid) => {
     try {
-      const data = await AccountService.getProfile(router.query.sid);
+      const data = await AccountService.getProfile(sid);
       
       if (data) {
         const {
@@ -50,8 +49,8 @@ export default function AccountIndex({ onPageChange }) {
           profile_content,
         } = data;
 
-        setUserInf({
-          ...userInf,
+        setUserInf((prev) => ({
+          ...prev,
           email: email || '',
           name: username || '',
           gender: gender || '',
@@ -63,7 +62,7 @@ export default function AccountIndex({ onPageChange }) {
           profile: profile_content || '',
           hasLogin: data.hasLogin,
           hasPlay: data.hasPlay,
-        });
+        }));
 
         if (avatar) {
           setUserAvatar(avatar);
@@ -75,39 +74,10 @@ export default function AccountIndex({ onPageChange }) {
     }
   };
 
-  useEffect(() => {
-    if (!router.isReady) return;
+  const { isLoading } = useAccountAuth(async (sid) => {
     onPageChange(pageTitle);
-
-    //進頁面做授權確認，router的query有改會調用fetchCheck
-    const fetchCheck = async () => {
-      if (!router.isReady || !router.query.sid) return;
-      
-      open();
-      try {
-        if (auth.id === 0) {
-          return;
-        }
-
-        const result = await checkAuth(router.query.sid);
-        if (!result.success) {
-          router.push('/');
-          customToast.error(result.message || '驗證失敗');
-          return;
-        }
-        
-        await getUserInf();
-      } catch (error) {
-        console.error('fetchCheck error:', error);
-      } finally {
-        close(0.5);
-      }
-    };
-    
-    fetchCheck();
-
-    //進頁面做授權確認，授權通過，接收user的資料
-  }, [router.query]);
+    await getUserInf(sid);
+  });
 
   return (
     <AccountLayout currentPage={currentPage}>
