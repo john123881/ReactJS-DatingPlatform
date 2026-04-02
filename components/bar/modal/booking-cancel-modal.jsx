@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRef } from 'react';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
 import { BarService } from '@/services/bar-service';
 
 export default function BookingCancelModal({ booking, modalId, setBookings }) {
@@ -29,13 +29,7 @@ export default function BookingCancelModal({ booking, modalId, setBookings }) {
       );
       console.log(result);
 
-      Swal.fire({
-        title: '刪除成功!',
-        icon: 'success',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.success('刪除成功!');
 
       bookingCancelModalRef.current?.close();
 
@@ -44,13 +38,7 @@ export default function BookingCancelModal({ booking, modalId, setBookings }) {
       console.error('delete failed:', error);
 
       bookingCancelModalRef.current?.close();
-      Swal.fire({
-        title: '刪除失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.error('刪除失敗!');
     }
   };
 

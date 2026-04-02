@@ -36,6 +36,7 @@ export default function TripMediaBase({
         imageFetch: () => TripService.getBarPhoto(trip_plan_id),
         detailsFetch: () => TripService.getBarName(trip_plan_id),
         imageProp: 'bar_img',
+        urlProp: 'bar_img_url', // 新增 URL 屬性
         nameProp: 'bar_name',
         descProp: 'bar_description',
       };
@@ -46,6 +47,7 @@ export default function TripMediaBase({
         imageFetch: () => TripService.getMoviePhoto(trip_plan_id),
         detailsFetch: null,
         imageProp: 'movie_img',
+        urlProp: 'movie_img_url', // 新增 URL 屬性
         nameProp: 'title',
         descProp: 'movie_description',
       };
@@ -53,25 +55,32 @@ export default function TripMediaBase({
   }
 
   useEffect(() => {
-    if (!trip_plan_id) return;
+    if (!trip_plan_id || !tripDetails) return;
 
     const fetchData = async () => {
       if (!isOther) open();
       try {
-        // 抓取圖片 (對電影來說也包含詳情)
         const imageResult = await config.imageFetch();
         const filteredImage = imageResult.filter(
           (t) => t.block == tripDetails.block,
         );
+        
+        // 優先找尋 URL，若無則回退至 Blob
         const imageData = filteredImage.find(
-          (item) => item[config.imageProp] && item[config.imageProp].data,
+          (item) => (item[config.urlProp]) || (item[config.imageProp] && item[config.imageProp].data),
         );
 
         let hasData = false;
 
         if (imageData) {
-          const base64String = bufferToBase64(imageData[config.imageProp].data);
-          setImageSrc(`data:image/jpeg;base64,${base64String}`);
+          if (imageData[config.urlProp]) {
+            // S3 URL 優先
+            setImageSrc(imageData[config.urlProp]);
+          } else if (imageData[config.imageProp]?.data) {
+            // 傳統 Blob 回退
+            const base64String = bufferToBase64(imageData[config.imageProp].data);
+            setImageSrc(`data:image/jpeg;base64,${base64String}`);
+          }
 
           // 如果是電影，詳情就在同一個物件裡
           if (!config.detailsFetch) {

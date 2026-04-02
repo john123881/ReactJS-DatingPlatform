@@ -50,9 +50,10 @@ export const BarService = {
   /**
    * 依分類獲取酒吧 (特定分類)
    * @param {string} category - sport, music, foreign, specialty, others
-   * @param {object} params - { area }
+   * @param {object} params - { bar_area_id }
    */
   getBarsByCategory: (category, params = {}) => {
+    // 確保參數名稱與後端統一 (統一使用 bar_area_id)
     const query = new URLSearchParams(params).toString();
     const endpoint = query ? `/bar/bar-list-${category}?${query}` : `/bar/bar-list-${category}`;
     return apiClient(endpoint);
@@ -108,8 +109,8 @@ export const BarService = {
    * @param {string|number} userId
    * @param {string} barIds - 逗號分隔的 ID 字串
    */
-  checkBarStatus: (userId, barId) =>
-    apiClient.post(`/bar/check-bar-status`, { user_id: userId, bar_id: barId }),
+  checkBarStatus: (userId, barIds) =>
+    apiClient.post(`/bar/check-bar-status`, { userId, barIds }),
 
   /**
    * 收藏酒吧
@@ -117,7 +118,7 @@ export const BarService = {
    * @param {string|number} barId
    */
   saveBar: (userId, barId) =>
-    apiClient.post('/bar/saved-bar', { user_id: userId, bar_id: barId }),
+    apiClient.post('/bar/saved-bar', { barId }),
 
   /**
    * 取消收藏酒吧
@@ -125,7 +126,7 @@ export const BarService = {
    * @param {string|number} barId
    */
   unsaveBar: (userId, barId) =>
-    apiClient.delete('/bar/unsaved-bar', { body: { user_id: userId, bar_id: barId } }),
+    apiClient.delete('/bar/unsaved-bar', { body: { barId } }),
 
   /**
    * 刪除訂位

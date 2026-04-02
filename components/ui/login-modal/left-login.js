@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { toast as customToast } from '@/lib/toast';
-import Swal from 'sweetalert2';
 import { getAuthGoogle } from '@/context/firebase-config';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -75,10 +74,10 @@ export default function LeftLogin({ switchHandler }) {
     const timeoutId = setTimeout(() => {
       customToast.fire({
         title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
-        background: '#1a1d23',
-        color: '#ffffff',
+        showConfirmButton: false,
+        allowOutsideClick: false,
         didOpen: () => {
-          Swal.showLoading();
+          customToast.loading();
         },
       });
     }, 5000);
@@ -134,10 +133,10 @@ export default function LeftLogin({ switchHandler }) {
       const timeoutId = setTimeout(() => {
         customToast.fire({
           title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
-          background: '#1a1d23',
-          color: '#ffffff',
+          showConfirmButton: false,
+          allowOutsideClick: false,
           didOpen: () => {
-            Swal.showLoading();
+            customToast.loading();
           },
         });
       }, 5000);

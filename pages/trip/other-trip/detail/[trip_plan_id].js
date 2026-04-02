@@ -4,7 +4,6 @@ import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
 import OtherContentMorning from '@/components/trip/other-content/blocks/other-content-morning';
 import OtherContentNoon from '@/components/trip/other-content/blocks/other-content-noon';
 import OtherContentNight from '@/components/trip/other-content/blocks/other-content-night';
-import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import PageTitle from '@/components/page-title';

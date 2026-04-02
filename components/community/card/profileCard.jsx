@@ -1,7 +1,7 @@
 import PostModal from '../modal/postModal';
 import { usePostContext } from '@/context/post-context';
 import styles from './card.module.css';
-import { getImageUrl } from '@/services/image-utils';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 
 export default function ProfileCard({ post }) {
@@ -35,6 +35,7 @@ export default function ProfileCard({ post }) {
                     src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo w-[330px] h-[330px] object-cover`}
+                    onError={(e) => handleImageError(e, 'post')}
                   />
                 </div>
               </div>
@@ -42,11 +43,13 @@ export default function ProfileCard({ post }) {
           </div>
         </figure>
 
-        <PostModal
-          post={post}
-          modalId={modalId}
-          isOpen={postModalToggle === modalId}
-        />
+        {postModalToggle === modalId && (
+          <PostModal
+            post={post}
+            modalId={modalId}
+            isOpen={true}
+          />
+        )}
       </div>
     </>
   );

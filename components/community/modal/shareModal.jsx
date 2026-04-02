@@ -1,6 +1,6 @@
 // import { FaRegCircleXmark } from 'react-icons/fa6';
 import { useRef } from 'react';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
 
 export default function ShareModal({ post, postId, modalId }) {
   const shareModalRef = useRef(null);
@@ -18,24 +18,12 @@ export default function ShareModal({ post, postId, modalId }) {
       .writeText(shareUrl)
       .then(() => {
         shareModalRef.current.close();
-        Swal.fire({
-          title: '複製連結成功!',
-          icon: 'success',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        toast.success('複製連結成功!');
       })
       .catch((err) => {
         shareModalRef.current.close();
         console.error('無法複製連結: ', err);
-        Swal.fire({
-          title: '複製連結失敗!',
-          icon: 'error',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        toast.error('複製連結失敗!');
       });
   };
 

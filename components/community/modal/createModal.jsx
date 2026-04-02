@@ -56,7 +56,7 @@ export default function CreateModal() {
       >
         <div
           className={`modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 ${
-            selectedFile ? 'max-w-4xl w-[90%] h-[600px]' : 'max-w-md w-full h-[500px]'
+            selectedFile ? 'max-w-md w-[95%] h-[750px] max-h-[95vh]' : 'max-w-md w-full h-[500px]'
           }`}
           style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
@@ -67,7 +67,7 @@ export default function CreateModal() {
             </p>
           </div>
 
-          <div className="flex-grow flex flex-col sm:flex-row overflow-hidden">
+          <div className="flex-grow flex flex-col overflow-hidden">
             {!selectedFile ? (
               <Dropzone onDrop={onDrop}>
                 {({ getRootProps, getInputProps }) => (
@@ -80,7 +80,7 @@ export default function CreateModal() {
                     <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
                       請將照片拖曳至此處
                     </p>
-                    <button className="btn btn-primary rounded-full px-8 shadow-neon">
+                    <button className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none rounded-full px-8 shadow-neon">
                       從圖庫瀏覽
                     </button>
                   </div>
@@ -88,35 +88,35 @@ export default function CreateModal() {
               </Dropzone>
             ) : (
               <>
-                {/* Left Side: Image Preview */}
-                <div className="flex-[1.2] bg-black/40 flex items-center justify-center overflow-hidden border-r border-white/10">
+                {/* Top: Image Preview */}
+                <div className="h-[400px] bg-black/40 flex items-center justify-center overflow-hidden border-b border-white/10 shrink-0">
                   <img
                     src={previewUrl}
                     alt="Preview"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
-                {/* Right Side: Content Area */}
+                {/* Bottom: Content Area */}
                 <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
-                      <FaPhotoVideo className="text-primary text-xl" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+                      <FaPhotoVideo className="text-primary text-base" />
                     </div>
-                    <span className="text-white font-medium">編輯貼文內容</span>
+                    <span className="text-white font-medium text-sm">編輯貼文內容</span>
                   </div>
 
                   <textarea
-                    className="textarea textarea-ghost w-full flex-grow text-lg leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
+                    className="textarea textarea-ghost w-full flex-grow text-base leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
                     placeholder="撰寫貼文內容..."
                     autoFocus
                     onChange={handlePostContentChange}
                     onKeyDown={(e) => handleKeyPress(e, () => handleFileUpload())}
                   />
 
-                  <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
+                  <div className="pt-4 mt-auto border-t border-white/10 flex justify-center">
                     <button
-                      className="btn btn-primary btn-wide rounded-full shadow-neon font-bold text-lg"
+                      className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg"
                       onClick={handleFileUpload}
                     >
                       分享貼文

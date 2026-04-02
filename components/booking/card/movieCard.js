@@ -5,15 +5,10 @@ import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import { useAuth } from '@/context/auth-context';
 import { BookingService } from '@/services/booking-service';
+import { toast } from '@/lib/toast';
 
 export default function MovieCard({ movie, index, isSaved: initialSaved }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [hovered, setHovered] = useState(null);
-  const [isClicked, setIsClicked] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-
-  // const [savedMovies, setSavedMovies] = useState({});
   const [isSaved, setIsSaved] = useState(initialSaved);
   const router = useRouter();
 
@@ -28,46 +23,61 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     const userId = auth.id;
 
     if (userId === 0) {
+      toast.warning('請先登入!');
       return;
     }
 
     const wasSaved = isSaved || false;
     const newSavedState = !wasSaved;
 
+    // 樂觀更新
+    setIsSaved(newSavedState);
+
     try {
       const res = wasSaved
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (res.status) {
-        setIsSaved(newSavedState); // 更新本地狀態
-        setRerender(!rerender);
+      if (res.success || res.status) {
+        toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
       } else {
         throw new Error('Failed to update save status');
       }
     } catch (error) {
       console.error('Error updating save status:', error);
+      setIsSaved(wasSaved); // 發生錯誤時還原
+      toast.error('操作失敗!', error.message);
     }
   };
 
   function getMovieTypeName(movieTypeId) {
     switch (movieTypeId) {
-      case 1:
-        return '劇情';
-      case 2:
-        return '愛情';
-      case 3:
-        return '喜劇';
-      case 4:
-        return '動作';
-      case 5:
-        return '動畫';
-      case 6:
-        return '驚悚';
-      case 7:
-        return '懸疑';
+      case 1: return '劇情';
+      case 2: return '愛情';
+      case 3: return '喜劇';
+      case 4: return '動作';
+      case 5: return '動畫';
+      case 6: return '驚悚';
+      case 7: return '懸疑';
+      default: return '其他';
+    }
+  }
+
+  function getBadgeStyle(typeName) {
+    switch (typeName) {
+      case '愛情':
+        return { border: '1px solid #FF69B4', color: '#FF69B4' };
+      case '喜劇':
+        return { border: '1px solid #A0FF1F', color: '#A0FF1F' };
+      case '劇情':
+        return { border: '1px solid #00BFFF', color: '#00BFFF' };
+      case '動作':
+        return { border: '1px solid #FF4500', color: '#FF4500' };
+      case '懸疑':
+      case '驚悚':
+        return { border: '1px solid #9400D3', color: '#9400D3' };
       default:
-        return '其他';
+        return { border: '1px solid #A0FF1F', color: '#A0FF1F' };
     }
   }
 
@@ -81,7 +91,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
       <div
         key={index}
         className={`card bg-base-100 shadow-xl relative ${
-          isHovered || isClicked ? ' bg-white' : ''
+          isSaved ? ' ring-1 ring-neongreen/30' : ''
         }`}
         style={{
           width: '280px',
@@ -216,8 +226,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
               className="badge badge-secondary w-20 mt-2"
               style={{
                 backgroundColor: 'transparent',
-                border: '1px solid #A0FF1F',
-                color: '#A0FF1F',
+                ...getBadgeStyle(getMovieTypeName(movie.movie_type_id))
               }}
             >
               {getMovieTypeName(movie.movie_type_id)}

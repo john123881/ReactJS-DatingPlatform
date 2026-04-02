@@ -6,7 +6,7 @@ import { IoHeartCircleSharp, IoHeartCircleOutline } from 'react-icons/io5';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
 import Router from 'next/router';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
 
 export default function TripCalendarModal({ tripName }) {
   const { auth } = useAuth();
@@ -160,18 +160,7 @@ export default function TripCalendarModal({ tripName }) {
       Router.push(newPath);
     } catch (error) {
       console.error('Creating trip plan error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: '新增失敗',
-        text: error.message || '發生未知錯誤',
-        background: '#2a303c',
-        color: '#ffffff',
-        confirmButtonColor: '#a0ff1f',
-        customClass: {
-          confirmButton: 'text-black font-bold border-none px-6 py-2',
-          popup: 'border-2 border-[#a0ff1f] rounded-box shadow-[0_0_20px_rgba(160,255,31,0.3)]'
-        }
-      });
+      toast.error('新增失敗', error.message || '發生未知錯誤');
     }
   };
 

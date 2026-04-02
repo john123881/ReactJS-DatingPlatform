@@ -100,6 +100,19 @@ body input:-webkit-autofill {
   width: 100%;
 }
 
+html, body {
+  scrollbar-gutter: stable !important;
+}
+
+/* 避免 DaisyUI modal-open 在有 scrollbar-gutter 的情況下產生重複位移 */
+:root:has(.modal-open) {
+  overflow: hidden;
+}
+
+.modal-open {
+  padding-right: 0px !important;
+}
+
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;

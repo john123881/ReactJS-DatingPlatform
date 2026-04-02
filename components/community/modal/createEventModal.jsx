@@ -101,7 +101,7 @@ export default function CreateEventModal() {
                     <p className={`${styles['createModalListItemText']} text-xl mb-4 text-white/70`}>
                       請將活動照片拖曳至此處
                     </p>
-                    <button className="btn btn-primary rounded-full px-8 shadow-neon">
+                    <button className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none rounded-full px-8 shadow-neon">
                       從圖庫瀏覽
                     </button>
                   </div>
@@ -111,11 +111,11 @@ export default function CreateEventModal() {
               <>
                 {/* Left Side: Image Preview */}
                 <div className="flex-[1.2] bg-black/40 flex items-center justify-center overflow-hidden border-r border-white/10">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-full h-full object-contain"
-                  />
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
                 </div>
 
                 {/* Right Side: Activity Details Area */}
@@ -221,7 +221,7 @@ export default function CreateEventModal() {
 
                   <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
                     <button
-                      className="btn btn-primary btn-wide rounded-full shadow-neon font-bold text-lg"
+                      className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none btn-wide rounded-full shadow-neon font-bold text-lg"
                       onClick={handleEventFileUpload}
                     >
                       建立活動

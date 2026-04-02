@@ -61,61 +61,67 @@ export default function EditModal({ post, modalId }) {
         className="modal modal-bottom sm:modal-middle max-w-full"
       >
         <div
-          className="modal-box flex flex-col"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 max-w-md w-[95%] h-[750px] max-h-[95vh]"
+          style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
-          <p
-            className={`${styles['createModalListItemText']} font-bold text-lg mb-5 text-h5 flex justify-center`}
-          >
-            編輯貼文
-          </p>
-
-          <div className="flex flex-col items-center">
-            {selectedFile ? (
-              <img
-                src={previewUrl}
-                alt={post.photo_name || 'No Image Available'}
-                className="w-full max-h-full object-cover mb-4"
-              />
-            ) : (
-              <img
-                src={post.img || '/unavailable-image.jpg'}
-                alt={post.photo_name || 'No Image Available'}
-                className="w-full max-h-full object-cover mb-4 cursor-pointer"
-                onClick={handleFilePicker}
-              />
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-            <p
-              className={`${styles['createModalListItemText']} font-bold  mb-5 text-[12px] flex justify-center`}
-            >
-              點擊照片編輯
+          {/* Header */}
+          <div className="p-4 border-b border-white/10 flex justify-center items-center relative">
+            <p className={`${styles['createModalListItemText']} font-bold text-xl text-neongreen`}>
+              編輯貼文
             </p>
-            <textarea
-              className="textarea textarea-ghost w-full h-32 resize-none my-3"
-              placeholder="編輯貼文內容"
-              value={localPostContext}
-              onChange={handlePostContentChange}
-              onKeyDown={(e) =>
-                // 使用 onKeyDown 並檢查是否按下 Enter 鍵
-                handleKeyPress(e, () =>
-                  handlePostUpdate(post, localPostContext, editModalRef),
-                )
-              }
-            />
-            <button
-              className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3`}
-              onClick={() =>
-                handlePostUpdate(post, localPostContext, editModalRef)
-              }
+          </div>
+
+          <div className="flex-grow flex flex-col overflow-hidden">
+            {/* Top: Image Preview / Change */}
+            <div 
+              className="h-[400px] bg-black/40 flex items-center justify-center overflow-hidden border-b border-white/10 cursor-pointer group relative shrink-0"
+              onClick={handleFilePicker}
             >
-              完成
-            </button>
+              <img
+                src={selectedFile ? previewUrl : (post.img || '/unavailable-image.jpg')}
+                alt={post.photo_name || 'Post Image'}
+                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-50"
+              />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-white bg-black/50 px-4 py-2 rounded-full border border-white/30 backdrop-blur-sm">
+                  點擊更換照片
+                </p>
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            </div>
+
+            {/* Bottom: Edit Area */}
+            <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                   <div className="text-primary font-bold text-[10px]">EDIT</div>
+                </div>
+                <span className="text-white font-medium text-sm">修改貼文內容</span>
+              </div>
+
+              <textarea
+                className="textarea textarea-ghost w-full flex-grow text-base leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
+                placeholder="編輯你的貼文..."
+                autoFocus
+                value={localPostContext}
+                onChange={handlePostContentChange}
+                onKeyDown={(e) => handleKeyPress(e, () => handlePostUpdate(post, localPostContext, editModalRef))}
+              />
+
+              <div className="pt-4 mt-auto border-t border-white/10 flex justify-center">
+                <button
+                  className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg"
+                  onClick={() => handlePostUpdate(post, localPostContext, editModalRef)}
+                >
+                  確認修改
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

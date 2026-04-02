@@ -14,7 +14,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
   const router = useRouter();
 
   const {
-    socket,
     userInfo,
     handleLikedClick,
     handleSavedClick,
@@ -62,41 +61,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
     router.push(`/community/profile/${userId}`);
   };
 
-  const handleNotification = (type) => {
-    // 確保 socket已獲取
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        senderName: userInfo.username,
-        avatar: userInfo.avatar,
-        receiverId: post.post_userId,
-        receiverName: post.username,
-        type: type,
-        postId: post.post_id,
-        message: `${userInfo.username} ${
-          type === 'like'
-            ? '喜愛你的貼文'
-            : type === 'comment'
-              ? '回覆你的貼文'
-              : '開始追蹤你'
-        }`,
-      };
-      socket.emit('sendNotification', notificationData);
-    }
-  };
-
-  // TODO: 刪除 comment 並刪除其通知有 bug, 會將同個 post 的 comment 通知一併刪除
-  const handleRemoveNotification = (type) => {
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        receiverId: post.post_userId,
-        postId: post.post_id,
-        type: type,
-      };
-      socket.emit('removeNotification', notificationData);
-    }
-  };
 
   useEffect(() => {
     // 定義路由變化完成後要執行的函數，這個函數將會關閉 modal
@@ -139,10 +103,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
               className="flex flex-col w-full md:w-1/2 card-photo mx-3"
               onDoubleClick={() => {
                 handleLikedClick(post);
-                handleRemoveNotification('like');
-                if (!isLiked) {
-                  handleNotification('like');
-                }
               }}
             >
               <img
@@ -279,12 +239,8 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                                   <a
                                     className="hover:text-neongreen"
                                     onClick={async () => {
-                                      // 使用 async 等待確認刪除再刪除 noti
-                                      const result =
-                                        await handleDeleteCommentClick(comment);
-                                      if (result) {
-                                        handleRemoveNotification('comment');
-                                      }
+                                      // 使用 async 等待確認刪除
+                                      await handleDeleteCommentClick(comment);
                                     }}
                                   >
                                     刪除回覆
@@ -309,7 +265,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                           className="card-icon hover:text-neongreen"
                           onClick={() => {
                             handleLikedClick(post);
-                            handleRemoveNotification('like');
                           }}
                         />
                       ) : (
@@ -317,7 +272,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                           className="card-icon hover:text-neongreen"
                           onClick={() => {
                             handleLikedClick(post);
-                            handleNotification('like');
                           }}
                         />
                       )}
@@ -366,7 +320,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                         // 使用 onKeyDown 並檢查是否按下 Enter 鍵
                         handleKeyPress(e, () => {
                           handleCommentUpload(post, newComment);
-                          handleNotification('comment');
                         })
                       }
                     />
@@ -374,7 +327,6 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                       className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 flex justify-center"
                       onClick={() => {
                         handleCommentUpload(post, newComment);
-                        handleNotification('comment');
                       }}
                     >
                       回覆

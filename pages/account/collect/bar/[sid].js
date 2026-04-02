@@ -217,7 +217,7 @@ export default function AccountCollect({ onPageChange }) {
                               setBars((prev) => prev.filter(b => b.save_id !== bar.save_id));
                             }
                           }}
-                          className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-[#a0ff1f] text-4xl"
+                          className="text-white absolute right-[10px] top-[10px] cursor-pointer hover:text-[#a0ff1f] text-3xl z-20"
                         />
                         <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
                           <Link

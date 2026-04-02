@@ -82,7 +82,7 @@ export default function Sidebar() {
             <li
               className={`${
                 isActive('/community') ? 'text-neongreen' : ''
-              } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen`}
+              } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen cursor-pointer select-none`}
               onClick={() => {
                 handleHomeClick();
               }}
@@ -94,7 +94,7 @@ export default function Sidebar() {
             </li>
 
             <li
-              className={`sidebarListItem flex items-center mb-8 p-2 cursor-pointer ${
+              className={`sidebarListItem flex items-center mb-8 p-2 cursor-pointer select-none ${
                 isHoverActive
                   ? 'hover:bg-gray-800 rounded-[20px] hover:text-neongreen'
                   : ''
@@ -112,7 +112,7 @@ export default function Sidebar() {
               <li
                 className={`${
                   isActive('/community/explore') ? 'text-neongreen' : ''
-                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen`}
+                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen cursor-pointer select-none`}
               >
                 <MdOutlineExplore className="sidebarIcon text-h3 mr-5" />
                 <span className="sidebarListItemText text-h6 lg:inline md:hidden">
@@ -123,7 +123,7 @@ export default function Sidebar() {
 
             {userId !== 0 && userId !== null && (
               <li
-                className={`sidebarListItem flex items-center mb-8 p-2 cursor-pointer ${
+                className={`sidebarListItem flex items-center mb-8 p-2 cursor-pointer select-none ${
                   isHoverActive
                     ? 'hover:bg-gray-800 rounded-[20px] hover:text-neongreen'
                     : ''
@@ -173,7 +173,7 @@ export default function Sidebar() {
               <li
                 className={`${
                   isActive('/community/events') ? 'text-neongreen' : ''
-                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen`}
+                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen cursor-pointer select-none`}
               >
                 <FiCalendar className="sidebarIcon text-h3 mr-5" />
                 <span className="sidebarListItemText text-h6 lg:inline md:hidden">
@@ -186,11 +186,11 @@ export default function Sidebar() {
               <li
                 className={`${
                   isActive('/community/profile') ? 'text-neongreen' : ''
-                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen cursor-pointer`}
+                } sidebarListItem flex items-center mb-8 p-2 hover:bg-gray-800 rounded-[20px] hover:text-neongreen cursor-pointer select-none`}
                 onClick={() => handleProfileClick()}
               >
                 <FiUser className="sidebarIcon text-h3 mr-5" />
-                <span className="sidebarListItemTe text-h6 lg:inline md:hidden">
+                <span className="sidebarListItemText text-h6 lg:inline md:hidden">
                   個人檔案
                 </span>
               </li>

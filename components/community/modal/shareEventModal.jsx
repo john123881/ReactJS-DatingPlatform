@@ -1,6 +1,5 @@
-// import { FaRegCircleXmark } from 'react-icons/fa6';
 import { useRef } from 'react';
-import Swal from 'sweetalert2';
+import { toast as customToast } from '@/lib/toast';
 
 export default function ShareEventModal({ event, eventId, modalId }) {
   const shareEventModalRef = useRef(null);
@@ -16,24 +15,12 @@ export default function ShareEventModal({ event, eventId, modalId }) {
       .writeText(shareUrl)
       .then(() => {
         shareEventModalRef.current.close();
-        Swal.fire({
-          title: '複製連結成功!',
-          icon: 'success',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        customToast.success('複製連結成功!');
       })
       .catch((err) => {
         shareEventModalRef.current.close();
         console.error('無法複製連結: ', err);
-        Swal.fire({
-          title: '複製連結失敗!',
-          icon: 'error',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        customToast.error('複製連結失敗!');
       });
   };
 
@@ -63,7 +50,7 @@ export default function ShareEventModal({ event, eventId, modalId }) {
           </div>
           <div className="flex justify-center">
             <button
-              className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3"
+              className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none rounded-full shadow-neon font-bold"
               onClick={copyToClipboard} // 點擊按鈕以複製連結
             >
               複製連結

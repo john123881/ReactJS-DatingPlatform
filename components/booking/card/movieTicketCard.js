@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { BookingService } from '@/services/booking-service';
-import { FaRegHeart } from 'react-icons/fa';
-import { FaHeart } from 'react-icons/fa6';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 dayjs.extend(customParseFormat);
 
@@ -29,29 +28,11 @@ export default function MovieCard({ movie, index }) {
   const handleBookingDelete = async (bookingId) => {
     try {
       const result = await BookingService.deleteMovieBooking(bookingId);
-
-      Swal.fire({
-        title: '刪除成功!',
-        icon: 'success',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
-
-      // bookingCancelModalRef.current?.close();
-
+      toast.success('刪除成功!', '您的訂位已移除');
       console.log('delete response:', result);
     } catch (error) {
       console.error('delete failed:', error);
-
-      // bookingCancelModalRef.current?.close();
-      Swal.fire({
-        title: '刪除失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.error('刪除失敗!', '請稍後再試或聯繫客服');
     }
   };
 
@@ -60,56 +41,79 @@ export default function MovieCard({ movie, index }) {
   };
   return (
     <>
-      <div style={{ width: '1440px' }}>
+      <div className="w-full max-w-5xl mx-auto mb-10 group">
         <figure>
-          <div className="card lg:card-side bg-transparent shadow-xl">
-            <figure>
+          <div className="card lg:card-side bg-base-300 shadow-2xl overflow-hidden rounded-3xl border border-slate-700 group-hover:border-neongreen transition-all duration-300">
+            <figure className="relative min-w-[250px] overflow-hidden">
               <img
-                // src={movie.movie_img}
-                src={`/movie_img/${movie.poster_img}`}
-                alt={movie.title} // 使用動態的 movieName
-                className="w-[250px] h-[400px]"
+                src={movie.movie_img || getImageUrl(movie.poster_img, 'movie')}
+                alt={movie.title || '電影票'}
+                onError={(e) => handleImageError(e, 'movie')}
+                className="w-[280px] h-[400px] object-cover group-hover:scale-105 transition-transform duration-500"
               />
-
-              <div></div>
             </figure>
-            <div className="card-body">
-              <h2
-                className="card-title flex justify-start h-5 pt-10 pb-4"
-                style={{ fontSize: '1.5rem' }}
-              >
-                {movie.title} {/* 使用動態的 movieName */}
-                <div
-                  className="badge badge-secondary w-20"
-                  style={{
-                    backgroundColor: 'grey',
-                    // border: '1px solid #A0FF1F',
-                    color: 'white',
+            <div className="card-body p-8 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2
+                    className="card-title text-light font-bold h-auto"
+                    style={{ fontSize: '1.8rem' }}
+                  >
+                    {movie.title || '電影資料 (已從系統移除)'}
+                  </h2>
+                  <div className="badge badge-secondary py-4 px-6 bg-slate-700 border-none text-white font-medium ml-4">
+                    數位
+                  </div>
+                </div>
+
+                <div className="space-y-4 text-slate-400 text-lg">
+                  <div className="flex items-center">
+                    <span className="w-24 font-medium">電影日期：</span>
+                    <span className="text-neongreen">{formattedMovieDate}</span>
+                  </div>
+                  <hr className="border-slate-800" />
+                  <div className="flex items-center">
+                    <span className="w-24 font-medium">電影時間：</span>
+                    <span className="text-neongreen">{formattedMovieTime}</span>
+                  </div>
+                  <hr className="border-slate-800" />
+                  <div className="flex items-center">
+                    <span className="w-24 font-medium">訂票時間：</span>
+                    <span className="text-slate-500">
+                      {formattedBookingTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card-actions justify-end mt-6">
+                <button
+                  type="button"
+                  className="btn btn-outline border-2 border-slate-600 text-slate-400 rounded-full px-8 hover:bg-red-500 hover:border-red-500 hover:text-white transition-all duration-300"
+                  onClick={() => {
+                    toast.fire({
+                      title: '確定要刪除此訂位嗎?',
+                      text: '刪除後將無法還原！',
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonText: '確定刪除',
+                      cancelButtonText: '取消',
+                      confirmButtonColor: '#A0FF1F',
+                      cancelButtonColor: '#475569',
+                      customClass: {
+                        confirmButton: 'text-black font-bold px-6 py-2 rounded-full',
+                        cancelButton: 'text-white font-bold px-6 py-2 rounded-full'
+                      }
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        handleBookingDelete(movie.booking_id);
+                      }
+                    });
                   }}
                 >
-                  數位
-                </div>
-              </h2>
-              <p>電影日期： {formattedMovieDate}</p>
-
-              <hr></hr>
-
-              <p>電影時間： {formattedMovieTime}</p>
-              <hr></hr>
-              <p>訂票時間： {formattedBookingTime}</p>
-
-              {/* <div
-                type="submit"
-                className="badge badge-outline border-white text-[12px] text-white h-[24px] w-[76px] hover:bg-[#FF03FF] hover:text-black"
-                // onClick={() =>
-                //   document.getElementById('booking-cancel-modal').showModal()
-                // }
-                onClick={() => {
-                  handleBookingDelete(movie.movie_id);
-                }}
-              >
-                <span>刪除訂位</span>
-              </div> */}
+                  刪除訂位
+                </button>
+              </div>
             </div>
           </div>
         </figure>

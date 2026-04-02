@@ -70,17 +70,11 @@ export const CommunityService = {
 
   createPost: (data) => apiClient.post('/community/create-post', data),
 
-  uploadPostPhoto: (formData) =>
-    apiClient.post('/community/upload-photo', {
-      body: formData,
-    }),
+  uploadPostPhoto: (formData) => apiClient.post('/community/upload-photo', formData),
 
   updatePost: (data) => apiClient.put('/community/edit-post', data),
 
-  updatePostPhoto: (formData) =>
-    apiClient.post('/community/edit-post-photo', {
-      body: formData,
-    }),
+  updatePostPhoto: (formData) => apiClient.post('/community/edit-post-photo', formData),
 
   deletePost: (postId) =>
     apiClient.delete('/community/delete-post', { body: { postId } }),
@@ -109,17 +103,11 @@ export const CommunityService = {
 
   createEvent: (data) => apiClient.post('/community/create-event', data),
 
-  uploadEventPhoto: (formData) =>
-    apiClient.post('/community/upload-event-photo', {
-      body: formData,
-    }),
+  uploadEventPhoto: (formData) => apiClient.post('/community/upload-event-photo', formData),
 
   updateEvent: (data) => apiClient.put('/community/edit-event', data),
 
-  updateEventPhoto: (formData) =>
-    apiClient.post('/community/edit-event-photo', {
-      body: formData,
-    }),
+  updateEventPhoto: (formData) => apiClient.post('/community/edit-event-photo', formData),
 
   attendEvent: (userId, eventId) =>
     apiClient.post('/community/attend-event', { userId, eventId }),

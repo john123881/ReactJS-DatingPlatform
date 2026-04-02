@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import Loader from '@/components/ui/loader/loader';
@@ -19,30 +19,26 @@ export default function BarList({ onPageChange }) {
 
   const { auth, getAuthHeader } = useAuth();
   const [savedBars, setSavedBars] = useState({});
-  const {
-    isLoading,
-    bars,
-    setBars,
-    currentPage,
-    setCurrentPage,
-    barsPerPage,
-    selectedAreaId,
-    selectedTypeId,
-    totalPages,
-    maxPageNumberLimit,
-    minPageNumberLimit,
-    handlePageChange,
-    onAreaSelected,
-    onTypeSelected,
-  } = useBarList();
-
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
+  const {
+    isLoading,
+    bars,
+    currentPage,
+    setCurrentPage,
+    barsPerPage,
+    setSelectedAreaId,
+    setSelectedTypeId,
+    totalPages,
+    maxPageNumberLimit,
+    minPageNumberLimit,
+    handlePageChange,
+  } = useBarList();
 
-  // 檢查儲存酒吧狀態
+  // 檢查儲存酒吧狀態 - 使用 useCallback 確保參考穩定
   const checkBarsStatus = useCallback(
     async (barIds) => {
       const userId = auth.id;
@@ -66,23 +62,20 @@ export default function BarList({ onPageChange }) {
         console.error('無法獲取酒吧狀態:', error);
       }
     },
-    [auth.id],
+    [auth.id], // 依賴 auth.id
   );
 
-  // 監聽 bars 變化並檢查狀態
+  // 使用 memo 化的字串作為依賴，避免陣列參考變動導致的無限迴圈
+  const barIdsString = useMemo(() => {
+    return bars.map((bar) => bar.bar_id).join(',');
+  }, [bars]);
+
   useEffect(() => {
-    if (bars.length > 0) {
-      const barIds = bars.map((bar) => bar.bar_id).join(',');
-      checkBarsStatus(barIds);
+    if (barIdsString && auth.id !== 0) {
+      checkBarsStatus(barIdsString);
     }
-  }, [bars, checkBarsStatus]);
+  }, [barIdsString, checkBarsStatus, auth.id]);
 
-  // BarListSidebar
-  // const handleAreaSelected = (areaId) => {
-  //   setSelectedAreaId(areaId);
-  // };
-
-  // useEffect(() => {
   //   const url = selectedAreaId
   //     ? `http://localhost:3001/bar/bar-list?area=${selectedAreaId}`
   //     : 'http://localhost:3001/bar/bar-list';
@@ -144,8 +137,7 @@ export default function BarList({ onPageChange }) {
           </div>
           <div className="flex items-center justify-between">
             <div className="font-bold text-white md:text-h5">
-              {/* 所有酒吧 */}
-              {bars?.bar_type_id}
+              所有酒吧
             </div>
             <BarListDropdownMobile />
             <label className="hidden input input-bordered md:flex items-center gap-2 h-[32px] rounded-xl border-white bg-transparent hover:border-[#A0FF1F] text-white">

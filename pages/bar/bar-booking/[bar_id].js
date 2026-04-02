@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import Image from 'next/image';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import PageTitle from '@/components/page-title';
@@ -60,23 +60,11 @@ export default function Booking({ onPageChange }) {
       const result = await BarService.createBooking(bookingData);
       
       if (result.success) {
-        Swal.fire({
-          title: '訂位成功!',
-          icon: 'success',
-          confirmButtonText: '關閉',
-          confirmButtonColor: '#A0FF1F',
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        toast.success('訂位成功!');
       }
     } catch (error) {
       console.error('訂位失敗:', error);
-      Swal.fire({
-        title: error.message || '訂位失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.error('訂位失敗!', error.message);
     }
   };
 

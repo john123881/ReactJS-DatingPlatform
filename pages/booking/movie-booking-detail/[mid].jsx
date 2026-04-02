@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
-import Swal from 'sweetalert2';
+import { toast } from '@/lib/toast';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import Image from 'next/image';
@@ -68,13 +68,7 @@ export default function MovieDetail({ onPageChange }) {
 
   const handleSavedClick = async () => {
     if (auth.id === 0) {
-      Swal.fire({
-        title: '請先登入!',
-        icon: 'warning',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.warning('請先登入!');
       return;
     }
     const movieId = mid;
@@ -97,13 +91,7 @@ export default function MovieDetail({ onPageChange }) {
         result.message?.includes('成功')
       ) {
         // 操作成功，状态已在乐观更新中设置
-        Swal.fire({
-          title: newSavedState ? '收藏成功!' : '已取消收藏!',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-          background: 'rgba(0, 0, 0, 0.85)',
-        });
+        toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
       } else {
         throw new Error(result.message || result.msg || '操作失敗');
       }
@@ -111,14 +99,7 @@ export default function MovieDetail({ onPageChange }) {
       // 發生錯誤時還原狀態
       setIsSaved(wasSaved);
       console.error('Error updating save status:', error);
-      Swal.fire({
-        title: '操作失敗!',
-        text: error.message,
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      toast.error('操作失敗!', error.message);
     }
   };
 
@@ -147,13 +128,14 @@ export default function MovieDetail({ onPageChange }) {
 
             {/* 電影資訊 */}
             <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
-              <figure>
+              <figure className="lg:flex-shrink-0">
                 <Image
-                  className="lg:w-[300px] lg:h-[480px] object-cover"
+                  className="lg:w-[300px] lg:h-[480px] object-cover rounded-xl"
                   src={movie[0]?.movie_img || '/unavailable-image.jpg'}
                   alt="電影海報"
                   width={300}
                   height={480}
+                  priority
                 />
               </figure>
               <div className="card-body">
@@ -315,18 +297,9 @@ export default function MovieDetail({ onPageChange }) {
                       <div
                         type="submit"
                         className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
-                        onClick={() =>
-                          // document
-                          //   .getElementById('movie-confirm-modal')
-                          //   .showModal()
-                          Swal.fire({
-                            title: '訂位成功!',
-                            icon: 'success',
-                            confirmButtonText: '關閉',
-                            confirmButtonColor: '#A0FF1F',
-                            background: 'rgba(0, 0, 0, 0.85)',
-                          })
-                        }
+                        onClick={() => {
+                          toast.success('訂位成功!');
+                        }}
                       >
                         <span className="text-h6 text-black">確認訂票</span>
                       </div>

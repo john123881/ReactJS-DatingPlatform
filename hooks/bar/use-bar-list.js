@@ -39,20 +39,20 @@ export function useBarList(category) {
   const maxPageNumberLimit = Math.min(currentPage + 2, totalPages);
   const minPageNumberLimit = Math.max(currentPage - 2, 1);
 
-  // 事件處理器
-  const handlePageChange = (page) => {
+  // 事件處理器 - 使用 useCallback 確保參考穩定
+  const handlePageChange = useCallback((page) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const onAreaSelected = (areaId) => {
+  const onAreaSelected = useCallback((areaId) => {
     setSelectedAreaId(areaId);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const onTypeSelected = (typeId) => {
+  const onTypeSelected = useCallback((typeId) => {
     setSelectedTypeId(typeId);
     setCurrentPage(1);
-  };
+  }, []);
 
   return {
     bars,

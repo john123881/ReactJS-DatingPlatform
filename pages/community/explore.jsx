@@ -40,9 +40,9 @@ export default function Explore({ onPageChange }) {
         <TabbarMobile />
       </div>
 
-      <div className="flex pt-28 items-center justify-center">
-        <div className="flex flex-row items-center justify-center min-h-screen">
-          <div className="hidden md:flex md:w-2/12">
+      <div className="flex flex-col w-full pt-28">
+        <div className="flex flex-wrap min-h-screen max-w-[1440px] mx-auto w-full">
+          <div className="hidden md:flex md:basis-2/12">
             <Sidebar />
           </div>
 
@@ -57,7 +57,7 @@ export default function Explore({ onPageChange }) {
             </div>
           </div> */}
 
-          <div className="flex flex-wrap md:w-10/12 gap-5 justify-center">
+          <div className="flex flex-wrap md:basis-10/12 gap-5 justify-center pt-10">
             <div className="flex flex-wrap gap-5 justify-center">
               <InfiniteScroll
                 dataLength={randomPosts.length}

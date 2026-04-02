@@ -34,6 +34,7 @@ export const getImageUrl = (url, type = 'avatar') => {
   if (type === 'post') folder = 'community/post-img';
   if (type === 'event') folder = 'community/event-img';
   if (type === 'chat') folder = 'chat';
+  if (type === 'movie') folder = 'movie_img';
 
   // 確保路徑開頭沒有多餘的斜線
   const cleanUrl = finalUrl.startsWith('/') ? finalUrl.slice(1) : finalUrl;

@@ -40,6 +40,21 @@ export default function AccountCollect({ onPageChange }) {
     setArrowHovered(newArrowHovered);
   };
 
+  const getBadgeStyle = (typeName) => {
+    switch (typeName) {
+      case '愛情':
+        return { borderColor: '#FF69B4', color: '#FF69B4' };
+      case '喜劇':
+        return { borderColor: '#A0FF1F', color: '#A0FF1F' };
+      case '劇情':
+        return { borderColor: '#00BFFF', color: '#00BFFF' };
+      case '動作':
+        return { borderColor: '#FF4500', color: '#FF4500' };
+      default:
+        return { borderColor: '#A0FF1F', color: '#A0FF1F' };
+    }
+  };
+
   //處理上一頁按鈕
   const handlePrevPage = (e) => {
     e.preventDefault();
@@ -175,15 +190,23 @@ export default function AccountCollect({ onPageChange }) {
                       </figure>
                       <div className="card-body h-[200px] relative pt-[20px] pb-[48px] sm:pe-[48px] sm:basis-2/3">
                         <div className="font-bold text-white text-h5">
-                          {movie.movie_name ? movie.movie_name : 'unknownMovie'}
+                          {movie.title || movie.movie_name || movie.name || 'unknownMovie'}
                         </div>
-                        <p className={`absolute bottom-[16px] left-[32px] badge badge-secondary badge-outline`}>
-                          {movie.category}
-                        </p>
-                        <p>
-                          {movie.description.length > 40
-                            ? movie.description.substring(0, 40) + '...'
-                            : movie.description}
+                        <div className="flex gap-2 mb-2 min-h-6">
+                           <span className="badge badge-secondary badge-outline bg-gray-500/20 text-gray-300 border-gray-500">
+                            數位
+                          </span>
+                          <span
+                            className="badge badge-secondary badge-outline"
+                            style={getBadgeStyle(movie.type || movie.category || movie.subtitle)}
+                          >
+                            {movie.type || movie.category || movie.subtitle}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-400 line-clamp-3">
+                          {(movie.description || movie.movie_description || '').length > 80
+                            ? (movie.description || movie.movie_description).substring(0, 80) + '...'
+                            : (movie.description || movie.movie_description)}
                         </p>
                         <RxCrossCircled
                           onClick={async () => {
@@ -193,11 +216,11 @@ export default function AccountCollect({ onPageChange }) {
                               setMovies((prev) => prev.filter(m => m.save_id !== movie.save_id));
                             }
                           }}
-                          className="text-white absolute right-[8px] top-[-192px] sm:top-[8px] cursor-pointer hover:text-[#a0ff1f] text-4xl"
+                          className="text-white absolute right-[10px] top-[10px] cursor-pointer hover:text-[#a0ff1f] text-3xl z-20"
                         />
                         <div className="absolute bottom-[16px] right-[16px] justify-end card-actions">
                           <Link
-                            href={`/booking/movie-detail/${movie.movie_id}`}
+                            href={`/booking/movie-booking-detail/${movie.movie_id}`}
                             onMouseEnter={() => handleArrowHover(i, true)}
                             onMouseLeave={() => handleArrowHover(i, false)}
                             className="flex items-center cursor-pointer hover:text-neongreen"

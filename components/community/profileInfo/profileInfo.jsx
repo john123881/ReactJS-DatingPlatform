@@ -6,13 +6,12 @@ import FollowerModal from '../modal/followerModal';
 import FollowingModal from '../modal/followingModal';
 import { CommunityService } from '@/services/community-service';
 import PageLoader from '@/components/ui/loader/page-loader';
-import { getImageUrl } from '@/services/image-utils';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 
-export default function ProfileInfo() {
+export default function ProfileInfo({ onReady }) {
   const { auth } = useAuth();
   const {
-    socket,
     userInfo,
     following,
     postsCount,
@@ -102,39 +101,6 @@ export default function ProfileInfo() {
     }
   };
 
-  const handleNotification = (type) => {
-    // 確保 socket已獲取
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        senderName: userInfo.username,
-        avatar: userInfo.avatar,
-        receiverId: localUserInfo.user_id,
-        receiverName: localUserInfo.username,
-        type: type,
-        postId: null, // 追蹤沒有postId
-        message: `${userInfo.username} ${
-          type === 'like'
-            ? '喜愛你的貼文'
-            : type === 'comment'
-              ? '回覆你的貼文'
-              : '開始追蹤你'
-        }`,
-      };
-      socket.emit('sendNotification', notificationData);
-    }
-  };
-
-  const handleRemoveNotification = (type) => {
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        receiverId: localUserInfo.user_id,
-        type: type,
-      };
-      socket.emit('removeFollowNotification', notificationData);
-    }
-  };
 
   useEffect(() => {
     // 只要有 uid 就應該抓取基本資訊 (公開頁面不需要 auth.id)
@@ -149,16 +115,16 @@ export default function ProfileInfo() {
         getFollowings(),
       ]).finally(() => {
         setIsLoading(false);
+        if (onReady) onReady();
       });
     } else {
       setIsLoading(false);
+      if (onReady) onReady();
     }
   }, [uid]); // 只有當 uid 變化時重新抓取
 
-  if (isLoading) {
-    // 預留空間避免高度塌陷，但不顯示二次 Spinner
-    return <div className="w-full min-h-[200px]"></div>;
-  }
+  // 移除了原本的 if (isLoading) return <div ... />
+  // 改由父組件 (profile/[uid].jsx) 統一控制載入狀態
 
   return (
     <>
@@ -197,10 +163,6 @@ export default function ProfileInfo() {
                       className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-primary"
                       onClick={() => {
                         handleFollowClick(uid);
-                        handleRemoveNotification('follow');
-                        if (!isFollowing) {
-                          handleNotification('follow');
-                        }
                       }}
                     >
                       {isFollowing ? '追蹤中' : '追蹤'}

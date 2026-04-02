@@ -22,7 +22,7 @@ export default function EventCard({ event }) {
 
   const isAttended = attendedEvents[event?.comm_event_id] || false;
 
-  const handleDoubleClick = () => {
+  const handleFlip = (e) => {
     setIsFlipped(!isFlipped);
   };
 
@@ -34,14 +34,14 @@ export default function EventCard({ event }) {
 
   return (
     <>
-      <div className={styles['flip-card']} onDoubleClick={handleDoubleClick}>
+      <div className={styles['flip-card']} onClick={handleFlip}>
         <div
           className={`${styles['flip-card-inner']} ${
             isFlipped ? styles.flipped : ''
           }`}
         >
           <div
-            className={`${styles['flip-card-front']} eventCard card md:w-[330px] md:h-[480px] flex items-center justify-center border-grayBorder`}
+            className={`${styles['flip-card-front']} eventCard card md:w-[330px] md:h-[480px] flex flex-col items-center justify-start border-grayBorder overflow-hidden`}
           >
             <figure className="card-photo">
               <img
@@ -69,9 +69,10 @@ export default function EventCard({ event }) {
                   <div className="card-iconListRight flex justify-end items-center px-1 py-1 ">
                     <FiSend
                       className="card-icon hover:text-neongreen"
-                      onClick={() =>
-                        document.getElementById(shareEventModalId).showModal()
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById(shareEventModalId).showModal();
+                      }}
                     />
                     <ShareEventModal
                       event={event}
@@ -81,7 +82,11 @@ export default function EventCard({ event }) {
                     />
                     {userId === event.user_id ? (
                       <div className="dropdown dropdown-end">
-                        <div tabIndex={0} className="m-2">
+                        <div
+                          tabIndex={0}
+                          className="m-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <FiMoreHorizontal className="card-icon hover:text-neongreen" />
                         </div>
                         <ul
@@ -126,7 +131,10 @@ export default function EventCard({ event }) {
                 <div className="card-actions flex justify-center px-1 py-1 ">
                   <button
                     className="btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3"
-                    onClick={() => handleAttendedClick(event)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAttendedClick(event);
+                    }}
                   >
                     {isAttended ? <span>已參加</span> : <span>參加</span>}
                   </button>
@@ -134,9 +142,16 @@ export default function EventCard({ event }) {
               )}
             </div>
           </div>
-          <div className={`${styles['flip-card-back']} flex flex-col gap-5`}>
+          <div
+            className={`${styles['flip-card-back']} flex flex-col gap-5`}
+            onClick={(e) => {
+              // 點擊背面也翻回去
+              e.stopPropagation();
+              handleFlip();
+            }}
+          >
             <p className="text-h5 font-bold">{event.title}</p>
-            <p className="text-h6">{event.description}</p>
+            <p className="text-h6 font-light">{event.description}</p>
             <p className="text-h6">{event.location}</p>
             <p className="text-h6">
               {`${event.start_date} ${event.start_time} - ${event.end_date} ${event.end_time}`}

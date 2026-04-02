@@ -97,7 +97,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
-  const { socket, userInfo } = usePostContext();
+  const { userInfo } = usePostContext();
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -113,8 +113,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
   // //返回與 page 變量相對應的中文名稱
   function getPageChineseName(currentPageTitle) {
     switch (currentPageTitle) {
-      case '配對交友':
-        return 0;
       case '社群媒體':
         return 1;
       case '行程規劃':
@@ -245,18 +243,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     }
   }, [userInfo.user_id]);
 
-  // 監聽從 PostCard 發送的通知
-  useEffect(() => {
-    if (socket) {
-      socket.on('getNotification', (data) => {
-        setNotifications((prev) => [data, ...prev]); // 更新通知列表
-        setUnreadCount((prevCount) => prevCount + 1); // 增加未讀計數
-        customToast.info('收到新通知');
-      });
-
-      return () => socket.off('getNotification'); // 清理監聽器
-    }
-  }, [socket]);
 
   //取大頭照
   useEffect(() => {
@@ -362,10 +348,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
         <div className="hidden navbar-center md:flex">
           <ul className="px-0 menu menu-horizontal">
             {[
-              {
-                title: '配對交友',
-                href: '/date',
-              },
               {
                 title: '社群媒體',
                 href: '/community',
@@ -622,11 +604,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       {/* NAVBAR 中間底下區域 for mobile */}
       <div className="z-50 h-20 bg-dark btm-nav btm-nav-sm md:hidden">
         {[
-          {
-            title: '配對交友',
-            icon: <BsChatSquareHeart className="text-h5" />,
-            href: '/date',
-          },
           {
             title: '社群媒體',
             icon: <BsGlobe2 className="text-h5" />,

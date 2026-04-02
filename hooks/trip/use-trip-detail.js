@@ -47,7 +47,7 @@ export function useTripDetail(trip_plan_id) {
       // 不論是否成功，結束載入狀態
       setIsLoading(false);
     }
-  }, [trip_plan_id, isLoading, newDetail]);
+  }, [trip_plan_id]); // 移除 isLoading, newDetail
 
   useEffect(() => {
     fetchData();

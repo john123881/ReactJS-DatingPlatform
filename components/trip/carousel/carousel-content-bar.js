@@ -59,7 +59,9 @@ export default function CarouselContentBar({
     <div className="relative group animate__animated animate__fadeIn">
       <img
         src={
-          barSaved.bar_pic_name
+          barSaved.bar_img_url
+            ? barSaved.bar_img_url
+            : barSaved.bar_pic_name
             ? `/barPic/${barSaved.bar_pic_name}`
             : '/unavailable-image.jpg'
         }
@@ -78,7 +80,9 @@ export default function CarouselContentBar({
             <img
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-md object-cover"
               src={
-                barSaved.bar_pic_name
+                barSaved.bar_img_url
+                  ? barSaved.bar_img_url
+                  : barSaved.bar_pic_name
                   ? `/barPic/${barSaved.bar_pic_name}`
                   : '/unavailable-image.jpg'
               }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
@@ -69,7 +69,7 @@ export default function List({ onPageChange }) {
     setCurrentPage(page);
   };
 
-  // 檢查儲存酒吧狀態
+  // 檢查儲存酒吧狀態 - 使用 useCallback 確保參考穩定
   const checkBarsStatus = useCallback(
     async (barIds) => {
       const userId = auth.id;
@@ -93,26 +93,17 @@ export default function List({ onPageChange }) {
         console.error('無法獲取酒吧狀態:', error);
       }
     },
-    [auth.id, getAuthHeader],
+    [auth.id], // 移除 getAuthHeader 依賴
   );
 
-  //FETCH GET 酒吧列表資料
+  //FETCH GET 酒吧列表資料 - 使用 useCallback 確保參考穩定
   const getBarListDynamicById = useCallback(
     async (bar_type_id) => {
-      if (!bar_type_id) return; // 確保 bar_type_id 存在
+      if (!bar_type_id) return;
 
       try {
         setIsLoading(true);
-        // 使用特殊的分類端點，或者通用 getBars
-        // 這裡後端路徑是 /bar/bar-list/:bar_type_id
-        // 我們映射到 BarService.getBars({ bar_type_id })
         const result = await BarService.getBars({ bar_type_id });
-
-        if (result && result.length > 0) {
-          const barIds = result.map((bar) => bar.bar_id).join(',');
-          checkBarsStatus(barIds); //確認Saved or not 狀態的fetch
-        }
-
         setBars(result || []); 
       } catch (error) {
         console.error('Failed to fetch bar list:', error);
@@ -120,8 +111,19 @@ export default function List({ onPageChange }) {
         setIsLoading(false);
       }
     },
-    [checkBarsStatus],
+    [],
   );
+
+  // 監聽 bars 變化並檢查狀態 - 使用 memo 化的字串避免無限迴圈
+  const barIdsString = useMemo(() => {
+    return bars.map((bar) => bar.bar_id).join(',');
+  }, [bars]);
+
+  useEffect(() => {
+    if (barIdsString && auth.id !== 0) {
+      checkBarsStatus(barIdsString);
+    }
+  }, [barIdsString, checkBarsStatus, auth.id]);
 
   const handleSearchChange = async (e) => {
     getSearchBars(e.target.value);

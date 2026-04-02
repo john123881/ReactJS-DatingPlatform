@@ -119,137 +119,155 @@ export default function EditEventModal({ event, modalId }) {
         className="modal modal-bottom sm:modal-middle max-w-full"
       >
         <div
-          className="modal-box flex flex-col"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 max-w-5xl w-[95%] h-[650px]"
+          style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
-          <p
-            className={`${styles['createModalListItemText']} font-bold text-lg mb-5 text-h5 flex justify-center`}
-          >
-            編輯活動
-          </p>
-
-          <div className="flex flex-col items-center">
-            {selectedFile ? (
-              <img
-                src={previewUrl}
-                alt={event.photo_name || 'No Image Available'}
-                className="w-full max-h-full object-cover mb-4 cursor-pointer"
-                onClick={handleFilePicker}
-              />
-            ) : (
-              <img
-                src={event.img || '/unavailable-image.jpg'}
-                alt={event.photo_name || 'No Image Available'}
-                className="w-full max-h-full object-cover mb-4 cursor-pointer"
-                onClick={handleFilePicker}
-              />
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-            <p
-              className={`${styles['createModalListItemText']} font-bold  mb-5 text-[12px] flex justify-center`}
-            >
-              點擊照片編輯
+          {/* Header */}
+          <div className="p-4 border-b border-white/10 flex justify-center items-center relative">
+            <p className={`${styles['createModalListItemText']} font-bold text-xl text-neongreen`}>
+              編輯活動詳情
             </p>
+          </div>
 
-            <div className="flex flex-col inputFrom w-full gap-2">
-              <label className="input input-bordered flex items-center rounded-full">
-                <input
-                  type="text"
-                  className="grow"
-                  name="title"
-                  placeholder="活動名稱"
-                  value={localEventDetails.title}
-                  onChange={handleEventContentChange}
-                />
-              </label>
-              <label className="input input-bordered flex items-center rounded-full">
-                <input
-                  type="text"
-                  className="grow"
-                  name="description"
-                  placeholder="活動描述"
-                  value={localEventDetails.description}
-                  onChange={handleEventContentChange}
-                />
-              </label>
-              <label className="input input-bordered flex items-center rounded-full">
-                <input
-                  type="text"
-                  className="grow"
-                  name="location"
-                  placeholder="活動地點"
-                  value={localEventDetails.location}
-                  onChange={handleEventContentChange}
-                />
-              </label>
-              <div className="flex w-full justify-between">
-                <label className="input input-bordered flex items-center rounded-full w-1/2">
-                  <input
-                    type="date"
-                    name="startDate"
-                    min={minDate}
-                    placeholder="開始日期"
-                    value={localEventDetails.startDate}
-                    className="grow"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
-                <label className="input input-bordered flex items-center rounded-full w-1/2">
-                  <input
-                    type="time"
-                    name="startTime"
-                    placeholder="開始時間"
-                    value={localEventDetails.startTime}
-                    onFocus={handleTimeFocus}
-                    onBlur={handleBlur}
-                    className="grow"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
+          <div className="flex-grow flex flex-col sm:flex-row overflow-hidden">
+            {/* Left Side: Event Image / Change */}
+            <div 
+              className="flex-[1.2] bg-black/40 flex items-center justify-center overflow-hidden border-r border-white/10 cursor-pointer group relative"
+              onClick={handleFilePicker}
+            >
+              <img
+                src={selectedFile ? previewUrl : (event.img || '/unavailable-image.jpg')}
+                alt={event.photo_name || 'Event Image'}
+                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-50"
+              />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-white bg-black/50 px-4 py-2 rounded-full border border-white/30 backdrop-blur-sm shadow-xl">
+                   更換活動封面
+                </p>
               </div>
-
-              <div className="flex w-full justify-between">
-                <label className="input input-bordered flex items-center rounded-full w-1/2">
-                  <input
-                    type="date"
-                    name="endDate"
-                    min={minEndDate}
-                    placeholder="結束日期"
-                    value={localEventDetails.endDate}
-                    onFocus={handleDateFocus}
-                    onBlur={handleBlur}
-                    className="grow"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
-                <label className="input input-bordered flex items-center rounded-full w-1/2">
-                  <input
-                    type="time"
-                    name="endTime"
-                    placeholder="結束時間"
-                    value={localEventDetails.endTime}
-                    onFocus={handleTimeFocus}
-                    onBlur={handleBlur}
-                    className="grow"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
-              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
             </div>
 
-            <button
-              className={`${styles['createModalListItemText']} btn bg-dark border-primary rounded-full text-primary hover:shadow-xl3 my-3`}
-              onClick={() =>
-                handleEventUpdate(event, localEventDetails, editEventModalRef)
-              }
-            >
-              完成
-            </button>
+            {/* Right Side: Activity Details Area */}
+            <div className="flex-1 flex flex-col p-6 bg-dark/50 overflow-y-auto custom-scrollbar">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                  <div className="text-primary font-bold text-xs uppercase">Edit</div>
+                </div>
+                <span className="text-white font-medium italic text-sm">更新活動資訊</span>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <label className="form-control w-full">
+                  <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動名稱</span>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="活動名稱"
+                    value={localEventDetails.title}
+                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                    onChange={handleEventContentChange}
+                  />
+                </label>
+
+                <label className="form-control w-full">
+                  <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動描述</span>
+                  <textarea
+                    name="description"
+                    placeholder="活動描述"
+                    value={localEventDetails.description}
+                    className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-primary transition-all text-white h-24 resize-none"
+                    onChange={handleEventContentChange}
+                  />
+                </label>
+
+                <label className="form-control w-full">
+                   <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動地點</span>
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="活動地點"
+                    value={localEventDetails.location}
+                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12"
+                    onChange={handleEventContentChange}
+                  />
+                </label>
+
+                <div className="divider opacity-20 my-1">時間設定</div>
+
+                <div className="flex gap-4">
+                  <label className="form-control flex-1">
+                    <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">開始日期</span>
+                    <input
+                      type="date"
+                      name="startDate"
+                      min={minDate}
+                      placeholder="開始日期"
+                      value={localEventDetails.startDate}
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      onChange={handleEventContentChange}
+                    />
+                  </label>
+                  <label className="form-control flex-1">
+                    <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">開始時間</span>
+                    <input
+                      type="time"
+                      name="startTime"
+                      placeholder="開始時間"
+                      value={localEventDetails.startTime}
+                      onFocus={handleTimeFocus}
+                      onBlur={handleBlur}
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      onChange={handleEventContentChange}
+                    />
+                  </label>
+                </div>
+
+                <div className="flex gap-4 mb-4">
+                  <label className="form-control flex-1">
+                    <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">結束日期</span>
+                    <input
+                      type="date"
+                      name="endDate"
+                      min={minEndDate}
+                      placeholder="結束日期"
+                      value={localEventDetails.endDate}
+                      onFocus={handleDateFocus}
+                      onBlur={handleBlur}
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      onChange={handleEventContentChange}
+                    />
+                  </label>
+                  <label className="form-control flex-1">
+                    <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">結束時間</span>
+                    <input
+                      type="time"
+                      name="endTime"
+                      placeholder="結束時間"
+                      value={localEventDetails.endTime}
+                      onFocus={handleTimeFocus}
+                      onBlur={handleBlur}
+                      className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-primary transition-all text-white h-12 text-center"
+                      onChange={handleEventContentChange}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
+                <button
+                  className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none btn-wide rounded-full shadow-neon font-bold text-lg"
+                  onClick={() => handleEventUpdate(event, localEventDetails, editEventModalRef)}
+                >
+                  確認更新
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

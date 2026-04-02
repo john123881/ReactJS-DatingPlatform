@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import IndexMovieCard from '@/components/booking/card/indexMovieCard';
 import PageTitle from '@/components/page-title';
+import { useAuth } from '@/context/auth-context';
 import { BookingService } from '@/services/booking-service';
 import Link from 'next/link';
 import { IoTicketOutline } from 'react-icons/io5';
@@ -23,8 +24,10 @@ export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
   const carouselRef = useRef(null);
+  const { auth } = useAuth();
   const [activeTab, setActiveTab] = useState('now'); // 'now' or 'soon'
   const [movieCards, setMovieCards] = useState([]);
+  const [savedMovies, setSavedMovies] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -51,17 +54,38 @@ export default function Index({ onPageChange }) {
     return () => clearInterval(interval);
   }, [currentSlide]);
 
+  const checkMoviesStatus = useCallback(async (movieIds) => {
+    const userId = auth.id;
+    if (userId === 0 || !movieIds) return;
+
+    try {
+      const data = await BookingService.checkMovieStatus(userId, movieIds);
+      const newSavedMovies = {};
+      data.forEach((status) => {
+        newSavedMovies[status.movieId] = status.isSaved;
+      });
+      setSavedMovies(newSavedMovies);
+    } catch (error) {
+      console.error('無法獲取電影狀態:', error);
+    }
+  }, [auth.id]);
+
   const getBookingMovieCard = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await BookingService.getIndexMovies();
-      setMovieCards(data);
+      setMovieCards(data || []);
+      
+      if (data && data.length > 0 && auth.id !== 0) {
+        const movieIds = data.map((movie) => movie.movie_id).join(',');
+        checkMoviesStatus(movieIds);
+      }
     } catch (error) {
       console.error('Failed to fetch movie card', error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [auth.id, checkMoviesStatus]);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -304,7 +328,11 @@ export default function Index({ onPageChange }) {
           <Loader minHeight="400px" text="正在載入熱門電影..." />
         ) : (
           movieCards.map((movie, index) => (
-            <IndexMovieCard movie={movie} key={index} />
+            <IndexMovieCard 
+              movie={movie} 
+              key={movie.movie_id || index} 
+              isSaved={savedMovies[movie.movie_id] || false}
+            />
           ))
         )}
       </div>

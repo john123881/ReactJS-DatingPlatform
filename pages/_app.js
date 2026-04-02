@@ -5,10 +5,10 @@ import '@/styles/globals.css';
 import { useState } from 'react';
 import { AuthContextProvider } from '@/context/auth-context';
 import { NotifyProvider } from '@/context/use-notify';
-import { DateProvider } from '@/context/date-context';
 import { LoaderProvider } from '@/context/use-loader';
 import { PostProvider } from '@/context/post-context';
 import { CollectProvider } from '@/context/use-collect';
+import { BarProvider } from '@/context/bar-context';
 import LoginModal from '@/components/ui/login-modal/login-modal';
 
 export default function App({ Component, pageProps }) {
@@ -19,10 +19,10 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <AuthContextProvider>
-        <LoaderProvider>
-          <NotifyProvider>
-            <CollectProvider>
-              <DateProvider>
+        <BarProvider>
+          <LoaderProvider>
+            <NotifyProvider>
+              <CollectProvider>
                 <PostProvider>
                   <Navbar currentPageTitle={currentPageTitle} />
                   <LoginModal />
@@ -30,10 +30,10 @@ export default function App({ Component, pageProps }) {
                   <SpeedInsights />
                   <Footer />
                 </PostProvider>
-              </DateProvider>
-            </CollectProvider>
-          </NotifyProvider>
-        </LoaderProvider>
+              </CollectProvider>
+            </NotifyProvider>
+          </LoaderProvider>
+        </BarProvider>
       </AuthContextProvider>
     </>
   );

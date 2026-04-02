@@ -16,39 +16,6 @@ export default function Home({ onPageChange }) {
       <div className="flex flex-col items-center justify-center min-h-screen pt-20 overflow-hidden">
         {/* <KeyView and Login  /> */}
         <RegisterAcc />
-        {/* Data */}
-        {/* <div className="carousel carousel-center rounded-box max-w-full overflow-x-auto scrollbar-hide md:gap-[120px] p-[80px] ">
-          <div className="p-4 carousel-item">
-            <DateCard
-              title="Taipei Date浪漫啟程"
-              paragraph="我們深知交友的重要性，提供了豐富的功能。無論喜歡電影、喝酒，還是喜歡規劃一天的行程，共同的興趣和活動可以成為一段關係的契機。"
-              imageSrc="/date_index_1.jpg"
-              altText="約會"
-            />
-          </div>
-          <div className="p-4 carousel-item">
-            <DateCard
-              title="真誠約會，樂趣相伴！"
-              paragraph="Taipei Date不只是一個約會平台，更是一個建立真誠連結的地方。鼓勵開放、坦誠的交流，讓每一場約會都充滿歡笑和深刻的感動。"
-              imageSrc="/date_index_2.jpg"
-              altText="約會"
-            />
-          </div>
-          <div className="p-4 carousel-item">
-            <DateCard
-              title="突破框架，愉快約會"
-              paragraph="以真誠交友和有趣出遊為核心的約會平台！致力於改變約會遊戲的規則，打破陳舊的框架開啟一段珍貴的關係。"
-              imageSrc="/date_index_3.jpg"
-              altText="約會"
-            />
-          </div>
-        </div> */}
-
-        {/* <Link href="/date">
-          <button className="w-40 py-1 my-2 text-black border-2 rounded-full md:w-80 h-[55px] md:py-2 btn-primary bg-primary border-primary hover:shadow-xl3">
-            開始配對
-          </button>
-        </Link> */}
 
         {/* Other Theme */}
 

@@ -35,6 +35,7 @@ export default function Profile({ onPageChange }) {
   } = usePostContext();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isHeaderLoading, setIsHeaderLoading] = useState(true);
 
   const { uid } = router.query;
 
@@ -83,6 +84,7 @@ export default function Profile({ onPageChange }) {
       setProfilePosts([]);
       setUserProfileHasMore(true);
       setIsLoading(true);
+      setIsHeaderLoading(true);
       setProfilePage(1);
       getCommunityUserProfilePost(1);
     }
@@ -98,21 +100,24 @@ export default function Profile({ onPageChange }) {
         <TabbarMobile />
       </div>
 
-      <div className="flex flex-col w-full items-center justify-center pt-28 min-h-screen">
-        <div className="flex flex-wrap justify-center w-full grow">
-          <div className="hidden md:flex md:w-2/12 h-fit">
+      <div className="flex flex-col w-full pt-28">
+        <div className="flex flex-wrap min-h-screen max-w-[1440px] mx-auto w-full">
+          <div className="hidden md:flex md:basis-2/12 h-fit">
             <Sidebar />
           </div>
 
-          <div className="flex flex-col md:w-10/12 items-center">
-            {isLoading ? (
-              <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+          <div className="flex flex-col w-full md:basis-10/12 items-center pt-10">
+            {/* 統一載入動畫 */}
+            {(isLoading || isHeaderLoading) && (
+              <div className="flex items-center justify-center min-h-[500px] w-full">
                 <PageLoader type="index" />
               </div>
-            ) : (
-              <>
+            )}
+
+            {/* 內容區塊：即便在載入中也要掛載 ProfileInfo 以觸發資料抓取，但先隱藏 */}
+            <div className={(isLoading || isHeaderLoading) ? 'hidden' : 'w-full flex flex-col items-center'}>
                 {/* info area */}
-                <ProfileInfo />
+                <ProfileInfo onReady={() => setIsHeaderLoading(false)} />
                 {/* post area */}
                 <div className="flex flex-wrap gap-5 justify-center">
                   <InfiniteScroll
@@ -132,18 +137,7 @@ export default function Profile({ onPageChange }) {
                     ))}
                   </InfiniteScroll>
                 </div>
-              </>
-            )}
-            {/* <div className="md:flex md:flex-wrap md:gap-5 md:justify-center hidden">
-                {posts.map((_, index) => (
-                  <ProfileCard key={index} />
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-5 mx-5 md:hidden">
-                {posts.map((_, index) => (
-                  <ProfileCard key={index} />
-                ))}
-              </div> */}
+            </div>
           </div>
         </div>
       </div>

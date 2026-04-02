@@ -16,7 +16,6 @@ export default function PostCardLarge({ post }) {
   const router = useRouter();
 
   const {
-    socket,
     userInfo,
     handleLikedClick,
     handleSavedClick,
@@ -54,40 +53,6 @@ export default function PostCardLarge({ post }) {
     router.push(`/community/profile/${userId}`);
   };
 
-  const handleNotification = (type) => {
-    // 確保 socket已獲取
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        senderName: userInfo.username,
-        avatar: userInfo.avatar,
-        receiverId: post.post_userId,
-        receiverName: post.username,
-        type: type,
-        postId: post.post_id,
-        message: `${userInfo.username} ${
-          type === 'like'
-            ? '喜愛你的貼文'
-            : type === 'comment'
-              ? '回覆你的貼文'
-              : '開始追蹤你'
-        }`,
-      };
-      socket.emit('sendNotification', notificationData);
-    }
-  };
-
-  const handleRemoveNotification = (type) => {
-    if (socket) {
-      const notificationData = {
-        senderId: userInfo.user_id,
-        receiverId: post.post_userId,
-        postId: post.post_id,
-        type: type,
-      };
-      socket.emit('removeNotification', notificationData);
-    }
-  };
 
   return (
     <>
@@ -159,10 +124,7 @@ export default function PostCardLarge({ post }) {
           className="card-photo m-0 z-40"
           onDoubleClick={() => {
             handleLikedClick(post);
-            handleRemoveNotification('like');
-            if (!isLiked) {
-              handleNotification('like');
-            }
+            handleLikedClick(post);
           }}
         >
           <div className={styles.parallaxContainer}>
@@ -194,7 +156,6 @@ export default function PostCardLarge({ post }) {
                     className="card-icon hover:text-neongreen"
                     onClick={() => {
                       handleLikedClick(post);
-                      handleRemoveNotification('like');
                     }}
                   />
                 ) : (
@@ -202,7 +163,6 @@ export default function PostCardLarge({ post }) {
                     className="card-icon  hover:text-neongreen"
                     onClick={() => {
                       handleLikedClick(post);
-                      handleNotification('like');
                     }}
                   />
                 )}

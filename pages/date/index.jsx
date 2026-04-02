@@ -10,8 +10,8 @@ export default function Index({ onPageChange }) {
   const pageTitle = '配對交友';
   const router = useRouter();
   useEffect(() => {
-    onPageChange(pageTitle);
-  }, [onPageChange, pageTitle]);
+    router.replace('/community');
+  }, []);
 
   const { auth, setLoginModalToggle, isAuthLoaded } = useAuth();
   const { setToggleBar } = useDate();

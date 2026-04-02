@@ -1,16 +1,13 @@
-import ExploreModal from '../modal/exploreModal';
+import PostModal from '../modal/postModal';
 import { usePostContext } from '@/context/post-context';
 import styles from './card.module.css';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 export default function PostCardMedium({ post }) {
   const { postModalToggle, setPostModalToggle } = usePostContext();
 
   // 基於 post_id 的唯一 id
   const modalId = `photo_modal_${post.post_id}`;
-
-  // const handleShowModal = () => {
-  //   document.getElementById(modalId).showModal();
-  // };
 
   return (
     <>
@@ -31,9 +28,10 @@ export default function PostCardMedium({ post }) {
               <div className={styles.parallaxContent}>
                 <div className="parallaxContentBack">
                   <img
-                    src={post.img || '/unavailable-image.jpg'}
+                    src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo object-cover w-[330px] h-[330px]`}
+                    onError={(e) => handleImageError(e, 'post')}
                   />
                 </div>
               </div>
@@ -41,7 +39,7 @@ export default function PostCardMedium({ post }) {
           </div>
         </figure>
 
-        <ExploreModal
+        <PostModal
           post={post}
           modalId={modalId}
           isOpen={postModalToggle === modalId}

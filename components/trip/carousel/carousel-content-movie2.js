@@ -61,7 +61,11 @@ export default function CarouselContentMovie2({
   return (
     <div className="relative group animate__animated animate__fadeIn">
       <img
-        src={`/movie_img/${movies.poster_img}`}
+        src={
+          movies.movie_img_url
+            ? movies.movie_img_url
+            : `/movie_img/${movies.poster_img}`
+        }
         alt={altText}
         className="object-cover w-48 h-48 transition-transform duration-300 ease-in-out group-hover:scale-110 border border-white rounded-lg cursor-pointer"
         onClick={handleShowDetails}
@@ -86,7 +90,11 @@ export default function CarouselContentMovie2({
           <div className="flex justify-start items-center">
             <img
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-md object-cover"
-              src={`/movie_img/${movies.poster_img}`}
+              src={
+                movies.movie_img_url
+                  ? movies.movie_img_url
+                  : `/movie_img/${movies.poster_img}`
+              }
               alt={`Image of ${movies.title}`}
             />
             <div className="flex flex-col justify-center items-start ml-5 mr-5 sm:ml-12 sm:mr-12 flex-grow min-w-0">

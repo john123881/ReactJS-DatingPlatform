@@ -37,12 +37,12 @@ export default function Events({ onPageChange }) {
       <div className="flex md:hidden">
         <TabbarMobile />
       </div>
-      <div className="flex pt-28 items-center justify-center">
-        <div className="flex flex-row items-center justify-center min-h-screen">
-          <div className="hidden md:flex md:w-2/12">
+      <div className="flex flex-col w-full pt-28">
+        <div className="flex flex-wrap min-h-screen max-w-[1440px] mx-auto w-full">
+          <div className="hidden md:flex md:basis-2/12">
             <Sidebar />
           </div>
-          <div className="flex md:w-10/12 flex-wrap gap-5 justify-center">
+          <div className="flex md:basis-10/12 flex-wrap gap-5 justify-center h-fit">
             <InfiniteScroll
               dataLength={events.length}
               next={getCommunityEvents}

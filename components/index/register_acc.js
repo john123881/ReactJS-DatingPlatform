@@ -40,10 +40,10 @@ export default function RegisterAcc() {
         </div> */}
         {auth.id ? (
           <>
-            <div className=" z-10 flex flex-col items-center justify-center mb-[250px]">
-              <Link href="/date">
-                <button className="w-40 py-1 my-2 text-black border-2 rounded-full md:w-80 h-[55px] md:py-2 btn-primary bg-primary border-primary hover:shadow-xl3">
-                  開始配對
+            <div className="z-10 flex flex-col items-center justify-center mb-[250px]">
+              <Link href="/community">
+                <button className="w-40 py-1 my-2 text-black border-2 rounded-full md:w-80 h-[55px] md:py-2 btn-primary bg-primary border-primary hover:shadow-xl3 transition-all active:scale-95">
+                  探索社群
                 </button>
               </Link>
             </div>

@@ -10,9 +10,9 @@ import {
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
-import { io } from 'socket.io-client';
-import { API_BASE_URL, SOCKET_SERVER } from '@/configs/api-config';
+import { API_BASE_URL } from '@/configs/api-config';
 import { CommunityService } from '@/services/community-service';
+import { toast as customToast } from '@/lib/toast';
 
 const PostContext = createContext();
 
@@ -95,7 +95,6 @@ export const PostProvider = ({ children }) => {
   const router = useRouter();
   const { uid } = router.query;
 
-  const [socket, setSocket] = useState(null);
   const [userInfo, setUserInfo] = useState({});
 
   const getUserDetail = useCallback(async () => {
@@ -408,9 +407,12 @@ export const PostProvider = ({ children }) => {
       try {
         const data = await CommunityService.addComment({
           context: newComment,
+          content: newComment, // 同時送出 content 防止後端欄位不一致
           status: 'posted',
           postId,
+          post_id: postId,
           userId,
+          user_id: userId,
         });
 
         // 原本程式碼中有 res.ok，但這裡 CommunityService 應該直接回傳 data
@@ -565,28 +567,14 @@ export const PostProvider = ({ children }) => {
         userId,
       });
       if (data.success) {
-        setPostId(data.post.post_id);
+        setPostId(data.post_id);
         setPostCreated(true);
-        return data.post.post_id; // 返回 postId 給 handleFileUpload
+        return data.post_id; // 返回 postId 給 handleFileUpload
       } else {
         throw new Error(data.message || '新增貼文失敗');
       }
     } catch (error) {
-      console.error('upload post failed:', error);
-      createModalRef.current.close();
-      createModalMobileRef.current.close();
-
-      Swal.fire({
-        title: '分享失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-        }
-      });
+      customToast.error('分享失敗!');
     }
   };
 
@@ -614,12 +602,12 @@ export const PostProvider = ({ children }) => {
 
       if (data.success) {
         // 更新貼文以觸發刷新頁面 !!!Important!!!
-        setPosts((prevPosts) => [data.post, ...prevPosts]);
-        setProfilePosts((prevPosts) => [data.post, ...prevPosts]);
-        setFilteredPosts((prevPosts) => [data.post, ...prevPosts]);
-        setRandomPosts((prevPosts) => [data.post, ...prevPosts]);
+        setPosts((prevPosts) => [data, ...prevPosts]);
+        setProfilePosts((prevPosts) => [data, ...prevPosts]);
+        setFilteredPosts((prevPosts) => [data, ...prevPosts]);
+        setRandomPosts((prevPosts) => [data, ...prevPosts]);
         setPostPage((prevPosts) => [
-          data.post,
+          data,
           ...(Array.isArray(prevPosts) ? prevPosts : []),
         ]);
         setPostsCount((prevCount) => prevCount + 1); // 增加貼文數量
@@ -631,34 +619,15 @@ export const PostProvider = ({ children }) => {
       createModalRef.current.close();
       createModalMobileRef.current.close();
 
-      Swal.fire({
-        title: '分享成功!',
-        icon: 'success',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-          resetPostState();
-        }
-      });
+      customToast.success('分享成功!');
+      resetAndCloseModal();
+      resetPostState();
     } catch (error) {
       console.error('upload failed:', error);
       createModalRef.current.close();
       createModalMobileRef.current.close();
 
-      Swal.fire({
-        title: '分享失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-        }
-      });
+      customToast.error('分享失敗!');
     }
   };
 
@@ -692,7 +661,7 @@ export const PostProvider = ({ children }) => {
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -700,7 +669,7 @@ export const PostProvider = ({ children }) => {
         setFilteredPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -708,7 +677,7 @@ export const PostProvider = ({ children }) => {
         setProfilePosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -716,7 +685,7 @@ export const PostProvider = ({ children }) => {
         setRandomPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -724,7 +693,7 @@ export const PostProvider = ({ children }) => {
 
         // 更新 post page 單筆資料
         if (postPage.post_id === postId) {
-          setPostPage({ ...postPage, ...data.post });
+          setPostPage({ ...postPage, ...data });
         }
       } else {
         throw new Error(data.message || '編輯貼文失敗');
@@ -783,7 +752,7 @@ export const PostProvider = ({ children }) => {
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -791,7 +760,7 @@ export const PostProvider = ({ children }) => {
         setFilteredPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -799,7 +768,7 @@ export const PostProvider = ({ children }) => {
         setProfilePosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -807,7 +776,7 @@ export const PostProvider = ({ children }) => {
         setRandomPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.post_id === postId) {
-              return { ...p, ...data.post }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...p, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return p;
           }),
@@ -815,7 +784,7 @@ export const PostProvider = ({ children }) => {
 
         // 更新 post page 單筆資料
         if (postPage.post_id === postId) {
-          setPostPage({ ...postPage, ...data.post });
+          setPostPage({ ...postPage, ...data });
         }
       } else {
         throw new Error('Network response was not ok.');
@@ -889,7 +858,7 @@ export const PostProvider = ({ children }) => {
         setEvents((prevEvents) =>
           prevEvents.map((e) => {
             if (e.comm_event_id === eventId) {
-              return { ...e, ...data.event }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              return { ...e, ...data }; // 使用來自 API 回應的 data 作為更新後資料的來源
             }
             return e;
           }),
@@ -897,7 +866,7 @@ export const PostProvider = ({ children }) => {
 
         // 更新 event page card 單筆資料
         if (eventPageCard.comm_event_id === eventId) {
-          setEventPageCard({ ...eventPageCard, ...data.event });
+          setEventPageCard({ ...eventPageCard, ...data });
         }
       } else {
         throw new Error(data.message || '編輯活動失敗');
@@ -1230,31 +1199,13 @@ export const PostProvider = ({ children }) => {
 
               setPostsCount((prevCount) => prevCount - 1); // 減少貼文數量
 
-              Swal.fire({
-                title: '刪除成功!',
-                icon: 'success',
-                confirmButtonText: '關閉',
-                confirmButtonColor: '#A0FF1F',
-                background: 'rgba(0, 0, 0, 0.85)',
-              });
+              customToast.success('刪除成功!');
             } else {
-              Swal.fire({
-                title: '刪除失敗!',
-                icon: 'error',
-                confirmButtonText: '關閉',
-                confirmButtonColor: '#A0FF1F',
-                background: 'rgba(0, 0, 0, 0.85)',
-              });
+              customToast.error('刪除失敗!');
             }
           } catch (error) {
             console.error('Error delete post status:', error);
-            Swal.fire({
-              title: '刪除失敗!',
-              icon: 'error',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
+            customToast.error('刪除失敗!');
           }
         }
       });
@@ -1288,31 +1239,13 @@ export const PostProvider = ({ children }) => {
               );
             });
 
-            Swal.fire({
-              title: '刪除成功!',
-              icon: 'success',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
+            customToast.success('刪除成功!');
           } else {
-            Swal.fire({
-              title: '刪除失敗!',
-              icon: 'error',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
+            customToast.error('刪除失敗!');
           }
         } catch (error) {
           console.error('Error delete post status:', error);
-          Swal.fire({
-            title: '刪除失敗!',
-            icon: 'error',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          });
+          customToast.error('刪除失敗!');
         }
       }
     });
@@ -1354,32 +1287,14 @@ export const PostProvider = ({ children }) => {
               return updatedComments; // 返回更新後的評論對象
             });
 
-            Swal.fire({
-              title: '刪除成功!',
-              icon: 'success',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
+            customToast.success('刪除成功!');
             return true; // 確保成功時返回 true 給 handleRemoveNotification
           } else {
-            Swal.fire({
-              title: '刪除失敗!',
-              icon: 'error',
-              confirmButtonText: '關閉',
-              confirmButtonColor: '#A0FF1F',
-              background: 'rgba(0, 0, 0, 0.85)',
-            });
+            customToast.error('刪除失敗!');
           }
         } catch (error) {
           console.error('Error delete post status:', error);
-          Swal.fire({
-            title: '刪除失敗!',
-            icon: 'error',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          });
+          customToast.error('刪除失敗!');
         }
       }
     },
@@ -1401,27 +1316,21 @@ export const PostProvider = ({ children }) => {
     }
 
     if (!eventDetails) {
-      Swal.fire({
-        title: '請輸入活動內容!',
-        icon: 'warning',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      });
+      customToast.warning('請輸入活動內容!');
       return;
     }
 
-      try {
-        const data = await CommunityService.createEvent({
-          ...eventDetails,
-          status: 'upcoming',
-          userId,
-        });
+    try {
+      const data = await CommunityService.createEvent({
+        ...eventDetails,
+        status: 'upcoming',
+        userId,
+      });
 
-        if (data.success) {
-        setEventId(data.event.comm_event_id);
+      if (data.success) {
+        setEventId(data.comm_event_id);
         setEventCreated(true);
-        return data.event.comm_event_id; // 返回 eventId 給 handleEventFileUpload
+        return data.comm_event_id;
       } else {
         throw new Error(data.message || '新增活動失敗');
       }
@@ -1429,18 +1338,7 @@ export const PostProvider = ({ children }) => {
       console.error('upload event failed:', error);
       createEventModalRef.current.close();
       createEventModalMobileRef.current.close();
-
-      Swal.fire({
-        title: '創建活動失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-        }
-      });
+      customToast.error('創建活動失敗!');
     }
   };
 
@@ -1452,15 +1350,13 @@ export const PostProvider = ({ children }) => {
       currentEventId = await handleEventUpload();
       if (!currentEventId) {
         console.error('No event ID returned');
-        return; // 如果新增貼文失敗或沒有 eventID 則停止執行
+        return;
       }
       setEventId(currentEventId);
       setEventCreated(true);
     }
 
     const fd = new FormData();
-
-    // 對照server上要獲取的檔案名稱(req.files.photo)
     fd.append('photo', selectedFile);
     fd.append('eventId', currentEventId);
 
@@ -1468,44 +1364,22 @@ export const PostProvider = ({ children }) => {
       const data = await CommunityService.uploadEventPhoto(fd);
 
       if (data.success) {
-        // 更新活動以觸發刷新頁面 !!!Important!!!
-        setEvents((prevEvents) => [data.event, ...prevEvents]);
+        setEvents((prevEvents) => [data, ...prevEvents]);
       } else {
         throw new Error('Network response was not ok.');
       }
 
-      // 關閉 create modal
       createEventModalRef.current.close();
       createEventModalMobileRef.current.close();
 
-      Swal.fire({
-        title: '創建活動成功!',
-        icon: 'success',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-          resetEventState();
-        }
-      });
+      customToast.success('創建活動成功!');
+      resetAndCloseModal();
+      resetEventState();
     } catch (error) {
       console.error('upload failed:', error);
       createEventModalRef.current.close();
       createEventModalMobileRef.current.close();
-
-      Swal.fire({
-        title: '創建活動失敗!',
-        icon: 'error',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-        }
-      });
+      customToast.error('創建活動失敗!');
     }
   };
 
@@ -1536,26 +1410,6 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (auth.token) {
-      const newSocket = io(SOCKET_SERVER, {
-        auth: {
-          token: auth.token, // 這裡也可以寫在 headers 裡，根據後端需求
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-        },
-      });
-      setSocket(newSocket);
-      return () => {
-        newSocket.close();
-      };
-    }
-  }, [auth.token]);
-
-  useEffect(() => {
-    socket?.emit('newUser', userInfo.username);
-  }, [socket, userInfo]);
 
   useEffect(() => {
     if (auth.id) {
@@ -1573,7 +1427,6 @@ export const PostProvider = ({ children }) => {
       getPostPage,
       getEventPage,
       uid,
-      socket,
       userInfo,
       posts,
       setPosts,
@@ -1683,7 +1536,6 @@ export const PostProvider = ({ children }) => {
       getPostPage,
       getEventPage,
       uid,
-      socket,
       userInfo,
       posts,
       profilePosts,
@@ -1742,6 +1594,7 @@ export const PostProvider = ({ children }) => {
       searchResults,
       hasSearched,
       getSearchUsers,
+      auth,
     ],
   );
 
