@@ -80,25 +80,30 @@ export default function Index({ onPageChange }) {
   // try動態路由
   const getMovieListType = useCallback(async (movie_type_id) => {
     if (!movie_type_id) return; // 確保 bar_type_id 存在
+    console.log('getMovieListType started for type:', movie_type_id);
+    setIsLoading(true);
 
     try {
+      console.log('Fetching movies by category...');
       const result = await BookingService.getMoviesByCategory(movie_type_id);
-      setMovieCards(result);
- // 確認數據是否為預期格式
+      console.log('Fetched movies by category:', result?.length || 0);
+      setMovieCards(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Failed to fetch movie list:', error);
+      setMovieCards([]);
+    } finally {
+      console.log('getMovieListType finished');
+      setIsLoading(false);
     }
   }, []);
 
   // 動態路由成功
   useEffect(() => {
     if (router.isReady) {
-      //確保能得到 movie_type_id
       const { movie_type_id } = router.query;
-      // 有 movie_type_id 後，向伺服器要求資料
       getMovieListType(movie_type_id);
     }
-  }, [router.isReady, router.query, getMovieListType]);
+  }, [router.isReady, router.query.movie_type_id, getMovieListType]);
 
 
   return (

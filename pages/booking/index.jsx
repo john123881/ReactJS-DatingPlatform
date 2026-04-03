@@ -335,7 +335,7 @@ export default function Index({ onPageChange }) {
         </Link>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 mx-4 sm:justify-between min-h-[400px]">
+      <div className="flex flex-wrap justify-center gap-x-6 gap-y-10 mx-4 min-h-[400px]">
         {isLoading ? (
           <Loader minHeight="400px" text="正在載入熱門電影..." />
         ) : (

@@ -93,85 +93,75 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     <>
       <div
         key={index}
-        className={`card bg-base-100 shadow-xl relative ${
+        className={`card bg-base-100 shadow-xl relative overflow-hidden ${
           isSaved ? ' ring-1 ring-neongreen/30' : ''
         }`}
         style={{
           width: '280px',
-          height: '500px',
+          height: '520px', // 稍微增加一點高度以容納標題
         }}
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <figure>
-          <div className="shadow-xl card bg-base-100 w-72">
-            <figure>
-              <img
-                src={getMovieImgSrc(movie.poster_img)}
-                onError={(e) => {
-                  e.target.src = '/unavailable-image.jpg';
-                }}
-                alt={movie.title}
+        <figure style={{ height: '380px', overflow: 'hidden', margin: 0 }}>
+          <img
+            src={getMovieImgSrc(movie.poster_img)}
+            onError={(e) => {
+              e.target.src = '/unavailable-image.jpg';
+            }}
+            alt={movie.title}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
+              transition: 'filter 0.3s',
+              opacity: hoveredIndex === index ? '0.7' : '1',
+            }}
+          />
+          {hoveredIndex === index && (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', height: '380px' }}
+            >
+              <div
+                className="card-body"
                 style={{
-                  height: '400px',
-                  objectFit: 'cover',
-                  filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
-                  transition: 'filter 0.3s',
-                  opacity: hoveredIndex === index ? '0.7' : '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
-              />
-              {hoveredIndex === index && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
+              >
+                <Link
+                  className="btn btn-outline"
+                  style={{
+                    width: '130px',
+                    height: '40px',
+                    marginBottom: '10px',
+                    borderRadius: '30px',
+                  }}
+                  href={`/booking/movie-booking-detail/${movie.movie_id}`}
                 >
-                  <div
-                    className="card-body"
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Link
-                      className="btn btn-outline"
-                      style={{
-                        width: '130px',
-                        height: '40px',
-                        marginBottom: '10px',
-                        borderRadius: '30px',
-                      }}
-                      // onClick={() =>
-                      //   (window.location.href = `../../../booking/movie-booking-detail/${movie.movie_id}`)
-                      // }
-                      href={`/booking/movie-booking-detail/${movie.movie_id}`}
-                    >
-                      立即訂票
-                    </Link>
-                    <button
-                      className="btn btn-outline"
-                      style={{
-                        width: '130px',
-                        height: '40px',
-                        borderRadius: '30px',
-                      }}
-                      // onClick={() =>
-                      //   (window.location.href = `../../../booking/movie-booking-detail/${movie.movie_id}`)
-                      // }
-
-                      onClick={() =>
-                        router.push(
-                          `/booking/movie-booking-detail/${movie.movie_id}`,
-                        )
-                      }
-                    >
-                      電影資訊
-                    </button>
-                  </div>
-                </div>
-              )}
-            </figure>
-          </div>
+                  立即訂票
+                </Link>
+                <button
+                  className="btn btn-outline"
+                  style={{
+                    width: '130px',
+                    height: '40px',
+                    borderRadius: '30px',
+                  }}
+                  onClick={() =>
+                    router.push(
+                      `/booking/movie-booking-detail/${movie.movie_id}`,
+                    )
+                  }
+                >
+                  電影資訊
+                </button>
+              </div>
+            </div>
+          )}
         </figure>
 
         {/* 爱心图标 */}
@@ -205,29 +195,38 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           )}
         </div>
 
-        <div className="card-body">
-          <h2 className="card-title flex flex-wrap items-center">
-            <span style={{ fontSize: '1rem' }}>{movie.title}</span>{' '}
-            {/* 使用動態的 movieName */}
+        <div className="card-body p-4 flex flex-col justify-between" style={{ height: '140px' }}>
+          {/* 標題區塊 - 固定高度處理換行 */}
+          <div className="title-area" style={{ minHeight: '3rem' }}>
+            <h2 className="card-title text-white line-clamp-2" style={{ fontSize: '1rem', lineHeight: '1.2' }}>
+              {movie.title}
+            </h2>
+          </div>
+          
+          {/* 標籤區塊 - 確保對齊 */}
+          <div className="flex flex-wrap gap-2 mt-auto">
             <div
-              className="badge badge-secondary w-20 mr-2 mt-2"
+              className="badge badge-secondary w-20"
               style={{
                 backgroundColor: 'grey',
                 color: 'white',
+                border: 'none'
               }}
             >
               數位
             </div>
-            <div
-              className="badge badge-secondary w-20 mt-2"
-              style={{
-                backgroundColor: 'transparent',
-                ...getBadgeStyle(getMovieTypeName(movie.movie_type_id))
-              }}
-            >
-              {getMovieTypeName(movie.movie_type_id)}
-            </div>
-          </h2>
+            {movie.movie_type_id && (
+              <div
+                className="badge badge-secondary w-20"
+                style={{
+                  backgroundColor: 'transparent',
+                  ...getBadgeStyle(getMovieTypeName(movie.movie_type_id))
+                }}
+              >
+                {getMovieTypeName(movie.movie_type_id)}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

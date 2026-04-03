@@ -36,39 +36,47 @@ export default function Index({ onPageChange }) {
     if (userId === 0 || !movieIds) return;
 
     try {
+      console.log('Checking movie status for movies:', movieIds);
       const data = await BookingService.checkMovieStatus(userId, movieIds);
+      console.log('Received movie status data:', data);
 
-      // 初始化兩個對象來存儲所有電影的收藏狀態
-      const newSavedMoives = { ...savedMovies };
-
-      // 遍歷從後端獲取的每個貼文的狀態數據
-      data.forEach((status) => {
-        // 將每個電影的收藏狀態存儲到 newSavedMoives 對象中
-        newSavedMoives[status.movieId] = status.isSaved;
-      });
-
-      // 更新 React 狀態以觸發界面更新，以顯示最新的點讚和收藏狀態
-      setSavedMovies(newSavedMoives);
+      if (data && Array.isArray(data)) {
+        // 使用功能性更新，避免依賴 savedMovies 導致無限迴圈
+        setSavedMovies((prevSavedMovies) => {
+          const newSavedMovies = { ...prevSavedMovies };
+          data.forEach((status) => {
+            newSavedMovies[status.movieId] = status.isSaved;
+          });
+          return newSavedMovies;
+        });
+      } else {
+        console.warn('checkMovieStatus returned invalid data format:', data);
+      }
     } catch (error) {
       console.error('無法獲取電影狀態:', error);
     }
-  }, [auth.id, savedMovies]);
+  }, [auth.id]);
 
   const getBookingMovieCard = useCallback(async () => {
+    console.log('getBookingMovieCard started, auth.id:', auth.id);
     setIsLoading(true);
     try {
+      console.log('Fetching movie list...');
       const data = await BookingService.getMovieList();
-      if (data && data.length > 0) {
+      console.log('Fetched movies:', data?.length || 0);
+      
+      if (data && Array.isArray(data) && data.length > 0) {
         const movieIds = data.map((movie) => movie.movie_id).join(',');
         await checkMoviesStatus(movieIds);
       }
-      setMovieCards(data);
+      setMovieCards(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch movie card', error);
     } finally {
+      console.log('getBookingMovieCard finished, setting isLoading to false');
       setIsLoading(false);
     }
-  }, [checkMoviesStatus]);
+  }, [auth.id, checkMoviesStatus]);
 
   const handleSearchChange = async (e) => {
     getSearchMovies(e.target.value);

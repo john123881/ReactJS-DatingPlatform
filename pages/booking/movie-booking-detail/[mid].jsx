@@ -189,27 +189,32 @@ export default function MovieDetail({ onPageChange }) {
                       type="radio"
                       name="rating-6"
                       className="mask mask-star-2 bg-[#A0FF1F]"
+                      readOnly
                     />
                     <input
                       type="radio"
                       name="rating-6"
                       className="mask mask-star-2 bg-[#A0FF1F]"
+                      readOnly
                     />
                     <input
                       type="radio"
                       name="rating-6"
                       className="mask mask-star-2 bg-[#A0FF1F]"
+                      readOnly
                     />
                     <input
                       type="radio"
                       name="rating-6"
                       className="mask mask-star-2 bg-[#A0FF1F]"
+                      readOnly
                     />
                     <input
                       type="radio"
                       name="rating-6"
                       className="mask mask-star-2 bg-[#A0FF1F]"
                       checked
+                      readOnly
                     />
                   </div>
                 </div>
@@ -250,6 +255,7 @@ export default function MovieDetail({ onPageChange }) {
                     className="tab"
                     aria-label="電影時刻"
                     style={{ width: '130px' }}
+                    readOnly
                   />
                   <div role="tabpanel" className="tab-content p-10">
                     <form className="space-y-4">
@@ -338,6 +344,7 @@ export default function MovieDetail({ onPageChange }) {
                     className="tab"
                     aria-label="電影介紹"
                     checked
+                    readOnly
                     style={{ width: '130px' }}
                   />
                   <div role="tabpanel" className="tab-content p-10 mt-4 mx-2">
