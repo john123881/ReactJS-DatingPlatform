@@ -31,9 +31,21 @@ export default function RecordTable({
               <div className="flex items-center justify-center min-h-[40px]">
                 {col.label}
                 {col.sortable && (
-                  <div className="relative w-4 h-4 ml-1 flex-shrink-0">
-                    <MdArrowDropUp className={`absolute top-[-2px] text-lg ${currentSortKey === col.key && currentSortOrder === 'ASC' ? 'text-neongreen opacity-100' : 'opacity-30'}`} />
-                    <MdArrowDropDown className={`absolute top-[6px] text-lg ${currentSortKey === col.key && currentSortOrder === 'DESC' ? 'text-neongreen opacity-100' : 'opacity-30'}`} />
+                  <div className="relative w-4 h-4 ml-1 flex-shrink-0 flex items-center justify-center">
+                    <MdArrowDropUp 
+                      className={`absolute top-[-3px] text-lg transition-all duration-200 ${
+                        currentSortKey === col.key && currentSortOrder === 'ASC' 
+                          ? 'text-neongreen opacity-100 scale-125' 
+                          : 'text-slate-500 opacity-40 hover:opacity-100'
+                      }`} 
+                    />
+                    <MdArrowDropDown 
+                      className={`absolute bottom-[-3px] text-lg transition-all duration-200 ${
+                        currentSortKey === col.key && currentSortOrder === 'DESC' 
+                          ? 'text-neongreen opacity-100 scale-125' 
+                          : 'text-slate-500 opacity-40 hover:opacity-100'
+                      }`} 
+                    />
                   </div>
                 )}
               </div>

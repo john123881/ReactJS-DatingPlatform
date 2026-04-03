@@ -169,13 +169,18 @@ export default function Detail({ onPageChange }) {
                   </div>
                   <div className="flex items-center gap-4 bar-detail-button-group">
                     <button onClick={handleSavedClick}>
-                      <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px]">
+                      <div className={`badge badge-outline h-[28px] ${isSaved ? 'border-[#ff03ff] text-[#ff03ff]' : 'border-[#A0FF1F] text-white'}`}>
                         {isSaved ? (
-                          <FaHeart className="card-icon hover:text-neongreen" />
+                          <>
+                            <FaHeart className="card-icon" />
+                            已在收藏
+                          </>
                         ) : (
-                          <FaRegHeart className="card-icon hover:text-neongreen" />
+                          <>
+                            <FaRegHeart className="card-icon hover:text-neongreen" />
+                            加入收藏
+                          </>
                         )}
-                        加入收藏
                       </div>
                     </button>
                     <div

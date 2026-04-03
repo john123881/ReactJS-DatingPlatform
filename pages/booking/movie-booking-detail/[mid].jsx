@@ -85,21 +85,18 @@ export default function MovieDetail({ onPageChange }) {
     const wasSaved = isSaved;
     const newSavedState = !wasSaved;
     setIsSaved(newSavedState);
-
+    toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
     try {
       const result = wasSaved
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
       if (
-        result.success ||
-        result.output?.success ||
-        result.msg?.includes('成功') ||
-        result.message?.includes('成功')
+        !result.success &&
+        !result.output?.success &&
+        !result.msg?.includes('成功') &&
+        !result.message?.includes('成功')
       ) {
-        // 操作成功，状态已在乐观更新中设置
-        toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
-      } else {
         throw new Error(result.message || result.msg || '操作失敗');
       }
     } catch (error) {
@@ -114,7 +111,14 @@ export default function MovieDetail({ onPageChange }) {
   //   () => import('@/components/bar/modal/booking-confirm-modal'),
   //   { ssr: false }
   // );
-  // const [selectedTime, setSelectedTime] = useState('');
+  // 取得電影圖片路徑的輔助函式
+  const getMovieImgSrc = (src) => {
+    if (!src || src === '/unavailable-image.jpg') return '/unavailable-image.jpg';
+    if (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/')) {
+      return src;
+    }
+    return `/movie_img/${src}`;
+  };
 
   return (
     <>
@@ -138,11 +142,7 @@ export default function MovieDetail({ onPageChange }) {
               <figure className="lg:flex-shrink-0">
                 <Image
                   className="lg:w-[300px] lg:h-[480px] object-cover rounded-xl"
-                  src={
-                    movie[0]?.poster_img
-                      ? `/movie_img/${movie[0]?.poster_img}`
-                      : '/unavailable-image.jpg'
-                  }
+                  src={getMovieImgSrc(movie[0]?.poster_img)}
                   onError={(e) => {
                     e.target.src = '/unavailable-image.jpg';
                   }}

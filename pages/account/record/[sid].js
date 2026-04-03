@@ -61,13 +61,23 @@ export default function AccountRecord({ onPageChange }) {
     <AccountLayout currentPage={currentPage}>
       <RecordToggle 
         checked={gameRecordOpen} 
-        onChange={(e) => setGameRecordOpen(e.target.checked)}
-        onReset={() => {
+        onChange={(e) => {
+          const isChecked = e.target.checked;
+          setGameRecordOpen(isChecked);
+          // 切換時重置篩選與排序狀態
           setPointSource('全部');
           setDateSortToggle(false);
           setValueDateBegin('');
           setValueDateEnd('');
-          updateQuery({ page: 1, selectedValue: '全部', date_begin: '', date_end: '' });
+          updateQuery({ 
+            page: 1, 
+            selectedValue: '全部', 
+            date_begin: '', 
+            date_end: '',
+            sortKey: undefined,
+            sortOrder: undefined,
+            sortDate: undefined
+          });
         }}
       />
 

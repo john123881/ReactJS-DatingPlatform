@@ -59,14 +59,38 @@ export function useBarList(category) {
   }, []);
 
   const onAreaSelected = useCallback((areaId) => {
-    setSelectedAreaId(areaId);
+    const newQuery = { ...router.query };
+    if (areaId) newQuery.bar_area_id = areaId;
+    else delete newQuery.bar_area_id;
+
+    // 使用淺層路由更新 URL 並保持組合狀態
+    router.push(
+      {
+        pathname: router.pathname,
+        query: newQuery,
+      },
+      undefined,
+      { shallow: true }
+    );
     setCurrentPage(1);
-  }, []);
+  }, [router]);
 
   const onTypeSelected = useCallback((typeId) => {
-    setSelectedTypeId(typeId);
+    const newQuery = { ...router.query };
+    if (typeId) newQuery.bar_type_id = typeId;
+    else delete newQuery.bar_type_id;
+
+    // 使用淺層路由更新 URL 並保持組合狀態
+    router.push(
+      {
+        pathname: router.pathname,
+        query: newQuery,
+      },
+      undefined,
+      { shallow: true }
+    );
     setCurrentPage(1);
-  }, []);
+  }, [router]);
 
   return {
     bars,

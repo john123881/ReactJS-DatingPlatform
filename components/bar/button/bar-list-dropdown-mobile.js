@@ -38,7 +38,7 @@ export default function BarListDropdownMobile() {
     router.push({
       pathname: '/bar/bar-list',
       query: newQuery,
-    });
+    }, undefined, { shallow: true });
   };
 
   //bar-type 動態路由 - 優化為組合過濾
@@ -55,7 +55,7 @@ export default function BarListDropdownMobile() {
     router.push({
       pathname: '/bar/bar-list',
       query: newQuery,
-    });
+    }, undefined, { shallow: true });
   };
 
   return (

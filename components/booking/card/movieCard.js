@@ -32,15 +32,14 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
 
     // 樂觀更新
     setIsSaved(newSavedState);
+    toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
 
     try {
       const res = wasSaved
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (res.success || res.status) {
-        toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
-      } else {
+      if (!res.success && !res.status) {
         throw new Error('Failed to update save status');
       }
     } catch (error) {
@@ -81,10 +80,14 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     }
   }
 
-  // 當來自父組件的 isSavedProp 改變時，更新本地 isSaved 狀態
-  useEffect(() => {
-    setIsSaved(initialSaved);
-  }, [initialSaved]);
+  // 取得電影圖片路徑的輔助函式
+  const getMovieImgSrc = (src) => {
+    if (!src || src === '/unavailable-image.jpg') return '/unavailable-image.jpg';
+    if (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/')) {
+      return src;
+    }
+    return `/movie_img/${src}`;
+  };
 
   return (
     <>
@@ -104,9 +107,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           <div className="shadow-xl card bg-base-100 w-72">
             <figure>
               <img
-                src={
-                  movie.poster_img ? `/movie_img/${movie.poster_img}` : '/unavailable-image.jpg'
-                }
+                src={getMovieImgSrc(movie.poster_img)}
                 onError={(e) => {
                   e.target.src = '/unavailable-image.jpg';
                 }}

@@ -32,15 +32,14 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     
     // 樂觀更新
     setIsSaved(newSavedState);
+    toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
 
     try {
       const res = wasSaved
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (res.success || res.status) {
-        toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
-      } else {
+      if (!res.success && !res.status) {
         throw new Error('操作失敗');
       }
     } catch (error) {
@@ -78,6 +77,15 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     }
   }
 
+  // 取得電影圖片路徑的輔助函式
+  const getMovieImgSrc = (src) => {
+    if (!src || src === '/unavailable-image.jpg') return '/unavailable-image.jpg';
+    if (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/')) {
+      return src;
+    }
+    return `/movie_img/${src}`;
+  };
+
   return (
     <>
       <div
@@ -93,7 +101,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           <div className="card w-99 bg-base-100 shadow-xl">
             <figure>
               <Image
-                src={movie.movie_img || '/unavailable-image.jpg'}
+                src={getMovieImgSrc(movie.movie_img)}
                 alt={movie.title}
                 width={280}
                 height={400}

@@ -1,12 +1,9 @@
-import { MdArrowDropUp, MdArrowDropDown } from 'react-icons/md';
-
 /**
  * RecordToggle - 積分/遊戲紀錄切換開關
  */
-export default function RecordToggle({ checked, onChange, onReset }) {
+export default function RecordToggle({ checked, onChange }) {
   return (
     <label
-      onClick={onReset}
       className="relative grid grid-cols-2 px-4 mx-auto mt-4 border rounded-full cursor-pointer border-slate-700 bg-base-300 border-rounded place-items-center w-[300px] h-[40px]"
     >
       <span
