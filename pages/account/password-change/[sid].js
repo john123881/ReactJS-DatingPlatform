@@ -11,6 +11,7 @@ import { useAccountAuth } from '@/hooks/use-account-auth';
 import { AccountService } from '@/services/account-service';
 import { useNotify } from '@/context/use-notify';
 import PageLoader from '@/components/ui/loader/page-loader';
+import { useLoader } from '@/context/use-loader';
 import { toast as customToast } from '@/lib/toast';
 
 export default function AccountPasswordChange({ onPageChange }) {
@@ -21,7 +22,9 @@ export default function AccountPasswordChange({ onPageChange }) {
   const [showConfirmNewPWD, setConfirmNewShowPWD] = useState(false);
   const [isFocused3, setIsFocused3] = useState(false);
   const { auth } = useAuth();
-  const { notifyPromise } = useNotify();
+  const { isLoading } = useAccountAuth(async () => {
+    onPageChange(pageTitle);
+  });
   const router = useRouter();
 
   const handleShowOldPWD = () => {
@@ -82,13 +85,6 @@ export default function AccountPasswordChange({ onPageChange }) {
     },
   });
 
-  useAccountAuth(async () => {
-    onPageChange(pageTitle);
-  });
-
-  useEffect(() => {
-    onPageChange(pageTitle);
-  }, []);
 
   return (
     <AccountLayout currentPage={currentPage}>

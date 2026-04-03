@@ -13,7 +13,7 @@ import { toast as customToast } from '@/lib/toast';
 export function useAccountAuth(onAuthorized) {
   const router = useRouter();
   const { auth, checkAuth } = useAuth();
-  const { open, close } = useLoader();
+  const { open, close, isLoading } = useLoader();
   const [isFetched, setIsFetched] = useState(false);
 
   useEffect(() => {
@@ -52,5 +52,5 @@ export function useAccountAuth(onAuthorized) {
     fetchCheck();
   }, [router.isReady, router.query.sid, router.query.page, auth.id]);
 
-  return { isFetched, auth, router };
+  return { isFetched, auth, router, isLoading };
 }
