@@ -3,7 +3,7 @@ import { TripService } from '@/services/trip-service';
 import { FaCirclePlus, FaTrash } from 'react-icons/fa6';
 import TripRecomendModal from '@/components/trip/add-trip/trip-recomend-modal';
 
-export default function NoContentBase({ trip_plan_id, refreshTripDetails, block, label, trip_detail_id, isGhost }) {
+export default function NoContentBase({ trip_plan_id, refreshTripDetails, refreshAllDetails, block, label, trip_detail_id, isGhost }) {
   const [deleteContent, setDeleteContent] = useState(false);
   const [newTripDetailId, setNewTripDetailId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -14,6 +14,7 @@ export default function NoContentBase({ trip_plan_id, refreshTripDetails, block,
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
     refreshTripDetails();
+    if (refreshAllDetails) refreshAllDetails();
   };
 
   const handleAddClick = async () => {
@@ -47,17 +48,30 @@ export default function NoContentBase({ trip_plan_id, refreshTripDetails, block,
     const targetId = trip_detail_id;
     if (!targetId) return;
 
+    // 樂觀更新：立即從父組件狀態中移除
+    if (setNewDetail) {
+      setNewDetail((prev) => {
+        if (Array.isArray(prev)) {
+          return prev.filter((item) => item.trip_detail_id !== targetId);
+        }
+        return prev;
+      });
+    }
+
     try {
       const result = await TripService.deleteTripDetail(targetId);
       if (result.success) {
         customToast.success('刪除成功', '幽靈記錄已清除');
         refreshTripDetails();
+        if (refreshAllDetails) refreshAllDetails();
       } else {
         throw new Error(result.message || '刪除失敗');
       }
     } catch (error) {
       console.error('Delete ghost record error:', error);
       customToast.error('刪除失敗', error.message);
+      // 失敗時重新整理回原狀
+      if (refreshAllDetails) refreshAllDetails();
     }
   };
 

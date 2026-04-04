@@ -6,12 +6,12 @@ import ContentMorning from '@/components/trip/my-content/blocks/content-morning'
 import ContentNoon from '@/components/trip/my-content/blocks/content-noon';
 import ContentNight from '@/components/trip/my-content/blocks/content-night';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
-import MoviePhotoCarousel2 from '@/components/trip/carousel/movie-photo-carousel2';
 import PageTitle from '@/components/page-title';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { useTripDetail } from '@/hooks/trip/use-trip-detail';
 import { useAuth } from '@/context/auth-context';
 import Loader from '@/components/ui/loader/loader';
+import MyTripDetailSection from '@/components/trip/my-content/my-trip-detail-section';
 
 export default function MyTripDetail({ onPageChange }) {
   const router = useRouter();
@@ -29,13 +29,14 @@ export default function MyTripDetail({ onPageChange }) {
     tripDetails,
     tripName,
     newDetail,
+    setNewDetail,
     isLoading,
     refresh: refreshAllDetails,
   } = useTripDetail(trip_plan_id);
 
   const pageTitle = '行程規劃';
   useEffect(() => {
-    onPageChange(pageTitle);
+    onPageChange?.(pageTitle);
   }, [onPageChange, pageTitle]);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function MyTripDetail({ onPageChange }) {
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-black">
         <TripNavigationTab />
         <MyTripDetailSidebar
           tripName={tripName}
@@ -68,38 +69,46 @@ export default function MyTripDetail({ onPageChange }) {
             <p className="mt-4 text-white/50 text-xl">正在準備您的行程細節...</p>
           </div>
         ) : (
-          <div className="flex justify-center items-start w-full max-w-[1600px] py-8 overflow-x-hidden mx-auto px-6 sm:px-10 gap-8 lg:gap-16 animate__animated animate__fadeIn">
-            <div className="hidden lg:flex w-[250px] justify-end flex-shrink-0">
+          <div className="flex flex-col lg:flex-row justify-center items-start w-full max-w-[1700px] py-12 mx-auto px-6 sm:px-10 gap-12 lg:gap-20 transition-all duration-300 animate__animated animate__fadeIn">
+            {/* 左側：酒吧輪播 */}
+            <div className="hidden xl:flex w-[280px] justify-end flex-shrink-0 sticky top-32">
               <BarPhotoCarousel
                 trip_plan_id={trip_plan_id}
                 newDetail={newDetail}
                 refreshAllDetails={refreshAllDetails}
               />
             </div>
-            <div className="mt-8 mb-8 flex flex-col justify-center items-center gap-12 w-[896px] px-4 flex-shrink-0">
+
+            {/* 中間：時段內容 */}
+            <div className="flex flex-col gap-16 w-full lg:flex-grow max-w-5xl">
               <ContentMorning
                 newDetail={newDetail}
+                setNewDetail={setNewDetail}
                 tripDetails={tripDetails}
                 trip_plan_id={trip_plan_id}
+                refreshAllDetails={refreshAllDetails}
               />
               <ContentNoon
                 newDetail={newDetail}
+                setNewDetail={setNewDetail}
                 tripDetails={tripDetails}
                 trip_plan_id={trip_plan_id}
+                refreshAllDetails={refreshAllDetails}
               />
               <ContentNight
                 newDetail={newDetail}
+                setNewDetail={setNewDetail}
                 tripDetails={tripDetails}
                 trip_plan_id={trip_plan_id}
-              />
-            </div>
-            <div className="hidden lg:flex w-[250px] justify-start flex-shrink-0">
-              <MoviePhotoCarousel2
-                trip_plan_id={trip_plan_id}
-                newDetail={newDetail}
                 refreshAllDetails={refreshAllDetails}
               />
             </div>
+
+            {/* 右側：行程細節編輯器 */}
+            <MyTripDetailSection 
+              tripName={tripName} 
+              onUpdateSuccess={refreshAllDetails} 
+            />
           </div>
         )}
       </div>

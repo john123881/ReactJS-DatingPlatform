@@ -17,6 +17,8 @@ export default function TripMediaBase({
   trip_plan_id,
   tripDetails,
   refreshTripDetails,
+  refreshAllDetails,
+  setNewDetail,
   type, // 'bar' 或 'movie'
   ContentComponent,
   NoContentComponents = {},
@@ -132,6 +134,7 @@ export default function TripMediaBase({
         <NC
           trip_plan_id={trip_plan_id}
           refreshTripDetails={refreshTripDetails}
+          refreshAllDetails={refreshAllDetails}
           trip_detail_id={tripDetails.trip_detail_id}
           isGhost={true}
         />
@@ -157,6 +160,8 @@ export default function TripMediaBase({
           onClick={isOther ? null : () => setShowDetails(!showDetails)}
           tripDetails={tripDetails}
           refreshTripDetails={refreshTripDetails}
+          refreshAllDetails={refreshAllDetails}
+          setNewDetail={setNewDetail}
         />
       </div>
       <div

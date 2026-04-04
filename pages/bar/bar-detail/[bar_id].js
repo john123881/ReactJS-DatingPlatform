@@ -11,6 +11,7 @@ import useSWR from 'swr';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
 import Loader from '@/components/ui/loader/loader';
+import { toast } from '@/lib/toast';
 
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -33,7 +34,7 @@ export default function Detail({ onPageChange }) {
   const isSaved = bar && savedBars[bar?.bar_id];
 
   const handleSavedClick = async () => {
-    if (auth.id == 0) {
+    if (auth.id === 0) {
       setLoginModalToggle(true);
       return;
     }
@@ -45,21 +46,24 @@ export default function Detail({ onPageChange }) {
       return;
     }
 
-    const wasSaved = isSaved;
+    const wasSaved = isSaved || false;
     const newSavedState = !wasSaved;
 
-    try {
-      const result = wasSaved
-        ? await BarService.unsaveBar(userId, barId)
-        : await BarService.saveBar(userId, barId);
+    // 樂觀更新 UI
+    setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+    toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
 
-      if (result.success) {
-        setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+    try {
+      if (wasSaved) {
+        await BarService.unsaveBar(userId, barId);
       } else {
-        throw new Error(result.message || 'Failed to update save status');
+        await BarService.saveBar(userId, barId);
       }
     } catch (error) {
       console.error('Error updating save status:', error);
+      // 還原狀態
+      setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
+      toast.error('操作失敗，請稍後再試');
     }
   };
 

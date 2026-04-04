@@ -48,6 +48,12 @@ export default function CarouselContentMovie2({
       if (result.success) {
         toast.success(`成功加入: ${movies.title}`);
         document.getElementById(modalId).close(); // 關閉彈跳視窗
+
+        // 發送自遞義事件，通知對應的區塊進行局部重新整理
+        window.dispatchEvent(new CustomEvent('trip-detail-refresh', { 
+            detail: { block: timeOfDay } 
+        }));
+
         refreshAllDetails();
       } else {
         toast.error('發生錯誤', result.message || '未知錯誤');

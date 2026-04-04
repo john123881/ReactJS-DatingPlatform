@@ -19,8 +19,9 @@ export function useTripDetail(trip_plan_id) {
     }
     
     try {
-      // 僅在第一次進入頁面且無資料時設為載入中，避免後續「加入/刪除行程」時全頁閃爍
-      if (isLoading && (!newDetail || (Array.isArray(newDetail) && newDetail.length === 0) || (typeof newDetail === 'object' && Object.keys(newDetail).length <= 1 && !newDetail[0]?.trip_plan_id))) {
+      // 僅在第一次進入頁面且無資料時維持載入中狀態。
+      // 如果已經是 isLoading = false (代表初次加載已完成)，則不再設為 true。
+      if (isLoading && (!newDetail || (Array.isArray(newDetail) && newDetail.length === 0))) {
         setIsLoading(true);
       }
 
@@ -57,6 +58,7 @@ export function useTripDetail(trip_plan_id) {
     tripDetails, 
     tripName, 
     newDetail, 
+    setNewDetail,
     isLoading, 
     refresh: fetchData 
   };

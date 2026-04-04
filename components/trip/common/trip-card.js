@@ -35,20 +35,29 @@ const TripCard = memo(function TripCard({
   }, [trip?.trip_pic]);
 
   const onConfirmDelete = async () => {
+    const originalTrip = { ...trip };
+    const tripId = trip.trip_plan_id;
+    
+    // 樂觀執行：立即從 UI 移除
+    onDeleteSuccess && onDeleteSuccess(tripId);
+    
+    // 立即關閉對話框
+    const dialog = document.getElementById(`delete-dialog-${tripId}`);
+    if (dialog) dialog.close();
+
     try {
-      const result = await TripService.deleteTripPlan(trip.trip_plan_id);
+      const result = await TripService.deleteTripPlan(tripId);
       if (result.success) {
-        onDeleteSuccess && onDeleteSuccess(trip.trip_plan_id);
-        toast.success(`成功刪除: ${trip.trip_title}`);
+        toast.success(`成功刪除: ${originalTrip.trip_title}`);
       } else {
-        setErrorMessage('刪除失敗。');
+        throw new Error(result.message || '刪除失敗');
       }
     } catch (error) {
-      console.error('刪除行程時發生錯誤:', error);
-      setErrorMessage('刪除行程時發生錯誤。');
+      console.error('刪除行程時發生錯誤 (已執行回溯):', error);
+      toast.error(`刪除失敗: ${originalTrip.trip_title}。資料已還原。`);
+      // 失敗回溯：將資料補回列表
+      onDeleteRollback && onDeleteRollback(originalTrip);
     }
-    const dialog = document.getElementById(`delete-dialog-${trip.trip_plan_id}`);
-    if (dialog) dialog.close();
   };
 
   return (

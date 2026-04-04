@@ -86,7 +86,7 @@ export default function TripCalendar() {
 
     const thisMonthDays = Array.from({ length: totalDays }, (_, i) => {
       const day = i + 1;
-      const trip = trips.find((trip) => {
+      const dayTrips = trips.filter((trip) => {
         const tripDate = new Date(trip.trip_date);
         return (
           tripDate.getFullYear() === year &&
@@ -97,7 +97,7 @@ export default function TripCalendar() {
       return {
         day,
         isCurrentMonth: true,
-        trip: trip || null,
+        trips: dayTrips || [],
       };
     });
 
@@ -107,11 +107,11 @@ export default function TripCalendar() {
     const nextMonthDays = Array.from({ length: cellsToAdd }, (_, i) => ({
       day: i + 1,
       isCurrentMonth: false,
-      trip: null,
+      trips: [],
     }));
 
     const allDays = [
-      ...Array(firstDay).fill({ day: null, isCurrentMonth: false, trip: null }),
+      ...Array(firstDay).fill({ day: null, isCurrentMonth: false, trips: [] }),
       ...thisMonthDays,
       ...nextMonthDays,
     ];
@@ -122,37 +122,43 @@ export default function TripCalendar() {
           <td
             key={dayIndex}
             style={{ verticalAlign: 'top' }}
-            className={`text-sm sm:text:base h-12 sm:w-60 sm:h-28 text-center border border-white ${
+            className={`text-sm sm:text:base h-12 sm:w-60 sm:h-28 text-center border border-white p-1 overflow-y-auto ${
               cell.isCurrentMonth
                 ? 'text-white bg-black cursor-pointer'
                 : 'text-gray-500 bg-black'
             }`}
-            onClick={() => {
-              if (cell.isCurrentMonth && !cell.trip) {
-                //只有當前月份 "且" 不包含行程的td可以透過點擊觸發彈跳視窗
+            onClick={(e) => {
+              if (cell.isCurrentMonth) {
+                // 如果點擊的是 td 本身或者是行程列表的容器，則開啟新增視窗
                 handleDayClick(cell.day);
               }
             }}
           >
-            {cell.day}
-            {cell.trip && (
-              <div className="sm:mt-1 flex justify-center items-center">
-                <Link
-                  href={`/trip/my-trip/detail/${cell.trip.trip_plan_id}`}
-                  className="hidden sm:inline-flex items-center justify-center text-xs sm:text-sm font-bold bg-neongreen/10 backdrop-blur-sm px-3 py-1 border border-neongreen/30 rounded-full text-neongreen shadow-[0_0_10px_rgba(160,255,31,0.2)] hover:shadow-[0_0_20px_rgba(160,255,31,0.5)] hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300 tooltip"
-                  data-tip={cell.trip.trip_title}
-                  style={{ minWidth: '80px', maxWidth: '140px' }}
-                >
-                  {truncateChinese(cell.trip.trip_title)}
-                </Link>
-                <Link
-                  href={`/trip/my-trip/detail/${cell.trip.trip_plan_id}`}
-                  className="block sm:hidden text-neongreen text-xl active:scale-125 transition-transform"
-                >
-                  <IoHeartCircleSharp className="drop-shadow-[0_0_5px_rgba(160,255,31,0.8)]" />
-                </Link>
+            <div className="flex flex-col h-full">
+              <div className="text-right sm:text-center mb-1">{cell.day}</div>
+              <div className="flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+                {cell.trips && cell.trips.map((trip, idx) => (
+                  <div key={idx} className="flex justify-center items-center w-full">
+                    {/* PC 版 */}
+                    <Link
+                      href={`/trip/my-trip/detail/${trip.trip_plan_id}`}
+                      className="hidden sm:inline-flex items-center justify-center text-xs font-bold bg-neongreen/10 backdrop-blur-sm px-2 py-0.5 border border-neongreen/30 rounded-full text-neongreen shadow-[0_0_10px_rgba(160,255,31,0.2)] hover:shadow-[0_0_20px_rgba(160,255,31,0.5)] hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300 w-full truncate"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {truncateChinese(trip.trip_title, 6)}
+                    </Link>
+                    {/* 手機版 */}
+                    <Link
+                      href={`/trip/my-trip/detail/${trip.trip_plan_id}`}
+                      className="block sm:hidden text-neongreen text-xl active:scale-125 transition-transform"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <IoHeartCircleSharp className="drop-shadow-[0_0_5px_rgba(160,255,31,0.8)]" />
+                    </Link>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
           </td>
         ))}
       </tr>
@@ -197,24 +203,10 @@ export default function TripCalendar() {
         trip_draft: 0
       };
 
-      let data;
-      try {
-        // 根據您的分析，後端目前直接將 req.body 丟給 Service，因此我們預設發送 FLAT 結構
-        data = await TripService.addTripPlan(fullPayload);
-        
-        // 重要：如果後端回傳 200 但 success 為 false，手動切換到 nested 嘗試
-        if (data && data.success === false) {
-           console.warn('Flat payload failed with success:false, retrying with Nested wrapper...');
-           data = await TripService.addTripPlan({
-             tripPlan: fullPayload
-           });
-        }
-      } catch (e) {
-        console.warn('First attempt failed with error, retrying with Nested payload...', e);
-        data = await TripService.addTripPlan({
-          tripPlan: fullPayload
-        });
-      }
+      // 根據分析，後端目前期望 nested 結構 { tripPlan: ... }
+      const data = await TripService.addTripPlan({
+        tripPlan: fullPayload
+      });
 
       if (data && (data.success !== false && data.success !== 'false')) {
         console.log('Trip plan created successfully:', data);

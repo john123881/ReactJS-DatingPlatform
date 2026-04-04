@@ -10,6 +10,8 @@ export default function MyTripDetailSidebar({
       titlePrefix="我的行程"
       backLink="/trip/my-trip"
       backLabel="返回行程列表"
+      canEdit={true}
+      onUpdateSuccess={refreshTripDetails}
     />
   );
 }

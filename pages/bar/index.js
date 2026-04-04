@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import TabBar from '@/components/bar/bar/tab-bar';
@@ -15,7 +15,10 @@ import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
 import Loader from '@/components/ui/loader/loader';
 
+import { useAuth } from '@/context/auth-context';
+
 export default function Index({ onPageChange }) {
+  const { auth, setLoginModalToggle } = useAuth();
   const pageTitle = '酒吧探索';
   const router = useRouter();
   useEffect(() => {
@@ -26,6 +29,7 @@ export default function Index({ onPageChange }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [barRender, setBarRender] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [savedBars, setSavedBars] = useState({});
   const displayCount = 3; // Number of bars to display at once
 
   // random bar
@@ -40,6 +44,38 @@ export default function Index({ onPageChange }) {
       setIsLoading(false);
     }
   }, []);
+
+  // 檢查儲存狀態
+  const checkBarsStatus = useCallback(
+    async (barIds) => {
+      const userId = auth.id;
+      if (userId === 0 || !barIds) return;
+
+      try {
+        const data = await BarService.checkBarStatus(userId, barIds);
+        setSavedBars((prevSavedBars) => {
+          const newSavedBars = { ...prevSavedBars };
+          data.forEach((status) => {
+            newSavedBars[status.barId] = status.isSaved;
+          });
+          return newSavedBars;
+        });
+      } catch (error) {
+        console.error('無法獲取酒吧狀態:', error);
+      }
+    },
+    [auth.id],
+  );
+
+  const barIdsString = useMemo(() => {
+    return randomBars.map((bar) => bar.bar_id).join(',');
+  }, [randomBars]);
+
+  useEffect(() => {
+    if (barIdsString && auth.id !== 0) {
+      checkBarsStatus(barIdsString);
+    }
+  }, [barIdsString, checkBarsStatus, auth.id]);
 
   // next 3 random
   useEffect(() => {
@@ -119,7 +155,12 @@ export default function Index({ onPageChange }) {
                     <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
                   </button>
                   {displayedBars.map((randomBar) => (
-                    <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
+                    <BarCardIndex
+                      key={randomBar.bar_id}
+                      randomBar={randomBar}
+                      savedBars={savedBars}
+                      setSavedBars={setSavedBars}
+                    />
                   ))}
                   <button onClick={prevBars}>
                     <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
@@ -130,7 +171,12 @@ export default function Index({ onPageChange }) {
                 <div className="gap-5 carousel rounded-box">
                   <div className="gap-5 carousel-item">
                     {randomBars.slice(0, 2).map((randomBar) => (
-                      <BarCardIndex key={randomBar.bar_id} randomBar={randomBar} />
+                      <BarCardIndex
+                      key={randomBar.bar_id}
+                      randomBar={randomBar}
+                      savedBars={savedBars}
+                      setSavedBars={setSavedBars}
+                    />
                     ))}
                   </div>
                 </div>

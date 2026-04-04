@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
 import TripCard from '@/components/trip/common/trip-card';
 import { useAuth } from '@/context/auth-context';
+import { useLoader } from '@/context/use-loader';
 import Loader from '@/components/ui/loader/loader';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
@@ -24,7 +25,7 @@ export default function OtherTrip({ onPageChange }) {
   const sentinelRef = useRef(null);
 
   useEffect(() => {
-    onPageChange?.(pageTitle);
+    onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
   // Auth Guard

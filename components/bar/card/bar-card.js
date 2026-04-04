@@ -5,6 +5,7 @@ import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
+import { toast } from '@/lib/toast';
 
 export default function BarCard({ bar, savedBars, setSavedBars }) {
   // save bar
@@ -14,35 +15,39 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
   const isSaved = savedBars && savedBars[bar.bar_id];
 
   const handleSavedClick = async () => {
-    if (auth.id == 0) {
+    if (auth.id === 0) {
       setLoginModalToggle(true);
       return;
     }
     const barId = bar.bar_id;
-    const userId = auth.id; // Ensure user is defined and has an id
+    const userId = auth.id;
 
     if (!userId) {
       console.error('User ID is undefined or not set');
       return;
     }
 
-    const wasSaved = isSaved;
+    const wasSaved = isSaved || false;
     const newSavedState = !wasSaved;
 
-    try {
-      let result;
-      if (wasSaved) {
-        result = await BarService.unsaveBar(userId, barId);
-      } else {
-        result = await BarService.saveBar(userId, barId);
-      }
+    // 樂觀更新 UI
+    setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
+    toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
 
-      setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
-      setRerender(!rerender);
-      console.log('Save status updated:', result);
+    try {
+      if (wasSaved) {
+        await BarService.unsaveBar(userId, barId);
+      } else {
+        await BarService.saveBar(userId, barId);
+      }
+      
+      // 觸發全域重新渲染以同步其他組件 (如果需要)
+      // setRerender(!rerender); 
     } catch (error) {
       console.error('Error updating save status:', error);
-      setError(error.message);
+      // 發生錯誤時還原 UI 狀態
+      setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
+      toast.error('操作失敗，請稍後再試');
     }
   };
 
@@ -120,11 +125,13 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
               {isSaved ? (
                 <FaHeart
                   className="card-icon hover:text-neongreen"
+                  color="#ff03ff"
                   onClick={handleSavedClick}
                 />
               ) : (
                 <FaRegHeart
                   className="card-icon hover:text-neongreen"
+                  color="white"
                   onClick={handleSavedClick}
                 />
               )}

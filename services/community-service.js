@@ -60,8 +60,8 @@ export const CommunityService = {
       `/community/get-posts-by-keyword?keyword=${keyword}&page=${page}&limit=${limit}`,
     ),
 
-  getRandomPosts: (page, limit) =>
-    apiClient(`/community/get-random-posts?page=${page}&limit=${limit}`),
+  getRandomPosts: (page, limit, seed = null) =>
+    apiClient(`/community/get-random-posts?page=${page}&limit=${limit}${seed ? `&seed=${seed}` : ''}`),
 
   getPostDetail: (pid) => apiClient(`/community/get-post-page/${pid}`),
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarCard from '@/components/bar/card/bar-card';
 import Loader from '@/components/ui/loader/loader';
@@ -6,16 +6,16 @@ import BarListSidebar from '@/components/bar/bar/bar-list-sidebar';
 import BarListDropdownMobile from '@/components/bar/button/bar-list-dropdown-mobile';
 import { useBarList } from '@/hooks/bar/use-bar-list';
 import PageTitle from '@/components/page-title';
+import { useAuth } from '@/context/auth-context';
+import { BarService } from '@/services/bar-service';
 
 /**
  * 通用酒吧列表視圖組件
- * @param {string} category - 酒吧分類 (如 'sport', 'music')
- * @param {string} title - 頁面顯示標題
- * @param {string} loaderText - 加載時顯示的文字
- * @param {function} onPageChange - Navbar 同步回呼函數
  */
 export default function BarListView({ category, title, loaderText = '尋找美酒中...', onPageChange }) {
   const pageTitle = '酒吧探索';
+  const { auth } = useAuth();
+  const [savedBars, setSavedBars] = useState({});
 
   useEffect(() => {
     onPageChange(pageTitle);
@@ -33,6 +33,38 @@ export default function BarListView({ category, title, loaderText = '尋找美�
     onAreaSelected,
     onTypeSelected,
   } = useBarList(category);
+
+  // 檢查儲存酒吧狀態
+  const checkBarsStatus = useCallback(
+    async (barIds) => {
+      const userId = auth.id;
+      if (userId === 0 || !barIds) return;
+
+      try {
+        const data = await BarService.checkBarStatus(userId, barIds);
+        setSavedBars((prevSavedBars) => {
+          const newSavedBars = { ...prevSavedBars };
+          data.forEach((status) => {
+            newSavedBars[status.barId] = status.isSaved;
+          });
+          return newSavedBars;
+        });
+      } catch (error) {
+        console.error('無法獲取酒吧狀態:', error);
+      }
+    },
+    [auth.id],
+  );
+
+  const barIdsString = useMemo(() => {
+    return bars.map((bar) => bar.bar_id).join(',');
+  }, [bars]);
+
+  useEffect(() => {
+    if (barIdsString && auth.id !== 0) {
+      checkBarsStatus(barIdsString);
+    }
+  }, [barIdsString, checkBarsStatus, auth.id]);
 
   return (
     <>
@@ -85,7 +117,12 @@ export default function BarListView({ category, title, loaderText = '尋找美�
               bars
                 .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
                 .map((bar) => (
-                  <BarCard bar={bar} key={bar.bar_id} />
+                  <BarCard
+                    bar={bar}
+                    key={bar.bar_id}
+                    savedBars={savedBars}
+                    setSavedBars={setSavedBars}
+                  />
                 ))
             ) : (
               <div className="text-white py-20 text-center w-full">目前該地區沒有酒吧資料</div>

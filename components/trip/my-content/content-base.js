@@ -8,6 +8,8 @@ export default function ContentBase({
   block,
   fetchMethod,
   NoContentComponent,
+  refreshAllDetails,
+  setNewDetail,
 }) {
   const [tripDetailsList, setTripDetailsList] = useState([]);
 
@@ -40,12 +42,27 @@ export default function ContentBase({
     }
   };
 
+  // 監聽來自側邊欄或其它組件的「局部重新整理」請求
+  useEffect(() => {
+    const handleRefresh = (event) => {
+      // 如果事件沒指定 block，或是指定的 block 與本組件相同，則執行刷新
+      const targetBlock = event.detail?.block;
+      if (!targetBlock || String(targetBlock) === String(block)) {
+        refreshTripDetails();
+      }
+    };
+
+    window.addEventListener('trip-detail-refresh', handleRefresh);
+    return () => window.removeEventListener('trip-detail-refresh', handleRefresh);
+  }, [block, trip_plan_id, fetchMethod]); // 依賴項確保 refreshTripDetails 能正確執行
+
   return (
     <div className="flex flex-wrap gap-10 justify-center w-full transition-all duration-300">
       {tripDetailsList.length === 0 ? (
         <NoContentComponent
           trip_plan_id={trip_plan_id}
           refreshTripDetails={refreshTripDetails}
+          refreshAllDetails={refreshAllDetails}
         />
       ) : (
         tripDetailsList.map((details, index) => (
@@ -55,17 +72,22 @@ export default function ContentBase({
                 trip_plan_id={trip_plan_id}
                 tripDetails={details}
                 refreshTripDetails={refreshTripDetails}
+                refreshAllDetails={refreshAllDetails}
+                setNewDetail={setNewDetail}
               />
             ) : details.bar_id ? (
               <BarPhotoMy
                 trip_plan_id={trip_plan_id}
                 tripDetails={details}
                 refreshTripDetails={refreshTripDetails}
+                refreshAllDetails={refreshAllDetails}
+                setNewDetail={setNewDetail}
               />
             ) : (
               <NoContentComponent
                 trip_plan_id={trip_plan_id}
                 refreshTripDetails={refreshTripDetails}
+                refreshAllDetails={refreshAllDetails}
               />
             )}
           </div>

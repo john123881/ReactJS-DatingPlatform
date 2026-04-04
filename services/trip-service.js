@@ -9,7 +9,7 @@ export const TripService = {
   /**
    * 獲取其他人的推薦行程
    */
-  getOtherPlans: () => apiClient('/trip/other-plans'),
+  getOtherPlans: (page = 1, limit = 10) => apiClient(`/trip/other-plans?page=${page}&limit=${limit}`),
 
   /**
    * 獲取單個行程詳情
@@ -104,4 +104,9 @@ export const TripService = {
    * @param {string} tripId
    */
   checkTripStatus: (userId, tripId) => apiClient(`/trip/check-trip-status?userId=${userId}&tripId=${tripId}`),
+
+  /**
+   * 更新行程基本資訊 (標題、日期、描述、備註)
+   */
+  updateTripPlan: (tripPlanId, data) => apiClient.post(`/trip/my-details/DnN/${tripPlanId}`, data),
 };

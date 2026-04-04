@@ -65,6 +65,7 @@ export const PostProvider = ({ children }) => {
   const [filteredPage, setFilteredPage] = useState(1);
   const [eventPage, setEventPage] = useState(1);
   const [randomPage, setRandomPage] = useState(1);
+  const [randomSeed, setRandomSeed] = useState(null);
   const [likedPosts, setLikedPosts] = useState({});
   const [savedPosts, setSavedPosts] = useState({});
 
@@ -294,7 +295,13 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const data = await CommunityService.getRandomPosts(randomPage, 12);
+      let currentSeed = randomSeed;
+      if (randomPage === 1 && currentSeed === null) {
+        currentSeed = Math.floor(Math.random() * 1000000);
+        setRandomSeed(currentSeed);
+      }
+
+      const data = await CommunityService.getRandomPosts(randomPage, 12, currentSeed);
       if (data.length === 0) {
         setExploreHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -311,7 +318,7 @@ export const PostProvider = ({ children }) => {
       console.error('Failed to fetch explore posts:', error);
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  }, [exploreHasMore, randomPage, checkPostsStatus, getPostComments]);
+  }, [exploreHasMore, randomPage, randomSeed, checkPostsStatus, getPostComments]);
 
   const getCommunityProfilePost = useCallback(async () => {
     if (!profileHasMore) return; // 防止重複請求
@@ -1441,6 +1448,8 @@ export const PostProvider = ({ children }) => {
       setFilteredPage,
       currentKeyword,
       randomPosts,
+      randomSeed,
+      setRandomSeed,
       setPostContent,
       setProfilePosts,
       profilePage,
@@ -1546,6 +1555,7 @@ export const PostProvider = ({ children }) => {
       filteredPage,
       currentKeyword,
       randomPosts,
+      randomSeed,
       postContent,
       profilePage,
       checkPostsStatus,

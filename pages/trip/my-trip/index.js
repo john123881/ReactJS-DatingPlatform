@@ -69,6 +69,17 @@ export default function MyTrip({ onPageChange }) {
     setTrips((prev) => prev.filter((trip) => trip.trip_plan_id !== tripPlanId));
   }, []);
 
+  const onDeleteRollback = useCallback((originalTrip) => {
+    setTrips((prev) => {
+      // 避免重複加入
+      if (prev.find(t => t.trip_plan_id === originalTrip.trip_plan_id)) return prev;
+      // 將行程加回列表（通常加在原位或末尾，這裡簡單處理加在前面或保持原有排序邏輯）
+      const newTrips = [...prev, originalTrip];
+      // 依日期排序（可選，與原始載入邏輯保持一致）
+      return newTrips.sort((a, b) => new Date(b.trip_date) - new Date(a.trip_date));
+    });
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

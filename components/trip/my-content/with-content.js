@@ -11,6 +11,8 @@ export default function WithContent({
   onClick,
   tripDetails,
   refreshTripDetails,
+  refreshAllDetails,
+  setNewDetail,
 }) {
   const { isLoading } = useLoader();
   const openDeleteModal = () => {
@@ -37,19 +39,32 @@ export default function WithContent({
   };
 
   const onConfirmDelete = async () => {
+    const detailId = tripDetails.trip_detail_id;
+    // 樂觀更新：立即從父組件狀態中移除
+    if (setNewDetail) {
+      setNewDetail((prev) => {
+        if (Array.isArray(prev)) {
+          return prev.filter((item) => item.trip_detail_id !== detailId);
+        }
+        return prev;
+      });
+    }
+
     try {
-      const result = await TripService.deleteTripDetail(
-        tripDetails.trip_detail_id,
-      );
+      const result = await TripService.deleteTripDetail(detailId);
       if (result.success) {
         toast.success(`成功移除: ${altText}`);
         closeDeleteModal();
         refreshTripDetails();
+        if (refreshAllDetails) refreshAllDetails();
       } else {
         toast.error('刪除失敗', result.message);
+        // 失敗時重新整理回原狀
+        if (refreshAllDetails) refreshAllDetails();
       }
     } catch (error) {
       toast.error('發生錯誤', error.message);
+      if (refreshAllDetails) refreshAllDetails();
     }
   };
 
