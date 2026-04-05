@@ -23,8 +23,9 @@ export const PostProvider = ({ children }) => {
 
   const [posts, setPosts] = useState([]);
   const [profilePosts, setProfilePosts] = useState([]);
+  const [page, setPage] = useState(1);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [postPage, setPostPage] = useState([]);
+  const [filteredPage, setFilteredPage] = useState(1);
   const [postsCount, setPostsCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [eventPageCard, setEventPageCard] = useState([]);
@@ -69,6 +70,9 @@ export const PostProvider = ({ children }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const currentUploadRef = useRef(null);
+
+  // 個人檔案貼文分頁
+  const [profilePage, setProfilePage] = useState(1);
 
   // 個人檔案活動相關狀態
   const [profileEvents, setProfileEvents] = useState([]);
@@ -1689,7 +1693,7 @@ export const PostProvider = ({ children }) => {
       posts,
       setPosts,
       profilePosts,
-      postPage,
+      page,
       eventPageCard,
       filteredPosts,
       postsCount,
@@ -1731,6 +1735,7 @@ export const PostProvider = ({ children }) => {
       indexFilteredHasMore,
       exploreHasMore,
       profileHasMore,
+      setProfileHasMore,
       userProfileHasMore,
       setUserProfileHasMore,
       profileEvents,
@@ -1783,6 +1788,10 @@ export const PostProvider = ({ children }) => {
       setActiveFilterButton,
       isHoverActive,
       setIsHoverActive,
+      filteredPosts,
+      setFilteredPosts,
+      filteredPage,
+      setFilteredPage,
       reload,
       setReload,
       searchTerm,
@@ -1821,7 +1830,7 @@ export const PostProvider = ({ children }) => {
       userInfo,
       posts,
       profilePosts,
-      postPage,
+      page,
       eventPageCard,
       filteredPosts,
       postsCount,
