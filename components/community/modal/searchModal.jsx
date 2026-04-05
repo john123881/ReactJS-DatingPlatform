@@ -1,7 +1,7 @@
 import { usePostContext } from '@/context/post-context';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from './modal.module.css';
+import { FiSearch } from 'react-icons/fi';
 
 export default function SearchModal() {
   const {
@@ -16,12 +16,23 @@ export default function SearchModal() {
     setUserProfileHasMore,
     setReload,
     searchModalRef,
+    handleFilterClick,
   } = usePostContext();
 
   const router = useRouter();
 
   const handleSearchChange = async (e) => {
     getSearchUsers(e.target.value);
+  };
+
+  const handleTagSearch = (keyword) => {
+    // 呼叫過濾邏輯
+    handleFilterClick(keyword);
+    // 關閉 Modal
+    resetAndCloseSearchModal();
+    if (searchModalRef.current) {
+      searchModalRef.current.close();
+    }
   };
 
   const handleProfileClick = async (userId) => {
@@ -74,71 +85,65 @@ export default function SearchModal() {
             <input
               type="text"
               className="grow"
-              placeholder="搜尋...... "
+              placeholder="搜尋標籤、關鍵字或用戶... "
               value={searchTerm}
               onChange={handleSearchChange}
             />
           </label>
-          {/* <p className={`${styles['searchModalListItemText']} text-h6 mb-3`}>
-            歷史紀錄
-          </p> */}
-          <ul>
+          
+          <ul className="mt-4">
+            {/* 搜尋標籤或關鍵字選項 */}
+            {searchTerm.trim().length > 0 && (
+              <li
+                className="flex items-center gap-3 p-3 mb-4 rounded-xl border border-neongreen/30 bg-neongreen/5 hover:bg-neongreen/10 cursor-pointer transition-all group scale-100 hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => handleTagSearch(searchTerm)}
+              >
+                <div className="w-10 h-10 rounded-full bg-neongreen/20 flex items-center justify-center text-neongreen text-xl group-hover:bg-neongreen group-hover:text-black transition-colors">
+                  <FiSearch />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-white font-bold">搜尋標籤或關鍵字</span>
+                  <span className="text-neongreen text-sm font-medium">
+                    {searchTerm.startsWith('#') ? searchTerm : `#${searchTerm}`}
+                  </span>
+                </div>
+              </li>
+            )}
+
             {hasSearched && searchResults.length === 0 ? (
-              <p className={`${styles['searchModalListText']}`}>未找到结果</p>
+              searchTerm.trim().length === 0 && (
+                <p className={`${styles['searchModalListText']} text-center py-10 opacity-50`}>
+                  未找到結果
+                </p>
+              )
             ) : (
               searchResults.map((user, index) => (
                 <li
                   key={index}
-                  className="searchModalListItem flex flex-row justify-between items-center mb-3 p-2"
+                  className="searchModalListItem flex flex-row justify-between items-center mb-3 p-2 hover:bg-white/5 rounded-2xl transition-all cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProfileClick(user.user_id);
+                  }}
                 >
                   <div className="card-iconListLeft flex flex-row items-center">
                     <div className="avatar mr-3">
-                      <div className="w-10 rounded-full">
-                        <div
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleProfileClick(user.user_id);
-                          }}
-                        >
-                          <img
-                            src={user.avatar || '/unknown-user-image.jpg'}
-                            alt={user.username || 'No Image Available'}
-                          />
-                        </div>
+                      <div className="w-10 rounded-full border border-white/10">
+                        <img
+                          src={user.avatar || '/unknown-user-image.jpg'}
+                          alt={user.username || 'No Image Available'}
+                        />
                       </div>
                     </div>
-                    <div
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleProfileClick(user.user_id);
-                      }}
-                    >
-                      <span
-                        className={`${styles['searchModalListEmail']} text-h6`}
-                      >
-                        {user.email.split('@')[0]}
-                      </span>
-                    </div>
-
-                    <div
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleProfileClick(user.user_id);
-                      }}
-                    >
-                      <span
-                        className={`${styles['searchModalListUsername']} text-[14px] mx-3`}
-                      >
+                    <div className="flex flex-col">
+                      <span className={`${styles['searchModalListEmail']} text-white text-sm font-medium`}>
                         {user.username}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        @{user.email.split('@')[0]}
                       </span>
                     </div>
                   </div>
-
-                  {/* <div className="card-iconListRight flex justify-end">
-                    <FaRegCircleXmark
-                      className={`${styles['searchModalListItemIcon']} text-h5`}
-                    />
-                  </div> */}
                 </li>
               ))
             )}

@@ -22,7 +22,7 @@ export default function LeftLogin({ switchHandler }) {
     setAuth,
     login,
     loginModalToggle,
-    isOnLogin,
+    isOnLoginPage,
     setLoginModalToggle,
     setUserAvatar,
   } = useAuth();

@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
-import OtherTripDetailSidebar from '@/components/trip/sidebars/other-trip-detail-sidebar';
-import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
-import OtherContentMorning from '@/components/trip/other-content/blocks/other-content-morning';
-import OtherContentNoon from '@/components/trip/other-content/blocks/other-content-noon';
-import OtherContentNight from '@/components/trip/other-content/blocks/other-content-night';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
-import PageTitle from '@/components/page-title';
 import { TripService } from '@/services/trip-service';
 import { useTripDetail } from '@/hooks/trip/use-trip-detail';
 import { toast } from '@/lib/toast';
+import PageTitle from '@/components/page-title';
+import TripNavigationTab from '@/components/trip/sidebars/trip-navigation-tab';
+import OtherTripDetailSidebar from '@/components/trip/sidebars/other-trip-detail-sidebar';
+import OtherContentMorning from '@/components/trip/other-content/blocks/other-content-morning';
+import OtherContentNoon from '@/components/trip/other-content/blocks/other-content-noon';
+import OtherContentNight from '@/components/trip/other-content/blocks/other-content-night';
 import PageLoader from '@/components/ui/loader/page-loader';
 import Loader from '@/components/ui/loader/loader';
+import SharedTripWorkspace from '@/components/trip/other-content/shared-trip-workspace';
 
 export default function OtherTripdetail({ onPageChange }) {
   const pageTitle = '行程規劃';
   const router = useRouter();
   const { auth, isAuthLoaded, setLoginModalToggle } = useAuth();
   const { trip_plan_id } = router.query;
+
+  // 設置頁面標題
+  useEffect(() => {
+    onPageChange?.(pageTitle);
+  }, [onPageChange, pageTitle]);
 
   // Auth Guard
   useEffect(() => {
@@ -30,6 +36,9 @@ export default function OtherTripdetail({ onPageChange }) {
     tripDetails,
     tripName,
     newDetail,
+    barPhotos,
+    barNames,
+    moviePhotos,
     isLoading,
   } = useTripDetail(trip_plan_id);
 
@@ -89,11 +98,10 @@ export default function OtherTripdetail({ onPageChange }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-black overflow-x-hidden">
       <PageTitle pageTitle={pageTitle} />
       <TripNavigationTab />
       
-      {/* 判斷是否正在讀取穩定 Shell 中的內容 */}
       <OtherTripDetailSidebar tripName={tripName || {}} isLoading={isLoading} />
       
       <div className="flex-grow">
@@ -103,47 +111,80 @@ export default function OtherTripdetail({ onPageChange }) {
             <p className="mt-4 text-white/50 text-xl">正在準備行程分享內容...</p>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row justify-start items-start w-full max-w-[1600px] py-16 mx-auto px-6 sm:px-10 gap-16 transition-all duration-300 animate__animated animate__fadeIn">
-            {/* 左側：時段內容 */}
-            <div className="flex flex-col gap-16 w-full lg:flex-grow order-2 lg:order-1 max-w-6xl pb-20">
-              <OtherContentMorning trip_plan_id={trip_plan_id} newDetail={newDetail} />
-              <OtherContentNoon trip_plan_id={trip_plan_id} newDetail={newDetail} />
-              <OtherContentNight trip_plan_id={trip_plan_id} newDetail={newDetail} />
+          <div className="flex flex-col xl:flex-row justify-center items-start w-full max-w-[1700px] py-6 sm:py-12 mx-auto px-4 sm:px-10 gap-10 lg:gap-24 transition-all duration-500 animate__animated animate__fadeIn relative">
+            
+            {/* Vertical Timeline Background Line */}
+            <div className="absolute left-[34px] sm:left-[58px] top-40 bottom-40 w-[1px] bg-gradient-to-b from-transparent via-neongreen/20 to-transparent hidden sm:block"></div>
+
+            {/* 中間：時段內容 */}
+            <div className="flex flex-col gap-24 w-full xl:flex-grow max-w-4xl order-2 xl:order-1 relative z-10">
+              
+              {/* Morning Section */}
+              <section className="relative group/section">
+                <div className="flex items-start gap-6 mb-10 transition-transform duration-500 group-hover/section:translate-x-2">
+                  <div className="flex flex-col items-center mt-2">
+                    <div className="w-8 h-8 rounded-full border-2 border-neongreen flex items-center justify-center bg-black shadow-[0_0_15px_#39FF14] transition-all duration-500 group-hover/section:scale-125">
+                      <div className="w-2 h-2 bg-neongreen rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="w-0.5 h-full bg-gradient-to-b from-neongreen via-white/5 to-transparent absolute top-10 -z-10"></div>
+                  </div>
+                  <div className="pt-1">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-white text-3xl sm:text-5xl font-black italic uppercase tracking-tighter leading-none">Morning</h2>
+                      <span className="text-neongreen font-black text-xs sm:text-sm tracking-[0.4em] uppercase opacity-60">08:00</span>
+                    </div>
+                    <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em] mt-3 bg-white/5 py-1 px-3 rounded-full border border-white/5 inline-block">台北之晨：開始美好的一天</p>
+                  </div>
+                </div>
+                <OtherContentMorning trip_plan_id={trip_plan_id} newDetail={newDetail} barPhotos={barPhotos} barNames={barNames} moviePhotos={moviePhotos} />
+              </section>
+
+              {/* Noon Section */}
+              <section className="relative group/section">
+                <div className="flex items-start gap-6 mb-10 transition-transform duration-500 group-hover/section:translate-x-2">
+                  <div className="flex flex-col items-center mt-2">
+                    <div className="w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center bg-black transition-all duration-500 group-hover/section:border-neongreen group-hover/section:scale-125 group-hover/section:shadow-[0_0_15px_#39FF14]">
+                      <div className="w-2 h-2 bg-white/20 rounded-full group-hover/section:bg-neongreen group-hover/section:animate-pulse"></div>
+                    </div>
+                    <div className="w-0.5 h-full bg-gradient-to-b from-white/10 via-white/5 to-transparent absolute top-10 -z-10"></div>
+                  </div>
+                  <div className="pt-1">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-white text-3xl sm:text-5xl font-black italic uppercase tracking-tighter leading-none">Noon</h2>
+                      <span className="text-white/20 font-black text-xs sm:text-sm tracking-[0.4em] uppercase group-hover/section:text-neongreen group-hover/section:opacity-60 transition-colors">13:00</span>
+                    </div>
+                    <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em] mt-3 bg-white/5 py-1 px-3 rounded-full border border-white/5 inline-block">午後時光：探索城市角落</p>
+                  </div>
+                </div>
+                <OtherContentNoon trip_plan_id={trip_plan_id} newDetail={newDetail} barPhotos={barPhotos} barNames={barNames} moviePhotos={moviePhotos} />
+              </section>
+
+              {/* Night Section */}
+              <section className="relative group/section">
+                <div className="flex items-start gap-6 mb-10 transition-transform duration-500 group-hover/section:translate-x-2">
+                  <div className="flex flex-col items-center mt-2">
+                    <div className="w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center bg-black transition-all duration-500 group-hover/section:border-neongreen group-hover/section:scale-125 group-hover/section:shadow-[0_0_15px_#39FF14]">
+                      <div className="w-2 h-2 bg-white/20 rounded-full group-hover/section:bg-neongreen group-hover/section:animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="pt-1">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-white text-3xl sm:text-5xl font-black italic uppercase tracking-tighter leading-none">Night</h2>
+                      <span className="text-white/20 font-black text-xs sm:text-sm tracking-[0.4em] uppercase group-hover/section:text-neongreen group-hover/section:opacity-60 transition-colors">18:00</span>
+                    </div>
+                    <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em] mt-3 bg-white/5 py-1 px-3 rounded-full border border-white/5 inline-block">璀璨之夜：享受浪漫微醺</p>
+                  </div>
+                </div>
+                <OtherContentNight trip_plan_id={trip_plan_id} newDetail={newDetail} barPhotos={barPhotos} barNames={barNames} moviePhotos={moviePhotos} />
+              </section>
             </div>
 
-            {/* 右側：行程細節 (Sticky Sidebar Area) */}
-            <div className="flex flex-col justify-start items-center h-auto w-full lg:w-[450px] border border-white/10 rounded-3xl py-12 px-8 flex-shrink-0 bg-white/5 backdrop-blur-3xl shadow-2xl order-1 lg:order-2">
-              <h3 className="mb-10 text-4xl font-black text-neongreen text-center tracking-tighter">行程細節</h3>
-              
-              <div className="w-full mb-10">
-                <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4 text-white">行程描述</p>
-                <div className="w-full min-h-[120px] max-h-[250px] border border-white/10 rounded-2xl p-6 overflow-y-auto bg-black/40 text-lg leading-relaxed text-gray-300">
-                  {tripName?.trip_description ? (
-                    <div>{tripName.trip_description}</div>
-                  ) : (
-                    <p className="text-gray-500 italic text-center py-4 text-sm">此行程尚未填寫描述</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="w-full mb-12 flex-grow">
-                <p className="mb-4 text-2xl font-bold border-l-4 border-neongreen pl-4 text-white">行程筆記</p>
-                <div className="w-full min-h-[150px] max-h-[300px] border border-white/10 rounded-2xl p-6 overflow-y-auto bg-black/40 text-lg leading-relaxed text-gray-300">
-                  {tripName?.trip_notes ? (
-                    <div>{tripName.trip_notes}</div>
-                  ) : (
-                    <p className="text-gray-500 italic text-center py-4 text-sm">此行程尚未填寫筆記</p>
-                  )}
-                </div>
-              </div>
-
-              <button
-                className="group relative flex items-center justify-center w-full bg-neongreen hover:bg-white text-black font-black text-2xl py-6 rounded-2xl transition-all duration-300 shadow-glow-green hover:shadow-glow-white overflow-hidden"
-                onClick={openModal}
-              >
-                <span className="relative z-10">加入我的日曆</span>
-                <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-              </button>
+            {/* 右側：整合式工作區 */}
+            <div className="w-full xl:w-[480px] flex-shrink-0 order-1 xl:order-2 xl:sticky xl:top-32 z-10">
+              <SharedTripWorkspace
+                tripName={tripName}
+                onJoinClick={openModal}
+              />
             </div>
           </div>
         )}

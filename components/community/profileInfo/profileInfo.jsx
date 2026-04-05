@@ -16,6 +16,8 @@ export default function ProfileInfo({ onReady }) {
     following,
     postsCount,
     setPostsCount,
+    eventsCount,
+    getCommunityEventsCount,
     handleFollowClick,
     reload,
   } = usePostContext();
@@ -111,6 +113,7 @@ export default function ProfileInfo({ onReady }) {
       Promise.all([
         getFollowUsers(),
         getPostsCount(),
+        getCommunityEventsCount(uid),
         getLocalUserInfo(),
         getFollowers(),
         getFollowings(),
@@ -188,6 +191,9 @@ export default function ProfileInfo({ onReady }) {
                 }
               >
                 {followingCount} 追蹤中
+              </div>
+              <div className="basis-1/4">
+                {eventsCount} 活動
               </div>
               <FollowerModal
                 followers={userFollowers}

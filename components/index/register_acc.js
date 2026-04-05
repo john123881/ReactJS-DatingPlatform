@@ -8,7 +8,7 @@ const FireworkAnimation = dynamic(() => import('@/components/ui/animation/firewo
 const FireworkAnimationRight = dynamic(() => import('@/components/ui/animation/firework/firework-animation-right'), { ssr: false });
 
 export default function RegisterAcc() {
-  const { auth, setLoginModalToggle, switchHandler, isOnLogin, setIsOnLogin } =
+  const { auth, setLoginModalToggle, switchHandler, isOnLoginPage, setIsOnLoginPage } =
     useAuth();
 
   const [mounted, setMounted] = useState(false);
@@ -59,7 +59,7 @@ export default function RegisterAcc() {
               </button>
               <button
                 onClick={() => {
-                  setIsOnLogin(false);
+                  setIsOnLoginPage(false);
                   setLoginModalToggle(true);
                 }}
                 className="w-40 py-1 my-2 bg-black border-2 rounded-full md:w-80 h-[55px] md:py-2 border-primary text-primary hover:shadow-xl3"

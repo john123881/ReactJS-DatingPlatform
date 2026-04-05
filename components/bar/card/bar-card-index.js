@@ -47,7 +47,9 @@ export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
             <Image
               className="relative object-cover w-[159px] h-[155px] md:w-[241px] md:h-[230px] rounded-[10px]"
               src={
-                randomBar?.bar_pic_name
+                randomBar?.bar_img_url
+                  ? randomBar.bar_img_url
+                  : randomBar?.bar_pic_name
                   ? `/barPic/${randomBar.bar_pic_name}`
                   : '/unavailable-image.jpg'
               }

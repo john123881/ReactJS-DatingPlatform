@@ -8,6 +8,7 @@ import {
   useMemo,
 } from 'react';
 import { useAuth } from '@/context/auth-context';
+import { useCollect } from '@/context/use-collect';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { API_BASE_URL } from '@/configs/api-config';
@@ -18,12 +19,14 @@ const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
   const { auth, getAuthHeader, rerender, setRerender } = useAuth();
+  const { refreshCollectList } = useCollect();
 
   const [posts, setPosts] = useState([]);
   const [profilePosts, setProfilePosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [postPage, setPostPage] = useState([]);
   const [postsCount, setPostsCount] = useState(0);
+  const [eventsCount, setEventsCount] = useState(0);
   const [eventPageCard, setEventPageCard] = useState([]);
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [randomPosts, setRandomPosts] = useState([]);
@@ -67,9 +70,11 @@ export const PostProvider = ({ children }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const currentUploadRef = useRef(null);
 
-  const [page, setPage] = useState(1);
-  const [profilePage, setProfilePage] = useState(1);
-  const [filteredPage, setFilteredPage] = useState(1);
+  // 個人檔案活動相關狀態
+  const [profileEvents, setProfileEvents] = useState([]);
+  const [profileEventPage, setProfileEventPage] = useState(1);
+  const [profileEventHasMore, setProfileEventHasMore] = useState(true);
+
   const [eventPage, setEventPage] = useState(1);
   const [randomPage, setRandomPage] = useState(1);
   const [randomSeed, setRandomSeed] = useState(null);
@@ -118,6 +123,16 @@ export const PostProvider = ({ children }) => {
       setUserInfo({}); // 當請求失敗時，也設置一個空對象
     }
   }, [auth.id]);
+
+  const getCommunityEventsCount = useCallback(async (userId) => {
+    if (!userId) return;
+    try {
+      const data = await CommunityService.getCountEvents(userId);
+      setEventsCount(data[0].EventCount);
+    } catch (error) {
+      console.error('Failed to fetch event count', error);
+    }
+  }, []);
 
   const getPostComments = useCallback(async (postIds) => {
     if (!postIds || postIds === '0' || postIds === 0) return;
@@ -274,7 +289,7 @@ export const PostProvider = ({ children }) => {
         await checkPostsStatus(postIds); // 檢查貼文狀態
         await getPostComments(postIds);
 
-        setPosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
+        setPosts((prevPosts) => (page === 1 ? data : [...prevPosts, ...data])); // 更新posts狀態
         setPage((prevPage) => prevPage + 1); // 更新頁碼
         // setIsLoading(false); // 結束加載
       }
@@ -299,7 +314,7 @@ export const PostProvider = ({ children }) => {
             await checkEventsStatus(eventIds);
 
             // 將活動資料存入 filteredPosts (前端渲染時會判斷渲染 EventCard)
-            setFilteredPosts((prevPosts) => [...prevPosts, ...data]);
+            setFilteredPosts((prevPosts) => (filteredPage === 1 ? data : [...prevPosts, ...data]));
             setFilteredPage((prevPage) => prevPage + 1);
             setIsFilterActive(true);
           }
@@ -318,7 +333,7 @@ export const PostProvider = ({ children }) => {
             await checkPostsStatus(postIds);
             await getPostComments(postIds);
 
-            setFilteredPosts((prevPosts) => [...prevPosts, ...data]);
+            setFilteredPosts((prevPosts) => (filteredPage === 1 ? data : [...prevPosts, ...data]));
             setFilteredPage((prevPage) => prevPage + 1);
             setIsFilterActive(true);
           }
@@ -351,7 +366,7 @@ export const PostProvider = ({ children }) => {
         await checkPostsStatus(postIds); // 檢查貼文狀態
         await getPostComments(postIds);
 
-        setRandomPosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
+        setRandomPosts((prevPosts) => (randomPage === 1 ? data : [...prevPosts, ...data])); // 更新posts狀態
         setRandomPage((prevPage) => prevPage + 1); // 更新頁碼
         // setIsLoading(false); // 結束加載
       }
@@ -361,28 +376,47 @@ export const PostProvider = ({ children }) => {
     }
   }, [exploreHasMore, randomPage, randomSeed, checkPostsStatus, getPostComments]);
 
-  const getCommunityProfilePost = useCallback(async () => {
-    if (!profileHasMore) return; // 防止重複請求
-    // setIsLoading(true); // 開始加載
+  const getCommunityProfilePost = useCallback(async (userId = uid) => {
+    if (!userId || !profileHasMore) return; 
+
     try {
-      const data = await CommunityService.getPosts(page, 12);
+      const data = await CommunityService.getPostsByUser(userId, profilePage, 12);
       if (data.length === 0) {
-        setProfileHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+        setProfileHasMore(false);
       } else {
         const postIds = data.map((post) => post.post_id).join(',');
 
-        await checkPostsStatus(postIds); // 檢查貼文狀態
+        await checkPostsStatus(postIds);
         await getPostComments(postIds);
 
-        setProfilePosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
-        setPage((prevPage) => prevPage + 1); // 更新頁碼
-        // setIsLoading(false); // 結束加載
+        setProfilePosts((prevPosts) => (profilePage === 1 ? data : [...prevPosts, ...data]));
+        setProfilePage((prevPage) => prevPage + 1);
       }
     } catch (error) {
       console.error('Failed to fetch profile posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
     }
-  }, [profileHasMore, page, checkPostsStatus, getPostComments]);
+  }, [profileHasMore, profilePage, uid, checkPostsStatus, getPostComments]);
+
+  const getCommunityUserProfileEvents = useCallback(
+    async (userId = uid) => {
+      if (!userId || !profileEventHasMore) return;
+      try {
+        const data = await CommunityService.getEventsByUser(userId, profileEventPage, 12);
+        if (data.length === 0) {
+          setProfileEventHasMore(false);
+        } else {
+          const eventIds = data.map((e) => e.comm_event_id).join(',');
+          await checkEventsStatus(eventIds);
+
+          setProfileEvents((prev) => (profileEventPage === 1 ? data : [...prev, ...data]));
+          setProfileEventPage((prev) => prev + 1);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user events:', error);
+      }
+    },
+    [profileEventPage, profileEventHasMore, uid, checkEventsStatus],
+  );
 
   const getPostPage = useCallback(
     async (pid) => {
@@ -432,7 +466,7 @@ export const PostProvider = ({ children }) => {
 
         await checkEventsStatus(eventIds); // 檢查活動狀態
 
-        setEvents((prevEvents) => [...prevEvents, ...data]); // 更新posts狀態
+        setEvents((prevEvents) => (eventPage === 1 ? data : [...prevEvents, ...data])); // 更新posts狀態
         setEventPage((prevPage) => prevPage + 1); // 更新頁碼
         // setIsLoading(false); // 結束加載
       }
@@ -565,6 +599,16 @@ export const PostProvider = ({ children }) => {
   const resetAndCloseModal = () => {
     setSelectedFile(null);
     setPreviewUrl('');
+    setPostContent('');
+    setEventDetails({
+      title: '',
+      description: '',
+      location: '',
+      startDate: '',
+      startTime: '',
+      endDate: '',
+      endTime: '',
+    });
 
     if (createModalRef.current) {
       createModalRef.current.close();
@@ -585,9 +629,15 @@ export const PostProvider = ({ children }) => {
 
   // 重置篩選
   const handleFilterClick = (keyword) => {
+    // 檢查目前是否在 /community 頁面，如果不是，則導航過去
+    if (router.pathname !== '/community') {
+      router.push('/community');
+    }
+
     // reset
     setFilteredPosts([]);
     setFilteredPage(1);
+    setIndexFilteredHasMore(true);
 
     setCurrentKeyword(keyword);
     setActiveFilterButton(keyword);
@@ -1217,6 +1267,7 @@ export const PostProvider = ({ children }) => {
           result.message?.includes('成功')
         ) {
           setRerender(!rerender);
+          refreshCollectList();
         } else {
           throw new Error('Failed to update save status');
         }
@@ -1255,11 +1306,15 @@ export const PostProvider = ({ children }) => {
           : await CommunityService.followUser(userId, FollowingId);
 
         if (
-          !(result.success ||
+          result.success ||
           result.output?.success ||
           result.msg?.includes('成功') ||
-          result.message?.includes('成功'))
+          result.message?.includes('成功')
         ) {
+          // 觸發重新整理，更新追蹤人數
+          setReload((prev) => !prev);
+          customToast.success(newFollowingState ? '已追蹤' : '已取消追蹤');
+        } else {
           throw new Error('Failed to update follow status');
         }
       } catch (error) {
@@ -1273,7 +1328,7 @@ export const PostProvider = ({ children }) => {
         interactingItems.current.delete(`follow-${FollowingId}`);
       }
     },
-    [auth.id, following],
+    [auth.id, following, rerender, setRerender],
   );
 
   const handleDeletePostClick = useCallback(
@@ -1283,12 +1338,24 @@ export const PostProvider = ({ children }) => {
       if (!postId || postId === '0' || postId === 0) return;
 
       Swal.fire({
-        title: '確定刪除?',
+        title: '確定要刪除貼文嗎？',
+        text: '此動作無法還原，這篇貼文將從社群中永久移除。',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: '確認',
-        cancelButtonText: `取消`,
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
+        confirmButtonText: '確認刪除',
+        cancelButtonText: '再考慮一下',
+        confirmButtonColor: '#ff4d4d', // 霓虹紅
+        cancelButtonColor: '#333333',
+        background: 'rgba(15, 15, 15, 0.95)',
+        color: '#fff',
+        backdrop: `rgba(0,0,0,0.8) blur(4px)`,
+        customClass: {
+          popup: 'border border-white/10 rounded-2xl shadow-2xl',
+          title: 'text-xl font-bold pt-4',
+          htmlContainer: 'text-gray-400 text-sm pb-2',
+          confirmButton: 'rounded-xl px-6 py-2 font-bold',
+          cancelButton: 'rounded-xl px-6 py-2 font-bold border border-white/10'
+        }
       }).then(async (result) => {
         // 如果點擊確認刪除才執行
         if (result.isConfirmed) {
@@ -1340,12 +1407,24 @@ export const PostProvider = ({ children }) => {
     if (!eventId) return;
 
     Swal.fire({
-      title: '確定刪除?',
+      title: '確定要刪除活動嗎？',
+      text: '此動作無法還原，該活動的所有資訊將被永久移除。',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: '確認',
-      cancelButtonText: `取消`,
-      confirmButtonColor: '#A0FF1F',
-      background: 'rgba(0, 0, 0, 0.85)',
+      confirmButtonText: '確認刪除',
+      cancelButtonText: '再考慮一下',
+      confirmButtonColor: '#ff4d4d',
+      cancelButtonColor: '#333333',
+      background: 'rgba(15, 15, 15, 0.95)',
+      color: '#fff',
+      backdrop: `rgba(0,0,0,0.8) blur(4px)`,
+      customClass: {
+        popup: 'border border-white/10 rounded-2xl shadow-2xl',
+        title: 'text-xl font-bold pt-4',
+        htmlContainer: 'text-gray-400 text-sm pb-2',
+        confirmButton: 'rounded-xl px-6 py-2 font-bold',
+        cancelButton: 'rounded-xl px-6 py-2 font-bold border border-white/10'
+      }
     }).then(async (result) => {
       // 如果點擊確認刪除才執行
       if (result.isConfirmed) {
@@ -1379,12 +1458,24 @@ export const PostProvider = ({ children }) => {
       if (!commentId) return;
 
       const result = await Swal.fire({
-        title: '確定刪除?',
+        title: '確定要刪除回覆嗎？',
+        text: '選定的回覆內容將被永久移除。',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: '確認',
-        cancelButtonText: '取消',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
+        confirmButtonText: '確認刪除',
+        cancelButtonText: '再考慮一下',
+        confirmButtonColor: '#ff4d4d',
+        cancelButtonColor: '#333333',
+        background: 'rgba(15, 15, 15, 0.95)',
+        color: '#fff',
+        backdrop: `rgba(0,0,0,0.8) blur(4px)`,
+        customClass: {
+          popup: 'border border-white/10 rounded-2xl shadow-2xl',
+          title: 'text-xl font-bold pt-4',
+          htmlContainer: 'text-gray-400 text-sm pb-2',
+          confirmButton: 'rounded-xl px-6 py-2 font-bold',
+          cancelButton: 'rounded-xl px-6 py-2 font-bold border border-white/10'
+        }
       });
 
       // 如果點擊確認刪除才執行
@@ -1603,13 +1694,15 @@ export const PostProvider = ({ children }) => {
       filteredPosts,
       postsCount,
       setPostsCount,
-      setFilteredPosts,
+      eventsCount,
+      getCommunityEventsCount,
       filteredPage,
       setFilteredPage,
       currentKeyword,
       randomPosts,
       randomSeed,
       setRandomSeed,
+      postContent,
       setPostContent,
       setProfilePosts,
       profilePage,
@@ -1625,6 +1718,11 @@ export const PostProvider = ({ children }) => {
       setNewComment,
       events,
       setEvents,
+      postsCount,
+      setPostsCount,
+      eventsCount,
+      setEventsCount,
+      getCommunityEventsCount,
       minDate,
       setMinDate,
       minEndDate,
@@ -1635,6 +1733,13 @@ export const PostProvider = ({ children }) => {
       profileHasMore,
       userProfileHasMore,
       setUserProfileHasMore,
+      profileEvents,
+      setProfileEvents,
+      profileEventPage,
+      setProfileEventPage,
+      profileEventHasMore,
+      setProfileEventHasMore,
+      getCommunityUserProfileEvents,
       eventHasMore,
       commentHasMore,
       handleCommentUpload,
@@ -1725,6 +1830,7 @@ export const PostProvider = ({ children }) => {
       randomPosts,
       randomSeed,
       postContent,
+      setPostContent,
       profilePage,
       checkPostsStatus,
       checkFollowingStatus,
@@ -1740,6 +1846,10 @@ export const PostProvider = ({ children }) => {
       exploreHasMore,
       profileHasMore,
       userProfileHasMore,
+      profileEvents,
+      profileEventPage,
+      profileEventHasMore,
+      getCommunityUserProfileEvents,
       eventHasMore,
       commentHasMore,
       handleCommentUpload,

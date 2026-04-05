@@ -1,17 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLoader } from '@/context/use-loader';
 import { TripService } from '@/services/trip-service';
-
-// 輔助函式：將Buffer轉換成base64
-function bufferToBase64(buffer) {
-  var binary = '';
-  var bytes = new Uint8Array(buffer);
-  var len = bytes.byteLength;
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
+import { FaTrash } from 'react-icons/fa6';
+import { toast } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export default function TripMediaBase({
   trip_plan_id,
@@ -23,108 +15,89 @@ export default function TripMediaBase({
   ContentComponent,
   NoContentComponents = {},
   isOther = false,
+  barPhotos = [],
+  barNames = [],
+  moviePhotos = [],
 }) {
-  const [imageSrc, setImageSrc] = useState('');
-  const [details, setDetails] = useState({});
   const [showDetails, setShowDetails] = useState(isOther);
-  const [isEmpty, setIsEmpty] = useState(false);
   const { open, close } = useLoader();
 
-  // 根據 type 設定對應的 fetch 方法與欄位名稱
-  let config = {};
-  switch (type) {
-    case 'bar':
-      config = {
-        imageFetch: () => TripService.getBarPhoto(trip_plan_id),
-        detailsFetch: () => TripService.getBarName(trip_plan_id),
-        imageProp: 'bar_img',
-        urlProp: 'bar_img_url', // 新增 URL 屬性
-        nameProp: 'bar_name',
-        descProp: 'bar_description',
-      };
-      break;
-    case 'movie':
-    default:
-      config = {
-        imageFetch: () => TripService.getMoviePhoto(trip_plan_id),
-        detailsFetch: null,
-        imageProp: 'movie_img',
-        urlProp: 'movie_img_url', // 新增 URL 屬性
-        nameProp: 'title',
-        descProp: 'movie_description',
-      };
-      break;
-  }
+  // 使用 useMemo 同步計算衍生資料，從預處理過的 props 中直接提取
+  const { imageSrc, details, isEmpty } = useMemo(() => {
+    if (!tripDetails?.trip_detail_id) {
+      return { imageSrc: '', details: {}, isEmpty: true };
+    }
 
-  useEffect(() => {
-    if (!trip_plan_id || !tripDetails) return;
+    let foundImage = '';
+    let foundDetails = {};
 
-    const fetchData = async () => {
-      if (!isOther) open();
-      try {
-        const imageResult = await config.imageFetch();
-        const filteredImage = imageResult.filter(
-          (t) => t.block == tripDetails.block,
-        );
-        
-        // 優先找尋 URL，若無則回退至 Blob
-        const imageData = filteredImage.find(
-          (item) => (item[config.urlProp]) || (item[config.imageProp] && item[config.imageProp].data),
-        );
+    if (type === 'bar') {
+      const imageData = barPhotos.find(p => p.trip_detail_id == tripDetails.trip_detail_id);
+      const nameData = barNames.find(n => n.trip_detail_id == tripDetails.trip_detail_id);
 
-        let hasData = false;
-
-        if (imageData) {
-          if (imageData[config.urlProp]) {
-            // S3 URL 優先
-            setImageSrc(imageData[config.urlProp]);
-          } else if (imageData[config.imageProp]?.data) {
-            // 傳統 Blob 回退
-            const base64String = bufferToBase64(imageData[config.imageProp].data);
-            setImageSrc(`data:image/jpeg;base64,${base64String}`);
-          }
-
-          // 如果是電影，詳情就在同一個物件裡
-          if (!config.detailsFetch) {
-            setDetails({
-              name: imageData[config.nameProp] || '',
-              description: imageData[config.descProp] || '',
-            });
-          }
-          hasData = true;
-        }
-
-        // 抓取詳情 (僅限 Bar)
-        if (config.detailsFetch) {
-          const detailsResult = await config.detailsFetch();
-          const filteredDetails = detailsResult.filter(
-            (t) => t.block == tripDetails.block,
-          );
-          if (filteredDetails.length > 0) {
-            setDetails({
-              name: filteredDetails[0][config.nameProp] || '',
-              description: filteredDetails[0][config.descProp] || '',
-            });
-            hasData = true;
-          }
-        }
-
-        // 如果完全沒抓到圖片也沒抓到名稱，則視為空
-        if (!hasData) {
-          setIsEmpty(true);
-        } else {
-          setIsEmpty(false);
-        }
-      } catch (error) {
-        console.error(`Error fetching ${type} content:`, error);
-        setIsEmpty(true);
-      } finally {
-        if (!isOther) close();
+      if (imageData) {
+        foundImage = imageData.processedSrc || '';
       }
-    };
 
-    fetchData();
-  }, [trip_plan_id, tripDetails, isOther, type, config.imageProp]);
+      if (nameData) {
+        foundDetails = {
+          name: nameData.bar_name || '',
+          description: nameData.bar_description || '',
+        };
+      }
+    } else {
+      const movieData = moviePhotos.find(m => m.trip_detail_id == tripDetails.trip_detail_id);
+      if (movieData) {
+        foundImage = movieData.processedSrc || '';
+        foundDetails = {
+          name: movieData.title || '',
+          description: movieData.movie_description || '',
+        };
+      }
+    }
+
+    return {
+      imageSrc: foundImage,
+      details: foundDetails,
+      isEmpty: !foundImage && Object.keys(foundDetails).length === 0
+    };
+  }, [tripDetails, type, barPhotos, barNames, moviePhotos]);
+
+  const handleDelete = async () => {
+    if (isOther) return;
+
+    Swal.fire({
+      title: '確定要刪除行程嗎？',
+      text: '此動作無法還原，該項目將從計畫中永久移除。',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '確認刪除',
+      cancelButtonText: '再考慮一下',
+      confirmButtonColor: '#ff4d4d', // 霓虹紅
+      cancelButtonColor: '#333333',
+      background: 'rgba(15, 15, 15, 0.95)',
+      color: '#fff',
+      backdrop: `rgba(0,0,0,0.8) blur(4px)`,
+      customClass: {
+        popup: 'border border-white/10 rounded-2xl shadow-2xl',
+        title: 'text-xl font-bold pt-4',
+        htmlContainer: 'text-gray-400 text-sm pb-2',
+        confirmButton: 'rounded-xl px-6 py-2 font-bold',
+        cancelButton: 'rounded-xl px-6 py-2 font-bold border border-white/10'
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const confirmDelete = await TripService.deleteTripDetail(tripDetails.trip_detail_id);
+        if (confirmDelete.success) {
+          toast.success('已刪除該行程項目');
+          refreshTripDetails();
+          if (refreshAllDetails) refreshAllDetails();
+        } else {
+          toast.error('刪除失敗：' + confirmDelete.message);
+        }
+      }
+    });
+  };
 
   // Fallback 邏輯 (僅限我的行程)
   if (!isOther && isEmpty) {
@@ -137,6 +110,7 @@ export default function TripMediaBase({
           refreshAllDetails={refreshAllDetails}
           trip_detail_id={tripDetails.trip_detail_id}
           isGhost={true}
+          setNewDetail={setNewDetail}
         />
       );
     }
@@ -149,33 +123,63 @@ export default function TripMediaBase({
 
   return (
     <div
-      className="flex items-center justify-center gap-0 sm:gap-4 transition-all duration-500 ease-in-out group/media"
-      onMouseEnter={() => !isOther && setShowDetails(true)}
-      onMouseLeave={() => !isOther && setShowDetails(false)}
+      className="flex flex-col sm:flex-row items-center sm:items-start justify-start w-full max-w-2xl gap-5 sm:gap-8 p-4 sm:p-8 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[24px] sm:rounded-[32px] hover:border-neongreen/40 transition-all duration-500 group/card shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden mx-auto sm:mx-0"
     >
-      <div className="transition-all duration-500 ease-out flex-shrink-0 hover:translate-y-[-10px]">
+      {/* Background Accent Gradient */}
+      <div className="absolute top-0 left-0 w-1 sm:w-1.5 h-full bg-neongreen shadow-[0_0_20px_#39FF14] opacity-40 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+      
+      {/* Delete Button (Only for Owners) */}
+      {!isOther && (
+        <button 
+          onClick={handleDelete}
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 rounded-full bg-black/20 text-white/20 hover:bg-red-500 hover:text-white transition-all duration-300 z-10 opacity-0 group-hover/card:opacity-100"
+          title="刪除此項目"
+        >
+          <FaTrash className="text-sm sm:text-base" />
+        </button>
+      )}
+
+      <div className="flex-shrink-0 transition-transform duration-700 group-hover/card:scale-110">
         <ContentComponent
           imageSrc={imageSrc}
           altText={details.name}
-          onClick={isOther ? null : () => setShowDetails(!showDetails)}
+          onClick={null}
           tripDetails={tripDetails}
           refreshTripDetails={refreshTripDetails}
           refreshAllDetails={refreshAllDetails}
           setNewDetail={setNewDetail}
         />
       </div>
-      <div
-        className={`overflow-hidden transition-all duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] flex items-center ${
-          showDetails || isOther
-            ? 'max-w-[400px] opacity-100 ml-6 transform translate-x-0'
-            : 'max-w-0 opacity-0 ml-0 transform translate-x-[-20px]'
-        }`}
-      >
+      
+      <div className="flex flex-col flex-grow w-full min-w-0 pt-2 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2 sm:gap-3 mb-4">
+          <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest shadow-sm ${type === 'bar' ? 'bg-neongreen text-black' : 'bg-white/10 text-white/80 border border-white/10'}`}>
+            {type === 'bar' ? 'Bar' : 'Movie'}
+          </span>
+          <h4 className="text-white text-xl sm:text-3xl font-black tracking-tighter uppercase italic break-words w-full pr-8">
+            {details.name || '載入中...'}
+          </h4>
+        </div>
+        
         {details.description && (
-          <div className="w-80 lg:w-96 flex-shrink-0 text-gray-300 leading-relaxed line-clamp-4 overflow-y-auto max-h-32 lg:max-h-48 drop-shadow-lg">
-            {details.description}
+          <div className="relative w-full mt-2">
+            <div 
+              className="text-white/50 text-xs sm:text-[13px] leading-relaxed italic bg-white/5 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-white/5 transition-colors group-hover/card:text-white/80 break-words text-left relative"
+            >
+              <span className="text-neongreen/40 text-lg sm:text-xl font-serif absolute -top-1 -left-1">“</span>
+              {details.description}
+              <span className="text-neongreen/40 text-lg sm:text-xl font-serif absolute -bottom-4 -right-1">”</span>
+            </div>
           </div>
         )}
+        
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-4">
+          <div className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
+            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-neongreen/30 rounded-full animate-pulse shadow-[0_0_5px_#39FF14]"></div>
+            <span>Verified Entry</span>
+          </div>
+          <span className="text-white/10 text-[8px] sm:text-[9px] font-bold">UID: {tripDetails.trip_detail_id}</span>
+        </div>
       </div>
     </div>
   );

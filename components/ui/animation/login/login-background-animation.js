@@ -1,12 +1,12 @@
 import Lottie from 'lottie-react';
 import loginBackgroundAnima from './login-background.json';
 
-export default function LoginBackgroundAnimation({ isOnLogin }) {
+export default function LoginBackgroundAnimation({ isOnLoginPage }) {
   const style = {
     height: 550,
     width: '100%',
     borderRadius: '24px',
-    transform: isOnLogin ? 'scaleX(-1)' : 'none',
+    transform: isOnLoginPage ? 'scaleX(-1)' : 'none',
     transition: 'transform 0.5s ease-in-out',
   };
 

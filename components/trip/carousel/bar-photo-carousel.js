@@ -41,11 +41,10 @@ export default function BarPhotoCarousel({ trip_plan_id, refreshAllDetails, newD
 
   return (
     <div
-      className="hidden sm:flex sm:flex-col gap-6 mb-8"
+      className="flex flex-col gap-4 w-full"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <h3 className="text-center text-2xl">熱門酒吧</h3>
       {currentBars.map((bar, index) => (
         <CarouselContentBar
           key={bar.bar_id || index}

@@ -202,9 +202,9 @@ export default function PostCardLarge({ post }) {
               </div>
             </div>
           )}
-          <p className="postContext mb-2">{post.post_context?.split('#')[0].trim()}</p>
+          <p className="postContext mb-2">{(post.post_context || '').split('#')[0].trim()}</p>
           <div className="flex flex-wrap gap-2 mb-3 px-1">
-            {post.post_context?.split('#').slice(1).map((tag, i) => (
+            {(post.post_context || '').split('#').slice(1).map((tag, i) => (
               <CommunityTag key={i} text={tag.trim()} />
             ))}
           </div>

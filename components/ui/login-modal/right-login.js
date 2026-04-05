@@ -10,7 +10,7 @@ import { toast as customToast } from '@/lib/toast';
 
 import Link from 'next/link';
 
-export default function RightLogin({ isOnLogin, switchHandler }) {
+export default function RightLogin({ isOnLoginPage, switchHandler }) {
   const { auth, register } = useAuth();
   const router = useRouter();
   const [showPWD, setShowPWD] = useState(false);

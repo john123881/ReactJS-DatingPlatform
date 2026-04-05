@@ -117,6 +117,7 @@ export default function CreateModal() {
                       const isSelected = postContent?.includes(`#${tag}`);
                       return (
                         <button
+                          type="button"
                           key={tag}
                           onClick={() => {
                             const tagStr = `#${tag}`;

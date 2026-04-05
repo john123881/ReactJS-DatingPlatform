@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { usePostContext } from '@/context/post-context';
 import { useRouter } from 'next/router';
@@ -7,8 +7,9 @@ import ShareModal from '../modal/shareModal';
 import EditModal from '../modal/editModal';
 import { FiSend, FiMessageCircle, FiMoreHorizontal } from 'react-icons/fi';
 import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
-export default function ExploreModal({ post, modalId, isOpen }) {
+function ExploreModalContent({ post, modalId, isOpen }) {
   const { auth } = useAuth();
 
   const router = useRouter();
@@ -106,9 +107,13 @@ export default function ExploreModal({ post, modalId, isOpen }) {
               }}
             >
               <img
-                src={post.img || '/unavailable-image.jpg'}
+                src={getImageUrl(post.img, 'post')}
                 alt={post.photo_name || 'No Image Available'}
-                className="object-contain h-full w-full"
+                className="w-full h-full object-contain max-h-[50vh] md:max-h-none"
+                loading="eager"
+                fetchpriority="high"
+                decoding="sync"
+                onError={(e) => handleImageError(e, 'post')}
               />
             </figure>
 
@@ -122,8 +127,9 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                         onClick={() => handleUserClick(post.post_userId)}
                       >
                         <img
-                          src={post.avatar || '/unknown-user-image.jpg'}
+                          src={getImageUrl(post.avatar, 'avatar')}
                           alt={post.photo_name || 'No Image Available'}
+                          onError={(e) => handleImageError(e, 'avatar')}
                         />
                       </div>
                     </div>
@@ -199,8 +205,9 @@ export default function ExploreModal({ post, modalId, isOpen }) {
                             onClick={() => handleUserClick(comment.user_id)}
                           >
                             <img
-                              src={comment.avatar || '/unknown-user-image.jpg'}
+                              src={getImageUrl(comment.avatar, 'avatar')}
                               alt={post.photo_name || 'No Image Available'}
+                              onError={(e) => handleImageError(e, 'avatar')}
                             />
                           </div>
                         </div>
@@ -349,3 +356,16 @@ export default function ExploreModal({ post, modalId, isOpen }) {
     </>
   );
 }
+
+const ExploreModal = memo(ExploreModalContent, (prevProps, nextProps) => {
+  return (
+    prevProps.isOpen === nextProps.isOpen &&
+    prevProps.post.post_id === nextProps.post.post_id &&
+    prevProps.post.updated_at === nextProps.post.updated_at &&
+    prevProps.post.img === nextProps.post.img
+  );
+});
+
+ExploreModal.displayName = 'ExploreModal';
+
+export default ExploreModal;

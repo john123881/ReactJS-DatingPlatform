@@ -4,6 +4,7 @@ import {
   COMMUNITY_GET_POSTS,
   COMMUNITY_GET_FOLLOWS,
   COMMUNITY_GET_COUNT_POSTS,
+  COMMUNITY_GET_COUNT_EVENTS,
   COMMUNITY_GET_USER_INFO,
   COMMUNITY_GET_FOLLOWERS,
   COMMUNITY_GET_FOLLOWINGS,
@@ -28,6 +29,8 @@ export const CommunityService = {
    * @param {string|number} uid
    */
   getCountPosts: (uid) => apiClient(`${COMMUNITY_GET_COUNT_POSTS}/${uid}`),
+
+  getCountEvents: (uid) => apiClient(`${COMMUNITY_GET_COUNT_EVENTS}/${uid}`),
 
   /**
    * 獲取用戶基本資料
@@ -109,6 +112,9 @@ export const CommunityService = {
     apiClient(
       `/community/check-event-status?userId=${userId}&eventIds=${eventIds}`,
     ),
+
+  getEventsByUser: (uid, page, limit) =>
+    apiClient(`/community/get-user-events/${uid}?page=${page}&limit=${limit}`),
 
   createEvent: (data) => apiClient.post('/community/create-event', data),
 

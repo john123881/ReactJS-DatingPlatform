@@ -90,6 +90,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     // setMovieModalToggle,
     dropDownCollectOpen,
     setDropDownCollectOpen,
+    refreshTrigger,
   } = useCollect();
   // const [movieV, setMovieV] = useState({});
 
@@ -315,7 +316,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     return () => {
       controller.abort();
     };
-  }, [auth.id, posts, bars, movies, rerender]);
+  }, [auth.id, posts, bars, movies, rerender, refreshTrigger]);
 
   //點擊COLLECT LIST視窗外的區域會觸發DropDown的變化為false，關閉COLLECT LIST視窗
   useEffect(() => {

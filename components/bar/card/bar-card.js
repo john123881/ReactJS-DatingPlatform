@@ -7,11 +7,14 @@ import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { toast } from '@/lib/toast';
 
+import { useCollect } from '@/context/use-collect';
+
 export default function BarCard({ bar, savedBars, setSavedBars }) {
   // save bar
   // const [savedBars, setSavedBars] = useState({});
   const [error, setError] = useState('');
   const { auth, getAuthHeader, rerender, setRerender, setLoginModalToggle } = useAuth();
+  const { refreshCollectList } = useCollect();
   const isSaved = savedBars && savedBars[bar.bar_id];
 
   const handleSavedClick = async () => {
@@ -41,8 +44,10 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
         await BarService.saveBar(userId, barId);
       }
       
-      // 觸發全域重新渲染以同步其他組件 (如果需要)
-      // setRerender(!rerender); 
+      // 觸發全域重新渲染
+      setRerender(!rerender); 
+      // 觸發 Navbar 重新獲取收藏清單
+      refreshCollectList();
     } catch (error) {
       console.error('Error updating save status:', error);
       // 發生錯誤時還原 UI 狀態
@@ -108,7 +113,9 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
               <Image
                 className="relative w-[159px] h-[146px] lg:w-[223px] lg:h-[205px] object-cover"
                 src={
-                  bar?.bar_pic_name
+                  bar?.bar_img_url
+                    ? bar.bar_img_url
+                    : bar?.bar_pic_name
                     ? `/barPic/${bar.bar_pic_name}`
                     : '/unavailable-image.jpg'
                 }

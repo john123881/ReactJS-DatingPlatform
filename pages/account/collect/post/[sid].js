@@ -9,7 +9,7 @@ import PostModal from '@/components/community/modal/postModal';
 
 export default function AccountCollectPost({ onPageChange }) {
   const { posts, setPosts, checkPostsStatus, getPostComments, postModalToggle, setPostModalToggle } = usePostContext();
-  const { p, setP, modalId, setModalId } = useCollect();
+  const { p, setP, modalId, setModalId, refreshCollectList } = useCollect();
   
   const [pages, setPages] = useState({ page: 1, totalPages: 1 });
   const [arrowHovered, setArrowHovered] = useState([]);
@@ -45,6 +45,7 @@ export default function AccountCollectPost({ onPageChange }) {
     if (result && result.action === 'remove') {
       customToast.success('刪除收藏成功');
       setPosts((prev) => prev.filter((p) => p.save_id !== saveId));
+      refreshCollectList();
     }
   };
 

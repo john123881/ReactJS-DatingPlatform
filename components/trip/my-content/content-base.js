@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import BarPhotoMy from './bar-photo-my';
 import MoviePhotoMy from './movie-photo-my';
+import InPlaceSearch from '../add-trip/in-place-search';
 
 export default function ContentBase({
   trip_plan_id,
@@ -10,42 +11,28 @@ export default function ContentBase({
   NoContentComponent,
   refreshAllDetails,
   setNewDetail,
+  barPhotos,
+  barNames,
+  moviePhotos,
 }) {
   const [tripDetailsList, setTripDetailsList] = useState([]);
 
   useEffect(() => {
     if (newDetail && Array.isArray(newDetail)) {
       const filtered = newDetail.filter(d => d.block === block);
-      setTripDetailsList(filtered.length > 0 ? [filtered[filtered.length - 1]] : []);
-    } else if (!newDetail || (typeof newDetail === 'object' && Object.keys(newDetail).length === 0)) {
-      if (trip_plan_id) {
-        const fetchData = async () => {
-          try {
-            const result = await fetchMethod(trip_plan_id);
-            setTripDetailsList(result && result.length > 0 ? result : []);
-          } catch (error) {
-            console.error(`Fetching trip details error (block ${block}):`, error);
-            setTripDetailsList([]);
-          }
-        };
-        fetchData();
-      }
+      setTripDetailsList(filtered);
     }
-  }, [newDetail, trip_plan_id, fetchMethod, block]);
+  }, [newDetail, block]);
 
   const refreshTripDetails = async () => {
-    try {
-      const result = await fetchMethod(trip_plan_id);
-      setTripDetailsList(result && result.length > 0 ? result : []);
-    } catch (error) {
-      console.error(`Fetching trip details error (block ${block}):`, error);
+    if (refreshAllDetails) {
+      await refreshAllDetails();
     }
   };
 
   // 監聽來自側邊欄或其它組件的「局部重新整理」請求
   useEffect(() => {
     const handleRefresh = (event) => {
-      // 如果事件沒指定 block，或是指定的 block 與本組件相同，則執行刷新
       const targetBlock = event.detail?.block;
       if (!targetBlock || String(targetBlock) === String(block)) {
         refreshTripDetails();
@@ -54,10 +41,10 @@ export default function ContentBase({
 
     window.addEventListener('trip-detail-refresh', handleRefresh);
     return () => window.removeEventListener('trip-detail-refresh', handleRefresh);
-  }, [block, trip_plan_id, fetchMethod]); // 依賴項確保 refreshTripDetails 能正確執行
+  }, [block, refreshAllDetails]); 
 
   return (
-    <div className="flex flex-wrap gap-10 justify-center w-full transition-all duration-300">
+    <div className="flex flex-col items-center sm:flex-row sm:flex-wrap gap-6 sm:gap-10 justify-center w-full transition-all duration-300 overflow-visible">
       {tripDetailsList.length === 0 ? (
         <NoContentComponent
           trip_plan_id={trip_plan_id}
@@ -65,33 +52,48 @@ export default function ContentBase({
           refreshAllDetails={refreshAllDetails}
         />
       ) : (
-        tripDetailsList.map((details, index) => (
-          <div key={details.trip_detail_id || index} className="flex-shrink-0 hover:scale-105 transition-transform duration-300 animate__animated animate__fadeInUp">
-            {details.movie_id ? (
-              <MoviePhotoMy
-                trip_plan_id={trip_plan_id}
-                tripDetails={details}
-                refreshTripDetails={refreshTripDetails}
-                refreshAllDetails={refreshAllDetails}
-                setNewDetail={setNewDetail}
-              />
-            ) : details.bar_id ? (
-              <BarPhotoMy
-                trip_plan_id={trip_plan_id}
-                tripDetails={details}
-                refreshTripDetails={refreshTripDetails}
-                refreshAllDetails={refreshAllDetails}
-                setNewDetail={setNewDetail}
-              />
-            ) : (
-              <NoContentComponent
-                trip_plan_id={trip_plan_id}
-                refreshTripDetails={refreshTripDetails}
-                refreshAllDetails={refreshAllDetails}
-              />
-            )}
+        <>
+          {tripDetailsList.map((details, index) => {
+            // 如果此項目既無電影也無酒吧 ID，視為尚未填充的內容 (幽靈紀錄)
+            // 在有列表內容的情況下，我們略過它不在此處顯式渲染 NoContentComponent，
+            // 因為末尾已經有一個全局的 InPlaceSearch。
+            if (!details.movie_id && !details.bar_id) return null;
+
+            return (
+              <div key={details.trip_detail_id || index} className="w-full sm:w-auto flex-shrink transition-transform duration-300 animate__animated animate__fadeInUp">
+                {details.movie_id ? (
+                  <MoviePhotoMy
+                    trip_plan_id={trip_plan_id}
+                    tripDetails={details}
+                    refreshTripDetails={refreshTripDetails}
+                    refreshAllDetails={refreshAllDetails}
+                    setNewDetail={setNewDetail}
+                    moviePhotos={moviePhotos}
+                  />
+                ) : (
+                  <BarPhotoMy
+                    trip_plan_id={trip_plan_id}
+                    tripDetails={details}
+                    refreshTripDetails={refreshTripDetails}
+                    refreshAllDetails={refreshAllDetails}
+                    setNewDetail={setNewDetail}
+                    barPhotos={barPhotos}
+                    barNames={barNames}
+                  />
+                )}
+              </div>
+            );
+          })}
+          {/* 在已有的卡片下方加入一個統一的新增搜尋入口 */}
+          <div className="w-full flex items-center justify-center p-4 mt-2">
+            <InPlaceSearch 
+              trip_plan_id={trip_plan_id}
+              block={block}
+              refreshTripDetails={refreshTripDetails}
+              refreshAllDetails={refreshAllDetails}
+            />
           </div>
-        ))
+        </>
       )}
     </div>
   );

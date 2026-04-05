@@ -2,7 +2,7 @@ import { TripService } from '@/services/trip-service';
 import NoContentNight from './no-content-night';
 import ContentBase from '../content-base';
 
-export default function ContentNight({ trip_plan_id, newDetail, setNewDetail, refreshAllDetails }) {
+export default function ContentNight({ trip_plan_id, newDetail, setNewDetail, refreshAllDetails, barPhotos, barNames, moviePhotos }) {
   return (
     <ContentBase
       trip_plan_id={trip_plan_id}
@@ -12,6 +12,9 @@ export default function ContentNight({ trip_plan_id, newDetail, setNewDetail, re
       NoContentComponent={NoContentNight}
       refreshAllDetails={refreshAllDetails}
       setNewDetail={setNewDetail}
+      barPhotos={barPhotos}
+      barNames={barNames}
+      moviePhotos={moviePhotos}
     />
   );
 }

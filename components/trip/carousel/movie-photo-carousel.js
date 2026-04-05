@@ -49,11 +49,10 @@ export default function MoviePhotoCarousel({
 
   return (
     <div
-      className="hidden sm:flex sm:flex-col gap-6 mb-8"
+      className="flex flex-col gap-4 w-full"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <h3 className="text-center text-2xl">熱門電影</h3>
       {currentMovies.map((movie, index) => (
         <CarouselContentMovie
           key={movie.movie_id || index}

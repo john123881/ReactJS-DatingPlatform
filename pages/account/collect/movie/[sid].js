@@ -6,7 +6,7 @@ import { useCollect } from '@/context/use-collect';
 import { toast as customToast } from '@/lib/toast';
 
 export default function AccountCollectMovie({ onPageChange }) {
-  const { movies, setMovies } = useCollect();
+  const { movies, setMovies, refreshCollectList } = useCollect();
   const [pages, setPages] = useState({ page: 1, totalPages: 1 });
   const [arrowHovered, setArrowHovered] = useState([]);
 
@@ -33,6 +33,7 @@ export default function AccountCollectMovie({ onPageChange }) {
     if (result && result.action === 'remove') {
       customToast.success('刪除收藏成功');
       setMovies((prev) => prev.filter((m) => m.save_id !== saveId));
+      refreshCollectList();
     }
   };
 

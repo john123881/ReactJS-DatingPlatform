@@ -6,7 +6,7 @@ import { useCollect } from '@/context/use-collect';
 import { toast as customToast } from '@/lib/toast';
 
 export default function AccountCollectBar({ onPageChange }) {
-  const { bars, setBars } = useCollect();
+  const { bars, setBars, refreshCollectList } = useCollect();
   const [pages, setPages] = useState({ page: 1, totalPages: 1 });
   const [arrowHovered, setArrowHovered] = useState([]);
 
@@ -33,6 +33,7 @@ export default function AccountCollectBar({ onPageChange }) {
     if (result && result.action === 'remove') {
       customToast.success('刪除收藏成功');
       setBars((prev) => prev.filter((b) => b.save_id !== saveId));
+      refreshCollectList();
     }
   };
 

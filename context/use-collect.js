@@ -7,6 +7,13 @@ export function CollectProvider({ children }) {
   const [movies, setMovies] = useState([]);
   const [movieV, setMovieV] = useState({});
   const [dropDownCollectOpen, setDropDownCollectOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // 觸發重新整理收藏列表
+  const refreshCollectList = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   //P 為 Post , 避免與postContext重複
   const [p, setP] = useState({
     img: '../../../public/unavailable-image.jpg',
@@ -32,6 +39,8 @@ export function CollectProvider({ children }) {
       setMovieV,
       dropDownCollectOpen,
       setDropDownCollectOpen,
+      refreshTrigger,
+      refreshCollectList,
       p,
       setP,
       modalId,
@@ -44,6 +53,7 @@ export function CollectProvider({ children }) {
       movies,
       movieV,
       dropDownCollectOpen,
+      refreshTrigger,
       p,
       modalId,
       movieModalToggle,

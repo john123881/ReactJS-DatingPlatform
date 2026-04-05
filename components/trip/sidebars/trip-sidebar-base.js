@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { useState } from 'react';
-import TripNoteModal from '../common/trip-note-modal';
 
 /**
  * 輔助函式：將中文標題截斷為指定長度
@@ -27,7 +26,6 @@ export default function TripSidebarBase({
   onUpdateSuccess,
   children 
 }) {
-  const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [isIntroExpanded, setIsIntroExpanded] = useState(false);
 
   const formattedDate = tripName?.trip_date
@@ -75,15 +73,6 @@ export default function TripSidebarBase({
 
           <div className="flex flex-col items-end gap-4">
             <div className="flex items-center gap-4">
-              {canEdit && (
-                 <button
-                  onClick={() => setIsNoteOpen(true)}
-                  className="flex items-center gap-2 px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-white font-bold transition-all"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                  編輯行程資訊
-                </button>
-              )}
               <Link 
                 className="flex items-center gap-2 text-xl font-bold text-gray-400 hover:text-neongreen transition-colors group" 
                 href={backLink}
@@ -138,18 +127,6 @@ export default function TripSidebarBase({
               </div>
             </div>
 
-            {canEdit && (
-              <button
-                onClick={() => {
-                  setIsIntroExpanded(false);
-                  setIsNoteOpen(true);
-                }}
-                className="mt-2 w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                進入編輯模式
-              </button>
-            )}
           </div>
         </div>
 
@@ -165,7 +142,7 @@ export default function TripSidebarBase({
             {isIntroExpanded ? (
               <>收合詳細資訊 <span className="text-xs">▲</span></>
             ) : (
-              <>{canEdit ? '編輯行程資訊' : '閱讀行程簡介'} <span className="text-xs">▼</span></>
+              <>閱讀行程簡介 <span className="text-xs">▼</span></>
             )}
           </button>
           {children}
@@ -175,12 +152,6 @@ export default function TripSidebarBase({
         </div>
       </div>
 
-      <TripNoteModal 
-        isOpen={isNoteOpen} 
-        onClose={() => setIsNoteOpen(false)} 
-        tripName={tripName}
-        onUpdateSuccess={onUpdateSuccess}
-      />
     </div>
   );
 }

@@ -3,9 +3,10 @@ import RightLogin from '@/components/ui/login-modal/right-login';
 import { useAuth } from '@/context/auth-context';
 import PeopleAnimation from '@/components/ui/animation/login/people-animation';
 import LoginBackgroundAnimation from '@/components/ui/animation/login/login-background-animation';
+import LoadingOverlay from '@/components/ui/login-modal/loading-overlay';
 
 export default function LoginModal() {
-  const { loginModalToggle, setLoginModalToggle, switchHandler, isOnLogin } =
+  const { loginModalToggle, setLoginModalToggle, switchHandler, isOnLoginPage, isLoggingIn } =
     useAuth();
 
   return (
@@ -22,7 +23,7 @@ export default function LoginModal() {
               {/* if there is a button in form, it will close the modal */}
               <button
                 onClick={() => {
-                  isOnLogin ? '' : switchHandler();
+                  isOnLoginPage ? '' : switchHandler();
                   setLoginModalToggle(false);
                 }}
                 className={`absolute z-30 btn btn-sm text-gray-500 btn-circle btn-ghost right-2 top-2 md:text-`}
@@ -33,10 +34,10 @@ export default function LoginModal() {
               <div className="relative flex flex-wrap w-full min-h-[610px] md:min-h-full ">
                 <div
                   className={`flex flex-col w-full min-h-[399px] md:w-1/2 my-5 ease-in-out duration-1000  ${
-                    isOnLogin ? '' : ' md:translate-x-[100%] '
+                    isOnLoginPage ? '' : ' md:translate-x-[100%] '
                   } `}
                 >
-                  {isOnLogin ? (
+                  {isOnLoginPage ? (
                     <>
                       {/* LeftSide */}
                       <LeftLogin switchHandler={switchHandler} />
@@ -45,7 +46,7 @@ export default function LoginModal() {
                     <>
                       {/* RightSide */}
                       <RightLogin
-                        isOnLogin={isOnLogin}
+                        isOnLoginPage={isOnLoginPage}
                         switchHandler={switchHandler}
                       />
                     </>
@@ -55,36 +56,36 @@ export default function LoginModal() {
                 {/* Slider */}
                 <div
                   className={`${
-                    isOnLogin ? '' : 'translate-x-[-100%] '
+                    isOnLoginPage ? '' : 'translate-x-[-100%] '
                   } duration-1000 ease-in-out w-1/2 rounded-[24px] absolute pt-[33px] right-0 min-h-full outline-4 outline-gray-400 max-h-[600px] bg-cover bg-dark items-center p-4  text-center hidden md:block z-20 `}
                 >
                   <div className="relative flex flex-col items-center justify-between">
                     <div
                       className={`font-bol  text-nowrap text-neongreen ${
-                        isOnLogin
+                        isOnLoginPage
                           ? 'text-[40px] mb-[4.5px]'
                           : 'text-h1 max-h-[64.8px] '
                       }`}
                     >
-                      {`${isOnLogin ? 'Hello, Friend!' : '歡迎回來！  '} `}
+                      {`${isOnLoginPage ? 'Hello, Friend!' : '歡迎回來！  '} `}
                     </div>
                     <div className="px-4 min-h-[51px]  relative z-20 ">
                       <div className="px-4 font-bold text-[19px] mt-[170px] text-dark z-30">
                         註冊並開始認識新朋友及使用網站所有功能 ！
                       </div>
                       <div className="relative flex flex-col items-center justify-center w-full mt-[-95px] ">
-                        <PeopleAnimation isOnLogin={isOnLogin} />
+                        <PeopleAnimation isOnLoginPage={isOnLoginPage} />
                       </div>
                     </div>
                     <button
                       onClick={switchHandler}
                       className="py-2 px-4 z-20 font-bold mt-[-70px] max-w-[180px] rounded-xl hover:text-primary text-white w-full border-2 md:py-2 btn-primary bg-dark border-dark hover:shadow-xl3"
                     >
-                      {`${isOnLogin ? '會員註冊' : '會員登入'} `}
+                      {`${isOnLoginPage ? '會員註冊' : '會員登入'} `}
                     </button>
                   </div>
                   <div className="h-[550px] w-[100%] absolute top-[0px] left-0">
-                    <LoginBackgroundAnimation isOnLogin={isOnLogin} />
+                    <LoginBackgroundAnimation isOnLoginPage={isOnLoginPage} />
                   </div>
                 </div>
               </div>
@@ -92,6 +93,7 @@ export default function LoginModal() {
           </div>
         </>
       )}
+      {isLoggingIn && <LoadingOverlay />}
     </>
   );
 }

@@ -1,12 +1,12 @@
 import TripMediaBase from '../common/trip-media-base';
-import OtherTripContent from './other-tripcontent';
+import WithContent from '../my-content/with-content';
 
 export default function BarPhotoOther(props) {
   return (
     <TripMediaBase
       {...props}
       type="bar"
-      ContentComponent={OtherTripContent}
+      ContentComponent={WithContent}
       isOther={true}
     />
   );

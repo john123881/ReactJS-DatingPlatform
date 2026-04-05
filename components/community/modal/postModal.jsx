@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { usePostContext } from '@/context/post-context';
 import { useRouter } from 'next/router';
@@ -10,7 +10,7 @@ import { FaRegHeart, FaHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa';
 import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 
-export default function PostModal({ post, modalId, isOpen }) {
+function PostModalContent({ post, modalId, isOpen }) {
   const { auth } = useAuth();
   const router = useRouter();
   const postModalRef = useRef(null);
@@ -139,6 +139,9 @@ export default function PostModal({ post, modalId, isOpen }) {
                   src={getImageUrl(post.img, 'post')}
                   alt={post.photo_name || 'No Image Available'}
                   className="w-full h-full object-contain max-h-[50vh] md:max-h-none"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="sync"
                   onError={(e) => handleImageError(e, 'post')}
                 />
             </figure>
@@ -219,10 +222,10 @@ export default function PostModal({ post, modalId, isOpen }) {
                 {/* Post Content */}
                 <div className="mb-4 px-2">
                   <p className="text-gray-200 text-sm leading-relaxed mb-4">
-                    {post.post_context?.split('#')[0].trim()}
+                    {(post.post_context || '').split('#')[0].trim()}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {post.post_context?.split('#').slice(1).map((tag, i) => (
+                    {(post.post_context || '').split('#').slice(1).map((tag, i) => (
                       <div key={i} className="badge badge-outline border-neongreen/30 text-neongreen text-[10px] px-2 py-2">
                         #{tag.trim()}
                       </div>
@@ -444,3 +447,17 @@ export default function PostModal({ post, modalId, isOpen }) {
     </>
   );
 }
+
+const PostModal = memo(PostModalContent, (prevProps, nextProps) => {
+  // 只有當 isOpen 狀態改變，或是貼文內容/圖片有更新時才重繪
+  return (
+    prevProps.isOpen === nextProps.isOpen &&
+    prevProps.post.post_id === nextProps.post.post_id &&
+    prevProps.post.updated_at === nextProps.post.updated_at &&
+    prevProps.post.img === nextProps.post.img
+  );
+});
+
+PostModal.displayName = 'PostModal';
+
+export default PostModal;

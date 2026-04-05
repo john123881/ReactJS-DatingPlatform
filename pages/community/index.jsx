@@ -109,7 +109,7 @@ export default function Index({ onPageChange }) {
               }}
             >
               {(isFilterActive ? filteredPosts : posts).map((item, i) =>
-                activeFilterButton === '活動' ? (
+                item.type === 'event' ? (
                   <EventCard event={item} key={i} />
                 ) : (
                   <PostCardLarge post={item} key={i} />

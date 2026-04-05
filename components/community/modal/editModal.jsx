@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { usePostContext } from '@/context/post-context';
 import styles from './modal.module.css';
 import { IoClose } from 'react-icons/io5';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
-export default function EditModal({ post, modalId }) {
+function EditModalContent({ post, modalId }) {
   const {
     selectedFile,
     previewUrl,
@@ -82,9 +83,13 @@ export default function EditModal({ post, modalId }) {
               onClick={handleFilePicker}
             >
               <img
-                src={selectedFile ? previewUrl : (post.img || '/unavailable-image.jpg')}
+                src={selectedFile ? previewUrl : getImageUrl(post.img, 'post')}
                 alt={post.photo_name || 'Post Image'}
                 className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-50"
+                onError={(e) => handleImageError(e, 'post')}
+                loading="eager"
+                fetchpriority="high"
+                decoding="sync"
               />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <p className="text-white bg-black/50 px-4 py-2 rounded-full border border-white/30 backdrop-blur-sm">
@@ -114,13 +119,14 @@ export default function EditModal({ post, modalId }) {
                   const isSelected = localPostContext?.includes(`#${tag}`);
                   return (
                     <button
+                      type="button"
                       key={tag}
                       onClick={() => {
                         const tagStr = `#${tag}`;
                         if (isSelected) {
-                          setLocalPostContext(localPostContext.replace(tagStr, '').trim());
+                          setLocalPostContext((localPostContext || '').replace(tagStr, '').trim());
                         } else {
-                          setLocalPostContext(`${localPostContext.split('#')[0].trim()} ${tagStr} ${localPostContext.split('#').slice(1).map(t => `#${t.trim()}`).join(' ')}`.trim());
+                          setLocalPostContext(`${(localPostContext || '').split('#')[0].trim()} ${tagStr} ${(localPostContext || '').split('#').slice(1).map(t => `#${t.trim()}`).join(' ')}`.trim());
                         }
                       }}
                       className={`badge badge-sm cursor-pointer transition-all ${
@@ -139,9 +145,9 @@ export default function EditModal({ post, modalId }) {
                 className="textarea textarea-ghost w-full flex-grow text-base leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
                 placeholder="編輯你的貼文..."
                 autoFocus
-                value={localPostContext?.split('#')[0].trim()}
+                value={(localPostContext || '').split('#')[0].trim()}
                 onChange={(e) => {
-                  const tags = localPostContext?.split('#').slice(1).map(t => `#${t.trim()}`).join(' ');
+                  const tags = (localPostContext || '').split('#').slice(1).map(t => `#${t.trim()}`).join(' ');
                   setLocalPostContext(`${e.target.value} ${tags}`.trim());
                 }}
                 onKeyDown={(e) => handleKeyPress(e, () => handlePostUpdate(post, localPostContext, editModalRef))}
@@ -188,3 +194,15 @@ export default function EditModal({ post, modalId }) {
     </>
   );
 }
+
+const EditModal = memo(EditModalContent, (prevProps, nextProps) => {
+  return (
+    prevProps.post.post_id === nextProps.post.post_id &&
+    prevProps.post.updated_at === nextProps.post.updated_at &&
+    prevProps.post.img === nextProps.post.img
+  );
+});
+
+EditModal.displayName = 'EditModal';
+
+export default EditModal;

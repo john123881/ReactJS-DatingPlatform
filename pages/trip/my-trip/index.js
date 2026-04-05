@@ -88,14 +88,16 @@ export default function MyTrip({ onPageChange }) {
     event.preventDefault();
     try {
       const fullPayload = {
-        user_id: auth.id,
-        trip_date: tripDate,
-        trip_title: tripTitle,
-        trip_content: '',
-        trip_notes: '',
-        trip_description: '',
-        trip_pic: null,
-        trip_draft: 0
+        tripPlan: {
+          trip_date: tripDate,
+          trip_title: tripTitle,
+          trip_content: '',
+          trip_notes: '',
+          trip_description: '',
+          trip_pic: null,
+          trip_draft: 0
+        },
+        calendarData: {}
       };
 
       let data = await TripService.addTripPlan(fullPayload);
@@ -200,7 +202,7 @@ export default function MyTrip({ onPageChange }) {
         <div className="flex flex-col items-center sm:items-start justify-start">
           {/* 將新增按鈕提拔到 Shell 層級，不再隨資料切換而跳動 */}
           <button
-            className="mt-12 mb-8 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95 disabled:opacity-50"
+            className="mt-12 mb-16 bg-black sm:text-2xl text-white border border-white/30 rounded-full px-8 py-3 hover:bg-neongreen hover:text-black hover:border-neongreen transition-all shadow-lg hover:shadow-[0_0_20px_rgba(160,255,31,0.3)] active:scale-95 disabled:opacity-50"
             onClick={openModal}
             disabled={isContextLoading}
           >

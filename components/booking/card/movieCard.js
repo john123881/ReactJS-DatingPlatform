@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import { useAuth } from '@/context/auth-context';
+import { useCollect } from '@/context/use-collect';
 import { BookingService } from '@/services/booking-service';
 import { toast } from '@/lib/toast';
 
@@ -13,6 +14,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
   const router = useRouter();
 
   const { auth, rerender, setRerender } = useAuth();
+  const { refreshCollectList } = useCollect();
 
   // const handleHeartClick = () => {
   //   setIsClicked(!isClicked);
@@ -39,7 +41,10 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (!res.success && !res.status) {
+      if (res.success || res.status) {
+        setRerender(!rerender);
+        refreshCollectList();
+      } else {
         throw new Error('Failed to update save status');
       }
     } catch (error) {

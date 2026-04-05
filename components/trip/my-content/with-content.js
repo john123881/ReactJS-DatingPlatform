@@ -13,8 +13,16 @@ export default function WithContent({
   refreshTripDetails,
   refreshAllDetails,
   setNewDetail,
+  isOther = false,
 }) {
-  const { isLoading } = useLoader();
+  const [imgLoading, setImgLoading] = useState(true);
+
+  // 當圖片位址變更時，重新設定載入狀態
+  useEffect(() => {
+    if (imageSrc) {
+      setImgLoading(true);
+    }
+  }, [imageSrc]);
   const openDeleteModal = () => {
     // 調用 showModal 方法以開啟對話框
     const dialog = document.getElementById(
@@ -74,68 +82,69 @@ export default function WithContent({
   }
 
   return (
-    <>
-      <div className="flex justify-center items-end gap-9">
-        <div className="flex flex-col justify-center items-center w-32 h-32 sm:w-48 sm:h-48 border border-white rounded-2xl overflow-hidden relative group">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <img
-              src={imageSrc}
-              alt={altText}
-              className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300 ease-in-out border border-white rounded-lg cursor-pointer"
-            />
-          )}
-
-          <div
-            className="absolute top-0 left-0 w-full h-full flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out cursor-pointer"
-            onClick={handleShowDetails}
-          >
-            <p className="text-white text-xl text-center">{altText}</p>
+    <div className="relative group/item flex items-center gap-4">
+      <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 border border-white/20 rounded-2xl overflow-hidden relative shadow-inner shadow-black/50 bg-black/20">
+        {imgLoading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-neongreen/30 border-t-neongreen rounded-full animate-spin"></div>
           </div>
-        </div>
-        <button onClick={openDeleteModal} className="pb-2">
-          <FaTrash className="text-2xl hover:text-[#a0ff1f]" />
-        </button>
-        <dialog
-          id={`delete-dialog-${tripDetails.trip_detail_id}`}
-          className="modal"
-        >
-          <div className="modal-box w-96 flex flex-col justify-center items-center">
-            <h3 className="font-bold text-lg mb-4 text-white text-center">
-              確定要刪除 <span className="text-[#a0ff1f]">{altText} </span>
-              嗎？
-            </h3>
-            <h3 className="font-bold text-base mb-4 text-white">
-              行程時段：
-              {tripDetails.block === 1
-                ? '早上'
-                : tripDetails.block === 2
-                  ? '下午'
-                  : tripDetails.block === 3
-                    ? '晚上'
-                    : ''}
-            </h3>
-
-            <div className="modal-action">
-              <button
-                type="button"
-                className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                onClick={closeDeleteModal}
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                className="btn text-base bg-black px-8 border border-white rounded-full hover:bg-[#a0ff1f] hover:text-black hover:border-black"
-                onClick={onConfirmDelete}
-              >
-                確定
-              </button>
-            </div>
-          </div>
-        </dialog>
+        )}
+        <img
+          src={imageSrc || '/unavailable-image.jpg'}
+          alt={altText}
+          onLoad={() => setImgLoading(false)}
+          onError={() => setImgLoading(false)}
+          className={`object-cover w-full h-full transition-all duration-700 ease-in-out group-hover/item:scale-110 ${imgLoading ? 'opacity-0' : 'opacity-100'}`}
+        />
       </div>
-    </>
+
+      {/* Delete Trigger - Absolute in Card (provided by parent class 'relative') */}
+      {!isOther && (
+        <>
+          <button 
+            onClick={openDeleteModal} 
+            className="absolute -top-2 -right-2 w-10 h-10 bg-black/60 backdrop-blur-md text-white/50 hover:text-neongreen hover:bg-black rounded-full flex items-center justify-center border border-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-xl z-20"
+          >
+            <FaTrash className="text-base" />
+          </button>
+
+          <dialog
+            id={`delete-dialog-${tripDetails.trip_detail_id}`}
+            className="modal"
+          >
+            <div className="modal-box bg-neutral-900 border border-white/10 rounded-[32px] shadow-2xl backdrop-blur-2xl">
+              <div className="flex flex-col items-center text-center p-6">
+                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+                  <FaTrash className="text-2xl text-red-500" />
+                </div>
+                <h3 className="font-black text-2xl text-white italic uppercase tracking-tighter mb-2">
+                  移除此行程？
+                </h3>
+                <p className="text-white/40 text-sm mb-8">
+                  確定要將 <span className="text-neongreen">{altText || '此項目'}</span> 從「{tripDetails.block === 1 ? '早上' : tripDetails.block === 2 ? '下午' : '晚上'}」中移除嗎？
+                </p>
+                
+                <div className="flex gap-4 w-full">
+                  <button
+                    type="button"
+                    className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/10 transition-all"
+                    onClick={closeDeleteModal}
+                  >
+                    返回
+                  </button>
+                  <button
+                    type="button"
+                    className="flex-1 py-4 bg-red-500 hover:bg-red-400 text-white font-black rounded-2xl transition-all shadow-[0_5px_15px_rgba(239,68,68,0.3)]"
+                    onClick={onConfirmDelete}
+                  >
+                    確定刪除
+                  </button>
+                </div>
+              </div>
+            </div>
+          </dialog>
+        </>
+      )}
+    </div>
   );
 }

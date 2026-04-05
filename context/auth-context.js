@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from 'react';
 import { useRouter } from 'next/router';
 import { API_SERVER } from '@/configs/api-config';
@@ -29,13 +30,15 @@ export function AuthContextProvider({ children }) {
   const [userAvatar, setUserAvatar] = useState(
     getImageUrl(null, 'avatar'),
   );
-  const [isOnLogin, setIsOnLogin] = useState(true);
+  const [isOnLoginPage, setIsOnLoginPage] = useState(true);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const abortControllerRef = useRef(null);
 
   const storageKey = 'TD_auth';
 
   const switchHandler = () => {
-    setIsOnLogin(!isOnLogin);
+    setIsOnLoginPage(!isOnLoginPage);
   };
 
   const register = useCallback(async (email, validCode, username, password) => {
@@ -54,8 +57,13 @@ export function AuthContextProvider({ children }) {
 
 
   const login = useCallback(async (email, password) => {
+    setIsLoggingIn(true);
+    // 建立新的 AbortController
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
-      const result = await AuthService.login({ email, password });
+      const result = await AuthService.login({ email, password }, { signal: controller.signal });
 
       const authData = {
         ...result.data,
@@ -70,9 +78,23 @@ export function AuthContextProvider({ children }) {
 
       return result;
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Login request aborted by user');
+        return { success: false, error: '登入已取消' };
+      }
       console.error('登入時發生錯誤', error);
       return { success: false, error: error.message || '登入時發生錯誤' };
+    } finally {
+      setIsLoggingIn(false);
+      abortControllerRef.current = null;
     }
+  }, []);
+
+  const cancelLogin = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setIsLoggingIn(false);
   }, []);
 
   const logout = useCallback(async () => {
@@ -166,11 +188,13 @@ export function AuthContextProvider({ children }) {
       userAvatar,
       setUserAvatar,
       switchHandler,
-      isOnLogin,
-      setIsOnLogin,
+      isOnLoginPage,
+      setIsOnLoginPage,
       rerender,
       setRerender,
       isAuthLoaded,
+      isLoggingIn,
+      cancelLogin,
     }),
     [
       auth,
@@ -181,9 +205,11 @@ export function AuthContextProvider({ children }) {
       getAuthHeader,
       loginModalToggle,
       userAvatar,
-      isOnLogin,
+      isOnLoginPage,
       rerender,
       isAuthLoaded,
+      isLoggingIn,
+      cancelLogin,
     ],
   );
 

@@ -10,8 +10,9 @@ export const AuthService = {
   /**
    * 登入
    * @param {object} credentials - { email, password }
+   * @param {object} config - 額外的請求設定 (例如 signal)
    */
-  login: (credentials) => apiClient.post('/login', credentials),
+  login: (credentials, config = {}) => apiClient.post('/login', credentials, config),
 
   /**
    * 註冊前發送 OTP
