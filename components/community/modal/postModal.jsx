@@ -25,9 +25,13 @@ export default function PostModal({ post, modalId, isOpen }) {
     likedPosts,
     savedPosts,
     comments,
+    loadingComments,
     handleCommentUpload,
     handleDeletePostClick,
     handleDeleteCommentClick,
+    handleCommentUpdate,
+    handleFilterClick,
+    getPostComments,
     setPostModalToggle,
     setProfilePosts,
     setProfilePage,
@@ -62,6 +66,47 @@ export default function PostModal({ post, modalId, isOpen }) {
       Router.events.off('routeChangeComplete', handleRouteChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (isOpen && post.post_id) {
+      getPostComments(post.post_id);
+    }
+  }, [isOpen, post.post_id, getPostComments]);
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingText, setEditingText] = useState('');
+
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const date = new Date(timeStr);
+    const now = new Date();
+    const diff = (now - date) / 1000;
+
+    if (diff < 60) return '剛剛';
+    if (diff < 3600) return `${Math.floor(diff / 60)}分鐘前`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}小時前`;
+    if (diff < 2592000) return `${Math.floor(diff / 86400)}天前`;
+    return `${date.getMonth() + 1}月${date.getDate()}日`;
+  };
+
+  const startEditing = (comment) => {
+    setEditingCommentId(comment.comm_comment_id);
+    setEditingText(comment.context);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditingText('');
+  };
+
+  const submitEdit = async (commentId) => {
+    if (!editingText.trim()) return;
+    const success = await handleCommentUpdate(commentId, editingText);
+    if (success) {
+      setEditingCommentId(null);
+      setEditingText('');
+    }
+  };
 
   return (
     <>
@@ -116,11 +161,18 @@ export default function PostModal({ post, modalId, isOpen }) {
                       </div>
                     </div>
                     <div
-                      className="cursor-pointer font-bold text-sm hover:text-neongreen transition-colors"
-                      onClick={() => handleUserClick(post.post_userId)}
+                      className="flex items-center gap-2"
                     >
-                      <span>
-                        {post.email ? post.email.split('@')[0] : 'unknownuser'}
+                      <div
+                        className="cursor-pointer font-bold text-sm hover:text-neongreen transition-colors"
+                        onClick={() => handleUserClick(post.post_userId)}
+                      >
+                        <span>
+                          {post.email ? post.email.split('@')[0] : 'unknownuser'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 font-normal mt-0.5">
+                        • {formatTime(post.created_at)}
                       </span>
                     </div>
                   </div>
@@ -165,22 +217,47 @@ export default function PostModal({ post, modalId, isOpen }) {
                 </div>
 
                 {/* Post Content */}
-                <div className="mb-8 px-2">
-                  <p className="text-gray-200 text-sm leading-relaxed">{post.post_context}</p>
+                <div className="mb-4 px-2">
+                  <p className="text-gray-200 text-sm leading-relaxed mb-4">
+                    {post.post_context?.split('#')[0].trim()}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.post_context?.split('#').slice(1).map((tag, i) => (
+                      <div key={i} className="badge badge-outline border-neongreen/30 text-neongreen text-[10px] px-2 py-2">
+                        #{tag.trim()}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Comment list */}
-                <div className="space-y-6">
-                  {comments[post.post_id] &&
+                <div className="space-y-8">
+                  {loadingComments[post.post_id] ? (
+                    // Skeleton UI
+                    <>
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex flex-col gap-2 animate-pulse">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-white/5 flex-shrink-0" />
+                            <div className="flex flex-col flex-grow gap-2 mt-1">
+                              <div className="h-3 w-20 bg-white/5 rounded" />
+                              <div className="h-3 w-full bg-white/5 rounded" />
+                              <div className="h-3 w-2/3 bg-white/5 rounded" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    comments[post.post_id] &&
                     comments[post.post_id].map((comment, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col gap-2"
-                      >
+                      <div key={index} className="flex flex-col gap-2">
                         <div className="flex items-start gap-3">
                           <div className="avatar flex-shrink-0">
-                            <div className="w-8 h-8 rounded-full shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
-                                 onClick={() => handleUserClick(comment.user_id)}>
+                            <div
+                              className="w-8 h-8 rounded-full shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
+                              onClick={() => handleUserClick(comment.user_id)}
+                            >
                               <img
                                 src={getImageUrl(comment.avatar, 'avatar')}
                                 alt="avatar"
@@ -191,41 +268,92 @@ export default function PostModal({ post, modalId, isOpen }) {
                           </div>
                           <div className="flex flex-col flex-grow min-w-0">
                             <div className="flex items-center justify-between gap-2">
-                              <span 
+                              <span
                                 className="font-bold text-xs cursor-pointer hover:text-neongreen transition-colors"
                                 onClick={() => handleUserClick(comment.user_id)}
                               >
-                                {comment.email ? comment.email.split('@')[0] : 'unknownuser'}
+                                {comment.email
+                                  ? comment.email.split('@')[0]
+                                  : 'unknownuser'}
                               </span>
-                              
-                              {userId === comment.user_id && (
-                                <div className="dropdown dropdown-end">
-                                  <div tabIndex={0} className="p-1 cursor-pointer">
-                                    <FiMoreHorizontal className="text-gray-400 hover:text-neongreen" />
+
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-gray-500">
+                                  {formatTime(comment.created_at)}
+                                </span>
+                                {userId === comment.user_id && (
+                                  <div className="dropdown dropdown-end">
+                                    <div
+                                      tabIndex={0}
+                                      className="p-1 cursor-pointer"
+                                    >
+                                      <FiMoreHorizontal className="text-gray-400 hover:text-neongreen" />
+                                    </div>
+                                    <ul
+                                      tabIndex={0}
+                                      className="dropdown-content z-50 menu p-2 shadow-2xl bg-neutral-800 border border-white/10 rounded-xl w-32"
+                                    >
+                                      <li>
+                                        <a
+                                          className="hover:text-neongreen text-xs"
+                                          onClick={() => startEditing(comment)}
+                                        >
+                                          編輯回覆
+                                        </a>
+                                      </li>
+                                      <li>
+                                        <a
+                                          className="hover:text-red-500 text-xs"
+                                          onClick={() =>
+                                            handleDeleteCommentClick(comment)
+                                          }
+                                        >
+                                          刪除回覆
+                                        </a>
+                                      </li>
+                                    </ul>
                                   </div>
-                                  <ul
-                                    tabIndex={0}
-                                    className="dropdown-content z-50 menu p-2 shadow-2xl bg-neutral-800 border border-white/10 rounded-xl w-32"
-                                  >
-                                    <li>
-                                      <a
-                                        className="hover:text-red-500 text-xs"
-                                        onClick={() => handleDeleteCommentClick(comment)}
-                                      >
-                                        刪除回覆
-                                      </a>
-                                    </li>
-                                  </ul>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-300 break-words mt-1 leading-normal">
-                              {comment.context}
-                            </p>
+
+                            {editingCommentId === comment.comm_comment_id ? (
+                              <div className="mt-2 flex flex-col gap-2">
+                                <textarea
+                                  className="textarea bg-white/5 border-white/10 w-full min-h-[60px] resize-none rounded-lg p-2 focus:border-neongreen/50 outline-none text-xs text-white"
+                                  value={editingText}
+                                  onChange={(e) =>
+                                    setEditingText(e.target.value)
+                                  }
+                                  autoFocus
+                                />
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    className="btn btn-xs btn-ghost text-gray-400 hover:text-white"
+                                    onClick={cancelEditing}
+                                  >
+                                    取消
+                                  </button>
+                                  <button
+                                    className="btn btn-xs bg-neongreen border-none text-black hover:bg-neongreen/80"
+                                    onClick={() =>
+                                      submitEdit(comment.comm_comment_id)
+                                    }
+                                  >
+                                    儲存
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-gray-300 break-words mt-1 leading-normal">
+                                {comment.context}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
-                    ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -306,13 +434,12 @@ export default function PostModal({ post, modalId, isOpen }) {
             </div>
           </div>
         </div>
-        <form
-          method="dialog"
+        <div
           className="modal-backdrop bg-black/80"
           onClick={() => setPostModalToggle(false)}
         >
-          <button>close</button>
-        </form>
+          <button className="hidden">close</button>
+        </div>
       </div>
     </>
   );

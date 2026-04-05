@@ -62,15 +62,21 @@ export default function EventCard({ event }) {
             className={`${styles['flip-card-front']} eventCard card md:w-[330px] md:h-[480px] flex flex-col items-center justify-start border-grayBorder overflow-hidden`}
           >
             <figure className="relative card-photo w-[330px] h-[330px] overflow-hidden rounded-2xl">
-              <Image
-                src={event.img || '/unavailable-image.jpg'}
-                alt={event.photo_name || 'No Image Available'}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-                onError={(e) => handleImageError(e, 'event')}
-              />
+              <Link 
+                href={`/community/event/${event?.comm_event_id}`} 
+                onClick={(e) => e.stopPropagation()}
+                className="w-full h-full block relative"
+              >
+                <Image
+                  src={event.img || '/unavailable-image.jpg'}
+                  alt={event.photo_name || 'No Image Available'}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  onError={(e) => handleImageError(e, 'event')}
+                />
+              </Link>
             </figure>
             <div className="card-body h-auto w-[330px] p-0 overflow-auto flex flex-col justify-between">
               <div className="card-info text-h4 flex flex-col justify-between">

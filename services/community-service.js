@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { apiClient, uploadFile } from './api-client';
 import {
   COMMUNITY_GET_SUGGEST_USERS,
   COMMUNITY_GET_POSTS,
@@ -49,8 +49,8 @@ export const CommunityService = {
 
   // --- 貼文相關 ---
 
-  getPosts: (page, limit) =>
-    apiClient(`${COMMUNITY_GET_POSTS}?page=${page}&limit=${limit}`),
+  getPosts: (page, limit, seed = null) =>
+    apiClient(`${COMMUNITY_GET_POSTS}?page=${page}&limit=${limit}${seed !== null ? `&seed=${seed}` : ''}`),
 
   getPostsByUser: (uid, page, limit) =>
     apiClient(`${COMMUNITY_GET_POSTS}/${uid}?page=${page}&limit=${limit}`),
@@ -61,7 +61,7 @@ export const CommunityService = {
     ),
 
   getRandomPosts: (page, limit, seed = null) =>
-    apiClient(`/community/get-random-posts?page=${page}&limit=${limit}${seed ? `&seed=${seed}` : ''}`),
+    apiClient(`/community/get-random-posts?page=${page}&limit=${limit}${seed !== null ? `&seed=${seed}` : ''}`),
 
   getPostDetail: (pid) => apiClient(`/community/get-post-page/${pid}`),
 
@@ -72,9 +72,15 @@ export const CommunityService = {
 
   uploadPostPhoto: (formData) => apiClient.post('/community/upload-photo', formData),
 
+  uploadPostPhotoWithProgress: (formData, onProgress) =>
+    uploadFile('/community/upload-photo', formData, onProgress),
+
   updatePost: (data) => apiClient.put('/community/edit-post', data),
 
   updatePostPhoto: (formData) => apiClient.post('/community/edit-post-photo', formData),
+
+  updatePostPhotoWithProgress: (formData, onProgress) =>
+    uploadFile('/community/edit-post-photo', formData, onProgress),
 
   deletePost: (postId) =>
     apiClient.delete('/community/delete-post', { body: { postId } }),
@@ -88,6 +94,9 @@ export const CommunityService = {
 
   deleteComment: (commentId) =>
     apiClient.delete('/community/delete-comment', { body: { commentId } }),
+
+  updateComment: (commentId, context) =>
+    apiClient.put('/community/edit-comment', { commentId, context }),
 
   // --- 活動相關 ---
 
@@ -105,9 +114,15 @@ export const CommunityService = {
 
   uploadEventPhoto: (formData) => apiClient.post('/community/upload-event-photo', formData),
 
+  uploadEventPhotoWithProgress: (formData, onProgress) =>
+    uploadFile('/community/upload-event-photo', formData, onProgress),
+
   updateEvent: (data) => apiClient.put('/community/edit-event', data),
 
   updateEventPhoto: (formData) => apiClient.post('/community/edit-event-photo', formData),
+
+  updateEventPhotoWithProgress: (formData, onProgress) =>
+    uploadFile('/community/edit-event-photo', formData, onProgress),
 
   attendEvent: (userId, eventId) =>
     apiClient.post('/community/attend-event', { userId, eventId }),

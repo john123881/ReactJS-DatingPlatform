@@ -4,6 +4,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import SuggestionBar from '@/components/community/suggestionbar/SuggestionBar';
 import PostCardLarge from '@/components/community/card/postCardLarge';
+import EventCard from '@/components/community/card/eventCard';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageLoader from '@/components/ui/loader/page-loader';
 import CommunityLayout from '@/components/community/layout/CommunityLayout';
@@ -46,18 +47,16 @@ export default function Index({ onPageChange }) {
   return (
     <>
       <div className="flex flex-row flex-wrap w-full">
-        <div className="flex justify-center w-full lg:basis-7/12">
+        <div className="flex justify-center w-full lg:basis-9/12">
           <div className="flex flex-col items-center justify-start min-h-screen gap-8 pt-10">
-            <div className="filterBtn flex gap-5 justify-between sm:w-[330px] md:w-[480px] md:mx-auto sm:mx-5">
+            <div className="filterBtn flex flex-wrap gap-3 justify-center sm:w-[330px] md:w-[600px] md:mx-auto sm:mx-5">
               <button
                 className={`${
                   activeFilterButton === '約會'
                     ? 'bg-primary text-black'
-                    : 'bg-dark border'
-                } rounded-full hover:bg-primary hover:text-black w-28 h-8`}
-                onClick={() => {
-                  handleFilterClick('約會');
-                }}
+                    : 'bg-dark border border-white/10'
+                } rounded-full hover:bg-primary hover:text-black px-6 h-9 transition-all text-sm font-bold`}
+                onClick={() => handleFilterClick('約會')}
               >
                 約會
               </button>
@@ -65,11 +64,9 @@ export default function Index({ onPageChange }) {
                 className={`${
                   activeFilterButton === '酒吧'
                     ? 'bg-primary text-black'
-                    : 'bg-dark border'
-                } rounded-full hover:bg-primary hover:text-black w-28 h-8`}
-                onClick={() => {
-                  handleFilterClick('酒吧');
-                }}
+                    : 'bg-dark border border-white/10'
+                } rounded-full hover:bg-primary hover:text-black px-6 h-9 transition-all text-sm font-bold`}
+                onClick={() => handleFilterClick('酒吧')}
               >
                 酒吧
               </button>
@@ -77,20 +74,26 @@ export default function Index({ onPageChange }) {
                 className={`${
                   activeFilterButton === '電影'
                     ? 'bg-primary text-black'
-                    : 'bg-dark border'
-                } rounded-full hover:bg-primary hover:text-black w-28 h-8`}
-                onClick={() => {
-                  handleFilterClick('電影');
-                }}
+                    : 'bg-dark border border-white/10'
+                } rounded-full hover:bg-primary hover:text-black px-6 h-9 transition-all text-sm font-bold`}
+                onClick={() => handleFilterClick('電影')}
               >
                 電影
+              </button>
+              <button
+                className={`${
+                  activeFilterButton === '活動'
+                    ? 'bg-neongreen text-black'
+                    : 'bg-dark border border-white/10'
+                } rounded-full hover:bg-neongreen hover:text-black px-6 h-9 transition-all text-sm font-bold`}
+                onClick={() => handleFilterClick('活動')}
+              >
+                活動
               </button>
             </div>
 
             <InfiniteScroll
-              dataLength={
-                isFilterActive ? filteredPosts.length : posts.length
-              }
+              dataLength={isFilterActive ? filteredPosts.length : posts.length}
               next={
                 isFilterActive
                   ? () => getCommunityIndexFilteredPost(currentKeyword)
@@ -98,7 +101,6 @@ export default function Index({ onPageChange }) {
               }
               hasMore={isFilterActive ? indexFilteredHasMore : indexHasMore}
               loader={<PageLoader type="index" minHeight="500px" />}
-              // endMessage={<p>No more posts</p>}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -106,14 +108,18 @@ export default function Index({ onPageChange }) {
                 gap: '1.25rem',
               }}
             >
-              {(isFilterActive ? filteredPosts : posts).map((post, i) => (
-                <PostCardLarge post={post} key={i} />
-              ))}
+              {(isFilterActive ? filteredPosts : posts).map((item, i) =>
+                activeFilterButton === '活動' ? (
+                  <EventCard event={item} key={i} />
+                ) : (
+                  <PostCardLarge post={item} key={i} />
+                ),
+              )}
             </InfiniteScroll>
           </div>
         </div>
 
-        <div className="justify-end hidden w-full pr-10 lg:flex lg:basis-5/12 xl:basis-3/12">
+        <div className="justify-end hidden w-full pr-10 lg:flex lg:basis-3/12">
           <SuggestionBar />
         </div>
       </div>

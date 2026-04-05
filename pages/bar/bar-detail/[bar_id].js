@@ -222,7 +222,6 @@ export default function Detail({ onPageChange }) {
                     alt={`Image of ${bar?.bar_name || 'bar'}`}
                     width={440}
                     height={400}
-                    layout="intrinsic"
                   />
                 </div>
               </div>

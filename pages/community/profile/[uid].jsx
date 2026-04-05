@@ -118,6 +118,14 @@ export default function Profile({ onPageChange }) {
                   <ProfileCard post={post} key={i} />
                 ))}
               </InfiniteScroll>
+
+              {/* 空內容預設顯示 */}
+              {profilePosts.length === 0 && !userProfileHasMore && (
+                <div className="flex flex-col items-center justify-center py-20 opacity-50 w-full">
+                  <div className="text-6xl mb-4">📭</div>
+                  <p className="text-xl">目前還沒有任何貼文哦！</p>
+                </div>
+              )}
             </div>
         </div>
       </div>

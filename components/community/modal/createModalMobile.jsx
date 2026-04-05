@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { FaPhotoVideo } from 'react-icons/fa';
+import { IoClose } from 'react-icons/io5';
 import styles from './modal.module.css';
 
 export default function CreateModalMobile() {
@@ -16,6 +17,9 @@ export default function CreateModalMobile() {
     fileInputRef,
     handleKeyPress,
     createModalMobileRef,
+    isUploading,
+    uploadProgress,
+    cancelUpload,
   } = usePostContext();
 
   const handlePostContentChange = (e) => {
@@ -104,11 +108,33 @@ export default function CreateModalMobile() {
                   }
                 />
                 <button
-                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3`}
+                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 w-full ${isUploading ? 'loading' : ''}`}
                   onClick={handleFileUpload}
+                  disabled={isUploading}
                 >
-                  分享
+                  {isUploading ? `上傳中 ${uploadProgress}%` : '分享'}
                 </button>
+
+                {/* 上傳進度條與取消按鈕 */}
+                {isUploading && (
+                  <div className="mt-4 w-full">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-white/50 font-medium">上傳中...</span>
+                      <button 
+                        onClick={cancelUpload}
+                        className="text-white/40 hover:text-white/90 transition-colors flex items-center gap-1 text-xs"
+                      >
+                        <IoClose size={14} /> 取消
+                      </button>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+                      <div 
+                        className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_10px_rgba(160,255,31,0.5)]"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}

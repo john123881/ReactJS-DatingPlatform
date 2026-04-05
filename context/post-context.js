@@ -35,6 +35,7 @@ export const PostProvider = ({ children }) => {
   const [previewUrl, setPreviewUrl] = useState(''); // 預覽圖片(呼叫URL.createObjectURL得到的網址)
 
   const [comments, setComments] = useState({});
+  const [loadingComments, setLoadingComments] = useState({});
   const [newComment, setNewComment] = useState('');
   const [events, setEvents] = useState([]);
   const [minDate, setMinDate] = useState(''); // 建立event 當下時間紀錄
@@ -58,7 +59,13 @@ export const PostProvider = ({ children }) => {
   const [profileHasMore, setProfileHasMore] = useState(true);
   const [userProfileHasMore, setUserProfileHasMore] = useState(true);
   const [eventHasMore, setEventHasMore] = useState(true);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const [commentHasMore, setCommentHasMore] = useState(true);
+
+  // 上傳進度狀態
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const currentUploadRef = useRef(null);
 
   const [page, setPage] = useState(1);
   const [profilePage, setProfilePage] = useState(1);
@@ -66,6 +73,7 @@ export const PostProvider = ({ children }) => {
   const [eventPage, setEventPage] = useState(1);
   const [randomPage, setRandomPage] = useState(1);
   const [randomSeed, setRandomSeed] = useState(null);
+  const [indexSeed, setIndexSeed] = useState(null);
   const [likedPosts, setLikedPosts] = useState({});
   const [savedPosts, setSavedPosts] = useState({});
 
@@ -113,43 +121,55 @@ export const PostProvider = ({ children }) => {
 
   const getPostComments = useCallback(async (postIds) => {
     if (!postIds || postIds === '0' || postIds === 0) return;
+
+    // 將請求的 ID 轉為陣列以統一處理狀態
+    const requestedIds = Array.isArray(postIds) ? postIds : [postIds];
+
+    // 標記這些 ID 正在載入
+    setLoadingComments((prev) => {
+      const newState = { ...prev };
+      requestedIds.forEach((id) => {
+        newState[id] = true;
+      });
+      return newState;
+    });
+
     try {
       const data = await CommunityService.getComments(postIds);
 
       // 將評論數據按 post_id 分類
       const commentsByPostId = data.reduce((accumulator, comment) => {
-        // 從每個評論中解構出 post_id
         const { post_id } = comment;
-        // 如果累積器（accumulator）中尚未有這個 post_id 的鍵，則初始化為空陣列, 以確保後面可以將評論推送到這個陣列中
         if (!accumulator[post_id]) {
           accumulator[post_id] = [];
         }
-        // 將當前的評論對象推送到對應 post_id 的陣列中
         accumulator[post_id].push(comment);
-        // 返回更新後的累積器物件，供 reduce 函數的下一次迭代使用
         return accumulator;
-      }, {}); // 初始值為一個空物件，這是 reduce 函數建立物件累積的起點
+      }, {});
 
-      // 更新評論狀態，結合新載入的評論數據
+      // 更新評論狀態
       setComments((prevComments) => {
-        // 創建一個新的物件來存放更新後的評論數據，這個物件是基於先前的評論狀態（prevComments）的副本
         const updatedComments = { ...prevComments };
-
-        // 遍歷每個postId對應的新評論列表
-        for (const postId in commentsByPostId) {
-          // 直接用新載入的評論數據替換掉原有的評論數據
-          updatedComments[postId] = commentsByPostId[postId];
-        }
-
-        // 返回更新後的評論物件，這個操作將觸發React的狀態更新，導致相關組件根據新的評論數據重新渲染
+        requestedIds.forEach((id) => {
+          updatedComments[id] = commentsByPostId[id] || [];
+        });
         return updatedComments;
       });
 
       if (data.length === 0) {
-        setCommentHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+        setCommentHasMore(false);
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
+    } finally {
+      // 標記這些 ID 載入完成
+      setLoadingComments((prev) => {
+        const newState = { ...prev };
+        requestedIds.forEach((id) => {
+          newState[id] = false;
+        });
+        return newState;
+      });
     }
   }, []);
 
@@ -239,7 +259,13 @@ export const PostProvider = ({ children }) => {
     // setIsLoading(true); // 開始加載
 
     try {
-      const data = await CommunityService.getPosts(page, 12);
+      let currentSeed = indexSeed;
+      if (page === 1 && currentSeed === null) {
+        currentSeed = Math.floor(Math.random() * 1000000);
+        setIndexSeed(currentSeed);
+      }
+
+      const data = await CommunityService.getPosts(page, 12, currentSeed);
       if (data.length === 0) {
         setIndexHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -254,40 +280,55 @@ export const PostProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to fetch index posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
+      setIndexHasMore(false); // 發生錯誤時也要停止加載
     }
   }, [indexHasMore, page, checkPostsStatus, getPostComments]);
 
   const getCommunityIndexFilteredPost = useCallback(
     async (keyword) => {
-      if (!indexFilteredHasMore) return; // 防止重複請求
-      // setIsLoading(true); // 開始加載
+      if (!indexFilteredHasMore) return;
 
       try {
-        const data = await CommunityService.getPostsByKeyword(
-          keyword,
-          filteredPage,
-          12,
-        );
-        if (data.length === 0) {
-          setIndexFilteredHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
+        if (keyword === '活動') {
+          // 特殊處理：當關鍵字為「活動」時，抓取活動資料
+          const data = await CommunityService.getEvents(filteredPage, 12);
+          if (data.length === 0) {
+            setIndexFilteredHasMore(false);
+          } else {
+            const eventIds = data.map((event) => event.comm_event_id).join(',');
+            await checkEventsStatus(eventIds);
+
+            // 將活動資料存入 filteredPosts (前端渲染時會判斷渲染 EventCard)
+            setFilteredPosts((prevPosts) => [...prevPosts, ...data]);
+            setFilteredPage((prevPage) => prevPage + 1);
+            setIsFilterActive(true);
+          }
         } else {
-          const postIds = data.map((post) => post.post_id).join(',');
+          // 一般貼文關鍵字過濾
+          const data = await CommunityService.getPostsByKeyword(
+            keyword,
+            filteredPage,
+            12,
+          );
+          if (data.length === 0) {
+            setIndexFilteredHasMore(false);
+          } else {
+            const postIds = data.map((post) => post.post_id).join(',');
 
-          await checkPostsStatus(postIds); // 檢查貼文狀態
-          await getPostComments(postIds);
+            await checkPostsStatus(postIds);
+            await getPostComments(postIds);
 
-          setFilteredPosts((prevPosts) => [...prevPosts, ...data]); // 更新posts狀態
-          setFilteredPage((prevPage) => prevPage + 1); // 更新頁碼
-          setIsFilterActive(true);
-          // setIsLoading(false); // 結束加載
+            setFilteredPosts((prevPosts) => [...prevPosts, ...data]);
+            setFilteredPage((prevPage) => prevPage + 1);
+            setIsFilterActive(true);
+          }
         }
-      } catch (error) {
-        console.error('Failed to fetch index posts:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
+    } catch (error) {
+        console.error('Failed to fetch filtered index posts/events:', error);
+        setIndexFilteredHasMore(false); // 發生錯誤時也要停止加載
       }
     },
-    [indexFilteredHasMore, filteredPage, checkPostsStatus, getPostComments],
+    [indexFilteredHasMore, filteredPage, checkPostsStatus, checkEventsStatus, getPostComments],
   );
 
   const getCommunityExplorePost = useCallback(async () => {
@@ -400,6 +441,24 @@ export const PostProvider = ({ children }) => {
       // setIsLoading(false); // 確保即使出錯也要結束加載
     }
   }, [eventHasMore, eventPage, checkEventsStatus]);
+
+  const refreshEvents = useCallback(async () => {
+    setLoadingEvents(true);
+    setEventPage(1);
+    setEventHasMore(true);
+    try {
+      const data = await CommunityService.getEvents(1, 12);
+      const eventIds = data.map((event) => event.comm_event_id).join(',');
+      await checkEventsStatus(eventIds);
+      setEvents(data);
+      setEventPage(2);
+      if (data.length === 0) setEventHasMore(false);
+    } catch (error) {
+      console.error('Failed to refresh events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
+  }, [checkEventsStatus]);
 
   // 上傳回覆
   const handleCommentUpload = useCallback(
@@ -605,9 +664,20 @@ export const PostProvider = ({ children }) => {
       fd.append('photo', selectedFile);
       fd.append('postId', currentPostId);
 
-      const data = await CommunityService.uploadPostPhoto(fd);
+      setIsUploading(true);
+      setUploadProgress(0);
 
-      if (data.success) {
+      // 使用支援進度的上傳方法
+      const uploadPromise = CommunityService.uploadPostPhotoWithProgress(fd, (progress) => {
+        setUploadProgress(Math.round(progress));
+      });
+
+      // 儲存目前請求以便取消
+      currentUploadRef.current = uploadPromise;
+
+      const data = await uploadPromise;
+
+      if (data && data.success) {
         // 更新貼文以觸發刷新頁面 !!!Important!!!
         setPosts((prevPosts) => [data, ...prevPosts]);
         setProfilePosts((prevPosts) => [data, ...prevPosts]);
@@ -621,20 +691,39 @@ export const PostProvider = ({ children }) => {
       } else {
         throw new Error('Network response was not ok.');
       }
-
-      // 關閉 create modal
-      createModalRef.current.close();
-      createModalMobileRef.current.close();
-
-      customToast.success('分享成功!');
-      resetAndCloseModal();
-      resetPostState();
     } catch (error) {
+      if (error.message === 'Upload aborted') {
+        console.log('Upload was cancelled by user');
+        customToast.info('已取消上傳');
+        return;
+      }
       console.error('upload failed:', error);
       createModalRef.current.close();
       createModalMobileRef.current.close();
 
       customToast.error('分享失敗!');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      currentUploadRef.current = null;
+    }
+
+    // 關閉 create modal
+    createModalRef.current.close();
+    createModalMobileRef.current.close();
+
+    customToast.success('分享成功!');
+    resetAndCloseModal();
+    resetPostState();
+  };
+
+  // 取消上傳功能
+  const cancelUpload = () => {
+    if (currentUploadRef.current && currentUploadRef.current.abort) {
+      currentUploadRef.current.abort();
+      setIsUploading(false);
+      setUploadProgress(0);
+      currentUploadRef.current = null;
     }
   };
 
@@ -752,9 +841,20 @@ export const PostProvider = ({ children }) => {
       fd.append('photo', selectedFile);
       fd.append('postId', postId);
 
-      const data = await CommunityService.updatePostPhoto(fd);
+      setIsUploading(true);
+      setUploadProgress(0);
 
-      if (data.success) {
+      // 使用支援進度的上傳方法
+      const uploadPromise = CommunityService.updatePostPhotoWithProgress(fd, (progress) => {
+        setUploadProgress(Math.round(progress));
+      });
+
+      // 儲存目前請求以便取消
+      currentUploadRef.current = uploadPromise;
+
+      const data = await uploadPromise;
+
+      if (data && data.success) {
         // 更新狀態中的貼文 !!!Important
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
@@ -813,6 +913,11 @@ export const PostProvider = ({ children }) => {
         }
       });
     } catch (error) {
+      if (error.message === 'Upload aborted') {
+        console.log('Upload was cancelled by user');
+        customToast.info('已取消上傳');
+        return;
+      }
       console.error('upload failed:', error);
       // 關閉 edit modal
       editModalRef.current.close();
@@ -828,6 +933,10 @@ export const PostProvider = ({ children }) => {
           resetAndCloseModal();
         }
       });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      currentUploadRef.current = null;
     }
   };
 
@@ -879,83 +988,86 @@ export const PostProvider = ({ children }) => {
         throw new Error(data.message || '編輯活動失敗');
       }
 
-      // 活動更新成功，檢查是否有檔案要上傳
-      if (selectedFile) {
-        try {
-          const fd = new FormData();
-          fd.append('photo', selectedFile);
-          fd.append('eventId', eventId);
+          // 活動更新成功，檢查是否有檔案要上傳
+          if (selectedFile) {
+            try {
+              setIsUploading(true);
+              setUploadProgress(0);
 
-          const data = await CommunityService.updateEventPhoto(fd);
+              const fd = new FormData();
+              fd.append('photo', selectedFile);
+              fd.append('eventId', eventId);
 
-          if (data.success) {
-            // 更新活動以觸發刷新頁面 !!!Important!!!
-            // setEvents((prevEvents) => [data.event, ...prevEvents]);
-            setEvents((prevEvents) =>
-              prevEvents.map((e) => {
-                if (e.comm_event_id === eventId) {
-                  return { ...e, ...data.event }; // 使用來自 API 回應的 data.post 作為更新後資料的來源
+              const uploadPromise = CommunityService.updateEventPhotoWithProgress(fd, (progress) => {
+                setUploadProgress(Math.round(progress));
+              });
+
+              currentUploadRef.current = uploadPromise;
+              const data = await uploadPromise;
+
+              if (data.success) {
+                // 更新活動以觸發刷新頁面 !!!Important!!!
+                setEvents((prevEvents) =>
+                  prevEvents.map((e) => {
+                    if (e.comm_event_id === eventId) {
+                      return { ...e, ...data.event };
+                    }
+                    return e;
+                  }),
+                );
+
+                // 更新 event page card 單筆資料
+                if (eventPageCard.comm_event_id === eventId) {
+                  setEventPageCard({ ...eventPageCard, ...data.event });
                 }
-                return e;
-              }),
-            );
+              } else {
+                throw new Error('Network response was not ok.');
+              }
 
-            // 更新 event page card 單筆資料
-            if (eventPageCard.comm_event_id === eventId) {
-              setEventPageCard({ ...eventPageCard, ...data.event });
+              // 關閉 edit event modal
+              editEventModalRef.current.close();
+
+              Swal.fire({
+                title: '分享成功!',
+                icon: 'success',
+                confirmButtonText: '關閉',
+                confirmButtonColor: '#A0FF1F',
+                background: 'rgba(0, 0, 0, 0.85)',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  resetAndCloseModal();
+                  resetPostState();
+                  refreshEvents(); // 重新整理列表
+                }
+              });
+            } catch (error) {
+              if (error.message === 'Upload aborted') {
+                customToast.info('已取消上傳');
+                return;
+              }
+              console.error('upload failed:', error);
+              customToast.error('更新照片失敗!');
+            } finally {
+              setIsUploading(false);
+              setUploadProgress(0);
+              currentUploadRef.current = null;
             }
           } else {
-            throw new Error('Network response was not ok.');
+            // 沒有要更新照片，也要關閉視窗與重新整理
+            editEventModalRef.current.close();
+            Swal.fire({
+              title: '編輯成功!',
+              icon: 'success',
+              confirmButtonText: '關閉',
+              confirmButtonColor: '#A0FF1F',
+              background: 'rgba(0, 0, 0, 0.85)',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                resetAndCloseModal();
+                refreshEvents(); // 重新整理列表
+              }
+            });
           }
-
-          // 關閉 edit event modal
-          editEventModalRef.current.close();
-
-          Swal.fire({
-            title: '分享成功!',
-            icon: 'success',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              resetAndCloseModal();
-              resetPostState();
-            }
-          });
-        } catch (error) {
-          console.error('upload failed:', error);
-          createModalRef.current.close();
-          createModalMobileRef.current.close();
-
-          Swal.fire({
-            title: '更新照片失敗!',
-            icon: 'error',
-            confirmButtonText: '關閉',
-            confirmButtonColor: '#A0FF1F',
-            background: 'rgba(0, 0, 0, 0.85)',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              resetAndCloseModal();
-            }
-          });
-        }
-      }
-
-      // 關閉 edit event modal
-      editEventModalRef.current.close();
-
-      Swal.fire({
-        title: '編輯成功!',
-        icon: 'success',
-        confirmButtonText: '關閉',
-        confirmButtonColor: '#A0FF1F',
-        background: 'rgba(0, 0, 0, 0.85)',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          resetAndCloseModal();
-        }
-      });
     } catch (error) {
       console.error('Failed to update the post:', error);
 
@@ -1207,6 +1319,8 @@ export const PostProvider = ({ children }) => {
               setPostsCount((prevCount) => prevCount - 1); // 減少貼文數量
 
               customToast.success('刪除成功!');
+              setReload((prev) => !prev); // 觸發重新整理，確保數據同步
+              setPostModalToggle(false); // 刪除成功後關閉 Modal
             } else {
               customToast.error('刪除失敗!');
             }
@@ -1308,6 +1422,35 @@ export const PostProvider = ({ children }) => {
     [getAuthHeader],
   );
 
+  const handleCommentUpdate = useCallback(
+    async (commentId, newContext) => {
+      if (!commentId || !newContext.trim()) return;
+
+      try {
+        const res = await CommunityService.updateComment(commentId, newContext);
+
+        if (res) {
+          setComments((prevComments) => {
+            const updatedComments = { ...prevComments };
+            for (const postId in updatedComments) {
+              updatedComments[postId] = (updatedComments[postId] || []).map((c) =>
+                c.comm_comment_id === commentId ? { ...c, context: newContext } : c
+              );
+            }
+            return updatedComments;
+          });
+          customToast.success('修改成功!');
+          return true;
+        }
+      } catch (error) {
+        console.error('Error updating comment:', error);
+        customToast.error('修改失敗!');
+      }
+      return false;
+    },
+    [],
+  );
+
   // 重置貼文狀態
   const resetEventState = () => {
     setEventId('');
@@ -1368,7 +1511,15 @@ export const PostProvider = ({ children }) => {
     fd.append('eventId', currentEventId);
 
     try {
-      const data = await CommunityService.uploadEventPhoto(fd);
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      const uploadPromise = CommunityService.uploadEventPhotoWithProgress(fd, (progress) => {
+        setUploadProgress(Math.round(progress));
+      });
+
+      currentUploadRef.current = uploadPromise;
+      const data = await uploadPromise;
 
       if (data.success) {
         setEvents((prevEvents) => [data, ...prevEvents]);
@@ -1382,11 +1533,20 @@ export const PostProvider = ({ children }) => {
       customToast.success('創建活動成功!');
       resetAndCloseModal();
       resetEventState();
+      refreshEvents(); // 重新整理列表
     } catch (error) {
+      if (error.message === 'Upload aborted') {
+        customToast.info('已取消上傳');
+        return;
+      }
       console.error('upload failed:', error);
       createEventModalRef.current.close();
       createEventModalMobileRef.current.close();
       customToast.error('創建活動失敗!');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      currentUploadRef.current = null;
     }
   };
 
@@ -1460,6 +1620,7 @@ export const PostProvider = ({ children }) => {
       getPostComments,
       comments,
       setComments,
+      loadingComments,
       newComment,
       setNewComment,
       events,
@@ -1526,6 +1687,9 @@ export const PostProvider = ({ children }) => {
       resetAndCloseSearchModal,
       resetAndCloseFollowerModal,
       resetAndCloseFollowingModal,
+      isUploading,
+      uploadProgress,
+      cancelUpload,
       fileInputRef,
       createModalRef,
       createModalMobileRef,
@@ -1535,6 +1699,10 @@ export const PostProvider = ({ children }) => {
       searchModalMobileRef,
       followerModalRef,
       followingModalRef,
+      handleCommentUpdate,
+      loadingEvents,
+      refreshEvents,
+      eventDetails,
     }),
     [
       getCommunityIndexPost,
@@ -1562,6 +1730,7 @@ export const PostProvider = ({ children }) => {
       checkFollowingStatus,
       getPostComments,
       comments,
+      loadingComments,
       newComment,
       events,
       minDate,
@@ -1588,6 +1757,7 @@ export const PostProvider = ({ children }) => {
       handleDeletePostClick,
       handleDeleteEventClick,
       handleDeleteCommentClick,
+      handleCommentUpdate,
       handleFilterClick,
       likedPosts,
       savedPosts,
@@ -1604,7 +1774,12 @@ export const PostProvider = ({ children }) => {
       searchResults,
       hasSearched,
       getSearchUsers,
+      isUploading,
+      uploadProgress,
       auth,
+      loadingEvents,
+      refreshEvents,
+      eventDetails,
     ],
   );
 

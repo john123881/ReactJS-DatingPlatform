@@ -184,6 +184,81 @@ export async function apiClient(endpoint, { body: rawBody, ...customConfig } = {
   return processResponse(response);
 }
 
+/**
+ * 檔案上傳器 (支援進度追蹤與取消)
+ */
+export function uploadFile(endpoint, formData, onProgress) {
+  let abortFn;
+  const promise = new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    abortFn = () => xhr.abort();
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${API_SERVER}${endpoint}`;
+
+    xhr.open('POST', fullUrl);
+
+    // 取得認證資訊
+    const storageKey = 'TD_auth';
+    const str = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    if (str) {
+      try {
+        const parsed = JSON.parse(str);
+        if (parsed?.token) {
+          xhr.setRequestHeader('Authorization', `Bearer ${parsed.token}`);
+        }
+      } catch (e) {
+        console.error('API Client: Auth parse error', e);
+      }
+    }
+
+    xhr.withCredentials = true;
+
+    // 進度監聽
+    if (onProgress && xhr.upload) {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          onProgress(percentComplete);
+        }
+      };
+    }
+
+    xhr.onload = async () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const responseText = xhr.responseText;
+          const result = JSON.parse(responseText);
+          if (result && result.success) {
+            const finalData = result.data !== undefined ? result.data : result;
+            if (finalData && (typeof finalData === 'object' || Array.isArray(finalData))) {
+              Object.defineProperty(finalData, 'success', { value: true, enumerable: false, configurable: true });
+              Object.defineProperty(finalData, 'data', { value: finalData, enumerable: false, configurable: true });
+              if (result.message) {
+                Object.defineProperty(finalData, 'message', { value: result.message, enumerable: false, configurable: true });
+              }
+            }
+            resolve(finalData);
+          } else {
+            resolve(result);
+          }
+        } catch (e) {
+          resolve(xhr.responseText);
+        }
+      } else {
+        handleErrorStatus(xhr.status);
+        reject(new Error(`Upload failed with status ${xhr.status}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+    xhr.onabort = () => reject(new Error('Upload aborted'));
+
+    xhr.send(formData);
+  });
+
+  promise.abort = abortFn;
+  return promise;
+}
+
 // 輔助方法
 apiClient.get = (endpoint, config) => apiClient(endpoint, { ...config, method: 'GET' });
 apiClient.post = (endpoint, body, config) => apiClient(endpoint, { ...config, method: 'POST', body });

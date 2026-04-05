@@ -337,15 +337,14 @@ export default function ExploreModal({ post, modalId, isOpen }) {
             </div>
           </div>
         </div>
-        <form
-          method="dialog"
+        <div
           className="modal-backdrop"
           onClick={() => {
             setPostModalToggle(false);
           }}
         >
-          <button>close</button>
-        </form>
+          <button className="hidden">close</button>
+        </div>
       </div>
     </>
   );

@@ -11,6 +11,7 @@ import EditModal from '../../../components/community/modal/editModal';
 import TabbarMobile from '@/components/community/tabbar/tabbarMobile';
 import Sidebar from '@/components/community/sidebar/sidebar';
 import PageTitle from '@/components/page-title';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
 
 export default function Post({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -147,10 +148,12 @@ export default function Post({ onPageChange }) {
                             href={`/community/profile/${postPage.post_userId}`}
                           >
                             <Image
-                              src={postPage.avatar || '/unknown-user-image.jpg'}
+                              src={getImageUrl(postPage.avatar, 'avatar')}
                               alt={postPage.photo_name || 'No Image Available'}
                               width={40}
                               height={40}
+                              className="rounded-full"
+                              onError={(e) => handleImageError(e, 'avatar')}
                             />
                           </Link>
                         </div>
@@ -226,14 +229,14 @@ export default function Post({ onPageChange }) {
                                 href={`/community/profile/${comment.user_id}`}
                               >
                                 <Image
-                                  src={
-                                    comment.avatar || '/unknown-user-image.jpg'
-                                  }
+                                  src={getImageUrl(comment.avatar, 'avatar')}
                                   alt={
                                     postPage.photo_name || 'No Image Available'
                                   }
                                   width={32}
                                   height={32}
+                                  className="rounded-full"
+                                  onError={(e) => handleImageError(e, 'avatar')}
                                 />
                               </Link>
                             </div>

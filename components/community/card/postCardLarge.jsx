@@ -57,7 +57,7 @@ export default function PostCardLarge({ post }) {
 
   return (
     <>
-      <div className="card sm:w-[330px] md:w-[480px] sm:h-auto max-h-[700px] overflow-hidden flex border-grayBorder mx-5">
+      <div className="card sm:w-[330px] md:w-[480px] h-auto flex border-grayBorder mx-5 mb-8 shadow-sm">
         <div className="card-user flex h-10 items-center gap-2 m-2 justify-between">
           <div className="flex justify-start items-center gap-2 ">
             <div
@@ -202,13 +202,11 @@ export default function PostCardLarge({ post }) {
               </div>
             </div>
           )}
-          <p className="postContext mb-2">{post.post_context}</p>
+          <p className="postContext mb-2">{post.post_context?.split('#')[0].trim()}</p>
           <div className="flex flex-wrap gap-2 mb-3 px-1">
-          <div className="flex flex-wrap gap-2 mb-3 px-1">
-            <CommunityTag text="愛情" />
-            <CommunityTag text="酒吧" />
-            <CommunityTag text="電影" />
-          </div>
+            {post.post_context?.split('#').slice(1).map((tag, i) => (
+              <CommunityTag key={i} text={tag.trim()} />
+            ))}
           </div>
           <p
             className="commentontext text-[12px] text-grayBlue cursor-pointer"

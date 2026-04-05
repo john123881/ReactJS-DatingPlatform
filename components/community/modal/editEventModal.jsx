@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePostContext } from '@/context/post-context';
+import { FaPhotoVideo } from 'react-icons/fa';
+import { IoClose } from 'react-icons/io5';
 import styles from './modal.module.css';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -23,6 +25,9 @@ export default function EditEventModal({ event, modalId }) {
     setMinDate,
     minEndDate,
     setMinEndDate,
+    isUploading,
+    uploadProgress,
+    cancelUpload,
   } = usePostContext();
 
   const editEventModalRef = useRef(null);
@@ -119,7 +124,9 @@ export default function EditEventModal({ event, modalId }) {
         className="modal modal-bottom sm:modal-middle max-w-full"
       >
         <div
-          className="modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 max-w-5xl w-[95%] h-[650px]"
+          className={`modal-box p-0 overflow-hidden flex flex-col transition-all duration-300 ${
+            selectedFile ? '!max-w-[1200px] w-[95%] h-[800px]' : '!max-w-[1200px] w-[95%] h-[750px]'
+          }`}
           style={{ backgroundColor: 'rgba(20, 20, 20, 0.95)', backdropFilter: 'blur(10px)' }}
         >
           {/* Header */}
@@ -259,13 +266,37 @@ export default function EditEventModal({ event, modalId }) {
                 </div>
               </div>
 
-              <div className="pt-6 mt-auto border-t border-white/10 flex justify-end">
+              <div className="pt-6 mt-auto border-t border-white/10 flex flex-col items-end gap-4">
                 <button
-                  className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none btn-wide rounded-full shadow-neon font-bold text-lg"
+                  className={`btn bg-neongreen hover:bg-neongreen/80 text-black border-none btn-wide rounded-full shadow-neon font-bold text-lg ${
+                    isUploading ? 'loading' : ''
+                  }`}
                   onClick={() => handleEventUpdate(event, localEventDetails, editEventModalRef)}
+                  disabled={isUploading}
                 >
-                  確認更新
+                  {isUploading ? `更新中 ${uploadProgress}%` : '確認更新'}
                 </button>
+
+                {/* 上傳進度條與取消按鈕 */}
+                {isUploading && (
+                  <div className="w-full mt-2 px-10 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-white/50 font-medium">資料更新中...</span>
+                      <button 
+                        onClick={cancelUpload}
+                        className="text-white/40 hover:text-white/90 transition-colors flex items-center gap-1 text-xs"
+                      >
+                        <IoClose size={14} /> 取消上傳
+                      </button>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+                      <div 
+                        className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_10px_rgba(160,255,31,0.5)]"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

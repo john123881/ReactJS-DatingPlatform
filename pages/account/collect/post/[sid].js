@@ -49,10 +49,10 @@ export default function AccountCollectPost({ onPageChange }) {
   };
 
   // 貼文點擊處理
-  const handlePostClick = (post, postId) => {
-    setPostModalToggle(postId);
+  const handlePostClick = (post, modalId) => {
+    setPostModalToggle(modalId);
     setP(post);
-    setModalId(postId);
+    setModalId(modalId);
   };
 
   // 箭頭動畫處理

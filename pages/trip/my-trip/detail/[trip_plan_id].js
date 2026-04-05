@@ -6,6 +6,7 @@ import ContentMorning from '@/components/trip/my-content/blocks/content-morning'
 import ContentNoon from '@/components/trip/my-content/blocks/content-noon';
 import ContentNight from '@/components/trip/my-content/blocks/content-night';
 import BarPhotoCarousel from '@/components/trip/carousel/bar-photo-carousel';
+import MoviePhotoCarousel from '@/components/trip/carousel/movie-photo-carousel';
 import PageTitle from '@/components/page-title';
 import PageLoader from '@/components/ui/loader/page-loader';
 import { useTripDetail } from '@/hooks/trip/use-trip-detail';
@@ -104,11 +105,21 @@ export default function MyTripDetail({ onPageChange }) {
               />
             </div>
 
-            {/* 右側：行程細節編輯器 */}
-            <MyTripDetailSection 
-              tripName={tripName} 
-              onUpdateSuccess={refreshAllDetails} 
-            />
+            {/* 右側：行程細節編輯器 與 電影輪播 */}
+            <div className="flex flex-col gap-12 w-full lg:w-[450px] flex-shrink-0">
+              <MyTripDetailSection 
+                tripName={tripName} 
+                onUpdateSuccess={refreshAllDetails} 
+              />
+              
+              <div className="hidden xl:flex justify-start">
+                <MoviePhotoCarousel
+                  trip_plan_id={trip_plan_id}
+                  newDetail={newDetail}
+                  refreshAllDetails={refreshAllDetails}
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -16,7 +16,7 @@ export default function Events({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { events, eventHasMore, getCommunityEvents } = usePostContext();
+  const { events, eventHasMore, getCommunityEvents, loadingEvents } = usePostContext();
 
   useEffect(() => {
     if (auth.id !== undefined && auth.id !== null && events.length === 0) {
@@ -25,9 +25,25 @@ export default function Events({ onPageChange }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.id]);
 
+  if (loadingEvents && events.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <PageLoader type="index" />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="flex flex-wrap gap-5 justify-center h-fit pt-10">
+      <div className="flex flex-wrap gap-5 justify-center h-fit pt-10 relative">
+        {loadingEvents && (
+          <div className="absolute inset-x-0 top-0 z-50 flex justify-center pt-2">
+            <div className="bg-dark/80 backdrop-blur-md px-4 py-2 rounded-full border border-neongreen/30 shadow-neon flex items-center gap-2">
+               <span className="loading loading-spinner text-neongreen loading-sm"></span>
+               <span className="text-neongreen text-xs font-bold tracking-widest">正在更新活動資料...</span>
+            </div>
+          </div>
+        )}
         <InfiniteScroll
           dataLength={events.length}
           next={getCommunityEvents}

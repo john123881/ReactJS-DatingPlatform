@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TripService } from '@/services/trip-service';
 import { toast } from '@/lib/toast';
 
-export default function CarouselContentMovie2({
+export default function CarouselContentMovie({
   movies,
   altText,
   onClick,

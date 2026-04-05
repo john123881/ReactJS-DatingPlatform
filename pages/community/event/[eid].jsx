@@ -64,6 +64,27 @@ export default function Event({ onPageChange }) {
   return (
     <>
       <div className="flex flex-col w-full items-center px-4 pt-10">
+        <div className="w-full max-w-[1000px] mb-6">
+          <nav className="flex items-center text-sm font-medium space-x-2 text-gray-400">
+            <button 
+              onClick={() => router.push('/community')}
+              className="hover:text-white transition-colors"
+            >
+              社群媒體
+            </button>
+            <span className="text-gray-600">/</span>
+            <button 
+              onClick={() => router.push('/community/events')}
+              className="hover:text-white transition-colors"
+            >
+              活動列表
+            </button>
+            <span className="text-gray-600">/</span>
+            <span className="text-neongreen font-bold truncate max-w-[200px] md:max-w-md">
+              {eventPageCard?.title}
+            </span>
+          </nav>
+        </div>
         <div className="w-full max-w-[1000px] bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-2xl transition-all hover:shadow-primary/5">
           <div className="flex flex-col md:flex-row h-full">
             {/* Image Section */}
@@ -72,6 +93,7 @@ export default function Event({ onPageChange }) {
                 src={eventPageCard?.img || '/unavailable-image.jpg'}
                 alt={eventPageCard?.photo_name || 'No Image Available'}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
                 className="object-cover transition-transform duration-700 hover:scale-105"
                 onError={(e) => handleImageError(e, 'event')}
               />

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { usePostContext } from '@/context/post-context';
-import { FaPhotoVideo } from 'react-icons/fa';
+import { FaPhotoVideo, FaRegTimesCircle } from 'react-icons/fa';
+import { IoClose } from 'react-icons/io5';
 import styles from './modal.module.css';
 import Dropzone from 'react-dropzone';
 
@@ -9,6 +10,7 @@ export default function CreateModal() {
     selectedFile,
     previewUrl,
     setPreviewUrl,
+    postContent,
     setPostContent,
     resetAndCloseModal,
     handleFilePicker,
@@ -18,6 +20,9 @@ export default function CreateModal() {
     setIsHoverActive,
     fileInputRef,
     createModalRef,
+    isUploading,
+    uploadProgress,
+    cancelUpload,
   } = usePostContext();
 
   const handlePostContentChange = (e) => {
@@ -106,22 +111,78 @@ export default function CreateModal() {
                     <span className="text-white font-medium text-sm">編輯貼文內容</span>
                   </div>
 
+                  {/* Tags Selection */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {['約會', '酒吧', '電影', '活動'].map((tag) => {
+                      const isSelected = postContent?.includes(`#${tag}`);
+                      return (
+                        <button
+                          key={tag}
+                          onClick={() => {
+                            const tagStr = `#${tag}`;
+                            if (isSelected) {
+                              setPostContent((postContent || '').replace(tagStr, '').trim());
+                            } else {
+                              // 將標籤加在內容後面
+                              setPostContent(`${(postContent || '').trim()} ${tagStr}`.trim());
+                            }
+                          }}
+                          className={`badge badge-sm cursor-pointer transition-all ${
+                            isSelected 
+                              ? 'bg-neongreen text-black border-neongreen' 
+                              : 'badge-outline border-white/20 text-white/50 hover:border-neongreen/50'
+                          }`}
+                        >
+                          #{tag}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <textarea
                     className="textarea textarea-ghost w-full flex-grow text-base leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
                     placeholder="撰寫貼文內容..."
                     autoFocus
-                    onChange={handlePostContentChange}
+                    value={(postContent || '').split('#')[0].trim()}
+                    onChange={(e) => {
+                      const tags = (postContent || '').split('#').slice(1).map(t => `#${t.trim()}`).join(' ');
+                      setPostContent(`${e.target.value} ${tags}`.trim());
+                    }}
                     onKeyDown={(e) => handleKeyPress(e, () => handleFileUpload())}
                   />
 
                   <div className="pt-4 mt-auto border-t border-white/10 flex justify-center">
                     <button
-                      className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg"
+                      className={`btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg ${
+                        isUploading ? 'loading' : ''
+                      }`}
                       onClick={handleFileUpload}
+                      disabled={isUploading}
                     >
-                      分享貼文
+                      {isUploading ? `上傳中 ${uploadProgress}%` : '分享貼文'}
                     </button>
                   </div>
+
+                  {/* 上傳進度條與取消按鈕 */}
+                  {isUploading && (
+                    <div className="mt-4 px-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-white/50 font-medium">圖片上傳中...</span>
+                        <button 
+                          onClick={cancelUpload}
+                          className="text-white/40 hover:text-white/90 transition-colors flex items-center gap-1 text-xs"
+                        >
+                          <IoClose size={14} /> 取消上傳
+                        </button>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+                        <div 
+                          className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_10px_rgba(160,255,31,0.5)]"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

@@ -17,6 +17,7 @@ export default function ProfileInfo({ onReady }) {
     postsCount,
     setPostsCount,
     handleFollowClick,
+    reload,
   } = usePostContext();
 
   const [followersCount, setFollowersCount] = useState(0);
@@ -121,7 +122,7 @@ export default function ProfileInfo({ onReady }) {
       setIsLoading(false);
       if (onReady) onReady();
     }
-  }, [uid]); // 只有當 uid 變化時重新抓取
+  }, [uid, reload]); // 只有當 uid 或 reload 變化時重新抓取
 
   // 移除了原本的 if (isLoading) return <div ... />
   // 改由父組件 (profile/[uid].jsx) 統一控制載入狀態

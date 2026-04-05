@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePostContext } from '@/context/post-context';
 import styles from './modal.module.css';
+import { IoClose } from 'react-icons/io5';
 
 export default function EditModal({ post, modalId }) {
   const {
@@ -14,6 +15,9 @@ export default function EditModal({ post, modalId }) {
     postContent,
     fileInputRef,
     handleKeyPress,
+    isUploading,
+    uploadProgress,
+    cancelUpload,
   } = usePostContext();
 
   const editModalRef = useRef(null);
@@ -104,23 +108,75 @@ export default function EditModal({ post, modalId }) {
                 <span className="text-white font-medium text-sm">修改貼文內容</span>
               </div>
 
+              {/* Tags Selection */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {['約會', '酒吧', '電影', '活動'].map((tag) => {
+                  const isSelected = localPostContext?.includes(`#${tag}`);
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => {
+                        const tagStr = `#${tag}`;
+                        if (isSelected) {
+                          setLocalPostContext(localPostContext.replace(tagStr, '').trim());
+                        } else {
+                          setLocalPostContext(`${localPostContext.split('#')[0].trim()} ${tagStr} ${localPostContext.split('#').slice(1).map(t => `#${t.trim()}`).join(' ')}`.trim());
+                        }
+                      }}
+                      className={`badge badge-sm cursor-pointer transition-all ${
+                        isSelected 
+                          ? 'bg-neongreen text-black border-neongreen' 
+                          : 'badge-outline border-white/20 text-white/50 hover:border-neongreen/50'
+                      }`}
+                    >
+                      #{tag}
+                    </button>
+                  );
+                })}
+              </div>
+
               <textarea
                 className="textarea textarea-ghost w-full flex-grow text-base leading-relaxed placeholder:text-white/30 focus:bg-white/5 transition-all resize-none p-0 focus:outline-none"
                 placeholder="編輯你的貼文..."
                 autoFocus
-                value={localPostContext}
-                onChange={handlePostContentChange}
+                value={localPostContext?.split('#')[0].trim()}
+                onChange={(e) => {
+                  const tags = localPostContext?.split('#').slice(1).map(t => `#${t.trim()}`).join(' ');
+                  setLocalPostContext(`${e.target.value} ${tags}`.trim());
+                }}
                 onKeyDown={(e) => handleKeyPress(e, () => handlePostUpdate(post, localPostContext, editModalRef))}
               />
 
               <div className="pt-4 mt-auto border-t border-white/10 flex justify-center">
                 <button
-                  className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg"
+                  className={`btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-full shadow-neon font-bold text-lg ${isUploading ? 'loading' : ''}`}
                   onClick={() => handlePostUpdate(post, localPostContext, editModalRef)}
+                  disabled={isUploading}
                 >
-                  確認修改
+                  {isUploading ? `上傳中 ${uploadProgress}%` : '確認修改'}
                 </button>
               </div>
+
+              {/* 上傳進度條與取消按鈕 */}
+              {isUploading && (
+                <div className="mt-4 px-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-white/50 font-medium">圖片更新中...</span>
+                    <button 
+                      onClick={cancelUpload}
+                      className="text-white/40 hover:text-white/90 transition-colors flex items-center gap-1 text-xs"
+                    >
+                      <IoClose size={14} /> 取消上傳
+                    </button>
+                  </div>
+                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+                    <div 
+                      className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_10px_rgba(160,255,31,0.5)]"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

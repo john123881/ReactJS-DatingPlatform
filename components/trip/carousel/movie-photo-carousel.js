@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import CarouselContentMovie2 from './carousel-content-movie2';
+import CarouselContentMovie from './carousel-content-movie';
 import { TripService } from '@/services/trip-service';
 
-export default function MoviePhotoCarousel2({
+export default function MoviePhotoCarousel({
   trip_plan_id,
   refreshAllDetails,
   newDetail
@@ -23,7 +23,7 @@ export default function MoviePhotoCarousel2({
         const data = await TripService.getRecommendMovies();
         setMovies(data);
       } catch (error) {
-        console.error('Fetching Bar saved error:', error);
+        console.error('Fetching Movie recommendation error:', error);
       }
     };
     fetchMovie();
@@ -54,10 +54,10 @@ export default function MoviePhotoCarousel2({
       onMouseLeave={() => setIsHovering(false)}
     >
       <h3 className="text-center text-2xl">熱門電影</h3>
-      {currentMovies.map((movies, index) => (
-        <CarouselContentMovie2
-          key={movies.movie_id || index}
-          movies={movies}
+      {currentMovies.map((movie, index) => (
+        <CarouselContentMovie
+          key={movie.movie_id || index}
+          movies={movie}
           trip_plan_id={trip_plan_id}
           newDetail={newDetail}
           refreshAllDetails={refreshAllDetails}
