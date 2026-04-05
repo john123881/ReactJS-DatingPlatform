@@ -24,6 +24,7 @@ export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [profilePosts, setProfilePosts] = useState([]);
   const [page, setPage] = useState(1);
+  const [postPage, setPostPage] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [filteredPage, setFilteredPage] = useState(1);
   const [postsCount, setPostsCount] = useState(0);
@@ -1694,6 +1695,9 @@ export const PostProvider = ({ children }) => {
       setPosts,
       profilePosts,
       page,
+      setPage,
+      postPage,
+      setPostPage,
       eventPageCard,
       filteredPosts,
       postsCount,
@@ -1831,6 +1835,7 @@ export const PostProvider = ({ children }) => {
       posts,
       profilePosts,
       page,
+      postPage,
       eventPageCard,
       filteredPosts,
       postsCount,
