@@ -1575,7 +1575,20 @@ export const PostProvider = ({ children }) => {
               );
             });
 
+            // 更新個人檔案活動清單
+            setProfileEvents((prev) =>
+              prev.filter((event) => event.comm_event_id !== eventId),
+            );
+
+            // 更新活動總數
+            setEventsCount((prev) => Math.max(0, prev - 1));
+
             customToast.success('刪除成功!');
+
+            // 如果是在詳情頁刪除，則跳轉回活動列表
+            if (router.pathname.includes('/community/event/')) {
+              router.push('/community/events');
+            }
           } else {
             customToast.error('刪除失敗!');
           }
@@ -1750,6 +1763,14 @@ export const PostProvider = ({ children }) => {
 
       if (data.success) {
         setEvents((prevEvents) => [data, ...prevEvents]);
+        
+        // 更新個人檔案活動清單 (如果是目前登入使用者的頁面)
+        if (Number(uid) === auth.id) {
+          setProfileEvents((prev) => [data, ...prev]);
+        }
+        
+        // 更新活動總數
+        setEventsCount((prev) => (prev || 0) + 1);
       } else {
         throw new Error('Network response was not ok.');
       }
