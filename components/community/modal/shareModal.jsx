@@ -1,5 +1,5 @@
-// import { FaRegCircleXmark } from 'react-icons/fa6';
 import { useRef } from 'react';
+// import { FaRegCircleXmark } from 'react-icons/fa6';
 import { toast } from '@/lib/toast';
 
 export default function ShareModal({ post, postId, modalId }) {
@@ -62,7 +62,7 @@ export default function ShareModal({ post, postId, modalId }) {
               <div className="card-iconListLeft flex flex-row">
                 <div className="avatar mr-3">
                   <div className="w-10 rounded-full">
-                    <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                    <img src="/unavailable-image.jpg" />
                   </div>
                 </div>
                 <span className="searchModalListItemText text-h6">UserID</span>

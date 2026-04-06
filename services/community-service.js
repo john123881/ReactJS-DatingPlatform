@@ -103,8 +103,8 @@ export const CommunityService = {
 
   // --- 活動相關 ---
 
-  getEvents: (page, limit) =>
-    apiClient(`/community/events?page=${page}&limit=${limit}`),
+  getEvents: (page, limit, seed = null) =>
+    apiClient(`/community/events?page=${page}&limit=${limit}${seed !== null ? `&seed=${seed}` : ''}`),
 
   getEventDetail: (eid) => apiClient(`/community/get-event-page/${eid}`),
 
@@ -140,6 +140,8 @@ export const CommunityService = {
 
   deleteEvent: (eventId) =>
     apiClient.delete('/community/delete-event', { body: { eventId } }),
+
+  getParticipants: (eventId) => apiClient(`/community/get-participants/${eventId}`),
 
   // --- 互動相關 ---
 

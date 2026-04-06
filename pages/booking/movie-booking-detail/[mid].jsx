@@ -138,10 +138,10 @@ export default function MovieDetail({ onPageChange }) {
             </div>
 
             {/* 電影資訊 */}
-            <div className="card lg:card-side bg-transparent shadow-xl p-20 mx-4 mt-11">
-              <figure className="lg:flex-shrink-0">
+            <div className="card lg:card-side bg-transparent shadow-xl p-6 lg:p-20 mx-4 mt-6 lg:mt-11">
+              <figure className="lg:flex-shrink-0 flex justify-center">
                 <Image
-                  className="lg:w-[300px] lg:h-[480px] object-cover rounded-xl"
+                  className="w-full max-w-[300px] h-auto lg:w-[300px] lg:h-[480px] object-cover rounded-xl mx-auto"
                   src={getMovieImgSrc(movie[0]?.poster_img)}
                   onError={(e) => {
                     e.target.src = '/unavailable-image.jpg';
@@ -154,12 +154,11 @@ export default function MovieDetail({ onPageChange }) {
               </figure>
               <div className="card-body">
                 <h2
-                  className="card-title pt-2 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:pb-0"
-                  style={{ fontSize: '2rem' }}
+                  className="card-title pt-2 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:pb-0 text-2xl lg:text-4xl font-bold gap-4"
                 >
                   {movie[0]?.title}
                   <button
-                    className={`btn btn-outline btn-accent w-[130px] mx-24 mt-2`}
+                    className={`btn btn-outline btn-accent w-[130px] lg:mx-24 mt-2`}
                     style={{
                       height: '0.5rem',
                       borderColor: '#A0FF1F',
@@ -244,9 +243,9 @@ export default function MovieDetail({ onPageChange }) {
             </div>
 
             {/* 電影時刻/電影介紹 */}
-            <div className="flex justify-center  mx-12 w-[100px] lg:w-[100%]">
+            <div className="flex justify-center w-full px-4 lg:px-12 mt-6">
               {/* 在这里添加 mb-8 来增加上下间距 */}
-              <div className="w-[85%] lg:w-[100%]">
+              <div className="w-full">
                 <div role="tablist" className="tabs tabs-bordered pt-8 pb-8">
                   <input
                     type="radio"

@@ -31,6 +31,7 @@ export default function PostCardMedium({ post }) {
                     src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo object-cover w-[330px] h-[330px]`}
+                    loading="lazy"
                     onError={(e) => handleImageError(e, 'post')}
                   />
                 </div>

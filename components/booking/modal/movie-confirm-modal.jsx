@@ -22,7 +22,7 @@ export default function MovieConfirmModal() {
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="col-span-1">預約日期</div>
-                  <div className="col-span-1">2024/05/10 (五)</div>
+                  <div className="col-span-1">2026/05/10 (日)</div>
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="col-span-1">預約時段</div>
@@ -32,10 +32,13 @@ export default function MovieConfirmModal() {
             </div>
             <div className="col-span-1 pt-10">
               <button
-                className="btn btn-outline btn-accent mx-20 h-[0.5rem] border-[]"
+                className="btn btn-outline btn-accent mx-20 h-[0.5rem]"
                 style={{
                   height: '0.5rem',
                   borderColor: '#A0FF1F',
+                }}
+                onClick={() => {
+                  window.location.href = '/booking/movie-ticket';
                 }}
               >
                 我的電影票

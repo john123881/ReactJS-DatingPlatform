@@ -19,6 +19,7 @@ export default function ProfileEventCard({ event }) {
                     src={getImageUrl(event.img, 'event')}
                     alt={event.title || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo w-[330px] h-[330px] object-cover`}
+                    loading="lazy"
                     onError={(e) => handleImageError(e, 'event')}
                   />
                 </div>

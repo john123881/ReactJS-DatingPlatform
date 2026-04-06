@@ -367,7 +367,7 @@ export default function Index({ onPageChange }) {
                               </p>
                               <button
                                 onClick={() =>
-                                  router.push('/booking/movie-seat')
+                                  router.push('/under-construction')
                                 }
                               >
                                 確認場次，前往座位選擇

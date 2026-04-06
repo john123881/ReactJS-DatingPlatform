@@ -8,7 +8,9 @@ import PageLoader from '@/components/ui/loader/page-loader';
 import { toast as customToast } from '@/lib/toast';
 import { handleImageError } from '@/services/image-utils';
 import EditEventModal from '@/components/community/modal/editEventModal';
+import ParticipantModal from '@/components/community/modal/participantModal';
 import CommunityLayout from '@/components/community/layout/CommunityLayout';
+import Link from 'next/link';
 
 export default function Event({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -27,6 +29,9 @@ export default function Event({ onPageChange }) {
     attendedEvents,
     handleAttendedClick,
     handleDeleteEventClick,
+    getEventParticipants,
+    eventParticipants,
+    participantModalRef,
   } = usePostContext();
 
   const isAttended = attendedEvents[eventPageCard?.comm_event_id] || false;
@@ -35,6 +40,16 @@ export default function Event({ onPageChange }) {
 
   // 基於 comm_event_id 的唯一 edit modal id
   const editEventModalId = `edit_event_modal_${eventPageCard?.comm_event_id}`;
+  const participantModalId = `participant_modal_${eventPageCard?.comm_event_id}`;
+
+  const handleParticipantClick = async () => {
+    if (eventPageCard?.comm_event_id) {
+      await getEventParticipants(eventPageCard.comm_event_id);
+      if (participantModalRef.current) {
+        participantModalRef.current.showModal();
+      }
+    }
+  };
 
   const handleQuickCopy = (e) => {
     e?.stopPropagation();
@@ -94,7 +109,7 @@ export default function Event({ onPageChange }) {
                 alt={eventPageCard?.photo_name || 'No Image Available'}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
-                className="object-cover transition-transform duration-700 hover:scale-105"
+                className="object-contain transition-transform duration-700"
                 onError={(e) => handleImageError(e, 'event')}
               />
               <div className="absolute top-4 left-4">
@@ -139,6 +154,25 @@ export default function Event({ onPageChange }) {
                   </div>
                 </div>
 
+                {/* 發起者資訊 */}
+                <Link 
+                  href={`/community/profile/${eventPageCard?.user_id}`}
+                  className="flex items-center gap-4 mb-8 p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                >
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-neongreen/50 group-hover:border-neongreen transition-all duration-300">
+                    <Image
+                      src={eventPageCard?.organizer_avatar ? (eventPageCard.organizer_avatar.startsWith('http') ? eventPageCard.organizer_avatar : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}${eventPageCard.organizer_avatar}`) : '/avatar/defaultAvatar.jpg'}
+                      alt={eventPageCard?.organizer_name || '主辦人頭像'}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">發起者</p>
+                    <p className="text-white font-bold text-lg leading-tight group-hover:text-neongreen transition-colors">{eventPageCard?.organizer_name || '神秘用戶'}</p>
+                  </div>
+                </Link>
+
                 <div className="space-y-4 mb-8">
                   <div className="flex items-center gap-3 text-white/90">
                     <div className="w-2 h-2 rounded-full bg-neongreen animate-pulse"></div>
@@ -156,6 +190,26 @@ export default function Event({ onPageChange }) {
                         {eventPageCard?.start_date ? `${eventPageCard.start_date} ${eventPageCard.start_time || ''}` : '時間未定'} 
                         {eventPageCard?.end_date && <><br /><span className="text-gray-500">—</span> {eventPageCard.end_date} {eventPageCard.end_time || ''}</>}
                       </span>
+                    </div>
+
+                    {/* 參與者資訊 */}
+                    <div 
+                      className="flex items-start gap-4 text-gray-400 text-sm pt-2 border-t border-white/5 cursor-pointer group/participants"
+                      onClick={handleParticipantClick}
+                    >
+                      <span className="font-semibold text-neongreen whitespace-nowrap min-w-[3rem] group-hover/participants:translate-x-1 transition-transform duration-300">參與者:</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-white group-hover/participants:text-neongreen transition-colors">
+                          目前已參加：<span className="font-bold text-neongreen">{eventPageCard?.participant_count || 0}</span> 人
+                        </span>
+                        {eventPageCard?.first_participant_name ? (
+                          <span className="text-xs text-gray-400 group-hover/participants:text-gray-300 transition-colors">
+                            ( {eventPageCard.first_participant_name} {eventPageCard.participant_count > 1 ? '及其他參與者...' : '已參加'} )
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500 italic">點擊查看詳情</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -193,6 +247,11 @@ export default function Event({ onPageChange }) {
             key={eventPageCard?.comm_event_id}
           />
         )}
+        
+        <ParticipantModal 
+          participants={eventParticipants}
+          modalId={participantModalId}
+        />
       </div>
     </>
   );

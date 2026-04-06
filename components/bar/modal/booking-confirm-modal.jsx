@@ -26,7 +26,7 @@ export default function BookingConfirmModal() {
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="col-span-1">預約日期</div>
-                  <div className="col-span-1">2024/05/10 (五)</div>
+                  <div className="col-span-1">2026/05/10 (日)</div>
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="col-span-1">預約時段</div>

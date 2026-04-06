@@ -16,15 +16,24 @@ export default function Explore({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { randomPosts, exploreHasMore, getCommunityExplorePost } =
-    usePostContext();
+  const { 
+    randomPosts, 
+    exploreHasMore, 
+    getCommunityExplorePost, 
+    resetExplorePosts,
+    loadingPosts 
+  } = usePostContext();
 
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null && randomPosts.length === 0) {
-      getCommunityExplorePost();
+    if (auth?.id !== undefined && auth?.id !== null && randomPosts.length === 0 && !loadingPosts) {
+      if (getCommunityExplorePost) getCommunityExplorePost();
     }
+    // Cleanup: Reset posts when leaving the page to ensure randomization on next visit
+    return () => {
+      if (resetExplorePosts) resetExplorePosts();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.id]);
+  }, [auth?.id]); // 只相依於 auth.id，內部邏輯會處理其餘狀態去防止重複請求
 
   return (
     <>
@@ -39,7 +48,7 @@ export default function Explore({ onPageChange }) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               gap: '1.25rem',
             }}
           >

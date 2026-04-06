@@ -66,11 +66,12 @@ export default function PostCardLarge({ post }) {
             >
               <div className="avatar">
                 <div className="w-10 rounded-full">
-                  <img
-                    src={getImageUrl(post.avatar, 'avatar')}
-                    alt={post.photo_name || 'No Image Available'}
-                    onError={(e) => handleImageError(e, 'avatar')}
-                  />
+                    <img
+                      src={getImageUrl(post.avatar, 'avatar')}
+                      alt={post.photo_name || 'No Image Available'}
+                      loading="lazy"
+                      onError={(e) => handleImageError(e, 'avatar')}
+                    />
                 </div>
               </div>
             </div>
@@ -140,6 +141,7 @@ export default function PostCardLarge({ post }) {
                     src={getImageUrl(post.img, 'post')}
                     alt={post.photo_name || 'No Image Available'}
                     className={`${styles.parallaxMedia} card-photo w-[480px] h-[480px] object-cover`}
+                    loading="lazy"
                     onError={(e) => handleImageError(e, 'post')}
                   />
                 </div>

@@ -194,22 +194,21 @@ export default function Detail({ onPageChange }) {
                       <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px] cursor-pointer">
                         留下評論
                       </div>
-                      <BarRatingModal bar={bar} />
                     </div>
                   </div>
-                  <button className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]">
-                    <Link 
-                      href={`/bar/bar-booking/${bar?.bar_id}`}
-                      onClick={(e) => {
-                        if (auth.id === 0) {
-                          e.preventDefault();
-                          setLoginModalToggle(true);
-                        }
-                      }}
-                    >
-                      立即訂位
-                    </Link>
-                  </button>
+                  <Link 
+                    href={`/bar/bar-booking/${bar?.bar_id}`}
+                    onClick={(e) => {
+                      if (auth.id === 0) {
+                        e.preventDefault();
+                        setLoginModalToggle(true);
+                      }
+                    }}
+                    className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]"
+                  >
+                    立即訂位
+                  </Link>
+                  <BarRatingModal bar={bar} />
                 </div>
                 <div className="bar-detail-img">
                   <Image

@@ -11,19 +11,33 @@ export default function Events({ onPageChange }) {
   const pageTitle = '社群媒體';
   const router = useRouter();
   const { auth } = useAuth();
+  const context = usePostContext();
+
+  // Safety check for context
+  if (!context) return <PageLoader type="index" />;
+
+  const { 
+    events = [], 
+    eventHasMore = false, 
+    getCommunityEvents, 
+    loadingEvents = false, 
+    resetEventsData 
+  } = context;
 
   useEffect(() => {
-    onPageChange(pageTitle);
+    if (onPageChange) onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const { events, eventHasMore, getCommunityEvents, loadingEvents } = usePostContext();
-
   useEffect(() => {
-    if (auth.id !== undefined && auth.id !== null && events.length === 0) {
-      getCommunityEvents();
+    if (auth?.id !== undefined && auth?.id !== null && events.length === 0 && !loadingEvents) {
+      if (getCommunityEvents) getCommunityEvents();
     }
+    // Cleanup: Reset events data when leaving the page to ensure randomization on next visit
+    return () => {
+      if (resetEventsData) resetEventsData();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.id]);
+  }, [auth?.id]); // 只相依於 auth.id，內部邏輯會處理其餘狀態去防止重複請求
 
   if (loadingEvents && events.length === 0) {
     return (
@@ -31,6 +45,11 @@ export default function Events({ onPageChange }) {
         <PageLoader type="index" />
       </div>
     );
+  }
+
+  // Double check components are valid before rendering
+  if (!InfiniteScroll || !EventCard) {
+    return <PageLoader type="index" />;
   }
 
   return (
@@ -49,16 +68,15 @@ export default function Events({ onPageChange }) {
           next={getCommunityEvents}
           hasMore={eventHasMore}
           loader={<PageLoader type="index" minHeight="200px" />}
-          // endMessage={<p>No more events</p>}
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             gap: '1.25rem',
           }}
         >
-          {events.map((event, i) => (
-            <EventCard event={event} key={i} />
+          {Array.isArray(events) && events.map((event, i) => (
+            <EventCard event={event} key={`event-${event.comm_event_id || i}`} />
           ))}
         </InfiniteScroll>
       </div>
@@ -66,4 +84,7 @@ export default function Events({ onPageChange }) {
   );
 }
 
-Events.getLayout = (page) => <CommunityLayout>{page}</CommunityLayout>;
+Events.getLayout = (page) => {
+  if (!CommunityLayout) return page;
+  return <CommunityLayout>{page}</CommunityLayout>;
+};

@@ -108,9 +108,11 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <figure style={{ height: '380px', overflow: 'hidden', margin: 0 }}>
+        <figure className="flex-shrink-0" style={{ height: '380px', overflow: 'hidden', margin: 0 }}>
           <img
             src={getMovieImgSrc(movie.poster_img)}
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.target.src = '/unavailable-image.jpg';
             }}
@@ -126,8 +128,8 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           />
           {hoveredIndex === index && (
             <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', height: '380px' }}
+              className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', height: '380px' }}
             >
               <div
                 className="card-body"
@@ -138,7 +140,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                 }}
               >
                 <Link
-                  className="btn btn-outline"
+                  className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
                   style={{
                     width: '130px',
                     height: '40px',
@@ -150,7 +152,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                   立即訂票
                 </Link>
                 <button
-                  className="btn btn-outline"
+                  className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
                   style={{
                     width: '130px',
                     height: '40px',

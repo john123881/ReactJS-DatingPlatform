@@ -10,6 +10,17 @@ import PageLoader from '@/components/ui/loader/page-loader';
 import CommunityLayout from '@/components/community/layout/CommunityLayout';
 
 export default function Index({ onPageChange }) {
+  // Defensive checks to prevent "Element type is invalid" if components are undefined
+  // This can happen due to circular dependencies or HMR issues
+  if (typeof InfiniteScroll === 'undefined' || 
+      typeof EventCard === 'undefined' || 
+      typeof PostCardLarge === 'undefined' || 
+      typeof SuggestionBar === 'undefined' ||
+      typeof CommunityLayout === 'undefined' ||
+      typeof PageLoader === 'undefined') {
+    return <div className="flex justify-center items-center h-screen bg-dark text-white">Loading Components...</div>;
+  }
+
   const pageTitle = '社群媒體';
   const router = useRouter();
   const { auth } = useAuth();
@@ -79,16 +90,6 @@ export default function Index({ onPageChange }) {
                 onClick={() => handleFilterClick('電影')}
               >
                 電影
-              </button>
-              <button
-                className={`${
-                  activeFilterButton === '活動'
-                    ? 'bg-neongreen text-black'
-                    : 'bg-dark border border-white/10'
-                } rounded-full hover:bg-neongreen hover:text-black px-6 h-9 transition-all text-sm font-bold`}
-                onClick={() => handleFilterClick('活動')}
-              >
-                活動
               </button>
             </div>
 

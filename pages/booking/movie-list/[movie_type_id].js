@@ -1,4 +1,5 @@
 import MovieCard from '@/components/booking/card/movieCard';
+import MovieCardSkeleton from '@/components/booking/card/movieCardSkeleton';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useCallback } from 'react';
 import PageTitle from '@/components/page-title';
@@ -163,15 +164,15 @@ export default function Index({ onPageChange }) {
         </div>
       </div>
 
-      <div className="flex  gap-4 mx-10 pt-10 pb-10">
+      <div className="sticky top-[64px] z-30 sm:static flex justify-center gap-8 py-4 px-4 mx-4 md:mx-auto max-w-7xl bg-black/60 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none sm:pt-10 sm:pb-10 transition-all duration-300">
         {/* 分類搜索 */}
         <select
-          className="select select-bordered w-full max-w-xs bg--100 border-neongreen text-neongreen focus:border-neongreen "
+          className="select select-bordered w-36 lg:w-full max-w-xs bg--100 border-neongreen text-neongreen focus:border-neongreen "
           onChange={handleTypeChange} // 為 select 元素添加 onChange 處理器
           defaultValue=""
         >
           <option disabled value="">
-            想找哪類的電影
+            電影分類
           </option>
           <option value="1">劇情</option>
           <option value="2">愛情</option>
@@ -183,7 +184,7 @@ export default function Index({ onPageChange }) {
         </select>
 
         {/* 關鍵字搜索 */}
-        <label className="input input-bordered flex items-center gap-2 w-full max-w-xs  border-neongreen text-neongreen focus:border-neongreen">
+        <label className="input input-bordered flex items-center gap-2 w-full max-w-md border-neongreen text-neongreen focus:border-neongreen">
           <input
             type="text"
             className="grow"
@@ -327,16 +328,27 @@ export default function Index({ onPageChange }) {
   ))}
 </div> */}
 
-      <div className="flex justify-center md:justify-start flex-wrap gap-6 lg:gap-10 mx-4 md:mx-10">
-        {isLoading ? (
-          <p>Loading...</p> // 正在加載提示
-        ) : hasSearched && searchResults.length === 0 ? (
-          <p>未找到结果</p> // 搜索后无结果提示
-        ) : (
-          (hasSearched ? searchResults : movieCards).map((movie, index) => (
-            <MovieCard movie={movie} key={index} isSaved={false} />
-          ))
-        )}
+      <div 
+        className="flex flex-col items-center w-full min-h-screen pb-20 transition-colors duration-500 overflow-hidden"
+        style={{ 
+          background: 'radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000000 100%)',
+          backgroundAttachment: 'fixed',
+          marginTop: '-40px' 
+        }}
+      >
+        <div className="flex flex-wrap justify-center gap-6 lg:gap-10 mx-4 md:mx-auto max-w-7xl pt-10">
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <MovieCardSkeleton key={i} />
+            ))
+          ) : hasSearched && searchResults.length === 0 ? (
+            <p className="text-white py-20 text-center w-full">未找到結果</p>
+          ) : (
+            (hasSearched ? searchResults : movieCards).map((movie, index) => (
+              <MovieCard movie={movie} key={movie.movie_id || index} isSaved={false} />
+            ))
+          )}
+        </div>
       </div>
 
       {/* 分頁 */}

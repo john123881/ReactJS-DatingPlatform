@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function BarRatingModal(bar) {
+export default function BarRatingModal({ bar }) {
   const [rating, setRating] = useState(0); // 初始化評分值為0
 
   const handleRatingChange = (event) => {
@@ -21,16 +21,15 @@ export default function BarRatingModal(bar) {
           <div className="flex items-center justify-center">
             <img
               className="w-[99px] h-[99px] object-cover rounded-full"
-              src="https://damei17.com/wp-content/uploads/2022/08/Fake-Sober-24.jpg"
-              alt="bar pic"
+              src={bar?.bar_pic_name ? `/barPic/${bar.bar_pic_name}` : '/unavailable-image.jpg'}
+              alt={bar?.bar_name || "bar pic"}
             ></img>
           </div>
           <div className="col-span-10 flex justify-center items-center">
             <div>
               留下您對{' '}
               <span>
-                Fake Sober Taipei
-                {/* {bar.bar_name} */}
+                {bar?.bar_name || "這間酒吧"}
               </span>{' '}
               的整體滿意度
             </div>
@@ -74,11 +73,13 @@ export default function BarRatingModal(bar) {
             ))}
           </div>
           <div className="flex justify-center">
-            <button className="btn w-[320px] text-black text-[15px] border-[#A0FF1F] rounded-[20px]">
-              <Link href="/bar/bar-rating-list" className="text-white">
-                送出評論
-              </Link>
-            </button>
+            <Link 
+              href={`/bar/bar-rating-list/${bar?.bar_id}`} 
+              className="btn w-[320px] text-white text-[15px] border-[#A0FF1F] rounded-[20px] hover:text-black hover:bg-[#A0FF1F]"
+              onClick={() => { document.getElementById('bar-rating-modal').close(); }}
+            >
+              送出評論
+            </Link>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">

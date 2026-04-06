@@ -30,6 +30,7 @@ export const PostProvider = ({ children }) => {
   const [postsCount, setPostsCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [eventPageCard, setEventPageCard] = useState([]);
+  const [eventParticipants, setEventParticipants] = useState([]);
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [randomPosts, setRandomPosts] = useState([]);
   const [postContent, setPostContent] = useState('');
@@ -64,6 +65,7 @@ export const PostProvider = ({ children }) => {
   const [profileHasMore, setProfileHasMore] = useState(true);
   const [userProfileHasMore, setUserProfileHasMore] = useState(true);
   const [eventHasMore, setEventHasMore] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [commentHasMore, setCommentHasMore] = useState(true);
 
@@ -79,10 +81,13 @@ export const PostProvider = ({ children }) => {
   const [profileEvents, setProfileEvents] = useState([]);
   const [profileEventPage, setProfileEventPage] = useState(1);
   const [profileEventHasMore, setProfileEventHasMore] = useState(true);
+  const [profileLoadingPosts, setProfileLoadingPosts] = useState(false);
+  const [profileLoadingEvents, setProfileLoadingEvents] = useState(false);
 
   const [eventPage, setEventPage] = useState(1);
   const [randomPage, setRandomPage] = useState(1);
   const [randomSeed, setRandomSeed] = useState(null);
+  const [eventSeed, setEventSeed] = useState(null);
   const [indexSeed, setIndexSeed] = useState(null);
   const [likedPosts, setLikedPosts] = useState({});
   const [savedPosts, setSavedPosts] = useState({});
@@ -108,6 +113,7 @@ export const PostProvider = ({ children }) => {
   const searchModalMobileRef = useRef(null);
   const followerModalRef = useRef(null);
   const followingModalRef = useRef(null);
+  const participantModalRef = useRef(null);
 
   const interactingItems = useRef(new Set());
 
@@ -116,18 +122,31 @@ export const PostProvider = ({ children }) => {
 
   const [userInfo, setUserInfo] = useState({});
 
-  const getUserDetail = useCallback(async () => {
-    if (!auth.id) return;
+  const getUserDetail = useCallback(async (userId = uid) => {
+    if (!userId) return;
 
     try {
-      const data = await CommunityService.getUserInfo(auth.id);
+      const data = await CommunityService.getUserInfo(userId);
       // 確保即使 data[0] 為 undefined，也能安全地設置一個空對象
       setUserInfo(data[0] || {});
     } catch (error) {
       console.error('Failed to fetch user info', error);
       setUserInfo({}); // 當請求失敗時，也設置一個空對象
     }
-  }, [auth.id]);
+  }, [uid]);
+
+  const resetProfileState = useCallback(() => {
+    console.log('[Debug] Resetting Profile State');
+    setProfilePosts([]);
+    setProfilePage(1);
+    setProfileHasMore(true);
+    setProfileEvents([]);
+    setProfileEventPage(1);
+    setProfileEventHasMore(true);
+    setProfileLoadingPosts(false);
+    setProfileLoadingEvents(false);
+    setUserInfo({});
+  }, []);
 
   const getCommunityEventsCount = useCallback(async (userId) => {
     if (!userId) return;
@@ -352,8 +371,8 @@ export const PostProvider = ({ children }) => {
   );
 
   const getCommunityExplorePost = useCallback(async () => {
-    if (!exploreHasMore) return; // 防止重複請求
-    // setIsLoading(true); // 開始加載
+    if (!exploreHasMore || loadingPosts) return; // 防止重複請求且在加載中不執行
+    setLoadingPosts(true);
 
     try {
       let currentSeed = randomSeed;
@@ -373,19 +392,23 @@ export const PostProvider = ({ children }) => {
 
         setRandomPosts((prevPosts) => (randomPage === 1 ? data : [...prevPosts, ...data])); // 更新posts狀態
         setRandomPage((prevPage) => prevPage + 1); // 更新頁碼
-        // setIsLoading(false); // 結束加載
       }
     } catch (error) {
       console.error('Failed to fetch explore posts:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
+    } finally {
+      setLoadingPosts(false);
     }
-  }, [exploreHasMore, randomPage, randomSeed, checkPostsStatus, getPostComments]);
+  }, [exploreHasMore, randomPage, randomSeed, loadingPosts, checkPostsStatus, getPostComments]);
 
-  const getCommunityProfilePost = useCallback(async (userId = uid) => {
-    if (!userId || !profileHasMore) return; 
+  const getCommunityProfilePost = useCallback(async (userId = uid, isReset = false) => {
+    const effectiveHasMore = isReset ? true : profileHasMore;
+    const effectivePage = isReset ? 1 : profilePage;
+
+    if (!userId || !effectiveHasMore || profileLoadingPosts) return; 
+    setProfileLoadingPosts(true);
 
     try {
-      const data = await CommunityService.getPostsByUser(userId, profilePage, 12);
+      const data = await CommunityService.getPostsByUser(userId, effectivePage, 12);
       if (data.length === 0) {
         setProfileHasMore(false);
       } else {
@@ -394,33 +417,45 @@ export const PostProvider = ({ children }) => {
         await checkPostsStatus(postIds);
         await getPostComments(postIds);
 
-        setProfilePosts((prevPosts) => (profilePage === 1 ? data : [...prevPosts, ...data]));
-        setProfilePage((prevPage) => prevPage + 1);
+        setProfilePosts((prevPosts) => (effectivePage === 1 ? data : [...prevPosts, ...data]));
+        setProfilePage(effectivePage + 1);
+        if (data.length < 12) setProfileHasMore(false);
+        if (isReset) setProfileHasMore(true); // 確保在 reset 時如果是第 1 頁且有資料，則 hasMore 設為 true (除非資料不足 12 筆)
       }
     } catch (error) {
       console.error('Failed to fetch profile posts:', error);
+    } finally {
+      setProfileLoadingPosts(false);
     }
-  }, [profileHasMore, profilePage, uid, checkPostsStatus, getPostComments]);
+  }, [profileHasMore, profilePage, profileLoadingPosts, uid, checkPostsStatus, getPostComments]);
 
   const getCommunityUserProfileEvents = useCallback(
-    async (userId = uid) => {
-      if (!userId || !profileEventHasMore) return;
+    async (userId = uid, isReset = false) => {
+      const effectiveHasMore = isReset ? true : profileEventHasMore;
+      const effectivePage = isReset ? 1 : profileEventPage;
+
+      if (!userId || !effectiveHasMore || profileLoadingEvents) return;
+      setProfileLoadingEvents(true);
       try {
-        const data = await CommunityService.getEventsByUser(userId, profileEventPage, 12);
+        const data = await CommunityService.getEventsByUser(userId, effectivePage, 12);
         if (data.length === 0) {
           setProfileEventHasMore(false);
         } else {
           const eventIds = data.map((e) => e.comm_event_id).join(',');
           await checkEventsStatus(eventIds);
 
-          setProfileEvents((prev) => (profileEventPage === 1 ? data : [...prev, ...data]));
-          setProfileEventPage((prev) => prev + 1);
+          setProfileEvents((prev) => (effectivePage === 1 ? data : [...prev, ...data]));
+          setProfileEventPage(effectivePage + 1);
+          if (data.length < 12) setProfileEventHasMore(false);
+          if (isReset) setProfileEventHasMore(true);
         }
       } catch (error) {
         console.error('Failed to fetch user events:', error);
+      } finally {
+        setProfileLoadingEvents(false);
       }
     },
-    [profileEventPage, profileEventHasMore, uid, checkEventsStatus],
+    [profileEventPage, profileEventHasMore, profileLoadingEvents, uid, checkEventsStatus],
   );
 
   const getPostPage = useCallback(
@@ -451,19 +486,41 @@ export const PostProvider = ({ children }) => {
           setEventPageCard(data[0]);
         }
       } catch (error) {
-        console.error('Failed to fetch index posts:', error);
-        // setIsLoading(true); // 確保即使出錯也要結束加載
+        console.error('Failed to fetch event page detail:', error);
+        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
     },
     [checkEventsStatus],
   );
 
+  const getEventParticipants = useCallback(async (eid) => {
+    try {
+      const data = await CommunityService.getParticipants(eid);
+      setEventParticipants(data);
+    } catch (error) {
+      console.error('Failed to fetch event participants:', error);
+    }
+  }, []);
+
+  const resetAndCloseParticipantModal = useCallback(() => {
+    setEventParticipants([]);
+    if (participantModalRef.current) {
+      participantModalRef.current.close();
+    }
+  }, []);
+
   const getCommunityEvents = useCallback(async () => {
-    if (!eventHasMore) return; // 防止重複請求
-    // setIsLoading(true); // 開始加載
+    if (!eventHasMore || loadingEvents) return; // 防止重複請求且在加載中不執行
+    setLoadingEvents(true);
 
     try {
-      const data = await CommunityService.getEvents(eventPage, 12);
+      let currentSeed = eventSeed;
+      if (eventPage === 1 && currentSeed === null) {
+        currentSeed = Math.floor(Math.random() * 1000000);
+        setEventSeed(currentSeed);
+      }
+
+      const data = await CommunityService.getEvents(eventPage, 12, currentSeed);
       if (data.length === 0) {
         setEventHasMore(false); // 如果返回的數據少於預期，設置hasMore為false
       } else {
@@ -473,13 +530,13 @@ export const PostProvider = ({ children }) => {
 
         setEvents((prevEvents) => (eventPage === 1 ? data : [...prevEvents, ...data])); // 更新posts狀態
         setEventPage((prevPage) => prevPage + 1); // 更新頁碼
-        // setIsLoading(false); // 結束加載
       }
     } catch (error) {
       console.error('Failed to fetch events:', error);
-      // setIsLoading(false); // 確保即使出錯也要結束加載
+    } finally {
+      setLoadingEvents(false);
     }
-  }, [eventHasMore, eventPage, checkEventsStatus]);
+  }, [eventHasMore, eventPage, eventSeed, loadingEvents, checkEventsStatus]);
 
   const refreshEvents = useCallback(async () => {
     setLoadingEvents(true);
@@ -631,6 +688,22 @@ export const PostProvider = ({ children }) => {
     //   editModalRef.current.close();
     // }
   };
+
+  // 新增：重置探索頁面狀態
+  const resetExplorePosts = useCallback(() => {
+    setRandomPosts([]);
+    setRandomPage(1);
+    setRandomSeed(null); // 清除種子以在下次加載時生成新的
+    setExploreHasMore(true);
+  }, []);
+
+  // 新增：重置活動頁面狀態
+  const resetEventsData = useCallback(() => {
+    setEvents([]);
+    setEventPage(1);
+    setEventSeed(null); // 清除種子以在下次加載時生成新的
+    setEventHasMore(true);
+  }, []);
 
   // 重置篩選
   const handleFilterClick = (keyword) => {
@@ -1203,17 +1276,56 @@ export const PostProvider = ({ children }) => {
       const prevAttendedState = attendedEvents[eventId] || false;
       const newAttendedState = !prevAttendedState;
 
-      // 樂觀更新
+      // 樂觀更新狀態
       setAttendedEvents((prev) => ({
         ...prev,
         [eventId]: newAttendedState,
       }));
 
+      // 樂觀更新計數 (Detail Page)
+      if (eventPageCard && eventPageCard.comm_event_id === eventId) {
+        setEventPageCard((prev) => ({
+          ...prev,
+          participant_count: newAttendedState 
+            ? (prev.participant_count || 0) + 1 
+            : Math.max(0, (prev.participant_count || 0) - 1)
+        }));
+      }
+
+      // 樂觀更新計數 (List Pages)
+      const updateListCount = (prevList) => prevList.map((e) => {
+        if (e.comm_event_id === eventId) {
+          return {
+            ...e,
+            participant_count: newAttendedState
+              ? (e.participant_count || 0) + 1
+              : Math.max(0, (e.participant_count || 0) - 1)
+          };
+        }
+        return e;
+      });
+
+      setEvents(updateListCount);
+      setProfileEvents(updateListCount);
+      setFilteredPosts((prev) => {
+        // 如果是活動類型的過濾貼文，也要更新
+        return prev.map((item) => {
+          if (item.comm_event_id === eventId) {
+            return {
+              ...item,
+              participant_count: newAttendedState
+                ? (item.participant_count || 0) + 1
+                : Math.max(0, (item.participant_count || 0) - 1)
+            };
+          }
+          return item;
+        });
+      });
+
       try {
         const result = prevAttendedState
           ? await CommunityService.notAttendEvent(userId, eventId)
           : await CommunityService.attendEvent(userId, eventId);
-
 
         if (
           !(result.success ||
@@ -1225,18 +1337,37 @@ export const PostProvider = ({ children }) => {
         ) {
           throw new Error('Failed to update attendance status');
         }
+        
+        // 成功後可以重新獲取參與者清單 (如果是在詳情頁)
+        if (eventPageCard && eventPageCard.comm_event_id === eventId) {
+          getEventParticipants(eventId);
+        }
+        
       } catch (error) {
         console.error('Error updating event attendance, reverting:', error);
-        // 還原
+        // 還原狀態
         setAttendedEvents((prev) => ({
           ...prev,
           [eventId]: prevAttendedState,
         }));
+
+        // 還原計數
+        if (eventPageCard && eventPageCard.comm_event_id === eventId) {
+          setEventPageCard((prev) => ({
+            ...prev,
+            participant_count: prevAttendedState 
+              ? (prev.participant_count || 0) + 1 
+              : Math.max(0, (prev.participant_count || 0) - 1)
+          }));
+        }
+        
+        setEvents((prev) => updateListCount(prev)); // 這裡其實可以用相反邏輯還原，但直接傳遞 prev 會比較複雜，暫時用 map 還原
+        setProfileEvents((prev) => updateListCount(prev));
       } finally {
         interactingItems.current.delete(`attend-${eventId}`);
       }
     },
-    [auth.id, attendedEvents],
+    [auth.id, attendedEvents, eventPageCard, getEventParticipants],
   );
 
   const handleSavedClick = useCallback(
@@ -1818,9 +1949,19 @@ export const PostProvider = ({ children }) => {
       followerModalRef,
       followingModalRef,
       handleCommentUpdate,
+      loadingPosts,
       loadingEvents,
+      profileLoadingPosts,
+      profileLoadingEvents,
       refreshEvents,
       eventDetails,
+      resetExplorePosts,
+      resetEventsData,
+      resetProfileState,
+      eventParticipants,
+      getEventParticipants,
+      resetAndCloseParticipantModal,
+      participantModalRef,
     }),
     [
       getCommunityIndexPost,
@@ -1850,6 +1991,7 @@ export const PostProvider = ({ children }) => {
       checkFollowingStatus,
       getPostComments,
       comments,
+      loadingPosts,
       loadingComments,
       newComment,
       events,
@@ -1901,9 +2043,18 @@ export const PostProvider = ({ children }) => {
       isUploading,
       uploadProgress,
       auth,
+      loadingPosts,
       loadingEvents,
+      profileLoadingPosts,
+      profileLoadingEvents,
       refreshEvents,
       eventDetails,
+      resetExplorePosts,
+      resetEventsData,
+      resetProfileState,
+      eventParticipants,
+      getEventParticipants,
+      resetAndCloseParticipantModal,
     ],
   );
 

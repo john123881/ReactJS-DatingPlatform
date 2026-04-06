@@ -90,23 +90,24 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     <>
       <div
         key={index}
-        className={`card bg-base-100 shadow-xl relative ${
+        className={`card bg-base-100 shadow-xl relative h-full min-h-[380px] sm:min-h-[550px] transition-all duration-300 ${
           isSaved ? ' ring-1 ring-neongreen/30' : ''
         }`}
-        style={{ width: '280px', height: '550px' }}
+        style={{ width: '100%' }}
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <figure>
-          <div className="card w-99 bg-base-100 shadow-xl">
-            <figure>
+        <figure className="flex-shrink-0">
+          <div className="card w-full bg-base-100 shadow-xl overflow-hidden">
+            <figure className="relative">
               <Image
                 src={getMovieImgSrc(movie.movie_img)}
                 alt={movie.title}
                 width={280}
                 height={400}
                 style={{
-                  height: '400px',
+                  width: '100%',
+                  aspectRatio: '28/40',
                   objectFit: 'cover',
                   filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
                   transition: 'filter 0.3s',
@@ -115,8 +116,8 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
               />
               {hoveredIndex === index && (
                 <div
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
+                  className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
                 >
                   <div
                     className="card-body"
@@ -127,7 +128,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                     }}
                   >
                     <button
-                      className="btn btn-outline"
+                      className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
                       style={{
                         width: '130px',
                         height: '40px',
@@ -145,7 +146,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                       立即訂票
                     </button>
                     <button
-                      className="btn btn-outline"
+                      className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
                       style={{
                         width: '130px',
                         height: '40px',
@@ -173,8 +174,8 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           className="absolute top-2 right-2 cursor-pointer"
           onClick={handleHeartClick}
           style={{
-            backgroundColor: 'white', // 根据点击状态改变背景色
-            borderRadius: '50%', // 圆形背景
+            backgroundColor: 'white', // 點擊更換顏色
+            borderRadius: '50%', // 圖形背景
             width: '32px',
             height: '32px',
             display: 'flex',
@@ -195,12 +196,15 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           )}
         </div>
 
-        <div className="card-body">
-          <h2 className="card-title flex flex-wrap items-center">
-            <span style={{ fontSize: '1rem' }}>{movie.title}</span>{' '}
-            {/* 使用動態的 movieName */}
+        <div className="card-body p-4 flex flex-col justify-between">
+          <div>
+            <h2 className="text-[1rem] font-bold line-clamp-2 min-h-[3rem] leading-snug">
+              {movie.title}
+            </h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mt-auto">
             <div
-              className="badge badge-secondary w-24 mr-2 mt-2"
+              className="badge badge-secondary w-20"
               style={{
                 backgroundColor: 'grey',
                 color: 'white',
@@ -209,7 +213,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
               數位
             </div>
             <div
-              className="badge badge-secondary w-24 mt-2"
+              className="badge badge-secondary w-20"
               style={{
                 backgroundColor: 'transparent',
                 ...getBadgeStyle(getMovieTypeName(movie.movie_type_id))
@@ -217,7 +221,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
             >
               {getMovieTypeName(movie.movie_type_id)}
             </div>
-          </h2>
+          </div>
         </div>
       </div>
     </>

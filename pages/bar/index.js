@@ -82,12 +82,18 @@ export default function Index({ onPageChange }) {
     getBarListRandom();
   }, [barRender, getBarListRandom]);
 
-  // 按一下在生成隨機三筆
+  // 上一頁酒吧
   const prevBars = () => {
     setCurrentIndex(
       (prev) => (prev - displayCount + randomBars.length) % randomBars.length,
     );
-    setBarRender(!barRender);
+  };
+
+  // 下一頁酒吧
+  const nextBars = () => {
+    setCurrentIndex(
+      (prev) => (prev + displayCount) % randomBars.length,
+    );
   };
 
   // Calculate the bars to be displayed based on the current index
@@ -101,7 +107,7 @@ export default function Index({ onPageChange }) {
     );
 
   const initialTabs = [
-    { title: '酒吧地圖', path: '/bar/bar-map', active: false },
+    { title: '酒吧地圖', path: '/under-construction', active: false },
     { title: '酒吧首頁', path: '/bar', active: true },
     { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false, isProtected: true },
   ];
@@ -151,7 +157,7 @@ export default function Index({ onPageChange }) {
               </div>
               <div className="hidden player-wall md:flex md:justify-center md:items-center">
                 <div className="flex items-center justify-center gap-16">
-                  <button onClick={prevBars}>
+                  <button type="button" onClick={prevBars}>
                     <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
                   </button>
                   {displayedBars.map((randomBar) => (
@@ -162,7 +168,7 @@ export default function Index({ onPageChange }) {
                       setSavedBars={setSavedBars}
                     />
                   ))}
-                  <button onClick={prevBars}>
+                  <button type="button" onClick={nextBars}>
                     <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
                   </button>
                 </div>
@@ -170,7 +176,7 @@ export default function Index({ onPageChange }) {
               <div className="flex items-center justify-center w-100 md:hidden">
                 <div className="gap-5 carousel rounded-box">
                   <div className="gap-5 carousel-item">
-                    {randomBars.slice(0, 2).map((randomBar) => (
+                    {displayedBars.slice(0, 2).map((randomBar) => (
                       <BarCardIndex
                       key={randomBar.bar_id}
                       randomBar={randomBar}

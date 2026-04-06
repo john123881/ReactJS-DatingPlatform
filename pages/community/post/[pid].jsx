@@ -149,7 +149,7 @@ export default function Post({ onPageChange }) {
                           >
                             <Image
                               src={getImageUrl(postPage.avatar, 'avatar')}
-                              alt={postPage.photo_name || 'No Image Available'}
+                              alt={postPage.username || '用戶頭像'}
                               width={40}
                               height={40}
                               className="rounded-full"

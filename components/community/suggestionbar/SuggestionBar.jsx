@@ -53,6 +53,7 @@ export default function SuggestionBar() {
                   <img
                     src={getImageUrl(user.avatar, 'avatar')}
                     alt={user.username || 'No Image Available'}
+                    loading="lazy"
                     onError={(e) => handleImageError(e, 'avatar')}
                   />
                 </div>

@@ -32,7 +32,10 @@ export default function Profile({ onPageChange }) {
     profileEventHasMore,
     setProfileEventHasMore,
     getCommunityUserProfileEvents,
+    profileLoadingPosts,
+    profileLoadingEvents,
     reload,
+    resetProfileState,
   } = usePostContext();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -48,24 +51,24 @@ export default function Profile({ onPageChange }) {
       setIsLoading(true);
       setIsHeaderLoading(true);
       
-      // 重置狀態
-      setProfilePosts([]);
-      setProfilePage(1);
-      setProfileHasMore(true);
+      // 使用 Context 提供的統一重置函式
+      resetProfileState();
       
-      setProfileEvents([]);
-      setProfileEventPage(1);
-      setProfileEventHasMore(true);
+      // 抓取數據 (第一頁)
+      const fetchData = async () => {
+        try {
+          await Promise.all([
+            getCommunityProfilePost(uid, true), // Pass isReset: true
+            getCommunityUserProfileEvents(uid, true), // Pass isReset: true
+          ]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-      // 預設抓取貼文
-      getCommunityProfilePost(uid).finally(() => {
-        setIsLoading(false);
-      });
-      
-      // 預也抓取活動 (或者等到切換 tab 再抓，這裡我們先預抓第一頁以顯示數量或加速切換)
-      getCommunityUserProfileEvents(uid);
+      fetchData();
     }
-  }, [uid, reload]);
+  }, [uid, reload, resetProfileState]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -105,18 +108,24 @@ export default function Profile({ onPageChange }) {
                   dataLength={profilePosts.length}
                   next={() => getCommunityProfilePost(uid)}
                   hasMore={profileHasMore}
-                  loader={<PageLoader type="index" minHeight="200px" />}
+                  loader={<div className="w-full flex justify-center py-4"><PageLoader type="index" minHeight="50px" /></div>}
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     gap: '1.25rem',
-                    width: '100%'
+                    overflow: 'hidden'
                   }}
                 >
                   {profilePosts.map((post, i) => (
                     <ProfileCard post={post} key={`post-${i}`} />
                   ))}
+                  {profileLoadingPosts && profilePosts.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 w-full text-center">
+                      <PageLoader type="index" />
+                      <p className="text-gray-400 mt-4 animate-pulse">正在載入貼文...</p>
+                    </div>
+                  )}
                   {profilePosts.length === 0 && !profileHasMore && (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 w-full text-center">
                       <div className="text-6xl mb-4">📭</div>
@@ -129,18 +138,24 @@ export default function Profile({ onPageChange }) {
                   dataLength={profileEvents.length}
                   next={() => getCommunityUserProfileEvents(uid)}
                   hasMore={profileEventHasMore}
-                  loader={<PageLoader type="index" minHeight="200px" />}
+                  loader={<div className="w-full flex justify-center py-4"><PageLoader type="index" minHeight="50px" /></div>}
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     gap: '1.25rem',
-                    width: '100%'
+                    overflow: 'hidden'
                   }}
                 >
                   {profileEvents.map((event, i) => (
                     <ProfileEventCard event={event} key={`event-${i}`} />
                   ))}
+                  {profileLoadingEvents && profileEvents.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 w-full text-center">
+                      <PageLoader type="index" />
+                      <p className="text-gray-400 mt-4 animate-pulse">正在載入活動...</p>
+                    </div>
+                  )}
                   {profileEvents.length === 0 && !profileEventHasMore && (
                     <div className="flex flex-col items-center justify-center py-20 opacity-50 w-full text-center">
                       <div className="text-6xl mb-4">🗓️</div>

@@ -41,72 +41,54 @@ export default function FollowingModal({ followings, modalId }) {
         className="modal modal-bottom sm:modal-middle max-w-full"
       >
         <div
-          className="modal-box md:w-[500px] md:h-[500px]"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box md:w-[450px] md:h-[550px] border border-white/10 shadow-2xl relative overflow-hidden"
+          style={{ 
+            backgroundColor: 'rgba(20, 20, 20, 0.95)',
+            backdropFilter: 'blur(16px)',
+            boxShadow: '0 0 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(57, 255, 20, 0.2)'
+          }}
         >
-          <p
-            className={`${styles['followModalListText']} font-bold text-lg mb-5 text-h5`}
-          >
-            追蹤中
-          </p>
+          <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+            <h3 className="font-black text-2xl text-white tracking-tighter uppercase italic">
+              Following <span className="text-neongreen text-sm not-italic ml-1 opacity-70">/ 追蹤中</span>
+            </h3>
+            <form method="dialog">
+              <button className="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-neongreen transition-colors">✕</button>
+            </form>
+          </div>
 
-          <ul>
+          <ul className="space-y-1 pr-2 max-h-[400px] overflow-y-auto custom-scrollbar">
             {followings.map((user, index) => (
               <li
                 key={index}
-                className="followModalListItem flex flex-row justify-between items-center mb-3 p-2"
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all duration-300 group border border-transparent hover:border-white/10 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleProfileClick(user.user_id);
+                }}
               >
-                <div className="card-iconListLeft flex flex-row items-center">
-                  <div className="avatar mr-3">
-                    <div className="w-10 rounded-full">
-                      <div
-                        className="cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleProfileClick(user.user_id);
-                        }}
-                      >
-                        <img
-                          src={getImageUrl(user.avatar, 'avatar')}
-                          alt={user.username || 'No Image Available'}
-                        />
-                      </div>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/5 group-hover:ring-neongreen/50 transition-all duration-500">
+                      <img
+                        src={getImageUrl(user.avatar, 'avatar')}
+                        alt={user.username || 'User'}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
-                  <div
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleProfileClick(user.user_id);
-                    }}
-                  >
-                    <span
-                      className={`${styles['followModalListEmail']} text-h6`}
-                    >
-                      {user.email.split('@')[0]}
-                    </span>
-                  </div>
-
-                  <div
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleProfileClick(user.user_id);
-                    }}
-                  >
-                    <span
-                      className={`${styles['followModalListUsername']} text-[14px] mx-3`}
-                    >
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold text-sm group-hover:text-neongreen transition-colors">
                       {user.username}
+                    </span>
+                    <span className="text-gray-500 text-xs font-mono opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                      @{user.email.split('@')[0]}
                     </span>
                   </div>
                 </div>
-
-                {/* <div className="card-iconListRight flex justify-end">
-                    <FaRegCircleXmark
-                      className={`${styles['followModalListItemIcon']} text-h5`}
-                    />
-                  </div> */}
+                <div className="opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <span className="text-[10px] cursor-pointer uppercase tracking-widest text-neongreen font-black bg-neongreen/10 px-2 py-1 rounded border border-neongreen/30">View Profile</span>
+                </div>
               </li>
             ))}
           </ul>

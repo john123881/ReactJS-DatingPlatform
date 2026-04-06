@@ -35,6 +35,14 @@ const nextConfig = {
         hostname: 'taipei-date-bucket.s3.ap-southeast-2.amazonaws.com',
       },
       {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },

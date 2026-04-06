@@ -55,7 +55,7 @@ export default function Booking({ onPageChange }) {
 
   // 初始選單分頁標籤
   const initialTabs = [
-    { title: '酒吧地圖', path: '/bar/bar-map', active: false },
+    { title: '酒吧地圖', path: '/under-construction', active: false },
     { title: '酒吧首頁', path: '/bar', active: false },
     { title: '訂位紀錄', path: '/bar/bar-booking-list', active: true, isProtected: true },
   ];
