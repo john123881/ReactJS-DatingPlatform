@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { BsTelephone, HiOutlineLocationMarker } from '@/lib/react-icons';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarRatingModal from '@/components/bar/modal/bar-rating-modal';
 import Link from 'next/link';
-import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import { FaRegBookmark, FaBookmark, FaStar, FaPhoneAlt } from 'react-icons/fa';
+import { HiOutlineLocationMarker } from 'react-icons/hi';
+import { IoMdStar } from 'react-icons/io';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -112,146 +113,186 @@ export default function Detail({ onPageChange }) {
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <div className="flex flex-row justify-center pt-28">
-        <div className="w-1/12 md:w-2/12"></div>
-        <div className="w-10/12 md:w-8/12">
-          <div className="text-sm breadcrumbs">
+      
+      {/* 沉浸式背景圖層 - 使用酒吧照片作為模糊背景，營造氣氛 */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src={
+            bar?.bar_pic_name
+              ? `/barPic/${bar.bar_pic_name}`
+              : '/unavailable-image.jpg'
+          }
+          alt="Background"
+          fill
+          className="object-cover opacity-20 blur-md scale-105"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black"></div>
+      </div>
+
+      <div className="relative z-10 min-h-screen pt-24 pb-20 px-4 md:px-0">
+        <div className="max-w-[1400px] mx-auto">
+          
+          <div className="mb-8 opacity-60 hover:opacity-100 transition-opacity text-sm breadcrumbs">
             <Breadcrumbs currentPage={currentPage} />
           </div>
+
           {isLoading || !bar ? (
-            <Loader minHeight="600px" text="正在準備您的專屬酒單..." />
+            <div className="flex justify-center items-center min-h-[600px]">
+              <Loader minHeight="400px" text="正在為您調製專屬視覺..." />
+            </div>
           ) : (
-            <div className="md:space-y-12">
-              <div className="grid gap-8 md:grid-cols-2">
-                <div className="space-y-5 text-white bar-detail-content">
-                  <div className="space-y-1 md:w-full">
-                    <div className="text-[18px] md:text-h3">
-                      {bar?.bar_name}
-                    </div>
-                    <div className="flex items-center gap-2 review">
-                      <Link
-                        className="text-[13px] md:text-h6"
-                        href={`/bar/bar-rating-list/${bar?.bar_id}`}
-                      >
-                        {bar?.rating}
-                      </Link>
-                      <div className="flex gap-1 bar-detail-stars rating rating-sm">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <input
-                            key={i}
-                            type="radio"
-                            name="rating-6"
-                            className="mask mask-star-2 bg-[#A0FF1F]"
-                            checked={i <= Math.round(bar?.rating || 0)}
-                            readOnly
-                          />
-                        ))}
+            <div className="flex flex-col gap-10">
+              
+              {/* 上半部：沉浸式內容區塊 */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                {/* 左側：詳情面板 (Glassmorphism) */}
+                <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6 order-2 lg:order-1">
+                  <div className="glass-card-neon p-8 lg:p-12 rounded-[30px] border border-white/10 backdrop-blur-xl bg-white/5 relative overflow-hidden group">
+                    {/* 裝飾性霓虹光暈 */}
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#A0FF1F]/10 blur-[100px] pointer-events-none"></div>
+                    
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-4">
+                        <span className="px-3 py-1 rounded-full bg-[#A0FF1F]/10 text-[#A0FF1F] text-[12px] font-bold tracking-widest uppercase border border-[#A0FF1F]/30">
+                          {bar?.bar_type_name}
+                        </span>
+                        <span className="text-white/40 text-sm font-medium tracking-wide">
+                          {bar?.bar_area_name}
+                        </span>
                       </div>
-                      <p className="text-[13px] md:text-h6">
-                        {'('}2 則評論{')'}
-                      </p>
-                    </div>
-                    <div className="flex gap-4 text-[13px] md:text-h6">
-                      <div className="text-white">
-                        {bar?.bar_area_name}
+
+                      <h1 className="text-4xl lg:text-6xl font-black text-white leading-tight mb-2">
+                        {bar?.bar_name}
+                      </h1>
+
+                      <div className="flex flex-wrap items-center gap-6 mb-4 font-medium">
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10">
+                          <span className="text-2xl font-black text-[#A0FF1F]">{bar?.rating}</span>
+                          <div className="flex gap-0.5 text-[#A0FF1F]">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <IoMdStar key={i} className={`text-xl ${i <= Math.round(bar?.rating || 0) ? 'opacity-100' : 'opacity-20'}`} />
+                            ))}
+                          </div>
+                          <Link href={`/bar/bar-rating-list/${bar?.bar_id}`} className="ml-2 text-white/40 hover:text-white transition-colors text-sm underline underline-offset-4">
+                            2 則評論
+                          </Link>
+                        </div>
                       </div>
-                      <div className="text-white">
-                        {bar?.bar_type_name}
+
+                      <div className="space-y-4 mb-8">
+                        <div className="flex items-start gap-4 text-white/80 group/info">
+                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/info:border-[#A0FF1F]/50 transition-colors">
+                            <FaPhoneAlt className="text-[#A0FF1F]" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[12px] text-white/40 font-bold uppercase tracking-wider">聯絡方式</span>
+                            <span className="text-lg lg:text-xl font-medium">{bar?.bar_contact}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-4 text-white/80 group/info">
+                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/info:border-[#A0FF1F]/50 transition-colors">
+                            <HiOutlineLocationMarker className="text-2xl text-[#A0FF1F]" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[12px] text-white/40 font-bold uppercase tracking-wider">店鋪位址</span>
+                            <span className="text-lg lg:text-xl font-medium">{bar?.bar_addr}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex gap-4 telephone">
-                      <BsTelephone />
-                      <div className="text-white text-[13px] md:text-h6">
-                        {bar?.bar_contact}
+
+                      <div className="p-6 rounded-2xl bg-black/30 border border-white/5 text-white/80 text-lg leading-relaxed text-justify mb-8 italic font-light">
+                        「 {bar?.bar_description} 」
                       </div>
-                    </div>
-                    <div className="flex gap-4 address">
-                      <HiOutlineLocationMarker />
-                      <div className="text-white text-[13px] md:text-h6">
-                        {bar?.bar_addr}
+
+                      <div className="flex flex-wrap items-center gap-4">
+                        <Link 
+                          href="/under-construction"
+                          className="flex-1 lg:flex-none flex items-center justify-center gap-2 btn btn-lg h-[65px] px-6 md:px-12 bg-[#A0FF1F] text-black font-black text-xl border-none rounded-2xl shadow-[0_0_30px_rgba(160,255,31,0.3)] hover:shadow-[0_0_50px_rgba(160,255,31,0.5)] hover:scale-[1.02] transition-all duration-300 whitespace-nowrap"
+                        >
+                          立即訂位
+                        </Link>
+                        
+                        <button 
+                          onClick={handleSavedClick}
+                          className={`w-[65px] h-[65px] rounded-2xl flex items-center justify-center backdrop-blur-md transition-all duration-300 border ${
+                            isSaved 
+                              ? 'bg-[#A0FF1F]/20 border-[#A0FF1F]/50 shadow-[0_0_20px_rgba(160,255,31,0.3)]' 
+                              : 'bg-white/5 border-white/10 hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10 text-white'
+                          }`}
+                        >
+                          {isSaved ? (
+                            <FaBookmark className="text-2xl text-[#A0FF1F]" />
+                          ) : (
+                            <FaRegBookmark className="text-2xl" />
+                          )}
+                        </button>
+
+                        <button 
+                          onClick={handleLeaveReviewClick}
+                          className="w-[65px] h-[65px] rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10 transition-all duration-300"
+                          title="留下評論"
+                        >
+                          <FaStar className="text-2xl" />
+                        </button>
                       </div>
-                    </div>
-                    <div className="text-white text-[13px] md:text-h6 text-justify md:w-full">
-                      {bar?.bar_description}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 bar-detail-button-group">
-                    <button onClick={handleSavedClick}>
-                      <div className={`badge badge-outline h-[28px] ${isSaved ? 'border-[#ff03ff] text-[#ff03ff]' : 'border-[#A0FF1F] text-white'}`}>
-                        {isSaved ? (
-                          <>
-                            <FaHeart className="card-icon" />
-                            已在收藏
-                          </>
-                        ) : (
-                          <>
-                            <FaRegHeart className="card-icon hover:text-neongreen" />
-                            加入收藏
-                          </>
-                        )}
-                      </div>
-                    </button>
-                    <div
-                      type="submit"
-                      onClick={handleLeaveReviewClick}
-                    >
-                      <div className="badge badge-outline border-[#A0FF1F] text-white h-[28px] cursor-pointer">
-                        留下評論
-                      </div>
-                    </div>
+                </div>
+
+                {/* 右側：主視覺大圖 */}
+                <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2">
+                  <div className="relative aspect-[4/5] lg:aspect-square group overflow-hidden rounded-[40px] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] border border-white/10">
+                    <Image
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      src={
+                        bar?.bar_img_url
+                          ? bar.bar_img_url
+                          : bar?.bar_pic_name
+                          ? `/barPic/${bar.bar_pic_name}`
+                          : '/unavailable-image.jpg'
+                      }
+                      alt={bar?.bar_name}
+                      fill
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  <Link 
-                    href="/under-construction"
-                    className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]"
-                  >
-                    立即訂位
-                  </Link>
-                  <BarRatingModal bar={bar} />
                 </div>
-                <div className="bar-detail-img">
-                  <Image
-                    className="object-cover rounded-[10px]"
-                    src={
-                      bar?.bar_pic_name
-                        ? `/barPic/${bar.bar_pic_name}`
-                        : '/unavailable-image.jpg'
-                    }
-                    alt={`Image of ${bar?.bar_name || 'bar'}`}
-                    width={440}
-                    height={400}
-                  />
+
+              </div>
+
+              {/* 下半部：地圖指南 */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-8 bg-[#A0FF1F] rounded-full shadow-[0_0_15px_rgba(160,255,31,0.8)]"></div>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-wider">交通指南 / <span className="text-[#A0FF1F]">Map Guidance</span></h2>
+                </div>
+                
+                <div className="relative group p-1.5 rounded-[35px] bg-white/5 border border-white/10 overflow-hidden shadow-2xl">
+                  {/* 地圖容器上的裝飾邊框 */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#A0FF1F]/10 via-transparent to-transparent pointer-events-none rounded-[35px]"></div>
+                  
+                  <div className="relative rounded-[30px] overflow-hidden grayscale-[0.3] contrast-[1.1] hover:grayscale-0 transition-all duration-500 shadow-inner">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(bar?.bar_addr)}&output=embed`}
+                      width="100%"
+                      height="500"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
+                      title="Store Location"
+                      className="filter brightness-[0.85] invert-[0.9] hue-rotate-[160deg] saturate-[0.5]"
+                    ></iframe>
+                  </div>
                 </div>
               </div>
-              <div className="flex my-4 google-map md:hidden">
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    bar?.bar_addr,
-                  )}&output=embed`}
-                  width="100%"
-                  height="300"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  title="Store Location"
-                ></iframe>
-              </div>
-              <div className="hidden google-map md:flex">
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    bar?.bar_addr,
-                  )}&output=embed`}
-                  width="100%"
-                  height="700"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  title="Store Location"
-                ></iframe>
-              </div>
+
+              <BarRatingModal bar={bar} />
             </div>
           )}
         </div>
-        <div className="w-1/12 md:w-2/12"></div>
       </div>
     </>
   );
