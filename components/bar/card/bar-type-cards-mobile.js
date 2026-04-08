@@ -15,9 +15,9 @@ export default function BarTypeCardsMobile() {
                   alt="運動酒吧"
                 />
               </div>
-              <div className="absolute top-8 start-36">
-                <p className="text-[15px] text-white">運動酒吧</p>
-                <p className="text-[15px] text-white">sport bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[18px] text-white font-bold neon-text-green mb-0.5">運動酒吧</p>
+                <p className="text-[12px] text-white/70 italic uppercase tracking-wider">sport bar</p>
               </div>
             </div>
           </div>
@@ -35,9 +35,9 @@ export default function BarTypeCardsMobile() {
                   alt="音樂酒吧"
                 />
               </div>
-              <div className="absolute top-8 start-36">
-                <p className="text-[15px] text-white">音樂酒吧</p>
-                <p className="text-[15px] text-white">music bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[18px] text-white font-bold neon-text-green mb-0.5">音樂酒吧</p>
+                <p className="text-[12px] text-white/70 italic uppercase tracking-wider">music bar</p>
               </div>
             </div>
           </div>
@@ -55,9 +55,9 @@ export default function BarTypeCardsMobile() {
                   alt="異國酒吧"
                 />
               </div>
-              <div className="absolute top-8 start-36">
-                <p className="text-[15px] text-white">異國酒吧</p>
-                <p className="text-[15px] text-white">foreign bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[18px] text-white font-bold neon-text-green mb-0.5">異國酒吧</p>
+                <p className="text-[12px] text-white/70 italic uppercase tracking-wider">foreign bar</p>
               </div>
             </div>
           </div>
@@ -75,9 +75,9 @@ export default function BarTypeCardsMobile() {
                   alt="特色酒吧"
                 />
               </div>
-              <div className="absolute top-8 start-36">
-                <p className="text-[15px] text-white">特色酒吧</p>
-                <p className="text-[15px] text-white">specialty bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[18px] text-white font-bold neon-text-green mb-0.5">特色酒吧</p>
+                <p className="text-[12px] text-white/70 italic uppercase tracking-wider">specialty bar</p>
               </div>
             </div>
           </div>
@@ -95,9 +95,9 @@ export default function BarTypeCardsMobile() {
                   alt="其他酒吧"
                 />
               </div>
-              <div className="absolute top-8 start-36">
-                <p className="text-[15px] text-white">其他酒吧</p>
-                <p className="text-[15px] text-white">others</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[18px] text-white font-bold neon-text-green mb-0.5">其他酒吧</p>
+                <p className="text-[12px] text-white/70 italic uppercase tracking-wider">others</p>
               </div>
             </div>
           </div>

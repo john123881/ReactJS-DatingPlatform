@@ -14,9 +14,9 @@ export default function BarTypeCards(bar, key) {
                   alt="運動酒吧"
                 />
               </div>
-              <div className="absolute items-center justify-center top-20 left-10">
-                <p className="text-[20px] text-white m-2">運動酒吧</p>
-                <p className="text-[20px] text-white m-2 ms-5">sport bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[20px] lg:text-[22px] text-white font-bold neon-text-green mb-1">運動酒吧</p>
+                <p className="text-[14px] lg:text-[16px] text-white/70 italic uppercase tracking-widest">sport bar</p>
               </div>
             </div>
           </div>
@@ -34,9 +34,9 @@ export default function BarTypeCards(bar, key) {
                   alt="音樂酒吧"
                 />
               </div>
-              <div className="absolute items-center justify-center top-20 left-10">
-                <p className="text-[20px] text-white m-2">音樂酒吧</p>
-                <p className="text-[20px] text-white m-2 ms-5">music bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[20px] lg:text-[22px] text-white font-bold neon-text-green mb-1">音樂酒吧</p>
+                <p className="text-[14px] lg:text-[16px] text-white/70 italic uppercase tracking-widest">music bar</p>
               </div>
             </div>
           </div>
@@ -54,9 +54,9 @@ export default function BarTypeCards(bar, key) {
                   alt="異國酒吧"
                 />
               </div>
-              <div className="absolute items-center justify-center top-20 left-10">
-                <p className="text-[20px] text-white m-2">異國酒吧</p>
-                <p className="text-[20px] text-white m-2 ms-5">foreign bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <p className="text-[20px] lg:text-[22px] text-white font-bold neon-text-green mb-1">異國酒吧</p>
+                <p className="text-[14px] lg:text-[16px] text-white/70 italic uppercase tracking-widest">foreign bar</p>
               </div>
             </div>
           </div>

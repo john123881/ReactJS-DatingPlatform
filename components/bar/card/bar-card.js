@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BarService } from '@/services/bar-service';
 import { IoMdStar } from 'react-icons/io';
-import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
@@ -104,14 +104,12 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
   return (
     <>
       <div
-        // key={key}
-        className=" card bg-white w-[159px] h-[228px] lg:w-[223px] lg:h-[320px] shadow-xl"
+        className="glass-card-neon w-full max-w-[340px] lg:max-w-none h-[300px] lg:h-[380px] overflow-hidden group transition-all duration-300 hover:shadow-[0_0_30px_rgba(160,255,31,0.15)]"
       >
-        <figure>
-          <div className="cursor-pointer bar-card-img">
-            <Link href={`/bar/bar-detail/${bar.bar_id}`}>
+        <figure className="relative overflow-hidden h-[146px] lg:h-[205px]">
+          <Link href={`/bar/bar-detail/${bar.bar_id}`}>
+            <div className="relative w-full h-full cursor-pointer group-hover:scale-110 transition-transform duration-500">
               <Image
-                className="relative w-[159px] h-[146px] lg:w-[223px] lg:h-[205px] object-cover"
                 src={
                   bar?.bar_img_url
                     ? bar.bar_img_url
@@ -120,73 +118,72 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
                     : '/unavailable-image.jpg'
                 }
                 alt={`Image of ${bar.bar_name}`}
-                width={223}
-                height={205}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 340px, 223px"
               />
-            </Link>
-            {/* <div className="absolute text-white top-3 right-3 text-[20px]">
-              <FiHeart className="card-icon hover:text-neongreen" />
-            </div> */}
+            </div>
+          </Link>
 
-            <div className="card-iconListRight flex justify-end absolute text-white top-3 right-3 text-[20px]">
+          <div className="absolute top-3 right-3 z-10">
+            <div 
+              className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 cursor-pointer ${
+                isSaved 
+                  ? 'bg-[#A0FF1F]/20 border border-[#A0FF1F]/50 shadow-[0_0_15px_rgba(160,255,31,0.3)]' 
+                  : 'bg-black/20 border border-white/20 hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10'
+              }`}
+              onClick={handleSavedClick}
+            >
               {isSaved ? (
-                <FaHeart
-                  className="card-icon hover:text-neongreen"
-                  color="#ff03ff"
-                  onClick={handleSavedClick}
+                <FaBookmark
+                  className="text-[16px] lg:text-[18px] transition-transform duration-300 active:scale-125 hover:scale-110"
+                  color="#A0FF1F"
                 />
               ) : (
-                <FaRegHeart
-                  className="card-icon hover:text-neongreen"
-                  color="white"
-                  onClick={handleSavedClick}
+                <FaRegBookmark
+                  className="text-[16px] lg:text-[18px] text-white transition-transform duration-300 hover:scale-110 hover:text-[#A0FF1F]"
                 />
               )}
             </div>
           </div>
         </figure>
-        <div className="bar-card-content h-[82px] lg:h-[115px] m-2">
-          <div className="text-[11px] lg:text-[15px] text-black font-bold">
-            {/* Fake Sober Taipei */}
+        <div className="bar-card-content p-4 lg:p-5 flex flex-col h-[calc(100%-146px)] lg:h-[calc(100%-205px)]">
+          <div className="text-[16px] lg:text-[20px] text-white font-bold truncate mb-2 group-hover:text-[#A0FF1F] transition-colors">
             {bar.bar_name}
           </div>
-          <button>
+          
+          <div className="flex items-center gap-3 mb-4">
             <Link href={`/bar/bar-rating-list/${bar.bar_id}`}>
-              <div className="flex w-[40px] lg:w-[50px] rounded-[30px] bg-[#BCBCBC] justify-center items-center">
-                <div className="text-[9px] lg:text-[12px] text-white ml-2">
-                  {/* {bar.averageRating} */}
+              <div className="flex px-3 py-1 rounded-full bg-[#A0FF1F]/10 backdrop-blur-md justify-center items-center border border-[#A0FF1F]/30 hover:border-[#A0FF1F] transition-all duration-300">
+                <span className="text-[12px] lg:text-[14px] text-[#A0FF1F] font-bold mr-1">
                   {bar.rating}
-                </div>
-                <div className="m-0.5 mr-2">
-                  <IoMdStar className="text-[13px] lg:text-[16px] text-white" />
-                </div>
+                </span>
+                <IoMdStar className="text-[14px] lg:text-[18px] text-[#A0FF1F]" />
               </div>
             </Link>
-          </button>
-          <p className="text-[10px] lg:text-[15px] text-black">
-            {/* 信義區 */}
-            {bar.bar_area_name}
-          </p>
-          <div className="w-[145px] lg:w-[200px] flex justify-between">
-            <div className="text-[10px] lg:text-[15px] text-black">
-              {/* bar_type -> bar_type_name*/}
-              {/* 特色酒吧 */}
-              {bar.bar_type_name}
+            <div className="flex items-center gap-1 text-white/50">
+              <span className="text-[12px] lg:text-[15px]">
+                {bar.bar_area_name}
+              </span>
             </div>
-            <button className="flex relative rounded-[30px] bg-black hover:bg-[#A0FF1F]">
-              <Link
-                className="text-[10px] lg:text-[12px] text-white hover:text-black m-0.5 mx-3"
-                onClick={(e) => {
-                  if (auth.id === 0) {
-                    e.preventDefault();
-                    setLoginModalToggle(true);
-                  }
-                }}
-                href={`/under-construction`}
-              >
-                立即訂位
-              </Link>
-            </button>
+          </div>
+
+          <div className="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
+            <span className="text-[11px] lg:text-[14px] text-white/60 font-medium tracking-wide uppercase">
+              {bar.bar_type_name}
+            </span>
+            <Link
+              className="text-[11px] lg:text-[13px] bg-[#A0FF1F] text-black font-bold px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(160,255,31,0.3)] hover:shadow-[0_0_25px_rgba(160,255,31,0.5)] hover:scale-105 transition-all duration-300"
+              onClick={(e) => {
+                if (auth.id === 0) {
+                  e.preventDefault();
+                  setLoginModalToggle(true);
+                }
+              }}
+              href={`/under-construction`}
+            >
+              立即訂位
+            </Link>
           </div>
         </div>
       </div>

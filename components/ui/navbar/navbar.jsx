@@ -102,6 +102,8 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isFetchingProfile, setIsFetchingProfile] = useState(false);
   const imgRef = useRef(null);
@@ -244,6 +246,28 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     }
   }, [userInfo.user_id]);
 
+  // 全站通用：手機版捲動隱藏/顯示導覽列邏輯
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // 增加 threshold (例如 10px) 避免過於靈敏
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 64) {
+        // 往下滑：隱藏 Top, 顯示 Bottom
+        setShowNav(false);
+      } else {
+        // 往上滑：顯示 Top, 隱藏 Bottom
+        setShowNav(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
 
   //取大頭照
   useEffect(() => {
@@ -337,7 +361,11 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
   return (
     <>
-      <div className="fixed top-0 z-[60] w-full h-16 navbar bg-dark ;">
+      <div 
+        className={`fixed top-0 z-[60] w-full h-16 navbar bg-dark transition-transform duration-300 ${
+          showNav ? 'translate-y-0' : 'translate-y-[-100%]'
+        }`}
+      >
         {/* NAVBAR 左側區域 - LOGO */}
         <div className="ml-3 navbar-start">
           <Link href="/">
@@ -613,7 +641,11 @@ export default function Header({ currentPageTitle, handlePageChange }) {
       </div>
 
       {/* NAVBAR 中間底下區域 for mobile */}
-      <div className="z-50 h-20 bg-dark btm-nav btm-nav-sm md:hidden">
+      <div 
+        className={`z-50 h-16 bg-dark btm-nav btm-nav-sm md:hidden transition-transform duration-300 ${
+          showNav ? 'translate-y-[100%]' : 'translate-y-0'
+        }`}
+      >
         {[
           {
             title: '社群媒體',

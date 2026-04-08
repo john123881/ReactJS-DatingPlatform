@@ -53,9 +53,18 @@ export const BarService = {
    * @param {object} params - { bar_area_id }
    */
   getBarsByCategory: (category, params = {}) => {
-    // 確保參數名稱與後端統一 (統一使用 bar_area_id)
+    // 映射 ID 到專屬 Slug，確保調用到正確的後端路由
+    const categoryMap = {
+      '1': 'sport',
+      '2': 'music',
+      '3': 'foreign',
+      '4': 'specialty',
+      '5': 'others'
+    };
+    
+    const slug = categoryMap[category] || category;
     const query = new URLSearchParams(params).toString();
-    const endpoint = query ? `/bar/bar-list-${category}?${query}` : `/bar/bar-list-${category}`;
+    const endpoint = query ? `/bar/bar-list-${slug}?${query}` : `/bar/bar-list-${slug}`;
     return apiClient(endpoint);
   },
 

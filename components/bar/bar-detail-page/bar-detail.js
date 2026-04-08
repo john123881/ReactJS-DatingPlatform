@@ -6,7 +6,6 @@ export default function BarDetail() {
 
   return (
     <>
-      <div className="fixed top-16 bg-dark w-full h-8 justify-center mx-auto"></div>
 
       <div className="flex flex-row pt-28 justify-center">
         <div className="lg:basis-9/12">

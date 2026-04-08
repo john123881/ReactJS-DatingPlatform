@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 export function useBarList(category) {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-  const [barsPerPage] = useState(8);
+  const [barsPerPage] = useState(12);
   
   // 從 router.query 初始化或預設為空字串
   const [selectedAreaId, setSelectedAreaId] = useState('');

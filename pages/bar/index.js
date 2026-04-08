@@ -114,9 +114,7 @@ export default function Index({ onPageChange }) {
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      <div className="fixed z-40 justify-center w-full h-8 mx-auto top-16 bg-dark">
-        <TabBar tabs={initialTabs} />
-      </div>
+      <TabBar tabs={initialTabs} />
       <div className="container flex items-center justify-center w-full pt-24 mx-auto bar md:w-8/12">
         <div className="flex flex-col bar-index-content">
           {isLoading ? (

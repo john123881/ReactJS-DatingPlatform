@@ -23,6 +23,8 @@ export default function TabbarMobile() {
   } = usePostContext();
 
   const [activeTab, setActiveTab] = useState('home');
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const userId = auth.id;
 
@@ -65,11 +67,31 @@ export default function TabbarMobile() {
     setActiveTab(path || 'home'); // 沒有路徑即為 home page
   }, [router.pathname]);
 
+  // 同步全站：捲動隱藏/顯示邏輯
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 64) {
+        setShowNav(false);
+      } else {
+        setShowNav(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   return (
     <>
       <div
         role="tablist"
-        className="tabs tabs-bordered md:hidden bg-dark fixed top-16 w-full h-8 z-50"
+        className={`tabs tabs-bordered md:hidden bg-dark fixed top-16 w-full h-8 z-50 transition-all duration-300 ${
+          showNav ? 'translate-y-0 opacity-100' : 'translate-y-[-100px] opacity-0 pointer-events-none'
+        }`}
       >
         <li
           role="tab"

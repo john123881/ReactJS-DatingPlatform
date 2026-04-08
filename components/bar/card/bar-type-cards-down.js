@@ -17,9 +17,9 @@ export default function BarTypeCardsDown() {
                   height={250}
                 />
               </div>
-              <div className="absolute top-20 left-40 text-center items-center justify-center">
-                <p className="text-[20px] text-white m-2">特色酒吧</p>
-                <p className="text-[20px] text-white m-2">specialty bar</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                <p className="text-[20px] lg:text-[24px] text-white font-bold neon-text-green mb-1">特色酒吧</p>
+                <p className="text-[14px] lg:text-[18px] text-white/70 italic uppercase tracking-widest">specialty bar</p>
               </div>
             </div>
           </div>
@@ -38,9 +38,9 @@ export default function BarTypeCardsDown() {
                   height={250}
                 />
               </div>
-              <div className="absolute top-20 left-40 text-center items-center justify-center">
-                <p className="text-[20px] text-white m-2">其他酒吧</p>
-                <p className="text-[20px] text-white m-2">others</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                <p className="text-[20px] lg:text-[24px] text-white font-bold neon-text-green mb-1">其他酒吧</p>
+                <p className="text-[14px] lg:text-[18px] text-white/70 italic uppercase tracking-widest">others</p>
               </div>
             </div>
           </div>

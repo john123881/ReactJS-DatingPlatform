@@ -147,6 +147,81 @@ html, body {
   --b2: 0.232607 0.013807 253.100675;
   --b3: 0.211484 0.01165 254.087939;
   --bc: 0.746477 0.0216 264.435964;
+  --neongreen: #A0FF1F;
+}
+
+/* Glassmorphism & Neon Design System */
+.glass-card-neon {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.glass-card-neon:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--neongreen);
+  box-shadow: 0 0 20px rgba(160, 255, 31, 0.2);
+  transform: translateY(-5px);
+}
+
+.neon-text-green {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(160, 255, 31, 0.8), 0 0 20px rgba(160, 255, 31, 0.3);
+}
+
+.glass-sidebar {
+  background: rgba(15, 15, 15, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.neon-pulse:focus {
+  animation: neon-pulse-strong 2s infinite;
+  border-color: var(--neongreen);
+}
+
+@keyframes neon-pulse-strong {
+  0% { box-shadow: 0 0 0 0 rgba(160, 255, 31, 1); }
+  70% { box-shadow: 0 0 0 15px rgba(160, 255, 31, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(160, 255, 31, 0); }
+}
+
+/* Staggered Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.15s; }
+.stagger-3 { animation-delay: 0.2s; }
+.stagger-4 { animation-delay: 0.25s; }
+.stagger-5 { animation-delay: 0.3s; }
+.stagger-6 { animation-delay: 0.35s; }
+.stagger-7 { animation-delay: 0.4s; }
+.stagger-8 { animation-delay: 0.45s; }
+
+.neon-pulse:focus {
+  animation: neon-pulse 1.5s infinite;
+}
+
+@keyframes neon-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(160, 255, 31, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(160, 255, 31, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(160, 255, 31, 0); }
 }
 
 /* 第二個按鈕動畫 */
@@ -274,8 +349,11 @@ html, body {
 
 /* 預設字體 背景 顏色 不然手機會看不到 */
 body {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #a6adbb;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .bg-base-300 {
@@ -393,3 +471,23 @@ body {
     scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 /*END----- dropdown DaisyUI硬改 visibility: hidden; 變成 display: none; */
+
+/* --- Mobile Drawer Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
