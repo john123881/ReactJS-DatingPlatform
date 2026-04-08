@@ -165,7 +165,7 @@ export default function BarListView({ category, title, loaderText = '正在探�
               searchResults.length > 0 ? (
                 searchResults.map((bar, index) => (
                   <div key={bar.bar_id} className={`animate-fadeInUp stagger-${(index % 8) + 1} flex justify-center`}>
-                    <BarCard bar={bar} savedBars={savedBars} setSavedBars={setSavedBars} />
+                    <BarCard bar={bar} savedBars={savedBars} setSavedBars={setSavedBars} index={index} />
                   </div>
                 ))
               ) : (
@@ -178,7 +178,7 @@ export default function BarListView({ category, title, loaderText = '正在探�
               .slice((currentPage - 1) * barsPerPage, currentPage * barsPerPage)
               .map((bar, index) => (
                 <div key={bar.bar_id} className={`animate-fadeInUp stagger-${(index % 8) + 1} flex justify-center`}>
-                  <BarCard bar={bar} savedBars={savedBars} setSavedBars={setSavedBars} />
+                  <BarCard bar={bar} savedBars={savedBars} setSavedBars={setSavedBars} index={index} />
                 </div>
               ))
             ) : (

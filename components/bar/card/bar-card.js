@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { BarService } from '@/services/bar-service';
 import { IoMdStar } from 'react-icons/io';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
@@ -9,7 +9,7 @@ import { toast } from '@/lib/toast';
 
 import { useCollect } from '@/context/use-collect';
 
-export default function BarCard({ bar, savedBars, setSavedBars }) {
+const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
   // save bar
   // const [savedBars, setSavedBars] = useState({});
   const [error, setError] = useState('');
@@ -104,11 +104,11 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
   return (
     <>
       <div
-        className="glass-card-neon w-full max-w-[340px] lg:max-w-none h-[300px] lg:h-[380px] overflow-hidden group transition-all duration-300 hover:shadow-[0_0_30px_rgba(160,255,31,0.15)]"
+        className="glass-card-neon w-full max-w-[340px] lg:max-w-none h-[300px] lg:h-[380px] overflow-hidden group transition-[transform,shadow] duration-300 hover:shadow-[0_0_30px_rgba(160,255,31,0.15)] transform-gpu"
       >
         <figure className="relative overflow-hidden h-[146px] lg:h-[205px]">
           <Link href={`/bar/bar-detail/${bar.bar_id}`}>
-            <div className="relative w-full h-full cursor-pointer group-hover:scale-110 transition-transform duration-500">
+            <div className="relative w-full h-full cursor-pointer group-hover:scale-110 transition-transform duration-500 transform-gpu">
               <Image
                 src={
                   bar?.bar_img_url
@@ -121,16 +121,17 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 340px, 223px"
+                priority={index < 3}
               />
             </div>
           </Link>
 
           <div className="absolute top-3 right-3 z-10">
             <div 
-              className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 cursor-pointer ${
+              className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-[background,border,shadow] duration-300 cursor-pointer ${
                 isSaved 
                   ? 'bg-[#A0FF1F]/20 border border-[#A0FF1F]/50 shadow-[0_0_15px_rgba(160,255,31,0.3)]' 
-                  : 'bg-black/20 border border-white/20 hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10'
+                  : 'bg-black/40 border border-white/20 hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10'
               }`}
               onClick={handleSavedClick}
             >
@@ -154,7 +155,7 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
           
           <div className="flex items-center gap-3 mb-4">
             <Link href={`/bar/bar-rating-list/${bar.bar_id}`}>
-              <div className="flex px-3 py-1 rounded-full bg-[#A0FF1F]/10 backdrop-blur-md justify-center items-center border border-[#A0FF1F]/30 hover:border-[#A0FF1F] transition-all duration-300">
+              <div className="flex px-3 py-1 rounded-full bg-[#A0FF1F]/10 justify-center items-center border border-[#A0FF1F]/30 hover:border-[#A0FF1F] transition-[border,background] duration-300">
                 <span className="text-[12px] lg:text-[14px] text-[#A0FF1F] font-bold mr-1">
                   {bar.rating}
                 </span>
@@ -189,4 +190,6 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
       </div>
     </>
   );
-}
+});
+
+export default BarCard;
