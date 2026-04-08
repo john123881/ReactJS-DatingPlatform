@@ -17,6 +17,7 @@ export default function InPlaceSearch({
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [addItemId, setAddItemId] = useState(null);
   const searchRef = useRef(null);
 
   // 監聽點擊外部關閉
@@ -59,8 +60,10 @@ export default function InPlaceSearch({
 
   // 加入行程邏輯
   const handleSelectItem = async (item) => {
-    if (!trip_plan_id) return;
+    if (!trip_plan_id || addItemId) return;
     
+    const id = item[category === 'bar' ? 'bar_id' : 'movie_id'];
+    setAddItemId(id);
     const loadingToast = toast.loading('正在加入行程...');
     try {
       // 1. 建立 Block (取得 trip_detail_id)
@@ -92,9 +95,8 @@ export default function InPlaceSearch({
       } else {
         throw new Error(finalResult.message || '加入失敗');
       }
-    } catch (error) {
-      console.error('Add item error:', error);
-      toast.error(`加入失敗：${error.message}`, { id: loadingToast });
+    } finally {
+      setAddItemId(null);
     }
   };
 
@@ -180,8 +182,14 @@ export default function InPlaceSearch({
                           {category === 'bar' ? item.bar_area_name : item.movie_type}
                         </span>
                       </div>
-                      <div className="ml-auto opacity-0 group-hover/result:opacity-100 transition-opacity">
-                        <FaCirclePlus className="text-neongreen text-lg" />
+                      <div className="ml-auto min-w-[24px] flex justify-center items-center">
+                        {addItemId === (category === 'bar' ? item.bar_id : item.movie_id) ? (
+                          <div className="w-5 h-5 border-2 border-neongreen/30 border-t-neongreen rounded-full animate-spin"></div>
+                        ) : (
+                          <div className="opacity-0 group-hover/result:opacity-100 transition-opacity">
+                            <FaCirclePlus className="text-neongreen text-lg" />
+                          </div>
+                        )}
                       </div>
                     </button>
                   ))}

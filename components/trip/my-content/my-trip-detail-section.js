@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { TripService } from '@/services/trip-service';
 import { toast } from '@/lib/toast';
+import Swal from 'sweetalert2';
+import { FaGlobe, FaLock } from 'react-icons/fa6';
 
 export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbedded = false }) {
   const [formData, setFormData] = useState({
@@ -10,6 +12,8 @@ export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbed
     trip_notes: '',
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isShared, setIsShared] = useState(false);
+  const [isShareLoading, setIsShareLoading] = useState(false);
 
   useEffect(() => {
     if (tripName) {
@@ -19,6 +23,7 @@ export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbed
         trip_description: tripName.trip_description || '',
         trip_notes: tripName.trip_notes || '',
       });
+      setIsShared(Boolean(tripName.trip_draft));
     }
   }, [tripName]);
 
@@ -45,6 +50,59 @@ export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbed
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleToggleShare = async () => {
+    if (!tripName?.trip_plan_id) return;
+    
+    const newStatus = !isShared;
+    const title = newStatus ? '公開分享行程？' : '取消公開分享？';
+    const text = newStatus 
+      ? '開啟後，其他使用者將能在「探索行程」中看到並收藏您的規劃。' 
+      : '關閉後，此行程將變回私人狀態，其他使用者將無法看到。';
+
+    Swal.fire({
+      title,
+      text,
+      icon: newStatus ? 'info' : 'warning',
+      showCancelButton: true,
+      confirmButtonText: newStatus ? '立即公開' : '確認私有',
+      cancelButtonText: '再想想',
+      confirmButtonColor: newStatus ? '#a0ff1f' : '#ff4d4d',
+      cancelButtonColor: '#333333',
+      background: 'rgba(15, 15, 15, 0.95)',
+      color: '#fff',
+      backdrop: `rgba(0,0,0,0.8) blur(4px)`,
+      scrollbarPadding: false,
+      heightAuto: false,
+      customClass: {
+        popup: 'border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl',
+        confirmButton: 'rounded-xl px-6 py-2 font-bold text-black',
+        cancelButton: 'rounded-xl px-6 py-2 font-bold border border-white/10'
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setIsShareLoading(true);
+        try {
+          const response = newStatus 
+            ? await TripService.shareTrip(tripName.trip_plan_id)
+            : await TripService.unshareTrip(tripName.trip_plan_id);
+          
+          if (response.success) {
+            setIsShared(newStatus);
+            toast.success(newStatus ? '行程已公開' : '已恢復私人狀態');
+            if (onUpdateSuccess) onUpdateSuccess();
+          } else {
+            throw new Error(response.message || '操作失敗');
+          }
+        } catch (error) {
+          console.error('Toggle share error:', error);
+          toast.error('操作失敗', error.message);
+        } finally {
+          setIsShareLoading(false);
+        }
+      }
+    });
   };
 
   const containerClasses = isEmbedded
@@ -86,6 +144,39 @@ export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbed
           value={formData.trip_date}
           onChange={handleChange}
         />
+      </div>
+
+      {/* 公開分享切換 */}
+      <div className="w-full mb-6 sm:mb-8 bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 flex items-center justify-between group/share hover:border-neongreen/30 transition-all duration-300">
+        <div className="flex items-center gap-4">
+          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${isShared ? 'bg-neongreen shadow-[0_0_20px_rgba(57,255,20,0.4)]' : 'bg-white/5 border border-white/10'}`}>
+            {isShared ? (
+              <FaGlobe className="text-black text-xl sm:text-2xl animate-spin-slow" />
+            ) : (
+              <FaLock className="text-white/40 text-lg sm:text-xl" />
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className={`text-sm sm:text-base font-black uppercase tracking-tight ${isShared ? 'text-neongreen' : 'text-white/80'}`}>
+              {isShared ? '行程已公開' : '私人存檔中'}
+            </span>
+            <span className="text-[9px] sm:text-[10px] text-white/30 font-bold uppercase tracking-widest mt-0.5">
+              {isShared ? 'Publicly Shared' : 'Private Mode'}
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleToggleShare}
+          disabled={isShareLoading}
+          className={`relative w-14 h-7 sm:w-16 sm:h-8 rounded-full transition-all duration-500 ${isShared ? 'bg-neongreen shadow-[0_0_15px_rgba(57,255,20,0.5)]' : 'bg-white/10 border border-white/20'}`}
+        >
+          <div className={`absolute top-1 w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full transition-all duration-500 shadow-lg ${isShared ? 'left-8 sm:left-9 scale-110' : 'left-1'}`}>
+            {isShareLoading && (
+              <div className="absolute inset-0 border-2 border-neongreen/30 border-t-neongreen rounded-full animate-spin"></div>
+            )}
+          </div>
+        </button>
       </div>
 
       <div className="w-full mb-5 sm:mb-6">
@@ -132,6 +223,9 @@ export default function MyTripDetailSection({ tripName, onUpdateSuccess, isEmbed
       <style jsx>{`
         .color-scheme-dark {
           color-scheme: dark;
+        }
+        :global(body.swal2-shown) {
+          padding-right: 0 !important;
         }
       `}</style>
     </div>

@@ -154,11 +154,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                         borderRadius: '30px',
                       }}
                       onClick={() => {
-                        if (auth.id === 0) {
-                          setLoginModalToggle(true);
-                        } else {
-                          router.push(`/under-construction`);
-                        }
+                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
                       }}
                     >
                       電影資訊

@@ -34,12 +34,12 @@ export default function OtherTrip({ onPageChange }) {
     }
   }, [isAuthLoaded, auth.id, setLoginModalToggle]);
 
-  const fetchTrips = useCallback(async (pageNum = 1, isLoadMore = false) => {
+  const fetchTrips = useCallback(async (pageNum = 1, isLoadMore = false, keyword = searchTerm) => {
     if (pageNum === 1) setIsInitialLoading(true);
     else setIsLoadingMore(true);
 
     try {
-      const result = await TripService.getOtherPlans(pageNum, 10);
+      const result = await TripService.getOtherPlans(pageNum, 10, keyword);
       const newTrips = result.data || [];
       const totalPages = result.pagination?.totalPages || 1;
 
@@ -61,14 +61,27 @@ export default function OtherTrip({ onPageChange }) {
       setIsInitialLoading(false);
       setIsLoadingMore(false);
     }
-  }, []);
+  }, [searchTerm]);
 
   // 初始載入
   useEffect(() => {
     if (auth.id !== 0 && isAuthLoaded) {
       fetchTrips(1, false);
+      setPage(1);
     }
-  }, [auth.id, isAuthLoaded, fetchTrips]);
+  }, [auth.id, isAuthLoaded]); // 移除 fetchTrips 避免無限循環，改由 search 或初始觸發
+
+  // 搜尋連動
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (isAuthLoaded && auth.id !== 0) {
+        fetchTrips(1, false, searchTerm);
+        setPage(1);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, auth.id, isAuthLoaded, fetchTrips]);
 
   // IntersectionObserver 實作
   useEffect(() => {
@@ -91,10 +104,8 @@ export default function OtherTrip({ onPageChange }) {
     return () => observer.disconnect();
   }, [hasMore, isLoadingMore, isInitialLoading, fetchTrips]);
 
-  // 以 filter 的方式過濾
-  const filteredTrips = (otherTrips || []).filter((trip) =>
-    (trip?.trip_title || '').toLowerCase().includes((searchTerm || '').toLowerCase()),
-  );
+  // 改為直接使用其他行程資料，因為搜尋已經在後端完成
+  const filteredTrips = otherTrips || [];
 
   if (!isAuthLoaded) {
     return <Loader text="確認登入狀態中..." minHeight="80vh" />;

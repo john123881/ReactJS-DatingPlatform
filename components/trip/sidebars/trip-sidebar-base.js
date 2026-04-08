@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
+import { FaGlobe, FaLock } from 'react-icons/fa6';
 
 /**
  * 輔助函式：將中文標題截斷為指定長度
@@ -63,6 +64,21 @@ export default function TripSidebarBase({
                 <div className="skeleton animate-pulse h-10 w-40 bg-white/5 rounded-full"></div>
               )}
 
+              {/* Status Badge */}
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-500 ${tripName?.trip_draft ? 'bg-neongreen/10 border-neongreen/30 text-neongreen shadow-[0_0_15px_rgba(160,255,31,0.1)]' : 'bg-white/5 border-white/10 text-white/40'}`}>
+                {tripName?.trip_draft ? (
+                  <>
+                    <FaGlobe className="text-sm animate-spin-slow" />
+                    <span className="text-xs font-black uppercase tracking-widest">Public</span>
+                  </>
+                ) : (
+                  <>
+                    <FaLock className="text-sm" />
+                    <span className="text-xs font-black uppercase tracking-widest">Private</span>
+                  </>
+                )}
+              </div>
+
               {tripName?.username && (
                 <h3 className="text-2xl text-gray-400 font-medium">
                   {usernamePrefix}<span className="text-white ml-2">{tripName.username}</span>
@@ -100,6 +116,14 @@ export default function TripSidebarBase({
           ) : (
             <div className="skeleton animate-pulse h-6 w-32 bg-white/10 rounded"></div>
           )}
+
+          {/* Mobile Status Row */}
+          <div className="flex items-center gap-2 mt-1">
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${tripName?.trip_draft ? 'bg-neongreen/10 border-neongreen/30 text-neongreen' : 'bg-white/5 border-white/10 text-white/40'}`}>
+              {tripName?.trip_draft ? <FaGlobe className="animate-spin-slow" /> : <FaLock />}
+              {tripName?.trip_draft ? 'Publicly Shared' : 'Private Draft'}
+            </div>
+          </div>
           
           {tripName?.username && (
             <div className="text-lg text-gray-400">{usernamePrefix}{tripName.username}</div>

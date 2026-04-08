@@ -16,6 +16,7 @@ export default function WithContent({
   isOther = false,
 }) {
   const [imgLoading, setImgLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // 當圖片位址變更時，重新設定載入狀態，並檢查是否已從快取載入完成
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function WithContent({
       });
     }
 
+    setIsDeleting(true);
     try {
       const result = await TripService.deleteTripDetail(detailId);
       if (result.success) {
@@ -82,6 +84,8 @@ export default function WithContent({
     } catch (error) {
       toast.error('發生錯誤', error.message);
       if (refreshAllDetails) refreshAllDetails();
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -143,10 +147,18 @@ export default function WithContent({
                   </button>
                   <button
                     type="button"
-                    className="flex-1 py-4 bg-red-500 hover:bg-red-400 text-white font-black rounded-2xl transition-all shadow-[0_5px_15px_rgba(239,68,68,0.3)]"
+                    className={`flex-1 py-4 bg-red-500 hover:bg-red-400 text-white font-black rounded-2xl transition-all shadow-[0_5px_15px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2 ${isDeleting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     onClick={onConfirmDelete}
+                    disabled={isDeleting}
                   >
-                    確定刪除
+                    {isDeleting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>刪除中...</span>
+                      </>
+                    ) : (
+                      '確定刪除'
+                    )}
                   </button>
                 </div>
               </div>
