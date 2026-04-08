@@ -99,7 +99,7 @@ export default function InPlaceSearch({
   };
 
   return (
-    <div ref={searchRef} className={`relative z-50 ${className}`}>
+    <div ref={searchRef} className={`relative ${isExpanded ? 'z-[100]' : 'z-10'} ${className}`}>
       {!isExpanded ? (
         <button
           onClick={() => setIsExpanded(true)}
@@ -169,7 +169,7 @@ export default function InPlaceSearch({
                       <img 
                         src={category === 'bar' ? `/barPic/${item.bar_pic_name}` : `/movie_img/${item.poster_img}`}
                         alt=""
-                        className="w-12 h-12 rounded-lg object-cover border border-white/10 group-hover/result:border-neongreen/50 transition-colors"
+                        className="w-12 h-16 rounded-lg object-cover border border-white/10 group-hover/result:border-neongreen/50 transition-colors shadow-lg"
                         onError={(e) => e.target.src = '/unavailable-image.jpg'}
                       />
                       <div className="flex flex-col items-start min-w-0">

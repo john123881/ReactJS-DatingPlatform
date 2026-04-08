@@ -151,7 +151,7 @@ export default function BarDetailCard() {
               </div>
             </div>
             <Link
-              href={`/bar/bar-booking/${bar.bar_id}`}
+              href={`/under-construction`}
               className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px] flex items-center justify-center"
             >
               立即訂位

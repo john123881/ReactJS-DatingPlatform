@@ -36,53 +36,55 @@ export default function LeftLogin({ switchHandler }) {
 
   const provider = new GoogleAuthProvider();
   const loginByGoogle = async () => {
-    const result = await signInWithPopup(getAuthGoogle, provider);
-    const user = await result.user;
-
-    const fetchGoogleLogin = async (user) => {
-      const userData = {
-        uid: user.uid,
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-      };
-
-      const { apiClient } = await import('@/services/api-client');
-      const jsonResult = await apiClient(GOOGLE_LOGIN, {
-        method: 'POST',
-        body: userData,
-      });
-
-      if (jsonResult.success) {
-        let data = {
-          id: jsonResult.data.id,
-          username: jsonResult.data.username,
-          email: jsonResult.data.email,
-          token: jsonResult.data.token,
-          avatar: user.photoURL || jsonResult.data.avatar,
-        };
-        localStorage.setItem(storageKey, JSON.stringify(data));
-        setAuth(data);
-        if (data.avatar) {
-          setUserAvatar(data.avatar);
-        }
-        return jsonResult;
-      }
-    };
-
-    customToast.loading('登入中...');
-    const timeoutId = setTimeout(() => {
-      customToast.fire({
-        title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        didOpen: () => {
-          customToast.loading();
-        },
-      });
-    }, 5000);
+    let timeoutId;
 
     try {
+      const result = await signInWithPopup(getAuthGoogle, provider);
+      const user = await result.user;
+
+      const fetchGoogleLogin = async (user) => {
+        const userData = {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        };
+
+        const { apiClient } = await import('@/services/api-client');
+        const jsonResult = await apiClient(GOOGLE_LOGIN, {
+          method: 'POST',
+          body: userData,
+        });
+
+        if (jsonResult.success) {
+          let data = {
+            id: jsonResult.data.id,
+            username: jsonResult.data.username,
+            email: jsonResult.data.email,
+            token: jsonResult.data.token,
+            avatar: user.photoURL || jsonResult.data.avatar,
+          };
+          localStorage.setItem(storageKey, JSON.stringify(data));
+          setAuth(data);
+          if (data.avatar) {
+            setUserAvatar(data.avatar);
+          }
+          return jsonResult;
+        }
+      };
+
+      customToast.loading('登入中...');
+      timeoutId = setTimeout(() => {
+        customToast.fire({
+          title: '登入中... (因首次登入須等伺服器冷啟動，須耐心等候)',
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          didOpen: () => {
+            customToast.loading();
+          },
+        });
+      }, 5000);
+
       const jsonResult = await fetchGoogleLogin(user);
       clearTimeout(timeoutId);
 
@@ -98,7 +100,15 @@ export default function LeftLogin({ switchHandler }) {
         throw new Error('登入時出現錯誤');
       }
     } catch (e) {
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      // 處理 Firebase 特定錯誤
+      if (e.code === 'auth/popup-closed-by-user') {
+        console.log('使用者關閉了登入視窗');
+        // 不需要報錯，因為是使用者主動行為
+        return; 
+      }
+
       console.error('Firebase Auth Error Details:', {
         code: e.code,
         message: e.message,
@@ -106,10 +116,6 @@ export default function LeftLogin({ switchHandler }) {
       });
       customToast.error(`登入錯誤: ${e.code || e.message || e}`);
     }
-
-    // fetchGoogleLogin(user);
-    // console.log('user:', user);
-    // console.log('googleUser:', googleUser);
   };
 
   const {

@@ -6,7 +6,7 @@ import LoginBackgroundAnimation from '@/components/ui/animation/login/login-back
 import LoadingOverlay from '@/components/ui/login-modal/loading-overlay';
 
 export default function LoginModal() {
-  const { loginModalToggle, setLoginModalToggle, switchHandler, isOnLoginPage, isLoggingIn } =
+  const { loginModalToggle, setLoginModalToggle, switchHandler, isOnLoginPage, isAuthLoading } =
     useAuth();
 
   return (
@@ -93,7 +93,7 @@ export default function LoginModal() {
           </div>
         </>
       )}
-      {isLoggingIn && <LoadingOverlay />}
+      {isAuthLoading && <LoadingOverlay />}
     </>
   );
 }

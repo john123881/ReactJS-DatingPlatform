@@ -147,7 +147,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                     marginBottom: '10px',
                     borderRadius: '30px',
                   }}
-                  href={`/booking/movie-booking-detail/${movie.movie_id}`}
+                  href="/under-construction"
                 >
                   立即訂票
                 </Link>

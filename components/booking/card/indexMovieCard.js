@@ -5,6 +5,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import { useAuth } from '@/context/auth-context';
 import { BookingService } from '@/services/booking-service';
+import { useCollect } from '@/context/use-collect';
 import { toast } from '@/lib/toast';
 
 export default function MovieCard({ movie, index, isSaved: initialSaved }) {
@@ -12,6 +13,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const { auth, setLoginModalToggle } = useAuth();
+  const { refreshCollectList } = useCollect();
 
   useEffect(() => {
     setIsSaved(initialSaved);
@@ -39,7 +41,10 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (!res.success && !res.status) {
+      if (res && (res.success || res.status)) {
+        // 成功後刷新全局收藏列表
+        refreshCollectList();
+      } else {
         throw new Error('操作失敗');
       }
     } catch (error) {
@@ -90,7 +95,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     <>
       <div
         key={index}
-        className={`card bg-base-100 shadow-xl relative h-full min-h-[380px] sm:min-h-[550px] transition-all duration-300 ${
+        className={`card bg-base-100 shadow-xl relative h-[520px] sm:h-[550px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-neongreen/20 ${
           isSaved ? ' ring-1 ring-neongreen/30' : ''
         }`}
         style={{ width: '100%' }}
@@ -136,11 +141,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                         borderRadius: '30px',
                       }}
                       onClick={() => {
-                        if (auth.id === 0) {
-                          setLoginModalToggle(true);
-                        } else {
-                          router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
-                        }
+                        router.push('/under-construction');
                       }}
                     >
                       立即訂票
@@ -156,7 +157,7 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
                         if (auth.id === 0) {
                           setLoginModalToggle(true);
                         } else {
-                          router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
+                          router.push(`/under-construction`);
                         }
                       }}
                     >
@@ -196,9 +197,9 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
           )}
         </div>
 
-        <div className="card-body p-4 flex flex-col justify-between">
-          <div>
-            <h2 className="text-[1rem] font-bold line-clamp-2 min-h-[3rem] leading-snug">
+        <div className="card-body p-4 flex flex-col justify-between overflow-hidden">
+          <div className="h-[3rem] flex items-center">
+            <h2 className="text-[1rem] font-bold line-clamp-2 leading-snug w-full">
               {movie.title}
             </h2>
           </div>

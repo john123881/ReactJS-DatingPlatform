@@ -19,6 +19,13 @@ const emptyAuth = {
   password: '',
   token: '',
   avatar: '',
+  hasPassword: null, // 預設為 null，代表尚未確認是否有密碼
+};
+
+const defaultLoadingConfig = {
+  title: '正在啟動伺服器',
+  text: '由於伺服器正在從休眠中啟動，可能需要一段時間，請稍候...',
+  btnText: '取消登入',
 };
 
 export function AuthContextProvider({ children }) {
@@ -32,7 +39,8 @@ export function AuthContextProvider({ children }) {
   );
   const [isOnLoginPage, setIsOnLoginPage] = useState(true);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [loadingConfig, setLoadingConfig] = useState(defaultLoadingConfig);
   const abortControllerRef = useRef(null);
 
   const storageKey = 'TD_auth';
@@ -51,13 +59,14 @@ export function AuthContextProvider({ children }) {
       });
     } catch (error) {
       console.error('註冊時發生錯誤', error);
-      return { success: false, error: error.message || '註冊時發生錯誤' };
+      throw error;
     }
   }, []);
 
 
   const login = useCallback(async (email, password) => {
-    setIsLoggingIn(true);
+    setLoadingConfig(defaultLoadingConfig);
+    setIsAuthLoading(true);
     // 建立新的 AbortController
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -85,7 +94,7 @@ export function AuthContextProvider({ children }) {
       console.error('登入時發生錯誤', error);
       return { success: false, error: error.message || '登入時發生錯誤' };
     } finally {
-      setIsLoggingIn(false);
+      setIsAuthLoading(false);
       abortControllerRef.current = null;
     }
   }, []);
@@ -94,7 +103,7 @@ export function AuthContextProvider({ children }) {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    setIsLoggingIn(false);
+    setIsAuthLoading(false);
   }, []);
 
   const logout = useCallback(async () => {
@@ -114,14 +123,6 @@ export function AuthContextProvider({ children }) {
     }
   }, [auth.token]);
 
-  //做授權測試，返回值:
-  //1.沒此ID {
-  //     status: 'error',
-  //     error: '無授權token，請進行登入',
-  //     success: false,
-  //     msg: '無授權token，請進行登入',
-  // }
-  // 2.授權成功:{success: true, msg:'確認成功，有Token，UserID也符合'}
   const checkAuth = useCallback(async (sid) => {
     try {
       return await AuthService.checkAuth(sid);
@@ -150,16 +151,20 @@ export function AuthContextProvider({ children }) {
       try {
         const data = JSON.parse(str);
         if (data && data.id) {
-          // 向後端確認 Cookie 是否仍然有效
-          // 注意：checkAuth 回傳的是 { success: true, message: '...' }
           const result = await checkAuth(data.id);
           if (result && result.success) {
-            setAuth(data);
-            if (data.avatar) {
-              setUserAvatar(getImageUrl(data.avatar, 'avatar'));
+            // 使用後端最新回傳的資料 (包含 hasPassword 等狀態)
+            const serverAuthData = {
+              ...result.data,
+              token: data.token // 保留原始 Token
+            };
+            setAuth(serverAuthData);
+            localStorage.setItem(storageKey, JSON.stringify(serverAuthData));
+
+            if (serverAuthData.avatar) {
+              setUserAvatar(getImageUrl(serverAuthData.avatar, 'avatar'));
             }
           } else {
-            // Cookie 無效，清除本地資料
             localStorage.removeItem(storageKey);
             setAuth(emptyAuth);
           }
@@ -193,7 +198,10 @@ export function AuthContextProvider({ children }) {
       rerender,
       setRerender,
       isAuthLoaded,
-      isLoggingIn,
+      isAuthLoading,
+      setIsAuthLoading,
+      loadingConfig,
+      setLoadingConfig,
       cancelLogin,
     }),
     [
@@ -208,7 +216,8 @@ export function AuthContextProvider({ children }) {
       isOnLoginPage,
       rerender,
       isAuthLoaded,
-      isLoggingIn,
+      isAuthLoading,
+      loadingConfig,
       cancelLogin,
     ],
   );

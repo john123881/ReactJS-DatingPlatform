@@ -11,7 +11,7 @@ import { toast as customToast } from '@/lib/toast';
 import Link from 'next/link';
 
 export default function RightLogin({ isOnLoginPage, switchHandler }) {
-  const { auth, register } = useAuth();
+  const { auth, register, isAuthLoading, setIsAuthLoading, setLoadingConfig } = useAuth();
   const router = useRouter();
   const [showPWD, setShowPWD] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -46,7 +46,7 @@ export default function RightLogin({ isOnLoginPage, switchHandler }) {
     validationSchema: registerSchema,
     onSubmit: async (values) => {
       try {
-        customToast.promise(
+        await customToast.promise(
           () => register(
             values.email,
             values.validCode,
@@ -55,21 +55,18 @@ export default function RightLogin({ isOnLoginPage, switchHandler }) {
           ),
           {
             loading: '註冊中',
-            success: (result) => {
-              if (!result.success) {
-                throw new Error(result.error);
-              }
+            success: () => {
               switchHandler();
               resetForm();
               return '註冊成功';
             },
             error: (e) => {
-              return `${e}`;
+              return `${e.message || e}`;
             },
           },
         );
       } catch (e) {
-        // console.error('error:', e);
+        console.error('註冊提交被攔截:', e);
       }
     },
   });
@@ -80,12 +77,18 @@ export default function RightLogin({ isOnLoginPage, switchHandler }) {
       return result;
     } catch (error) {
       console.error('發信時發生錯誤:', error);
-      return { success: false, error: '發信時發生錯誤' }; // 如果發生錯誤，返回一個錯誤對象
+      return { success: false, error: error.message || '發信時發生錯誤' }; // 使用實際錯誤訊息
     }
   };
 
   //按下後發送寄信
   const handleCodeClick = async () => {
+    setLoadingConfig({
+      title: '正在發送驗證信',
+      text: '請稍候，驗證信正在傳送到您的電子信箱...',
+      btnText: '取消發送',
+    });
+    setIsAuthLoading(true); // 開始載入
     try {
       const result = await sendValidCode(); // 使用 await 等待 sendValidCode 函數的返回結果
       if (!result.success) {
@@ -99,6 +102,8 @@ export default function RightLogin({ isOnLoginPage, switchHandler }) {
       }
     } catch (error) {
       console.error('按下發信按鍵時發生錯誤:', error);
+    } finally {
+      setIsAuthLoading(false); // 結束載入
     }
   };
 

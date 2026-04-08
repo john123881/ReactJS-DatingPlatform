@@ -2,9 +2,9 @@ import React from 'react';
 import { useAuth } from '@/context/auth-context';
 
 export default function LoadingOverlay() {
-  const { isLoggingIn, cancelLogin } = useAuth();
+  const { isAuthLoading, loadingConfig, cancelLogin } = useAuth();
 
-  if (!isLoggingIn) return null;
+  if (!isAuthLoading) return null;
 
   return (
     <div 
@@ -22,16 +22,16 @@ export default function LoadingOverlay() {
           <div className="absolute inset-0 border-4 border-neongreen border-t-transparent rounded-full animate-spin"></div>
         </div>
 
-        <h3 className="text-xl font-bold text-white mb-2">正在啟動伺服器</h3>
+        <h3 className="text-xl font-bold text-white mb-2">{loadingConfig.title}</h3>
         <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-          由於伺服器正在從休眠中啟動，可能需要一段時間，請稍候...
+          {loadingConfig.text}
         </p>
 
         <button
           onClick={cancelLogin}
           className="w-full py-2.5 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/20 transition-colors text-sm font-medium"
         >
-          取消登入
+          {loadingConfig.btnText}
         </button>
       </div>
 

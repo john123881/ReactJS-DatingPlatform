@@ -16,7 +16,7 @@ export default function BarRatingList({ onPageChange }) {
   const initialTabs = [
     { title: '酒吧地圖', path: '/under-construction', active: false },
     { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/bar/bar-booking-list', active: false, isProtected: true },
+    { title: '訂位紀錄', path: '/under-construction', active: false, isProtected: true },
   ];
   // const currentPage = '評論';
 

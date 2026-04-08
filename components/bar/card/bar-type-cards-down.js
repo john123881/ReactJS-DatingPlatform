@@ -10,7 +10,7 @@ export default function BarTypeCardsDown() {
             <div className="relative py-2">
               <div className="w-[410px]">
                 <Image
-                  className="object-cover w-[410px] h-[250px] rounded-[10px] opacity-50 hover:opacity-100"
+                  className="object-cover w-[410px] h-[250px] rounded-[10px] opacity-50 transition-opacity hover:opacity-100"
                   src="https://magarticles.magzter.com/articles/11977/390333/5deb8a0917c92/SpecialityBars-The-New-Trend.jpg"
                   alt="特色酒吧"
                   width={410}
@@ -31,7 +31,7 @@ export default function BarTypeCardsDown() {
             <div className="relative py-2">
               <div className="w-[410px]">
                 <Image
-                  className="object-cover w-[410px] h-[250px] rounded-[10px] opacity-50 hover:opacity-100"
+                  className="object-cover w-[410px] h-[250px] rounded-[10px] opacity-50 transition-opacity hover:opacity-100"
                   src="https://bartendersbusiness.com/en/articles/images/w/1200/BartendersBusiness-01222019060923000000-5c46b393188eb.jpg"
                   alt="其他酒吧"
                   width={410}

@@ -182,7 +182,7 @@ export default function BarCard({ bar, savedBars, setSavedBars }) {
                     setLoginModalToggle(true);
                   }
                 }}
-                href={`/bar/bar-booking/${bar.bar_id}`}
+                href={`/under-construction`}
               >
                 立即訂位
               </Link>

@@ -29,7 +29,6 @@ export default function MovieCard({ movie, index }) {
     try {
       const result = await BookingService.deleteMovieBooking(bookingId);
       toast.success('刪除成功!', '您的訂位已移除');
-      console.log('delete response:', result);
     } catch (error) {
       console.error('delete failed:', error);
       toast.error('刪除失敗!', '請稍後再試或聯繫客服');

@@ -21,7 +21,7 @@ export default function AccountPasswordChange({ onPageChange }) {
   const [isFocused2, setIsFocused2] = useState(false);
   const [showConfirmNewPWD, setConfirmNewShowPWD] = useState(false);
   const [isFocused3, setIsFocused3] = useState(false);
-  const { auth } = useAuth();
+  const { auth, setAuth, storageKey } = useAuth();
   const { isLoading } = useAccountAuth(async () => {
     onPageChange(pageTitle);
   });
@@ -38,7 +38,8 @@ export default function AccountPasswordChange({ onPageChange }) {
   };
 
   const pageTitle = '會員中心';
-  const currentPage = '更改密碼';
+  // 🔴 這裡根據 auth.hasPassword 來判斷顯示模式
+  const currentPage = auth.hasPassword ? '更改密碼' : '設置登入密碼';
 
   const {
     values,
@@ -60,19 +61,24 @@ export default function AccountPasswordChange({ onPageChange }) {
       customToast.loading('正在保存...');
       
       try {
-        // 發送所有欄位，後端要求包含 confirmNewPassword 進行驗證
         const { password, newPassword, confirmNewPassword } = values;
         const result = await AccountService.changePassword(auth.id, { 
           password, 
           newPassword, 
           confirmNewPassword 
         });
+        
         if (!result.success) {
           throw new Error(result.error || '更改密碼失敗');
         }
         
-        customToast.success('更改密碼成功', '即將跳轉回個人首頁');
+        customToast.success(auth.hasPassword ? '更改密碼成功' : '密碼設置成功', '即將跳轉回個人首頁');
         
+        // 更新 Auth 狀態中的 hasPassword 標記
+        const newAuth = { ...auth, hasPassword: true };
+        setAuth(newAuth);
+        localStorage.setItem(storageKey, JSON.stringify(newAuth));
+
         // 清除表單數據以確保安全
         resetForm();
         
@@ -80,10 +86,17 @@ export default function AccountPasswordChange({ onPageChange }) {
           router.push(`/account/index/${auth.id}`);
         }, 1500);
       } catch (error) {
-        customToast.error('更改密碼失敗', error.message || error.toString());
+        customToast.error('操作失敗', error.message || error.toString());
       }
     },
   });
+
+  // 🔴 除錯用 Log，這會出現在瀏覽器的 Console (F12)
+  useEffect(() => {
+    console.log('--- 密碼頁面當前 Auth 狀態 ---');
+    console.log('User ID:', auth.id);
+    console.log('Has Password Flag:', auth.hasPassword);
+  }, [auth]);
 
 
   return (
@@ -106,46 +119,62 @@ export default function AccountPasswordChange({ onPageChange }) {
                   {/* CONTENT1 START */}
                   <div className="flex flex-col h-full lg:mx-1 xl:mx-1 2xl:mx-12 lg:flex-row card bg-base-300 rounded-box place-items-center">
                     <div className="container">
-                      <div className="flex flex-row items-center justify-center mx-4 me-4 sm:me-16 lg:justify-start mt-7 ">
-                        <p className="text-center ms-2 basis-1/2 lg:ms-0 ">
-                          目前密碼：
-                        </p>
-                        <div className="relative basis-1/2">
-                          <input
-                            value={values.password}
-                            name="password"
-                            id="password"
-                            autoComplete="current-password"
-                            onFocus={() => setIsFocused1(true)}
-                            type={showOldPWD ? 'text' : 'password'}
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            className={`w-full input-sm input input-bordered ${
-                              errors.password && touched.password
-                                ? 'input-error'
-                                : ''
-                            }`}
-                          />
+                      
+                      {/* 🔴 條件渲染邏輯：如果 hasPassword 為 false，隱藏目前密碼欄位 */}
+                      {auth.hasPassword ? (
+                        <div className="flex flex-row items-center justify-center mx-4 me-4 sm:me-16 lg:justify-start mt-7 ">
+                          <p className="text-center ms-2 basis-1/2 lg:ms-0 ">
+                            目前密碼：
+                          </p>
+                          <div className="relative basis-1/2">
+                            <input
+                              value={values.password}
+                              name="password"
+                              id="password"
+                              autoComplete="current-password"
+                              onFocus={() => setIsFocused1(true)}
+                              type={showOldPWD ? 'text' : 'password'}
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              className={`w-full input-sm input input-bordered ${
+                                errors.password && touched.password
+                                  ? 'input-error'
+                                  : ''
+                              }`}
+                            />
 
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 16 16"
-                            fill="currentColor"
-                            className={` ${
-                              isFocused1 ? 'block' : 'hidden'
-                            } absolute right-4 w-5 h-5 cursor-pointer top-[6px] opacity-70 text-dark`}
-                            onClick={handleShowOldPWD}
-                          >
-                            {showOldPWD ? <FaEyeSlash /> : <FaEye />}
-                          </svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 16 16"
+                              fill="currentColor"
+                              className={` ${
+                                isFocused1 ? 'block' : 'hidden'
+                              } absolute right-4 w-5 h-5 cursor-pointer top-[6px] opacity-70 text-dark`}
+                              onClick={handleShowOldPWD}
+                            >
+                              {showOldPWD ? <FaEyeSlash /> : <FaEye />}
+                            </svg>
 
-                          {errors.password && touched.password && (
-                            <p className="absolute bottom-[-21px] mx-2 text-red-500 basis-full lg:justify-start text-[12px]">
-                              {errors.password}
-                            </p>
-                          )}
+                            {errors.password && touched.password && (
+                              <p className="absolute bottom-[-21px] mx-2 text-red-500 basis-full lg:justify-start text-[12px]">
+                                {errors.password}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="mx-4 mt-8 sm:mx-16 lg:mx-0">
+                           <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+                              <p className="text-sm text-primary font-bold mb-1 flex items-center gap-2">
+                                <span className="text-lg">💡</span> 溫馨提示
+                              </p>
+                              <p className="text-xs opacity-80 leading-relaxed">
+                                您目前使用 Google 登入，系統尚未儲存您的本地密碼。請在下方設定密碼，設定完成後，您未來也可以直接輸入 Email 與此密碼進行手動登入。
+                              </p>
+                           </div>
+                        </div>
+                      )}
+
                       <div className="flex flex-row items-center justify-center mx-4 lg:justify-start mt-7 me-4 sm:me-16">
                         <p className="text-center ms-2 basis-1/2 lg:ms-0 ">
                           新密碼：
@@ -230,7 +259,7 @@ export default function AccountPasswordChange({ onPageChange }) {
                             type="submit"
                             className="btn min-h-[40px] h-[40px] mt-4  sm:w-[140px] rounded-full border-dark  btn-primary  bg-primary hover:bg-primary hover:shadow-xl3 hover:border-primary font-bold"
                           >
-                            確定更改
+                            {auth.hasPassword ? '確定更改' : '設定密碼'}
                           </button>
                           <Link
                             href={`/account/index/${auth.id}`}

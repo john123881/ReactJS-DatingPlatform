@@ -58,7 +58,7 @@ export default function MovieCard({ movie, index }) {
                         borderRadius: '30px',
                       }}
                       onClick={() =>
-                        router.push('/booking/movie-booking-detail')
+                        router.push('/under-construction')
                       }
                     >
                       立即訂票

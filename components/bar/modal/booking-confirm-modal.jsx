@@ -36,7 +36,7 @@ export default function BookingConfirmModal() {
             </div>
             <div className="col-span-1 space-y-4">
               <button className="btn w-[320px] text-black text-[15px] border-[#A0FF1F] rounded-[20px]">
-                <Link href="/bar/bar-booking-list" className="text-white">
+                <Link href="/under-construction" className="text-white">
                   查看訂位紀錄
                 </Link>
               </button>

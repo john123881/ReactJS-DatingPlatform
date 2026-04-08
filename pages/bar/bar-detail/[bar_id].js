@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
+import { useCollect } from '@/context/use-collect';
 import Loader from '@/components/ui/loader/loader';
 import { toast } from '@/lib/toast';
 
@@ -17,6 +18,7 @@ export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
   const router = useRouter();
   const { auth, setLoginModalToggle } = useAuth();
+  const { refreshCollectList } = useCollect();
   const [savedBars, setSavedBars] = useState({});
 
   const { bar_id } = router.query;
@@ -59,6 +61,8 @@ export default function Detail({ onPageChange }) {
       } else {
         await BarService.saveBar(userId, barId);
       }
+      // 成功後刷新全局收藏列表
+      refreshCollectList();
     } catch (error) {
       console.error('Error updating save status:', error);
       // 還原狀態
@@ -197,13 +201,7 @@ export default function Detail({ onPageChange }) {
                     </div>
                   </div>
                   <Link 
-                    href={`/bar/bar-booking/${bar?.bar_id}`}
-                    onClick={(e) => {
-                      if (auth.id === 0) {
-                        e.preventDefault();
-                        setLoginModalToggle(true);
-                      }
-                    }}
+                    href="/under-construction"
                     className="btn w-[320px] text-black text-[15px] bg-[#A0FF1F] border-none rounded-[20px]"
                   >
                     立即訂位

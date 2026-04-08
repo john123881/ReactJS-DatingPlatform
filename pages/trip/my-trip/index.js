@@ -128,8 +128,8 @@ export default function MyTrip({ onPageChange }) {
         </p>
         <p className="sm:text-2xl text-white/80 mb-12">還沒有任何想法嗎？參考看看別人的行程吧</p>
       </div>
-      <div className="mb-24 w-full max-w-7xl px-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+      <div className="mb-24 w-full px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 sm:gap-12 justify-items-center sm:justify-items-start">
           {otherTrips.map((otherTrip) => (
             <TripCard key={otherTrip.trip_plan_id} trip={otherTrip} />
           ))}
@@ -198,7 +198,7 @@ export default function MyTrip({ onPageChange }) {
       )}
 
       {/* 主體內容區：確保 Shell 穩定 */}
-      <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12">
+      <div className="flex-grow w-full max-w-screen-2xl mx-auto px-6 sm:px-12 py-10">
         <div className="flex flex-col items-center sm:items-start justify-start">
           {/* 將新增按鈕提拔到 Shell 層級，不再隨資料切換而跳動 */}
           <button
@@ -224,6 +224,7 @@ export default function MyTrip({ onPageChange }) {
                         trip={trip}
                         isMyTrip={true}
                         onDeleteSuccess={onDeleteSuccess}
+                        onDeleteRollback={onDeleteRollback}
                       />
                     ))}
                   </div>

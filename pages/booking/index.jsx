@@ -315,7 +315,7 @@ export default function Index({ onPageChange }) {
       <div className="sticky top-[64px] z-30 sm:static flex flex-wrap justify-center sm:justify-end w-full mt-5 px-6 gap-2 sm:gap-3 mb-6 py-4 bg-black/60 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:mt-5 transition-all duration-300">
         <Link
           className="btn btn-outline bg-transparent w-[150px] rounded-[30px] hover:bg-neongreen hover:text-black group active:scale-95 transition-all flex items-center gap-2 border-neongreen/50"
-          href={'booking/movie-ticket'}
+          href={'/under-construction'}
           onClick={(e) => {
             if (auth.id === 0) {
               e.preventDefault();
@@ -349,14 +349,14 @@ export default function Index({ onPageChange }) {
           {/* Navigation Arrows */}
           <button 
             onClick={() => scrollMovieSlider(Math.max(0, movieScrollIndex - 1))}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/40 border border-white/10 rounded-full text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-neongreen hover:text-black xl:hidden"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/40 border border-white/10 rounded-full text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-neongreen hover:text-black"
           >
             ❮
           </button>
           
           <div 
             ref={movieContainerRef}
-            className="flex justify-center items-stretch gap-6 pt-4 pb-10 sm:py-10 min-h-[450px]"
+            className="flex justify-center items-stretch gap-6 pt-4 pb-10 sm:py-10 h-[520px]"
           >
             {isLoading ? (
               Array.from({ length: 1 }).map((_, i) => (
@@ -377,16 +377,16 @@ export default function Index({ onPageChange }) {
                 const isVisibleLg = index >= movieScrollIndex && index < movieScrollIndex + 3;
                 
                 // 大桌機版 (xl): 全部顯示 (5張)
-                const isVisibleXl = true; 
+                const isVisibleXl = index >= movieScrollIndex && index < movieScrollIndex + 4; 
 
                 return (
                   <div 
                     key={movie.movie_id || index} 
                     className={`flex-shrink-0 transition-all duration-500 animate__animated animate__fadeIn 
-                      ${isVisibleMobile ? 'block w-full max-w-[320px]' : 'hidden'} 
+                      ${isVisibleMobile ? 'block w-[280px]' : 'hidden'} 
                       ${isVisibleSm ? 'sm:block sm:w-[calc(50%-12px)]' : 'sm:hidden'}
                       ${isVisibleLg ? 'lg:block lg:w-[calc(33.33%-16px)]' : 'lg:hidden'}
-                      ${isVisibleXl ? 'xl:block xl:w-[calc(20%-19.2px)]' : 'xl:hidden'}
+                      ${isVisibleXl ? 'xl:block xl:w-[calc(25%-18px)]' : 'xl:hidden'}
                     `}
                   >
                     <IndexMovieCard 
@@ -401,7 +401,7 @@ export default function Index({ onPageChange }) {
 
           <button 
             onClick={() => scrollMovieSlider(Math.min(4, movieScrollIndex + 1))}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/40 border border-white/10 rounded-full text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-neongreen hover:text-black xl:hidden"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/40 border border-white/10 rounded-full text-white opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-neongreen hover:text-black"
           >
             ❯
           </button>

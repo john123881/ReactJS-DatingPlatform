@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { BarService } from '@/services/bar-service';
+import { useCollect } from '@/context/use-collect';
 import { toast } from '@/lib/toast';
 
 export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
   const { auth, setLoginModalToggle } = useAuth();
+  const { refreshCollectList } = useCollect();
   const isSaved = savedBars && savedBars[randomBar.bar_id];
 
   const handleSavedClick = async (e) => {
@@ -32,6 +34,8 @@ export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
       } else {
         await BarService.saveBar(userId, barId);
       }
+      // 成功後刷新全局收藏列表
+      refreshCollectList();
     } catch (error) {
       console.error('Error updating save status:', error);
       setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
@@ -93,7 +97,7 @@ export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
             <button>
               <Link
                 className="text-[12px] m-0.5 ml-2 mr-2 hover:text-[black]"
-                href={`/bar/bar-booking/${randomBar?.bar_id}`}
+                href={`/under-construction`}
                 onClick={(e) => {
                   if (auth.id === 0) {
                     e.preventDefault();

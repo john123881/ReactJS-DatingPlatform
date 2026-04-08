@@ -15,7 +15,7 @@ export const getImageUrl = (url, type = 'avatar') => {
 
   // 1. 處理硬編碼的舊 IP 或 localhost 位址 (強化修復)
   // 將舊 IP 119.14.x.x 或 localhost:3001 替換為當前的 API_SERVER
-  const legacyHostsRegex = /http:\/\/(119\.14\.\d{1,3}\.\d{1,3}|localhost):3001/g;
+  const legacyHostsRegex = /http:\/\/(119\.14\.\d{1,3}\.\d{1,3}|localhost):300[12]/g;
   if (legacyHostsRegex.test(finalUrl)) {
     finalUrl = finalUrl.replace(legacyHostsRegex, API_SERVER);
   }
@@ -38,6 +38,12 @@ export const getImageUrl = (url, type = 'avatar') => {
 
   // 確保路徑開頭沒有多餘的斜線
   const cleanUrl = finalUrl.startsWith('/') ? finalUrl.slice(1) : finalUrl;
+
+  // 4. 防止重複拼接路徑 (核心修正)
+  // 如果 cleanUrl 已經包含了對應的 folder 路徑，則不需要再次拼接
+  if (cleanUrl.startsWith(folder + '/')) {
+    return `${API_SERVER}/${cleanUrl}`;
+  }
   
   return `${API_SERVER}/${folder}/${cleanUrl}`;
 };
@@ -51,6 +57,7 @@ export const handleImageError = (e, type = 'avatar') => {
   e.target.onerror = null; // 防止無限迴圈
   e.target.src = type === 'avatar' ? '/unknown-user-image.jpg' : '/unavailable-image.jpg';
 };
+
 /**
  * 格式化聊天時間為 HH:mm
  * @param {string} dateStr - 原始日期字串 (ISO 或其他格式)
@@ -72,3 +79,4 @@ export const formatChatTime = (dateStr) => {
     return dateStr;
   }
 };
+

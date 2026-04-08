@@ -37,9 +37,7 @@ export default function Index({ onPageChange }) {
     if (userId === 0 || !movieIds) return;
 
     try {
-      console.log('Checking movie status for movies:', movieIds);
       const data = await BookingService.checkMovieStatus(userId, movieIds);
-      console.log('Received movie status data:', data);
 
       if (data && Array.isArray(data)) {
         // 使用功能性更新，避免依賴 savedMovies 導致無限迴圈
@@ -59,12 +57,9 @@ export default function Index({ onPageChange }) {
   }, [auth.id]);
 
   const getBookingMovieCard = useCallback(async () => {
-    console.log('getBookingMovieCard started, auth.id:', auth.id);
     setIsLoading(true);
     try {
-      console.log('Fetching movie list...');
       const data = await BookingService.getMovieList();
-      console.log('Fetched movies:', data?.length || 0);
       
       if (data && Array.isArray(data) && data.length > 0) {
         const movieIds = data.map((movie) => movie.movie_id).join(',');
@@ -74,7 +69,6 @@ export default function Index({ onPageChange }) {
     } catch (error) {
       console.error('Failed to fetch movie card', error);
     } finally {
-      console.log('getBookingMovieCard finished, setting isLoading to false');
       setIsLoading(false);
     }
   }, [auth.id, checkMoviesStatus]);

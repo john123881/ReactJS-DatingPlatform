@@ -72,6 +72,7 @@ export default function BarRatingModal({ bar }) {
               />
             ))}
           </div>
+{/* 
           <div className="flex justify-center">
             <Link 
               href={`/bar/bar-rating-list/${bar?.bar_id}`} 
@@ -81,6 +82,7 @@ export default function BarRatingModal({ bar }) {
               送出評論
             </Link>
           </div>
+          */}
         </div>
         <form method="dialog" className="modal-backdrop">
           <button>close</button>

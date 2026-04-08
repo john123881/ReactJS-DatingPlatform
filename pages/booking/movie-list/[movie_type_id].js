@@ -81,19 +81,15 @@ export default function Index({ onPageChange }) {
   // try動態路由
   const getMovieListType = useCallback(async (movie_type_id) => {
     if (!movie_type_id) return; // 確保 bar_type_id 存在
-    console.log('getMovieListType started for type:', movie_type_id);
     setIsLoading(true);
 
     try {
-      console.log('Fetching movies by category...');
       const result = await BookingService.getMoviesByCategory(movie_type_id);
-      console.log('Fetched movies by category:', result?.length || 0);
       setMovieCards(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Failed to fetch movie list:', error);
       setMovieCards([]);
     } finally {
-      console.log('getMovieListType finished');
       setIsLoading(false);
     }
   }, []);

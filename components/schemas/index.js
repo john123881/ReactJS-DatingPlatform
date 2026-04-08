@@ -58,9 +58,10 @@ export const editSchema = yup.object().shape({
 export const changePasswordSchema = yup.object().shape({
   password: yup
     .string()
-    .min(8, '請輸入8個字元以上')
-    .matches(passwordRules, { message: '請輸入符合需求的密碼' })
-    .required('必填'),
+    .test('password-if-present', '請輸入符合需求的密碼', (value) => {
+      if (!value) return true;
+      return passwordRules.test(value);
+    }),
   newPassword: yup
     .string()
     .min(8, '請輸入8個字元以上')

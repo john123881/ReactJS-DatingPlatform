@@ -10,6 +10,7 @@ import { API_BASE_URL } from '@/configs/api-config';
 
 import { BookingService } from '@/services/booking-service';
 import YouTube from 'react-youtube';
+import { useCollect } from '@/context/use-collect';
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 
 export default function MovieDetail({ onPageChange }) {
@@ -20,6 +21,7 @@ export default function MovieDetail({ onPageChange }) {
   }, [onPageChange, pageTitle]);
 
   const { auth } = useAuth();
+  const { refreshCollectList } = useCollect();
 
   const { mid } = router.query;
 
@@ -99,6 +101,8 @@ export default function MovieDetail({ onPageChange }) {
       ) {
         throw new Error(result.message || result.msg || '操作失敗');
       }
+      // 成功後刷新全局收藏列表
+      refreshCollectList();
     } catch (error) {
       // 發生錯誤時還原狀態
       setIsSaved(wasSaved);
@@ -135,6 +139,16 @@ export default function MovieDetail({ onPageChange }) {
                 />
                 Your browser does not support the video tag.
               </video> */}
+            </div>
+
+            {/* 返回按鈕 */}
+            <div className="absolute top-4 left-4 lg:top-8 lg:left-8 z-20">
+              <button 
+                onClick={() => router.push('/booking')}
+                className="btn btn-circle btn-outline border-neongreen text-neongreen hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300 bg-black/20 backdrop-blur-sm"
+              >
+                ❮
+              </button>
             </div>
 
             {/* 電影資訊 */}
@@ -324,7 +338,7 @@ export default function MovieDetail({ onPageChange }) {
                         type="submit"
                         className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
                         onClick={() => {
-                          toast.success('訂位成功!');
+                          router.push('/under-construction');
                         }}
                       >
                         <span className="text-h6 text-black">確認訂票</span>
@@ -349,10 +363,19 @@ export default function MovieDetail({ onPageChange }) {
                   <div role="tabpanel" className="tab-content p-10 mt-4 mx-2">
                     <div className="card bg-transparent shadow-xl">
                       {movie[0]?.youtube_id ? (
-                        <YouTube
-                          videoId={movie[0]?.youtube_id}
-                          className="w-full h-full lg:h-[500px]"
-                        />
+                        <div className="w-full aspect-video overflow-hidden rounded-xl bg-black">
+                          <YouTube
+                            videoId={movie[0]?.youtube_id}
+                            opts={{
+                              width: '100%',
+                              height: '100%',
+                              playerVars: {
+                                autoplay: 0,
+                              }
+                            }}
+                            className="w-full h-full"
+                          />
+                        </div>
                       ) : (
                         <div className="flex items-center justify-center w-full h-[300px] bg-slate-800 text-gray-400 rounded-xl">
                           暫無預告片影片

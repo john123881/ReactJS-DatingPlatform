@@ -59,7 +59,12 @@ export function useTripDetail(trip_plan_id) {
       const processedBarPhotos = (barPhotosData || []).map(item => {
         let src = '';
         if (item.bar_img_url) {
-          src = item.bar_img_url;
+          // 強化路徑判斷：如果是完整 URL 或 Base64 則維持，若是純檔名則補上 /barPic/
+          src = (item.bar_img_url.includes('/') || item.bar_img_url.startsWith('data:')) 
+                ? item.bar_img_url 
+                : `/barPic/${item.bar_img_url}`;
+        } else if (item.bar_pic_name) {
+          src = `/barPic/${item.bar_pic_name}`;
         } else if (item.bar_img?.data) {
           src = `data:image/jpeg;base64,${bufferToBase64(item.bar_img.data)}`;
         }
@@ -69,7 +74,12 @@ export function useTripDetail(trip_plan_id) {
       const processedMoviePhotos = (moviePhotosData || []).map(item => {
         let src = '';
         if (item.movie_img_url) {
-          src = item.movie_img_url;
+          // 強化路徑判斷：純檔名補上 /movie_img/
+          src = (item.movie_img_url.includes('/') || item.movie_img_url.startsWith('data:')) 
+                ? item.movie_img_url 
+                : `/movie_img/${item.movie_img_url}`;
+        } else if (item.poster_img) {
+          src = item.poster_img.startsWith('http') ? item.poster_img : `/movie_img/${item.poster_img}`;
         } else if (item.movie_img?.data) {
           src = `data:image/jpeg;base64,${bufferToBase64(item.movie_img.data)}`;
         }

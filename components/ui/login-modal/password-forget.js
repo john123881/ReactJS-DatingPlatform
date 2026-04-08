@@ -4,6 +4,7 @@ import { forgetPasswordSchema } from '@/components/schemas';
 import { AuthService } from '@/services/auth-service';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import { RiPassValidFill } from 'react-icons/ri';
+import { useAuth } from '@/context/auth-context';
 import { toast as customToast } from '@/lib/toast';
 import Link from 'next/link';
 
@@ -12,6 +13,7 @@ export default function PasswordForget({
   switchHandler,
   loginResetForm,
 }) {
+  const { setIsAuthLoading, setLoadingConfig } = useAuth();
   const [hasCheckPWDOTD, setHasCheckPWDOTD] = useState(true);
   const [hasSentOTP, setHasSentOTP] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -39,6 +41,12 @@ export default function PasswordForget({
 
   //按下後發送寄信
   const handleOTPClick = async () => {
+    setLoadingConfig({
+      title: '正在發送重設信',
+      text: '請稍候，密碼重設信正在傳送到您的電子信箱...',
+      btnText: '取消發送',
+    });
+    setIsAuthLoading(true);
     try {
       const result = await sendOTPForForgetPWD(); // 使用 await 等待 sendValidCode 函數的返回結果
       if (!result.success) {
@@ -52,6 +60,8 @@ export default function PasswordForget({
       }
     } catch (error) {
       console.error('按下發信按鍵時發生錯誤:', error);
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -77,19 +87,19 @@ export default function PasswordForget({
         return await AuthService.resetPassword(values);
       };
 
-      customToast.promise(fetchChangeForgetPWD, {
-        loading: '正在保存...',
-        success: (result) => {
-          if (!result.success) {
-            throw result.error;
-          }
-          // router.push(`/account/index/${auth.id}`);
-          setPasswordForgetBtn(false);
-          loginResetForm();
-          return result.message;
-        },
-        error: (error) => `${error.toString()}`,
-      });
+      try {
+        await customToast.promise(fetchChangeForgetPWD, {
+          loading: '正在保存...',
+          success: (result) => {
+            setPasswordForgetBtn(false);
+            loginResetForm();
+            return result.message || '密碼重設成功';
+          },
+          error: (error) => `${error.message || error}`,
+        });
+      } catch (e) {
+        console.error('忘記密碼提交被攔截:', e);
+      }
     },
   });
 

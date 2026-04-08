@@ -17,10 +17,19 @@ export default function WithContent({
 }) {
   const [imgLoading, setImgLoading] = useState(true);
 
-  // 當圖片位址變更時，重新設定載入狀態
+  // 當圖片位址變更時，重新設定載入狀態，並檢查是否已從快取載入完成
   useEffect(() => {
     if (imageSrc) {
       setImgLoading(true);
+      
+      // 快速檢查：如果圖片已在快取中，Browser 可能不會觸發 onLoad
+      const img = new Image();
+      img.src = imageSrc;
+      if (img.complete) {
+        setImgLoading(false);
+      }
+    } else {
+      setImgLoading(false); // 無圖片時不顯示載入圈圈
     }
   }, [imageSrc]);
   const openDeleteModal = () => {

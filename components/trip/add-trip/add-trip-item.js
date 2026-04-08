@@ -62,7 +62,7 @@ export default function AddTripItem({
     <div className="flex justify-start items-center w-full py-2 border-b border-gray-800 last:border-none">
       <div className="flex justify-start items-center flex-grow">
         <img
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-md object-cover"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-md object-cover shadow-md"
           src={imgSrc}
           alt={`Image of ${item[config.nameProp]}`}
           onError={(e) => {

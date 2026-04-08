@@ -17,9 +17,9 @@ export default function TripNavigationTab({ showTitle = true }) {
         )}
         <div className="flex justify-around items-center sidebarOptions sm:justify-start gap-4 sm:gap-16">
           <Link
-            href="/under-construction"
+            href="/trip"
             className={`text-sm sm:text-3xl font-bold transition-all duration-300 hover:scale-110 ${
-              router.pathname === '/under-construction' ? 'text-neongreen drop-shadow-[0_0_8px_rgba(160,255,31,0.5)]' : 'text-gray-400 hover:text-neongreen'
+              isCalendar ? 'text-neongreen drop-shadow-[0_0_8px_rgba(160,255,31,0.5)]' : 'text-gray-400 hover:text-neongreen'
             }`}
           >
             我的日曆
