@@ -10,12 +10,11 @@ export default function MovieModal({ movie, modalId, isOpen }) {
       <div
         id={modalId}
         // ref={postModalRef}
-        className={`modal z-50 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}
-        style={{ pointerEvents: 'auto' }}
+        className={`modal flex transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        style={{ zIndex: 99999 }}
       >
         <div
-          className="flex modal-box w-[90vw] max-w-[90vw] h-[90vh] overflow-auto"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box w-full md:max-w-[1200px] md:max-h-[85vh] h-full h-screen max-h-none md:max-h-[85vh] rounded-none md:rounded-2xl bg-[#0A0A0A] border-none md:border md:border-white/10 overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform m-0"
         >
           <div
             onClick={() => {
@@ -27,17 +26,17 @@ export default function MovieModal({ movie, modalId, isOpen }) {
           </div>
 
           <div className="container flex flex-col md:flex-row">
-            <figure className="relative flex flex-col w-full mx-3 md:w-1/2 card-photo h-[300px] md:h-auto">
+            <figure className="relative flex flex-col w-full mx-3 md:w-1/2 card-photo h-[35vh] md:h-auto">
               <Image
                 src={movie.img || '/unavailable-image.jpg'}
                 alt={movie.img_name || 'No Image Available'}
                 fill
-                sizes="(max-width: 768px) 90vw, 45vw"
+                sizes="(max-width: 768px) 100vw, 45vw"
                 className="object-contain"
               />
             </figure>
 
-            <div className="flex flex-col w-full h-full mx-3 overflow-auto card-body md:w-1/2">
+            <div className="flex flex-col w-full h-full mx-3 overflow-auto card-body md:w-1/2 pt-20 md:pt-0 pb-32 md:pb-10">
               <div className="flex flex-row items-center justify-between h-10 gap-2 m-2 md:mt-[64px] first-letter:card-user">
                 <div className="flex items-center justify-start gap-2 text-[26px] md:text-[32px]  font-semibold">
                   {movie.title

@@ -113,10 +113,11 @@ function PostModalContent({ post, modalId, isOpen }) {
       <div
         id={modalId}
         ref={postModalRef}
-        className={`modal z-[101] transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto' : 'pointer-events-none'}`}
+        className={`modal flex transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        style={{ zIndex: 99999 }}
       >
         <div
-          className="modal-box w-full max-w-[1200px] max-h-[90vh] bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform"
+          className="modal-box w-full md:max-w-[1200px] md:max-h-[90vh] h-full h-screen max-h-none md:max-h-[90vh] rounded-none md:rounded-2xl bg-[#0A0A0A] border-none md:border md:border-white/10 overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform m-0"
         >
           <button
             onClick={() => {
@@ -138,7 +139,7 @@ function PostModalContent({ post, modalId, isOpen }) {
                 <img
                   src={getImageUrl(post.img, 'post')}
                   alt={post.photo_name || 'No Image Available'}
-                  className="w-full h-full object-contain max-h-[50vh] md:max-h-none"
+                  className="w-full h-full object-contain max-h-[35vh] md:max-h-none"
                   loading="eager"
                   fetchpriority="high"
                   decoding="sync"
@@ -148,7 +149,7 @@ function PostModalContent({ post, modalId, isOpen }) {
 
             {/* Right side: Content & Comments */}
             <div className="flex flex-col w-full md:w-[40%] bg-[#0A0A0A] h-full overflow-hidden border-l border-white/10">
-              <div className="px-6 pb-6 pt-14 overflow-auto hide-scrollbar flex-grow">
+              <div className="px-6 pb-10 pt-20 md:pt-14 overflow-auto hide-scrollbar flex-grow">
                 {/* Header */}
                 <div className="flex flex-row items-center gap-3 mb-6 justify-between">
                   <div className="flex justify-start items-center gap-2">
@@ -361,56 +362,52 @@ function PostModalContent({ post, modalId, isOpen }) {
               </div>
 
               {/* Actions & Comment Input Area */}
-              <div className="p-6 bg-[#0A0A0A] border-t border-white/10">
+              <div className="p-4 md:p-6 pb-32 md:pb-6 bg-[#0A0A0A] border-t border-white/10">
                 {userId !== 0 && userId !== null && (
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    {/* Icons Area - more compact on mobile */}
                     <div className="flex items-center justify-between px-1">
-                      <div className="flex items-center gap-5">
+                      <div className="flex items-center gap-4 md:gap-5">
                         {isLiked ? (
                           <FaHeart
-                            className="text-2xl text-neongreen cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                            className="text-xl md:text-2xl text-neongreen cursor-pointer hover:scale-110 active:scale-95 transition-all"
                             onClick={() => handleLikedClick(post)}
                           />
                         ) : (
                           <FaRegHeart
-                            className="text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                            className="text-xl md:text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 active:scale-95 transition-all"
                             onClick={() => handleLikedClick(post)}
                           />
-                        )}
+                        )/* 移除多餘的括號 */}
                         <FiMessageCircle
-                          className="text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
+                          className="text-xl md:text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
                           onClick={() => textareaRef.current?.focus()}
                         />
                         <FiSend
-                          className="text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
+                          className="text-xl md:text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
                           onClick={() => document.getElementById(shareModalId).showModal()}
-                        />
-                        <ShareModal
-                          post={post}
-                          key={post.post_id}
-                          postId={post.post_id}
-                          modalId={shareModalId}
                         />
                       </div>
                       <div>
                         {isSaved ? (
                           <FaBookmark
-                            className="text-2xl text-neongreen cursor-pointer hover:scale-110 transition-all"
+                            className="text-xl md:text-2xl text-neongreen cursor-pointer hover:scale-110 transition-all"
                             onClick={() => handleSavedClick(post)}
                           />
                         ) : (
                           <FaRegBookmark
-                            className="text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
+                            className="text-xl md:text-2xl text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-all"
                             onClick={() => handleSavedClick(post)}
                           />
                         )}
                       </div>
                     </div>
 
-                    <div className="flex flex-row gap-3 items-end">
+                    {/* Input Area */}
+                    <div className="flex flex-row gap-2 md:gap-3 items-end">
                       <textarea
                         ref={textareaRef}
-                        className="textarea bg-white/5 border-white/10 w-full h-11 min-h-[44px] max-h-32 resize-none rounded-xl p-3 focus:border-neongreen/50 outline-none text-sm transition-all overflow-auto hide-scrollbar text-white placeholder:text-gray-600"
+                        className="textarea bg-white/5 border-white/10 w-full h-10 md:h-11 min-h-[40px] md:min-h-[44px] max-h-32 resize-none rounded-xl p-2 md:p-3 focus:border-neongreen/50 outline-none text-xs md:text-sm transition-all overflow-auto hide-scrollbar text-white placeholder:text-gray-600"
                         placeholder="新增回覆..."
                         value={localComment}
                         onChange={handleCommentContentChange}
@@ -422,7 +419,7 @@ function PostModalContent({ post, modalId, isOpen }) {
                         }
                       />
                       <button
-                        className="h-11 px-6 text-neongreen hover:text-black hover:bg-neongreen border border-neongreen/50 hover:border-neongreen rounded-xl transition-all font-bold text-sm whitespace-nowrap"
+                        className="h-10 md:h-11 px-4 md:px-6 text-neongreen hover:text-black hover:bg-neongreen border border-neongreen/50 hover:border-neongreen rounded-xl transition-all font-bold text-xs md:text-sm whitespace-nowrap"
                         onClick={async () => {
                           await handleCommentUpload(post, localComment);
                           setLocalComment('');

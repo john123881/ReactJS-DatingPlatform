@@ -71,7 +71,7 @@ export default function CreateEventModalMobile() {
       <dialog
         id="create_event_modal_mobile"
         ref={createEventModalMobileRef}
-        className="modal modal-bottom sm:modal-middle "
+        className="modal sm:modal-middle "
       >
         <div
           className="modal-box flex flex-col"

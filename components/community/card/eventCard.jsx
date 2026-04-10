@@ -1,187 +1,142 @@
+import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { usePostContext } from '@/context/post-context';
-import { useState } from 'react';
-import { FiSend, FiMoreHorizontal } from 'react-icons/fi';
-import EditEventModal from '../modal/editEventModal';
-import Link from 'next/link';
-import Image from 'next/image';
-import { toast as customToast } from '@/lib/toast';
-import { handleImageError } from '@/services/image-utils';
+import { useRouter } from 'next/router';
+import { FiCalendar, FiMapPin, FiClock } from 'react-icons/fi';
 import styles from './card.module.css';
+import { getImageUrl, handleImageError } from '@/services/image-utils';
+import Link from 'next/link';
 
 export default function EventCard({ event }) {
   const { auth } = useAuth();
-  const { handleAttendedClick, attendedEvents, handleDeleteEventClick } =
-    usePostContext();
-  const [isFlipped, setIsFlipped] = useState(false);
+  const router = useRouter();
+  const { attendedEvents, handleAttendedClick } = usePostContext();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const userId = auth.id;
+  const isAttended = attendedEvents[event.comm_event_id] || false;
 
-  // 基於 comm_event_id 的唯一 edit modal id
-  const editEventModalId = `edit_event_modal_${event?.comm_event_id}`;
-
-  // 基於 post_id 的唯一 share modal id
-  const shareEventModalId = `share_event_modal_${event?.comm_event_id}`;
-
-  const isAttended = attendedEvents[event?.comm_event_id] || false;
-
-  const handleFlip = (e) => {
-    setIsFlipped(!isFlipped);
-  };
-
-  const handleQuickCopy = (e) => {
+  const handleUserClick = (e, userId) => {
     e.stopPropagation();
-    const shareUrl = `${window.location.origin}/community/event/${event?.comm_event_id}`;
-    navigator.clipboard
-      .writeText(shareUrl)
-      .then(() => {
-        customToast.success('複製連結成功!');
-      })
-      .catch((err) => {
-        console.error('無法複製連結: ', err);
-        customToast.error('複製連結失敗!');
-      });
-  };
-
-  // 於前端處理地點顯示
-  const formatLocation = (location) => {
-    if (!location) return '';
-    // 檢查 location 是否有足夠長度, 如果沒有直接返回原字串
-    return location.length > 6 ? location.substring(0, 6) : location;
+    router.push(`/community/profile/${userId}`);
   };
 
   return (
     <>
-      <div className={styles['flip-card']} onClick={handleFlip}>
-        <div
-          className={`${styles['flip-card-inner']} ${
-            isFlipped ? styles.flipped : ''
-          }`}
-        >
-          <div
-            className={`${styles['flip-card-front']} eventCard card md:w-[330px] md:h-[480px] flex flex-col items-center justify-start border-grayBorder overflow-hidden`}
+      <div className="card sm:w-[330px] md:w-[480px] h-auto flex border-grayBorder mx-5 mb-8 shadow-sm overflow-hidden group">
+        {/* User Header */}
+        <div className="card-user flex h-10 items-center gap-2 m-2 justify-between">
+          <div 
+            className="flex justify-start items-center gap-2 cursor-pointer"
+            onClick={(e) => handleUserClick(e, event.user_id)}
           >
-            <figure className="relative card-photo w-[330px] h-[330px] overflow-hidden rounded-2xl">
-              <Link 
-                href={`/community/event/${event?.comm_event_id}`} 
-                onClick={(e) => e.stopPropagation()}
-                className="w-full h-full block relative"
-              >
-                <Image
-                  src={event.img || '/unavailable-image.jpg'}
-                  alt={event.photo_name || 'No Image Available'}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                  onError={(e) => handleImageError(e, 'event')}
+            <div className="avatar">
+              <div className="w-8 rounded-full border border-white/10">
+                <img
+                  src={getImageUrl(event.avatar, 'avatar')}
+                  alt={event.username || 'User'}
+                  onError={(e) => handleImageError(e, 'avatar')}
                 />
-              </Link>
-            </figure>
-            <div className="card-body h-auto w-[330px] p-0 overflow-auto flex flex-col justify-between">
-              <div className="card-info text-h4 flex flex-col justify-between">
-                <div className="flex flex-row justify-between items-start">
-                  <div className="card-infoLeft flex flex-row gap-2 px-1 py-1">
-                    <div className="flex flex-col gap-3">
-                      <Link 
-                        href={`/community/event/${event?.comm_event_id}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <p className="text-h5 font-bold hover:text-neongreen transition-colors">{event.title}</p>
-                      </Link>
-                      <p className="text-h6">
-                        {formatLocation(event.location)}
-                      </p>
-                      <p className="text-h6">
-                        {`${event.start_date} ${event.start_time}`}
-                      </p>
-                    </div>
-                  </div>
+              </div>
+            </div>
+            <span className="text-sm font-medium text-white/80 hover:text-neongreen transition-colors">
+              {event.username || (event.email ? event.email.split('@')[0] : 'User')}
+            </span>
+          </div>
+          <div className="badge badge-outline border-neongreen text-neongreen text-[10px] uppercase tracking-widest font-bold">
+            EVENT
+          </div>
+        </div>
 
-                  <div className="card-iconListRight flex justify-end items-center px-1 py-1 ">
-                    <FiSend
-                      className="card-icon hover:text-neongreen"
-                      onClick={handleQuickCopy}
-                    />
-                    {userId === event.user_id ? (
-                      <div className="dropdown dropdown-end">
-                        <div
-                          tabIndex={0}
-                          className="m-2"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <FiMoreHorizontal className="card-icon hover:text-neongreen" />
-                        </div>
-                        <ul
-                          tabIndex={0}
-                          className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
-                          style={{
-                            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                          }}
-                        >
-                          <li>
-                            <a
-                              className="hover:text-neongreen"
-                              onClick={() =>
-                                document
-                                  .getElementById(editEventModalId)
-                                  .showModal()
-                              }
-                            >
-                              編輯活動
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="hover:text-neongreen"
-                              onClick={() => handleDeleteEventClick(event)}
-                            >
-                              刪除活動
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    ) : null}
-                    <EditEventModal
-                      event={event}
-                      modalId={editEventModalId}
-                      key={event.comm_event_id}
-                    />
-                  </div>
+        {/* Event Media */}
+        <Link href={`/community/event/${event.comm_event_id}`}>
+          <figure className="card-photo m-0 relative overflow-hidden cursor-pointer">
+            <div className={styles.parallaxContainer}>
+              <div className={styles.parallax}>
+                <div className={styles.parallaxContent}>
+                  <img
+                    src={getImageUrl(event.img, 'event')}
+                    alt={event.title}
+                    className={`${styles.parallaxMedia} w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110`}
+                    onError={(e) => handleImageError(e, 'event')}
+                  />
                 </div>
               </div>
-              {userId !== 0 && userId !== null && (
-                <div className="card-actions flex justify-center px-1 py-1 ">
-                  <button
-                    className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAttendedClick(event);
-                    }}
-                  >
-                    {isAttended ? <span>已參加</span> : <span>參加</span>}
-                  </button>
-                </div>
-              )}
+            </div>
+            {/* Overlay Date Badge */}
+            <div className="absolute top-4 left-4 bg-dark/80 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 flex flex-col items-center">
+               <span className="text-neongreen font-bold text-lg leading-tight">
+                  {event.start_date ? event.start_date.split('月')[1].split('日')[0] : '??'}
+               </span>
+               <span className="text-white/60 text-[10px] uppercase font-medium">
+                  {event.start_date ? event.start_date.split('月')[0].replace('年', '').trim() + '月' : 'MONTH'}
+               </span>
+            </div>
+          </figure>
+        </Link>
+
+        {/* Event Details */}
+        <div className="card-body p-5 bg-black/20">
+          <Link href={`/community/event/${event.comm_event_id}`}>
+            <h2 className="card-title text-white hover:text-neongreen transition-colors cursor-pointer truncate">
+              {event.title}
+            </h2>
+          </Link>
+          
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="flex items-center gap-2 text-white/60 text-sm">
+              <FiCalendar className="text-neongreen" />
+              <span>{event.start_date}</span>
+            </div>
+            {event.start_time && (
+              <div className="flex items-center gap-2 text-white/60 text-sm">
+                <FiClock className="text-neongreen" />
+                <span>{event.start_time} - {event.end_time || ''}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-white/60 text-sm">
+              <FiMapPin className="text-neongreen" />
+              <span className="truncate">{event.location}</span>
             </div>
           </div>
-          <div
-            className={`${styles['flip-card-back']} flex flex-col gap-5`}
-            onClick={(e) => {
-              // 點擊背面也翻回去
-              e.stopPropagation();
-              handleFlip();
-            }}
-          >
-            <p className="text-h5 font-bold">{event.title}</p>
-            <p className="text-h6 font-light">{event.description}</p>
-            <p className="text-h6">{event.location}</p>
-            <p className="text-h6">
-              {`${event.start_date} ${event.start_time} - ${event.end_date} ${event.end_time}`}
+
+          <div className="card-actions justify-between items-center mt-5 pt-4 border-t border-white/5">
+            <p className="text-xs text-white/40 italic line-clamp-1 flex-1 mr-4">
+              {event.description}
             </p>
+            <button 
+              className={`btn btn-sm rounded-full px-6 transition-all duration-300 font-bold ${
+                isAttended 
+                  ? 'bg-neongreen/20 text-neongreen border-neongreen/50 hover:bg-neongreen/30' 
+                  : 'bg-neongreen text-black border-none hover:bg-neongreen/80 shadow-neon-sm'
+              }`}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (isProcessing) return;
+                
+                if (typeof handleAttendedClick === 'function') {
+                  setIsProcessing(true);
+                  try {
+                    await handleAttendedClick(event);
+                  } finally {
+                    setIsProcessing(false);
+                  }
+                }
+              }}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : isAttended ? (
+                '已參加'
+              ) : (
+                '立即參加'
+              )}
+            </button>
           </div>
         </div>
       </div>
     </>
   );
 }
+

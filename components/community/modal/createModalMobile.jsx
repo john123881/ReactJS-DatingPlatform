@@ -54,7 +54,7 @@ export default function CreateModalMobile() {
       <dialog
         id="create_modal_mobile"
         ref={createModalMobileRef}
-        className="modal modal-bottom sm:modal-middle max-w-full"
+        className="modal sm:modal-middle max-w-full"
       >
         <div
           className="modal-box flex flex-col"

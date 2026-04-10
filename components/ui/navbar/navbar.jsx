@@ -541,18 +541,6 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                 ))}
               </ul>
             </div>
-            <PostModal
-              className={`z-[100]`}
-              post={p}
-              modalId={modalId}
-              isOpen={postModalToggle === modalId}
-            />
-            <MovieModal
-              className={`z-[100]`}
-              movie={movieV}
-              modalId={modalId}
-              isOpen={movieModalToggle === modalId}
-            />
           </div>
 
           {/* NAVBAR 右側 - 會員中心(未登入) */}
@@ -639,6 +627,19 @@ export default function Header({ currentPageTitle, handlePageChange }) {
           </div>
         </div>
       </div>
+
+      <PostModal
+        className={`z-[9999]`}
+        post={p}
+        modalId={modalId}
+        isOpen={postModalToggle === modalId}
+      />
+      <MovieModal
+        className={`z-[9999]`}
+        movie={movieV}
+        modalId={modalId}
+        isOpen={movieModalToggle === modalId}
+      />
 
       {/* NAVBAR 中間底下區域 for mobile */}
       <div 

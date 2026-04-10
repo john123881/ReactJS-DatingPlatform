@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
@@ -18,6 +18,8 @@ export default function Event({ onPageChange }) {
   const { eid } = router.query;
 
   const { auth } = useAuth();
+
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     onPageChange(pageTitle);
@@ -230,9 +232,24 @@ export default function Event({ onPageChange }) {
                         ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' 
                         : 'bg-neongreen text-black border-none hover:bg-neongreen/90 hover:shadow-primary/20'
                     }`}
-                    onClick={() => handleAttendedClick(eventPageCard)}
+                    onClick={async () => {
+                      if (isProcessing) return;
+                      setIsProcessing(true);
+                      try {
+                        await handleAttendedClick(eventPageCard);
+                      } finally {
+                        setIsProcessing(false);
+                      }
+                    }}
+                    disabled={isProcessing}
                   >
-                    {isAttended ? '取消參加' : '立即參加'}
+                    {isProcessing ? (
+                      <span className="loading loading-spinner loading-md"></span>
+                    ) : isAttended ? (
+                      '取消參加'
+                    ) : (
+                      '立即參加'
+                    )}
                   </button>
                 </div>
               )}

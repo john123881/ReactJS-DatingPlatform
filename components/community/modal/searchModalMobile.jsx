@@ -48,7 +48,7 @@ export default function SearchModalMobile() {
       <dialog
         id="search_modal_mobile"
         ref={searchModalMobileRef}
-        className="modal modal-bottom sm:modal-middle"
+        className="modal modal-top sm:modal-middle"
       >
         <div
           className="modal-box flex flex-col"

@@ -83,12 +83,11 @@ function ExploreModalContent({ post, modalId, isOpen }) {
       <div
         id={modalId}
         ref={exploreModalRef}
-        className={`modal z-50 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}
-        style={{ pointerEvents: 'auto' }}
+        className={`modal flex transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        style={{ zIndex: 99999 }}
       >
         <div
-          className="flex modal-box w-[90vw] max-w-[90vw] h-[90vh] overflow-auto hide-scrollbar"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box w-full md:max-w-[1200px] md:max-h-[85vh] h-full h-screen max-h-none md:max-h-[85vh] rounded-none md:rounded-2xl bg-[#0A0A0A] border-none md:border md:border-white/10 overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform m-0"
         >
           <button
             onClick={() => {
@@ -109,7 +108,7 @@ function ExploreModalContent({ post, modalId, isOpen }) {
               <img
                 src={getImageUrl(post.img, 'post')}
                 alt={post.photo_name || 'No Image Available'}
-                className="w-full h-full object-contain max-h-[50vh] md:max-h-none"
+                className="w-full h-full object-contain max-h-[35vh] md:max-h-none"
                 loading="eager"
                 fetchpriority="high"
                 decoding="sync"
@@ -117,7 +116,7 @@ function ExploreModalContent({ post, modalId, isOpen }) {
               />
             </figure>
 
-            <div className="flex flex-col card-body h-full w-full md:w-1/2 overflow-auto hide-scrollbar mx-3">
+            <div className="flex flex-col card-body h-full w-full md:w-1/2 overflow-auto hide-scrollbar mx-3 pt-20 md:pt-0 pb-32 md:pb-10">
               <div className="flex flex-row first-letter:card-user h-10  items-center gap-2 m-2 justify-between">
                 <div className="flex justify-start items-center gap-2">
                   <div className="avatar">
@@ -264,62 +263,56 @@ function ExploreModalContent({ post, modalId, isOpen }) {
 
               {/* 只有當用戶登入時顯示這些元件 */}
               {userId !== 0 && userId !== null && (
-                <div className="my-5 h-auto">
-                  <div className="card-iconList text-h4 flex flex-row justify-between mb-5">
+                <div className="my-5 h-auto pb-32 md:pb-0">
+                  <div className="card-iconList text-h4 flex flex-row justify-between mb-3 md:mb-5">
                     <div className="card-iconListLeft flex flex-row gap-2">
                       {isLiked ? (
                         <FaHeart
-                          className="card-icon hover:text-neongreen"
+                          className="card-icon text-xl md:text-2xl hover:text-neongreen"
                           onClick={() => {
                             handleLikedClick(post);
                           }}
                         />
                       ) : (
                         <FaRegHeart
-                          className="card-icon hover:text-neongreen"
+                          className="card-icon text-xl md:text-2xl hover:text-neongreen"
                           onClick={() => {
                             handleLikedClick(post);
                           }}
                         />
                       )}
                       <FiMessageCircle
-                        className="card-icon hover:text-neongreen"
+                        className="card-icon text-xl md:text-2xl hover:text-neongreen"
                         onClick={() =>
                           textareaRef.current && textareaRef.current.focus()
                         }
                       />
                       <FiSend
-                        className="card-icon hover:text-neongreen"
+                        className="card-icon text-xl md:text-2xl hover:text-neongreen"
                         onClick={() => {
                           document.getElementById(shareModalId).showModal();
                         }}
-                      />
-                      <ShareModal
-                        post={post}
-                        key={post.post_id}
-                        postId={post.post_id}
-                        modalId={shareModalId}
                       />
                     </div>
                     <div className="card-iconListRight flex justify-end">
                       {isSaved ? (
                         <FaBookmark
-                          className="card-icon hover:text-neongreen"
+                          className="card-icon text-xl md:text-2xl hover:text-neongreen"
                           onClick={() => handleSavedClick(post)}
                         />
                       ) : (
                         <FaRegBookmark
-                          className="card-icon hover:text-neongreen"
+                          className="card-icon text-xl md:text-2xl hover:text-neongreen"
                           onClick={() => handleSavedClick(post)}
                         />
                       )}
                     </div>
                   </div>
 
-                  <div className="flex flex-row card-actions justify-center">
+                  <div className="flex flex-row card-actions justify-center gap-2">
                     <textarea
                       ref={textareaRef}
-                      className="textarea textarea-ghost w-full h-16 resize-none rounded-full mb-3"
+                      className="textarea textarea-ghost w-full h-10 md:h-16 resize-none rounded-full mb-0 text-xs md:text-sm"
                       placeholder="新增回覆"
                       value={newComment} // 綁定 textarea 的值到 state
                       onChange={handleCommentContentChange}
@@ -331,7 +324,7 @@ function ExploreModalContent({ post, modalId, isOpen }) {
                       }
                     />
                     <button
-                      className="btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 flex justify-center"
+                      className="btn btn-sm md:btn-md bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 flex justify-center text-xs md:text-sm"
                       onClick={() => {
                         handleCommentUpload(post, newComment);
                       }}

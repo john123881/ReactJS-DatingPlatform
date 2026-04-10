@@ -71,7 +71,7 @@ export default function Events({ onPageChange }) {
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             gap: '1.25rem',
           }}
         >

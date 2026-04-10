@@ -12,7 +12,7 @@ export default function BarRatingModal({ bar }) {
     <>
       <dialog
         id="bar-rating-modal"
-        className="modal modal-bottom sm:modal-middle text-white"
+        className="modal sm:modal-middle text-white"
       >
         <div
           className="modal-box h-[365px] border border-white space-y-8 flex flex-col justify-center"

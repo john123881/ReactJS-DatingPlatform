@@ -11,7 +11,7 @@ export default function PostCardMedium({ post }) {
 
   return (
     <>
-      <div className="flex aspect-square card w-[330px] h-[330px] overflow-hidden items-center justify-center border-grayBorder">
+      <div className="flex aspect-square card w-[330px] h-[330px] overflow-hidden items-center justify-center border-grayBorder mx-auto">
         <figure
           className="card-photo m-0"
           onClick={() => {
