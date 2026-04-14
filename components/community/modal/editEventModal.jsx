@@ -14,10 +14,7 @@ export default function EditEventModal({ event, modalId }) {
     previewUrl,
     setPreviewUrl,
     resetAndCloseModal,
-    handleFilePicker,
-    handleEventUpdate,
     handleFileChange,
-    fileInputRef,
     handleDateFocus,
     handleBlur,
     handleTimeFocus,
@@ -29,6 +26,9 @@ export default function EditEventModal({ event, modalId }) {
     uploadProgress,
     cancelUpload,
   } = usePostContext();
+
+  const fileInputRef = useRef(null);
+  const handleFilePicker = () => fileInputRef.current?.click();
 
   const editEventModalRef = useRef(null);
 
@@ -182,29 +182,6 @@ export default function EditEventModal({ event, modalId }) {
                   />
                 </label>
 
-                <label className="form-control w-full">
-                  <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動描述</span>
-                  <textarea
-                    name="description"
-                    placeholder="活動描述"
-                    value={localEventDetails.description}
-                    className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-neongreen transition-all text-white h-24 resize-none"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
-
-                <label className="form-control w-full">
-                   <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動地點</span>
-                  <input
-                    type="text"
-                    name="location"
-                    placeholder="活動地點"
-                    value={localEventDetails.location}
-                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
-                    onChange={handleEventContentChange}
-                  />
-                </label>
-
                 <div className="divider opacity-20 my-1">時間設定</div>
 
                 <div className="flex gap-4">
@@ -264,6 +241,29 @@ export default function EditEventModal({ event, modalId }) {
                     />
                   </label>
                 </div>
+
+                <label className="form-control w-full">
+                   <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動地點</span>
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="活動地點"
+                    value={localEventDetails.location}
+                    className="input input-bordered bg-white/5 border-white/10 rounded-full focus:border-neongreen transition-all text-white h-12"
+                    onChange={handleEventContentChange}
+                  />
+                </label>
+
+                <label className="form-control w-full">
+                  <span className="label-text text-white/50 mb-1 ml-4 text-xs font-bold uppercase tracking-wider">活動描述</span>
+                  <textarea
+                    name="description"
+                    placeholder="活動描述"
+                    value={localEventDetails.description}
+                    className="textarea textarea-bordered bg-white/5 border-white/10 rounded-2xl focus:border-neongreen transition-all text-white h-24 resize-none"
+                    onChange={handleEventContentChange}
+                  />
+                </label>
               </div>
 
               <div className="pt-6 mt-auto border-t border-white/10 flex flex-col items-end gap-4">
@@ -274,7 +274,10 @@ export default function EditEventModal({ event, modalId }) {
                   onClick={() => handleEventUpdate(event, localEventDetails, editEventModalRef)}
                   disabled={isUploading}
                 >
-                  {isUploading ? `更新中 ${uploadProgress}%` : '確認更新'}
+                  {isUploading ? (
+                    uploadProgress < 90 ? `更新同步中 ${uploadProgress}%` : 
+                    uploadProgress < 99 ? '雲端資料對接...' : '發布更新中...'
+                  ) : '確認更新'}
                 </button>
 
                 {/* 上傳進度條與取消按鈕 */}

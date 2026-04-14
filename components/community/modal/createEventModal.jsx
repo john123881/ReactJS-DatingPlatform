@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { FaPhotoVideo } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
@@ -14,7 +14,7 @@ export default function CreateEventModal() {
     setEventDetails,
     resetAndCloseModal,
     handleEventFileUpload,
-    handleFilePicker,
+    handleFileChange,
     handleDateFocus,
     handleBlur,
     handleTimeFocus,
@@ -24,12 +24,14 @@ export default function CreateEventModal() {
     setMinDate,
     minEndDate,
     setMinEndDate,
-    fileInputRef,
     createEventModalRef,
     isUploading,
     uploadProgress,
     cancelUpload,
   } = usePostContext();
+
+  const fileInputRef = useRef(null);
+  const handleFilePicker = () => fileInputRef.current?.click();
 
   const handleEventContentChange = (e) => {
     const { name, value } = e.target;
@@ -244,7 +246,10 @@ export default function CreateEventModal() {
                       onClick={handleEventFileUpload}
                       disabled={isUploading}
                     >
-                      {isUploading ? `建立中 ${uploadProgress}%` : '建立活動'}
+                      {isUploading ? (
+                        uploadProgress < 90 ? `圖片上傳中 ${uploadProgress}%` : 
+                        uploadProgress < 99 ? '同步至雲端...' : '發布活動中...'
+                      ) : '建立活動'}
                     </button>
 
                     {/* 上傳進度條與取消按鈕 */}

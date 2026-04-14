@@ -10,16 +10,17 @@ function EditModalContent({ post, modalId }) {
     previewUrl,
     setPreviewUrl,
     resetAndCloseModal,
-    handleFilePicker,
     handlePostUpdate,
     handleFileChange,
     postContent,
-    fileInputRef,
     handleKeyPress,
     isUploading,
     uploadProgress,
     cancelUpload,
   } = usePostContext();
+
+  const fileInputRef = useRef(null);
+  const handleFilePicker = () => fileInputRef.current?.click();
 
   const editModalRef = useRef(null);
 
@@ -159,7 +160,10 @@ function EditModalContent({ post, modalId }) {
                   onClick={() => handlePostUpdate(post, localPostContext, editModalRef)}
                   disabled={isUploading}
                 >
-                  {isUploading ? `上傳中 ${uploadProgress}%` : '確認修改'}
+                  {isUploading ? (
+                    uploadProgress < 90 ? `更新中 ${uploadProgress}%` : 
+                    uploadProgress < 99 ? '正在同步雲端...' : '正在儲存變更...'
+                  ) : '確認修改'}
                 </button>
               </div>
 

@@ -40,6 +40,7 @@ export default function PostCollectCard({ post, index, arrowHovered, onArrowHove
             fill
             sizes="(max-width: 640px) 100vw, 300px"
             onError={(e) => handleImageError(e, 'post')}
+            unoptimized={true}
           />
           <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
         </div>

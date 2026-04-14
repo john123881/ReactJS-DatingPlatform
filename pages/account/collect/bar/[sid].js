@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import CollectionView from '@/components/account-center/collection-view';
 import BarCollectCard from '@/components/account-center/collect-list/bar-collect-card';
 import { AccountService } from '@/services/account-service';
@@ -9,6 +9,7 @@ export default function AccountCollectBar({ onPageChange }) {
   const { bars, setBars, refreshCollectList } = useCollect();
   const [pages, setPages] = useState({ page: 1, totalPages: 1 });
   const [arrowHovered, setArrowHovered] = useState([]);
+  const interactingItems = useRef(new Set());
 
   // 資料抓取邏輯
   const fetchData = useCallback(async (sid, page) => {
@@ -29,11 +30,21 @@ export default function AccountCollectBar({ onPageChange }) {
 
   // 刪除處理
   const handleDelete = async (saveId) => {
-    const result = await AccountService.collectBar.delete(saveId);
-    if (result && result.action === 'remove') {
-      customToast.success('刪除收藏成功');
-      setBars((prev) => prev.filter((b) => b.save_id !== saveId));
-      refreshCollectList();
+    if (interactingItems.current.has(`delete-${saveId}`)) return;
+    interactingItems.current.add(`delete-${saveId}`);
+
+    try {
+      const result = await AccountService.collectBar.delete(saveId);
+      if (result && result.action === 'remove') {
+        customToast.success('刪除收藏成功');
+        setBars((prev) => prev.filter((b) => b.save_id !== saveId));
+        refreshCollectList();
+      }
+    } catch (error) {
+      console.error('Failed to delete bar:', error);
+      customToast.error('刪除失敗');
+    } finally {
+      interactingItems.current.delete(`delete-${saveId}`);
     }
   };
 

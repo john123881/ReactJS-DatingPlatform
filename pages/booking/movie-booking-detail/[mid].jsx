@@ -1,45 +1,31 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/auth-context';
 import { toast } from '@/lib/toast';
 import { useRouter } from 'next/router';
 import PageTitle from '@/components/page-title';
 import Image from 'next/image';
-import { API_BASE_URL } from '@/configs/api-config';
-
+import { FaBookmark, FaChevronDown, FaStar, FaPlay, FaCalendar, FaClock, FaArrowLeft, FaCheck } from 'react-icons/fa6';
 import { BookingService } from '@/services/booking-service';
 import YouTube from 'react-youtube';
 import { useCollect } from '@/context/use-collect';
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 
 export default function MovieDetail({ onPageChange }) {
-  const pageTitle = '電影探索';
+  const pageTitle = '電影詳情';
   const router = useRouter();
+  const { auth } = useAuth();
+  const { refreshCollectList, allCollectList, setAllCollectList } = useCollect();
+  const { mid } = router.query;
+
+  const [movie, setMovie] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const descriptionRef = useRef(null);
+  const interactingItems = useRef(new Set());
+
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
-
-  const { auth } = useAuth();
-  const { refreshCollectList } = useCollect();
-
-  const { mid } = router.query;
-
-  const [clickedButton, setClickedButton] = useState(null);
-
-  const [showFullDescription, setShowFullDescription] = useState(false); // 初始化电影描述显示状态為false
-
-  const [movie, setMovie] = useState([]);
-
-  const [hovered, setHovered] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const descriptionRef = useRef(null);
-
-  const scrollToDescription = () => {
-    if (descriptionRef.current) {
-      descriptionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   const checkMoviesStatus = useCallback(async (movieId) => {
     const userId = auth.id;
@@ -56,24 +42,28 @@ export default function MovieDetail({ onPageChange }) {
   }, [auth.id]);
 
   const getMovieDetail = useCallback(async (mid) => {
+    setIsLoading(true);
     try {
-      // 使用 BookingService
       const data = await BookingService.getMovieDetail(mid);
-      setMovie(data);
-      if (auth.id !== 0) {
-        checkMoviesStatus(mid);
+      if (data && data.length > 0) {
+        setMovie(data[0]);
+        if (auth.id !== 0) {
+          checkMoviesStatus(mid);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch movie detail', error);
+      toast.error('載入電影詳情失敗');
+    } finally {
+      setIsLoading(false);
     }
   }, [auth.id, checkMoviesStatus]);
 
   useEffect(() => {
-    const { mid } = router.query;
     if (mid) {
       getMovieDetail(mid);
     }
-  }, [router.query?.mid, getMovieDetail]);
+  }, [mid, getMovieDetail]);
 
   const handleSavedClick = async () => {
     if (auth.id === 0) {
@@ -83,39 +73,63 @@ export default function MovieDetail({ onPageChange }) {
     const movieId = mid;
     const userId = auth.id;
 
-    // 樂觀更新 (Optimistic Update)
-    const wasSaved = isSaved;
-    const newSavedState = !wasSaved;
+    if (interactingItems.current.has(`save-${movieId}`)) return;
+    interactingItems.current.add(`save-${movieId}`);
+
+    const wasSavedBeforeAction = isSaved;
+    const newSavedState = !wasSavedBeforeAction;
+
+    // 1. 樂觀更新頁面按鈕
     setIsSaved(newSavedState);
     toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
+
+    // 2. 樂觀更新全域收藏清單 (Sidebar)
+    if (newSavedState) {
+        const newItem = {
+          saved_id: Date.now(),
+          item_id: movieId,
+          title: movie.title,
+          img: movie.movie_img_url || movie.movie_img,
+          item_type: 'movie',
+          movie_rating: movie.movie_rating,
+          content: '', // 補上 content 避免傳入 undefined
+          created_at: new Date().toISOString(),
+          subtitle: movie.booking_movie_type?.movie_type,
+        };
+      setAllCollectList((prev) => [newItem, ...prev]);
+    } else {
+      setAllCollectList((prev) =>
+        prev.filter(
+          (item) => !(item.item_id == movieId && item.item_type === 'movie'),
+        ),
+      );
+    }
+
     try {
-      const result = wasSaved
+      const result = wasSavedBeforeAction
         ? await BookingService.unsaveMovie(userId, movieId)
         : await BookingService.saveMovie(userId, movieId);
 
-      if (
-        !result.success &&
-        !result.output?.success &&
-        !result.msg?.includes('成功') &&
-        !result.message?.includes('成功')
-      ) {
-        throw new Error(result.message || result.msg || '操作失敗');
+      if (result.success || result?.output?.success) {
+        // 3. 觸發背景刷新以維持最終一致性
+        refreshCollectList();
+      } else {
+        throw new Error('操作失敗');
       }
-      // 成功後刷新全局收藏列表
-      refreshCollectList();
     } catch (error) {
-      // 發生錯誤時還原狀態
-      setIsSaved(wasSaved);
-      console.error('Error updating save status:', error);
-      toast.error('操作失敗!', error.message);
+      // 失敗時還原所有狀態
+      setIsSaved(wasSavedBeforeAction);
+      setAllCollectList((prev) =>
+        wasSavedBeforeAction
+          ? [...prev] // 這裡較難精確還原，但 refresh 會在成功時處理
+          : prev.filter((item) => item.item_id != movieId),
+      );
+      toast.error('操作失敗，請稍後再試');
+    } finally {
+      interactingItems.current.delete(`save-${movieId}`);
     }
   };
 
-  // const BookingConfirmModal = dynamic(
-  //   () => import('@/components/bar/modal/booking-confirm-modal'),
-  //   { ssr: false }
-  // );
-  // 取得電影圖片路徑的輔助函式
   const getMovieImgSrc = (src) => {
     if (!src || src === '/unavailable-image.jpg') return '/unavailable-image.jpg';
     if (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/')) {
@@ -124,269 +138,189 @@ export default function MovieDetail({ onPageChange }) {
     return `/movie_img/${src}`;
   };
 
+  if (isLoading && !movie) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-neongreen"></div>
+      </div>
+    );
+  }
+
+  if (!movie) return null;
+
   return (
     <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="flex justify-center">
-        <div style={{ width: '100%' }}>
-          <div style={{ position: 'relative', marginBottom: '1rem' }}>
-            {/* 電影影片播放 */}
-            <div className="card bg-transparent shadow-xl">
-              {/* <video controls className="w-full" style={{ maxHeight: '493px' }}>
-                <source
-                  src="https://www.example.com/video.mp4"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video> */}
-            </div>
+      <PageTitle pageTitle={`${movie.title} - Taipei Date`} />
+      
+      <div className="relative min-h-screen bg-[#050505] text-white overflow-x-hidden font-inter pb-32">
+        {/* 1. 沉浸式背景 (Blurred Backdrop) */}
+        <div className="fixed inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-[#050505] z-10"></div>
+          <Image
+            src={getMovieImgSrc(movie.poster_img)}
+            alt="background blur"
+            fill
+            className="object-cover opacity-30 blur-3xl scale-110"
+          />
+        </div>
 
-            {/* 返回按鈕 */}
-            <div className="absolute top-4 left-4 lg:top-8 lg:left-8 z-20">
-              <button 
-                onClick={() => router.push('/booking')}
-                className="btn btn-circle btn-outline border-neongreen text-neongreen hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300 bg-black/20 backdrop-blur-sm"
-              >
-                ❮
-              </button>
-            </div>
+        {/* 2. 導覽列 (Header) */}
+        <header className="relative z-50 flex items-center justify-between p-6 lg:px-12 max-w-[1440px] mx-auto pt-32 lg:pt-40">
+          <button 
+            onClick={() => router.back()}
+            className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 hover:border-neongreen/50 transition-all"
+          >
+            <FaArrowLeft className="w-5 h-5 text-neongreen group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium tracking-wide">返回</span>
+          </button>
+        </header>
 
-            {/* 電影資訊 */}
-            <div className="card lg:card-side bg-transparent shadow-xl p-6 lg:p-20 mx-4 mt-6 lg:mt-11">
-              <figure className="lg:flex-shrink-0 flex justify-center">
+        {/* 3. 主要內容區 (Main Content) */}
+        <main className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12 pt-4">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+            
+            {/* 左側：海報 (Poster Card) */}
+            <div className="w-full lg:w-[400px] flex-shrink-0 flex justify-center lg:block">
+              <div className="relative w-[280px] lg:w-full aspect-[2/3] group">
+                <div className="absolute inset-0 bg-neongreen/20 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity rounded-3xl"></div>
                 <Image
-                  className="w-full max-w-[300px] h-auto lg:w-[300px] lg:h-[480px] object-cover rounded-xl mx-auto"
-                  src={getMovieImgSrc(movie[0]?.poster_img)}
-                  onError={(e) => {
-                    e.target.src = '/unavailable-image.jpg';
-                  }}
-                  alt="電影海報"
-                  width={300}
-                  height={480}
+                  src={getMovieImgSrc(movie.poster_img)}
+                  alt={movie.title}
+                  fill
+                  className="rounded-3xl object-cover shadow-2xl border border-white/10 relative z-10"
                   priority
                 />
-              </figure>
-              <div className="card-body">
-                <h2
-                  className="card-title pt-2 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:pb-0 text-2xl lg:text-4xl font-bold gap-4"
-                >
-                  {movie[0]?.title}
-                  <button
-                    className={`btn btn-outline btn-accent w-[130px] lg:mx-24 mt-2`}
-                    style={{
-                      height: '0.5rem',
-                      borderColor: '#A0FF1F',
-                      color: isSaved ? 'white' : 'black',
-                      backgroundColor: isSaved ? 'transparent' : '#A0FF1F',
-                    }}
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
-                    onClick={handleSavedClick}
-                  >
-                    {/* 愛心圖標 */}
-                    <FontAwesomeIcon
-                      icon={isSaved ? faHeart : farHeart}
-                      className="heart-icon  lg:w-[16px] h-[16px]"
-                      style={{
-                        color: isSaved ? 'red' : 'gray',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    {isSaved ? '已收藏' : '加入收藏'}
-                  </button>
-                </h2>
-                <div className="review flex ">
-                  <span>5.0</span>
-                  <div className="bar-detail-stars flex gap-1.5 rating rating-sm mx-2 mt-1">
-                    <input
-                      type="radio"
-                      name="rating-6"
-                      className="mask mask-star-2 bg-[#A0FF1F]"
-                      readOnly
-                    />
-                    <input
-                      type="radio"
-                      name="rating-6"
-                      className="mask mask-star-2 bg-[#A0FF1F]"
-                      readOnly
-                    />
-                    <input
-                      type="radio"
-                      name="rating-6"
-                      className="mask mask-star-2 bg-[#A0FF1F]"
-                      readOnly
-                    />
-                    <input
-                      type="radio"
-                      name="rating-6"
-                      className="mask mask-star-2 bg-[#A0FF1F]"
-                      readOnly
-                    />
-                    <input
-                      type="radio"
-                      name="rating-6"
-                      className="mask mask-star-2 bg-[#A0FF1F]"
-                      checked
-                      readOnly
-                    />
-                  </div>
-                </div>
-                <p
-                  ref={descriptionRef}
-                  style={{
-                    maxHeight: showFullDescription ? 'none' : '3em',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {movie[0]?.movie_description}
-                </p>
-                {!showFullDescription && (
-                  <div className="mt-2">
-                    <button
-                      onClick={() => {
-                        setShowFullDescription(true);
-                        scrollToDescription();
-                      }}
-                    >
-                      More
-                    </button>{' '}
-                    {/* 点击按钮显示更多描述并滚动到描述位置 */}
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* 電影時刻/電影介紹 */}
-            <div className="flex justify-center w-full px-4 lg:px-12 mt-6">
-              {/* 在这里添加 mb-8 来增加上下间距 */}
-              <div className="w-full">
-                <div role="tablist" className="tabs tabs-bordered pt-8 pb-8">
-                  <input
-                    type="radio"
-                    name="my_tabs_1"
-                    role="tab"
-                    className="tab"
-                    aria-label="電影時刻"
-                    style={{ width: '130px' }}
-                    readOnly
-                  />
-                  <div role="tabpanel" className="tab-content p-10">
-                    <form className="space-y-4">
-                      <div className="text-[15px] lg:text-[20px] text-white">
-                        選擇電影時段
-                      </div>
-                      <div>
-                        <label className="text-[15px] lg:text-[18px] text-white">
-                          全票
-                        </label>
-                        <br />
-                        <select 
-                          className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2"
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            選擇張數
-                          </option>
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                          <option>6</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-[15px] lg:text-[18px] text-white">
-                          電影日期
-                        </label>
-                        <br />
-                        <input
-                          type="date"
-                          className="input input-bordered input-sm w-full max-w-xs mt-2"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[15px] lg:text-[18px] text-white">
-                          電影時刻
-                        </label>
-                        <br />
-                        <select 
-                          className="select select-bordered select-sm w-full max-w-xs text-[15px] lg:text-[18px] mt-2"
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            選擇時刻
-                          </option>
-                          <option>14:30 </option>
-                          <option>16:50</option>
-                          <option>17:30</option>
-                          <option>18:30</option>
-                          <option>23:10</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-white">其他備註</label>
-                        <br />
-                        <textarea
-                          className="textarea textarea-bordered h-24 textarea-sm w-full max-w-xs"
-                          placeholder=""
-                        ></textarea>
-                      </div>
-                      <div
-                        type="submit"
-                        className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
-                        onClick={() => {
-                          router.push('/under-construction');
-                        }}
-                      >
-                        <span className="text-h6 text-black">確認訂票</span>
-                      </div>
-                    </form>
-
-                    <br></br>
-                    <br></br>
-                    <br></br>
-                  </div>
-
-                  <input
-                    type="radio"
-                    name="my_tabs_1"
-                    role="tab"
-                    className="tab"
-                    aria-label="電影介紹"
-                    checked
-                    readOnly
-                    style={{ width: '130px' }}
-                  />
-                  <div role="tabpanel" className="tab-content p-10 mt-4 mx-2">
-                    <div className="card bg-transparent shadow-xl">
-                      {movie[0]?.youtube_id ? (
-                        <div className="w-full aspect-video overflow-hidden rounded-xl bg-black">
-                          <YouTube
-                            videoId={movie[0]?.youtube_id}
-                            opts={{
-                              width: '100%',
-                              height: '100%',
-                              playerVars: {
-                                autoplay: 0,
-                              }
-                            }}
-                            className="w-full h-full"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-[300px] bg-slate-800 text-gray-400 rounded-xl">
-                          暫無預告片影片
-                        </div>
-                      )}
-                    </div>
-                  </div>
+            {/* 右側：詳細資訊 (Info & CTA) */}
+            <div className="flex-1 flex flex-col pt-4">
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
+                <span className="px-3 py-1 rounded-full bg-neongreen/10 border border-neongreen/30 text-neongreen text-xs font-bold tracking-widest uppercase">
+                  {movie.movie_type_name || 'Drama'}
+                </span>
+                <div className="flex items-center gap-1 text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1 rounded-full">
+                  <FaStar className="w-4 h-4 text-yellow-500" />
+                  <span className="text-sm font-black">{movie.movie_rating || '5.0'}</span>
                 </div>
+                
+                {/* 收藏按鈕搬家到這裡 (Bookmark relocated here) */}
+                <button 
+                  onClick={handleSavedClick}
+                  className={`ml-auto lg:ml-4 flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border transition-all duration-300 ${
+                    isSaved 
+                      ? 'bg-neongreen/20 border-neongreen text-neongreen shadow-[0_0_15px_rgba(160,255,31,0.2)]' 
+                      : 'bg-white/5 border-white/10 text-white hover:border-neongreen/50'
+                  }`}
+                >
+                  <FaBookmark className={`w-4 h-4 ${isSaved ? 'text-neongreen' : ''}`} />
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    {isSaved ? '已收藏' : '加入收藏'}
+                  </span>
+                </button>
+              </div>
+
+              <h1 className="text-4xl lg:text-7xl font-black mb-8 leading-tight tracking-tight">
+                {movie.title}
+              </h1>
+
+              {/* Stats Bar */}
+              <div className="flex flex-wrap gap-8 text-white/60 mb-10 pb-10 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <FaCalendar className="w-5 h-5 text-neongreen" />
+                  <span className="font-medium text-lg">2024</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaClock className="w-5 h-5 text-neongreen" />
+                  <span className="font-medium text-lg">141 min</span>
+                </div>
+              </div>
+
+              {/* Description Section with MORE */}
+              <div className="mb-12">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-neongreen rounded-full"></span>
+                  電影介紹
+                </h3>
+                <div className="relative">
+                  <div 
+                    ref={descriptionRef}
+                    className={`text-white/70 leading-relaxed text-lg transition-all duration-500 overflow-hidden ${
+                      isExpanded ? 'max-h-[2000px]' : 'max-h-[100px]'
+                    }`}
+                  >
+                    {movie.movie_description}
+                    {!isExpanded && (
+                      <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#050505] to-transparent"></div>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="mt-4 flex items-center gap-2 text-neongreen hover:text-white transition-colors group"
+                  >
+                    <span className="text-sm font-bold tracking-wider uppercase">
+                      {isExpanded ? '收起詳情' : '查看更多'}
+                    </span>
+                    <FaChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'animate-bounce'}`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons (Desktop Hidden, shown below for Desktop) */}
+              <div className="hidden lg:flex gap-6 mt-4">
+                <button 
+                  onClick={() => router.push('/under-construction')}
+                  className="px-12 py-5 rounded-2xl bg-neongreen text-black font-black text-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(160,255,31,0.3)] hover:shadow-[0_0_50px_rgba(160,255,31,0.5)]"
+                >
+                  立即訂票
+                </button>
               </div>
             </div>
           </div>
+
+          {/* 4. 預告片區 (Trailer Section) */}
+          <section className="mt-20 lg:mt-32 pb-20">
+            <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
+              <span className="p-2 rounded-lg bg-neongreen/20">
+                <FaPlay className="w-6 h-6 text-neongreen" />
+              </span>
+              預告片預覽
+            </h3>
+            <div className="glass-card-neon rounded-[40px] overflow-hidden border border-white/5 bg-white/2 p-4 lg:p-8">
+              {movie.youtube_id ? (
+                <div className="w-full aspect-video rounded-3xl overflow-hidden bg-black shadow-inner">
+                  <YouTube
+                    videoId={movie.youtube_id}
+                    opts={{
+                      width: '100%',
+                      height: '100%',
+                      playerVars: {
+                        autoplay: 0,
+                        modestbranding: 1,
+                        rel: 0,
+                      }
+                    }}
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full aspect-video bg-white/5 rounded-3xl text-white/20">
+                  <FaPlay className="w-20 h-20 mb-4 opacity-10" />
+                  <p className="text-xl font-bold">暫無預告片影片</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </main>
+
+        {/* 5. 行動端底部按鈕 (Mobile Sticky CTA) */}
+        <div className="lg:hidden fixed bottom-0 left-0 w-full p-6 z-[60] bg-gradient-to-t from-black via-black/90 to-transparent">
+          <button 
+            onClick={() => router.push('/under-construction')}
+            className="w-full py-5 rounded-2xl bg-neongreen text-black font-black text-xl shadow-[0_0_30px_rgba(160,255,31,0.4)] active:scale-95 transition-all"
+          >
+            立即訂票
+          </button>
         </div>
       </div>
     </>

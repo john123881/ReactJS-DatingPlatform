@@ -1,0 +1,16 @@
+.responsiveGrid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important; /* 手機版置中 */
+  gap: 1.25rem !important;
+  overflow: hidden !important;
+  max-width: 1030px !important;
+  margin: 0 auto !important;
+}
+
+/* 當寬度足以容納 3 欄時，切換為左對齊 */
+@media (min-width: 1030px) {
+  .responsiveGrid {
+    justify-content: flex-start !important;
+  }
+}

@@ -11,19 +11,17 @@ export const BarProvider = ({ children }) => {
   const { auth, getAuthHeader } = useAuth();
   const [savedBars, setSavedBars] = useState({});
 
-  //收藏酒吧
-  // const isSaved = !!savedBars[bar.bar_id];
+  const interactingItems = useRef(new Set());
 
-  const handleSavedClick = async () => {
-    if (auth.id == 0) return;
+  const handleSavedClick = async (bar) => {
+    if (auth.id == 0 || !bar?.bar_id) return;
     const barId = bar.bar_id;
-    const userId = auth.id; // Ensure user is defined and has an id
+    const userId = auth.id;
 
-    if (!userId) {
-      console.error('User ID is undefined or not set');
-      return;
-    }
+    if (interactingItems.current.has(`save-${barId}`)) return;
+    interactingItems.current.add(`save-${barId}`);
 
+    const isSaved = !!savedBars[barId];
     const wasSaved = isSaved;
     const newSavedState = !wasSaved;
 
@@ -43,7 +41,8 @@ export const BarProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error updating save status:', error);
-      setError(error.message);
+    } finally {
+      interactingItems.current.delete(`save-${barId}`);
     }
   };
 

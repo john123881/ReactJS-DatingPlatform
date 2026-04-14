@@ -68,14 +68,22 @@ export const AccountService = {
     apiClient(`${ACCOUNT_RECORD_GAME}/${sid}${query}`),
 
   getCollectList: (sid) =>
-    apiClient(sid ? `/account/collect-list/${sid}` : '/account/collect-list'),
+    apiClient(
+      sid
+        ? `/account/collect-list/${sid}?t=${Date.now()}`
+        : `/account/collect-list?t=${Date.now()}`,
+    ),
 
   /**
    * 收藏管理 - POST
    */
   collectPost: {
     get: (sid, query = '') =>
-      apiClient(`${ACCOUNT_COLLECT_POST}/${sid}${query}`),
+      apiClient(
+        `${ACCOUNT_COLLECT_POST}/${sid}${query}${
+          query.includes('?') ? '&' : '?'
+        }t=${Date.now()}`,
+      ),
     delete: (saveId) => apiClient.delete(`${ACCOUNT_COLLECT_POST_DELETE}/${saveId}`),
   },
 
@@ -83,7 +91,12 @@ export const AccountService = {
    * 收藏管理 - BAR
    */
   collectBar: {
-    get: (sid, query = '') => apiClient(`${ACCOUNT_COLLECT_BAR}/${sid}${query}`),
+    get: (sid, query = '') =>
+      apiClient(
+        `${ACCOUNT_COLLECT_BAR}/${sid}${query}${
+          query.includes('?') ? '&' : '?'
+        }t=${Date.now()}`,
+      ),
     delete: (saveId) => apiClient.delete(`${ACCOUNT_COLLECT_BAR_DELETE}/${saveId}`),
   },
 
@@ -92,7 +105,11 @@ export const AccountService = {
    */
   collectMovie: {
     get: (sid, query = '') =>
-      apiClient(`${ACCOUNT_COLLECT_MOVIE}/${sid}${query}`),
+      apiClient(
+        `${ACCOUNT_COLLECT_MOVIE}/${sid}${query}${
+          query.includes('?') ? '&' : '?'
+        }t=${Date.now()}`,
+      ),
     delete: (saveId) =>
       apiClient.delete(`${ACCOUNT_COLLECT_MOVIE_DELETE}/${saveId}`),
   },

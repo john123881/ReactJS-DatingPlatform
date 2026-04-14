@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, useRef } from 'react';
 import { BarService } from '@/services/bar-service';
 import { IoMdStar } from 'react-icons/io';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
@@ -11,11 +11,7 @@ import { useCollect } from '@/context/use-collect';
 
 const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
   // save bar
-  // const [savedBars, setSavedBars] = useState({});
-  const [error, setError] = useState('');
-  const { auth, getAuthHeader, rerender, setRerender, setLoginModalToggle } = useAuth();
-  const { refreshCollectList } = useCollect();
-  const isSaved = savedBars && savedBars[bar.bar_id];
+  const interactingItems = useRef(new Set());
 
   const handleSavedClick = async () => {
     if (auth.id === 0) {
@@ -25,17 +21,44 @@ const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
     const barId = bar.bar_id;
     const userId = auth.id;
 
+    if (interactingItems.current.has(`save-${barId}`)) return;
+    interactingItems.current.add(`save-${barId}`);
+
     if (!userId) {
       console.error('User ID is undefined or not set');
+      interactingItems.current.delete(`save-${barId}`);
       return;
     }
 
     const wasSaved = isSaved || false;
     const newSavedState = !wasSaved;
 
-    // 樂觀更新 UI
+    // 樂觀更新 UI (單個卡片)
     setSavedBars((prev) => ({ ...prev, [barId]: newSavedState }));
     toast.success(newSavedState ? '收藏成功!' : '已取消收藏!');
+
+    // 樂觀更新全域收藏清單 (Sidebar)
+    if (newSavedState) {
+      const newItem = {
+        saved_id: Date.now(),
+        item_id: barId,
+        title: bar.bar_name,
+        img:
+          bar?.bar_img_url ||
+          (bar?.bar_pic_name ? `/barPic/${bar.bar_pic_name}` : ''),
+        item_type: 'bar',
+        content: '', // 補上 content 避免傳入 undefined
+        created_at: new Date().toISOString(),
+        subtitle: bar.bar_area_name,
+      };
+      setAllCollectList((prev) => [newItem, ...prev]);
+    } else {
+      setAllCollectList((prev) =>
+        prev.filter(
+          (item) => !(item.item_id == barId && item.item_type === 'bar'),
+        ),
+      );
+    }
 
     try {
       if (wasSaved) {
@@ -43,16 +66,23 @@ const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
       } else {
         await BarService.saveBar(userId, barId);
       }
-      
+
       // 觸發全域重新渲染
-      setRerender(!rerender); 
-      // 觸發 Navbar 重新獲取收藏清單
+      setRerender(!rerender);
+      // 觸發 Navbar 重新獲取收藏清單 (背景同步)
       refreshCollectList();
     } catch (error) {
       console.error('Error updating save status:', error);
-      // 發生錯誤時還原 UI 狀態
+      // 發生錯誤時還原所有狀態
       setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
+      setAllCollectList((prev) =>
+        wasSaved
+          ? [...prev]
+          : prev.filter((item) => item.item_id != barId),
+      );
       toast.error('操作失敗，請稍後再試');
+    } finally {
+      interactingItems.current.delete(`save-${barId}`);
     }
   };
 

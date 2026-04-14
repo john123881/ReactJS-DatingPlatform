@@ -6,11 +6,13 @@ import { useAuth } from '@/context/auth-context';
 import { BarService } from '@/services/bar-service';
 import { useCollect } from '@/context/use-collect';
 import { toast } from '@/lib/toast';
+import { useRef } from 'react';
 
 export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
   const { auth, setLoginModalToggle } = useAuth();
   const { refreshCollectList } = useCollect();
   const isSaved = savedBars && savedBars[randomBar.bar_id];
+  const interactingItems = useRef(new Set());
 
   const handleSavedClick = async (e) => {
     e.preventDefault();
@@ -20,6 +22,9 @@ export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
     }
     const barId = randomBar.bar_id;
     const userId = auth.id;
+
+    if (interactingItems.current.has(`save-${barId}`)) return;
+    interactingItems.current.add(`save-${barId}`);
 
     const wasSaved = isSaved || false;
     const newSavedState = !wasSaved;
@@ -40,6 +45,8 @@ export default function BarCardIndex({ randomBar, savedBars, setSavedBars }) {
       console.error('Error updating save status:', error);
       setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
       toast.error('操作失敗，請稍後再試');
+    } finally {
+      interactingItems.current.delete(`save-${barId}`);
     }
   };
 

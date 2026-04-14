@@ -83,11 +83,11 @@ function ExploreModalContent({ post, modalId, isOpen }) {
       <div
         id={modalId}
         ref={exploreModalRef}
-        className={`modal flex transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
-        style={{ zIndex: 99999 }}
+        className={`modal fixed inset-0 w-screen h-screen flex items-end md:items-center justify-center transition-all duration-300 ${isOpen ? 'modal-open pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        style={{ zIndex: 1000 }}
       >
         <div
-          className="modal-box w-full md:max-w-[1200px] md:max-h-[85vh] h-full h-screen max-h-none md:max-h-[85vh] rounded-none md:rounded-2xl bg-[#0A0A0A] border-none md:border md:border-white/10 overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform m-0"
+          className="modal-box w-full md:max-w-[1200px] h-[92vh] md:h-[85vh] max-h-none md:max-h-[85vh] rounded-t-3xl md:rounded-2xl bg-[#0A0A0A] border-none md:border md:border-white/10 overflow-hidden p-0 flex flex-col md:flex-row relative will-change-transform m-0"
         >
           <button
             onClick={() => {
@@ -190,7 +190,7 @@ function ExploreModalContent({ post, modalId, isOpen }) {
               </div>
 
               {/* comment list */}
-              {comments[post.post_id] &&
+              {comments[post.post_id] && comments[post.post_id].length > 0 ? (
                 comments[post.post_id].map((comment, index) => (
                   <div
                     key={index}
@@ -236,7 +236,7 @@ function ExploreModalContent({ post, modalId, isOpen }) {
                               </div>
                               <ul
                                 tabIndex={0}
-                                className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box w-32"
+                                className="dropdown-content z-[110] menu p-2 shadow bg-base-100 rounded-box w-32"
                                 style={{
                                   backgroundColor: 'rgba(0, 0, 0, 0.85)',
                                 }}
@@ -259,7 +259,13 @@ function ExploreModalContent({ post, modalId, isOpen }) {
                       </div>
                     </div>
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 opacity-30 text-center">
+                  <FiMessageCircle className="text-4xl mb-4" />
+                  <p className="text-sm">尚無回覆<br/>成為第一個留言的人吧！</p>
+                </div>
+              )}
 
               {/* 只有當用戶登入時顯示這些元件 */}
               {userId !== 0 && userId !== null && (

@@ -19,7 +19,7 @@ const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
   const { auth, getAuthHeader, rerender, setRerender } = useAuth();
-  const { refreshCollectList } = useCollect();
+  const { refreshCollectList, setAllCollectList } = useCollect();
 
   const [posts, setPosts] = useState([]);
   const [profilePosts, setProfilePosts] = useState([]);
@@ -104,7 +104,6 @@ export const PostProvider = ({ children }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const fileInputRef = useRef(null);
   const createModalRef = useRef(null);
   const createModalMobileRef = useRef(null);
   const createEventModalRef = useRef(null);
@@ -722,12 +721,6 @@ export const PostProvider = ({ children }) => {
     setIsFilterActive(true);
   };
 
-  // 觸發隱藏的 file input 點擊事件
-  const handleFilePicker = () => {
-    // 利用 ref 引用來觸發 input 的點擊事件
-    fileInputRef.current?.click();
-  };
-
   // 重置貼文狀態
   const resetPostState = () => {
     setPostId('');
@@ -765,10 +758,14 @@ export const PostProvider = ({ children }) => {
         setPostCreated(true);
         return data.post_id; // 返回 postId 給 handleFileUpload
       } else {
-        throw new Error(data.message || '新增貼文失敗');
+        // 優先提取具體的驗證錯誤訊息 (從 error 陣列)
+        const specificError = data.error?.[0]?.message || data.message || '新增貼文失敗';
+        throw new Error(specificError);
       }
     } catch (error) {
-      customToast.error('分享失敗!');
+      console.error('Post upload error:', error);
+      customToast.error(error.message || '分享失敗!');
+      throw error; // 拋出錯誤讓 handleFileUpload 也能捕獲
     }
   };
 
@@ -829,7 +826,7 @@ export const PostProvider = ({ children }) => {
       createModalRef.current.close();
       createModalMobileRef.current.close();
 
-      customToast.error('分享失敗!');
+      customToast.error(error.message || '分享失敗!');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -1388,11 +1385,37 @@ export const PostProvider = ({ children }) => {
       // 樂觀更新
       setSavedPosts((prev) => ({ ...prev, [postId]: newSavedState }));
 
+      // 樂觀更新全域收藏清單 (Sidebar)
+      if (newSavedState) {
+        // 嘗試找到該貼文資料以提供標題與圖片
+        const postData =
+          posts.find((p) => p.post_id == postId) ||
+          filteredPosts.find((p) => p.post_id == postId) ||
+          profilePosts.find((p) => p.post_id == postId);
+
+        const newItem = {
+          saved_id: Date.now(),
+          item_id: postId,
+          title: postData?.post_context?.slice(0, 20) || '社群貼文',
+          img: postData?.photo_name || '',
+          item_type: 'post',
+          content: postData?.post_context || '', // 貼文則帶入內容
+          created_at: new Date().toISOString(),
+          subtitle: postData?.user_name || '使用者',
+        };
+        setAllCollectList((prev) => [newItem, ...prev]);
+      } else {
+        setAllCollectList((prev) =>
+          prev.filter(
+            (item) => !(item.item_id == postId && item.item_type === 'post'),
+          ),
+        );
+      }
+
       try {
         const result = prevSavedState
           ? await CommunityService.unsavePost(userId, postId)
           : await CommunityService.savePost(userId, postId);
-
 
         if (
           result.success ||
@@ -1411,6 +1434,11 @@ export const PostProvider = ({ children }) => {
         console.error('Error updating save status, reverting:', error);
         // 還原
         setSavedPosts((prev) => ({ ...prev, [postId]: prevSavedState }));
+        setAllCollectList((prev) =>
+          prevSavedState
+            ? [...prev]
+            : prev.filter((item) => item.item_id != postId),
+        );
       } finally {
         interactingItems.current.delete(`save-${postId}`);
       }
@@ -1530,17 +1558,24 @@ export const PostProvider = ({ children }) => {
           } catch (error) {
             console.error('Error delete post status:', error);
             customToast.error('刪除失敗!');
+          } finally {
+            interactingItems.current.delete(`delete-post-${postId}`);
           }
+        } else {
+          interactingItems.current.delete(`delete-post-${postId}`);
         }
       });
     },
-    [getAuthHeader],
+    [getAuthHeader, router, setPosts, setProfilePosts, setFilteredPosts, setRandomPosts, setPostPage, setPostsCount, setReload, setPostModalToggle],
   );
 
-  const handleDeleteEventClick = async (event, modalId) => {
+  const handleDeleteEventClick = useCallback(async (event, modalId) => {
     const eventId = event.comm_event_id;
 
     if (!eventId) return;
+
+    if (interactingItems.current.has(`delete-event-${eventId}`)) return;
+    interactingItems.current.add(`delete-event-${eventId}`);
 
     Swal.fire({
       title: '確定要刪除活動嗎？',
@@ -1593,18 +1628,25 @@ export const PostProvider = ({ children }) => {
             customToast.error('刪除失敗!');
           }
         } catch (error) {
-          console.error('Error delete post status:', error);
+          console.error('Error delete event status:', error);
           customToast.error('刪除失敗!');
+        } finally {
+          interactingItems.current.delete(`delete-event-${eventId}`);
         }
+      } else {
+        interactingItems.current.delete(`delete-event-${eventId}`);
       }
     });
-  };
+  }, [router, setEvents, setProfileEvents, setEventsCount]);
 
   const handleDeleteCommentClick = useCallback(
     async (comment, modalId) => {
       const commentId = comment.comm_comment_id;
 
       if (!commentId) return;
+
+      if (interactingItems.current.has(`delete-comment-${commentId}`)) return;
+      interactingItems.current.add(`delete-comment-${commentId}`);
 
       const result = await Swal.fire({
         title: '確定要刪除回覆嗎？',
@@ -1722,13 +1764,13 @@ export const PostProvider = ({ children }) => {
         setEventCreated(true);
         return data.comm_event_id;
       } else {
-        throw new Error(data.message || '新增活動失敗');
+        const specificError = data.error?.[0]?.message || data.message || '新增活動失敗';
+        throw new Error(specificError);
       }
     } catch (error) {
       console.error('upload event failed:', error);
-      createEventModalRef.current.close();
-      createEventModalMobileRef.current.close();
-      customToast.error('創建活動失敗!');
+      customToast.error(error.message || '創建活動失敗!');
+      throw error;
     }
   };
 
@@ -1790,7 +1832,7 @@ export const PostProvider = ({ children }) => {
       console.error('upload failed:', error);
       createEventModalRef.current.close();
       createEventModalMobileRef.current.close();
-      customToast.error('創建活動失敗!');
+      customToast.error(error.message || '創建活動失敗!');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -1914,7 +1956,6 @@ export const PostProvider = ({ children }) => {
       previewUrl,
       setPreviewUrl,
       resetAndCloseModal,
-      handleFilePicker,
       handleLikedClick,
       handleSavedClick,
       handleAttendedClick,
@@ -1960,7 +2001,6 @@ export const PostProvider = ({ children }) => {
       isUploading,
       uploadProgress,
       cancelUpload,
-      fileInputRef,
       createModalRef,
       createModalMobileRef,
       createEventModalRef,
@@ -2052,7 +2092,6 @@ export const PostProvider = ({ children }) => {
       following,
       handleEventUpload,
       handleEventFileUpload,
-      postModalToggle,
       isFilterActive,
       activeFilterButton,
       isHoverActive,

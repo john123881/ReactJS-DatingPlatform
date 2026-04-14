@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { FaPhotoVideo, FaRegTimesCircle } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
@@ -13,17 +13,19 @@ export default function CreateModal() {
     postContent,
     setPostContent,
     resetAndCloseModal,
-    handleFilePicker,
     handleFileUpload,
+    handleFileChange,
     onDrop,
     handleKeyPress,
     setIsHoverActive,
-    fileInputRef,
     createModalRef,
     isUploading,
     uploadProgress,
     cancelUpload,
   } = usePostContext();
+
+  const fileInputRef = useRef(null);
+  const handleFilePicker = () => fileInputRef.current?.click();
 
   const handlePostContentChange = (e) => {
     setPostContent(e.target.value);
@@ -160,7 +162,10 @@ export default function CreateModal() {
                       onClick={handleFileUpload}
                       disabled={isUploading}
                     >
-                      {isUploading ? `上傳中 ${uploadProgress}%` : '分享貼文'}
+                      {isUploading ? (
+                        uploadProgress < 90 ? `貼文上傳中 ${uploadProgress}%` : 
+                        uploadProgress < 99 ? '同步至雲端...' : '正在發布內容...'
+                      ) : '分享貼文'}
                     </button>
                   </div>
 

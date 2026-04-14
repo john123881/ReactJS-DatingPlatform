@@ -87,14 +87,12 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     movieV,
     // setMovieV,
     movieModalToggle,
-    // setMovieModalToggle,
     dropDownCollectOpen,
     setDropDownCollectOpen,
     refreshTrigger,
+    allCollectList,
+    setAllCollectList,
   } = useCollect();
-  // const [movieV, setMovieV] = useState({});
-
-  const [listData, setListData] = useState([]);
 
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
@@ -319,24 +317,38 @@ export default function Header({ currentPageTitle, handlePageChange }) {
 
     const controller = new AbortController(); //建立一個新的控制器
     // const signal = controller.signal; //取得訊號 塞到fetch後面
-    const fetchAllCollectList = async () => {
+    const fetchAllCollectList = async (signal) => {
       try {
-        const result = await AccountService.getCollectList(auth.id);
-        const fetchedData = result?.output?.data || result?.data || result?.rows || (Array.isArray(result) ? result : null);
-        
-        if (result?.output?.error === '無收藏' || !fetchedData || fetchedData.length === 0) {
-          setListData([]); // 設置為空列表
-          return;
+        // 增加 500ms 延遲以確保後端資料庫寫入已完全同步 (僅作為備援)
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        if (signal?.aborted) return;
+
+        const result = await AccountService.getCollectList(auth.id, { signal });
+        const fetchedData =
+          result?.output?.data ||
+          result?.data ||
+          result?.rows ||
+          (Array.isArray(result) ? result : null);
+
+        if (
+          result?.output?.error === '無收藏' ||
+          !fetchedData ||
+          fetchedData.length === 0
+        ) {
+          setAllCollectList([]);
         } else {
-          setListData(fetchedData);
+          setAllCollectList(fetchedData);
         }
       } catch (error) {
+        if (error.name === 'AbortError') return;
         console.error('Failed to fetch NAVBAR COLLECT LIST:', error);
-        // setIsLoading(false); // 確保即使出錯也要結束加載
       }
     };
-    fetchAllCollectList();
-    //這裡return abort動作
+
+    if (auth.id !== 0) {
+      fetchAllCollectList(controller.signal);
+    }
+
     return () => {
       controller.abort();
     };
@@ -529,7 +541,7 @@ export default function Header({ currentPageTitle, handlePageChange }) {
                 </Link>
               </div>
               <ul className={`flow-root divide-y divide-gray-700 `}>
-                {listData.map((data, i) => (
+                {allCollectList.map((data, i) => (
                   <CollectList
                     key={i}
                     i={i}

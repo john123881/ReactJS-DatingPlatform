@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import CollectionView from '@/components/account-center/collection-view';
 import PostCollectCard from '@/components/account-center/collect-list/post-collect-card';
 import { AccountService } from '@/services/account-service';
@@ -13,6 +13,7 @@ export default function AccountCollectPost({ onPageChange }) {
   
   const [pages, setPages] = useState({ page: 1, totalPages: 1 });
   const [arrowHovered, setArrowHovered] = useState([]);
+  const interactingItems = useRef(new Set());
 
   // 資料抓取邏輯
   const fetchData = useCallback(async (sid, page) => {
@@ -41,11 +42,21 @@ export default function AccountCollectPost({ onPageChange }) {
 
   // 刪除處理
   const handleDelete = async (saveId) => {
-    const result = await AccountService.collectPost.delete(saveId);
-    if (result && result.action === 'remove') {
-      customToast.success('刪除收藏成功');
-      setPosts((prev) => prev.filter((p) => p.save_id !== saveId));
-      refreshCollectList();
+    if (interactingItems.current.has(`delete-${saveId}`)) return;
+    interactingItems.current.add(`delete-${saveId}`);
+
+    try {
+      const result = await AccountService.collectPost.delete(saveId);
+      if (result && result.action === 'remove') {
+        customToast.success('刪除收藏成功');
+        setPosts((prev) => prev.filter((p) => p.save_id !== saveId));
+        refreshCollectList();
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+      customToast.error('刪除失敗');
+    } finally {
+      interactingItems.current.delete(`delete-${saveId}`);
     }
   };
 

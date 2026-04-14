@@ -33,6 +33,8 @@ export default function Index({ onPageChange }) {
   const movieContainerRef = useRef(null);
   const [movieScrollIndex, setMovieScrollIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const scrollMovieSlider = (index) => {
     setMovieScrollIndex(index);
@@ -128,6 +130,23 @@ export default function Index({ onPageChange }) {
   useEffect(() => {
     getBookingMovieCard();
   }, [getBookingMovieCard]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 64) {
+        setShowNav(false);
+      } else {
+        setShowNav(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   return (
     <>
@@ -312,9 +331,11 @@ export default function Index({ onPageChange }) {
         </div>
       </div>
 
-      <div className="sticky top-[64px] z-30 sm:static flex flex-wrap justify-center sm:justify-end w-full mt-5 px-6 gap-2 sm:gap-3 mb-6 py-4 bg-black/60 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:mt-5 transition-all duration-300">
+      <div className={`sticky top-[64px] z-30 flex justify-center sm:justify-end items-center gap-3 py-4 px-6 w-full bg-black/40 backdrop-blur-xl border-b border-white/5 transition-all duration-300 ${
+        showNav ? 'translate-y-0 opacity-100' : 'translate-y-[-100px] opacity-0 pointer-events-none'
+      }`}>
         <Link
-          className="btn btn-outline bg-transparent w-[150px] rounded-[30px] hover:bg-neongreen hover:text-black group active:scale-95 transition-all flex items-center gap-2 border-neongreen/50"
+          className="flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold bg-white/5 text-white/60 border border-white/10 hover:border-neongreen/50 hover:text-white transition-all duration-300 flex items-center gap-2"
           href={'/under-construction'}
           onClick={(e) => {
             if (auth.id === 0) {
@@ -323,18 +344,14 @@ export default function Index({ onPageChange }) {
             }
           }}
         >
-          <IoTicketOutline
-            className={`IoTicketOutline text-xl transition-colors duration-300 ${
-              clickedButton ? 'text-[#FF03FF]' : 'text-white group-hover:text-black'
-            }`}
-          />
-          <span className="whitespace-nowrap">我的電影票</span>
+          <IoTicketOutline className="text-lg" />
+          <span>我的電影票</span>
         </Link>
         <Link
-          className="btn btn-outline bg-transparent w-[100px] rounded-[30px] hover:bg-neongreen hover:text-black active:scale-95 transition-all text-xs sm:text-sm"
+          className="flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold bg-neongreen/20 text-neongreen border border-neongreen/30 hover:bg-neongreen hover:text-black transition-all duration-300"
           href={'/booking/movie-list'}
         >
-          看更多
+          探索更多
         </Link>
       </div>
 

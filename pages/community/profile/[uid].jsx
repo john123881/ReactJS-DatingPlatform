@@ -9,6 +9,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { CommunityService } from '@/services/community-service';
 import PageLoader from '@/components/ui/loader/page-loader';
 import CommunityLayout from '@/components/community/layout/CommunityLayout';
+import styles from './profile.module.css';
 
 export default function Profile({ onPageChange }) {
   const pageTitle = '社群媒體';
@@ -102,20 +103,15 @@ export default function Profile({ onPageChange }) {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-5 justify-center w-full px-4">
+            <div className="w-full px-4">
               {activeTab === 'posts' ? (
                 <InfiniteScroll
                   dataLength={profilePosts.length}
                   next={() => getCommunityProfilePost(uid)}
                   hasMore={profileHasMore}
                   loader={<div className="w-full flex justify-center py-4"><PageLoader type="index" minHeight="50px" /></div>}
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-start',
-                    gap: '1.25rem',
-                    overflow: 'hidden'
-                  }}
+                  style={{}}
+                  className={styles.responsiveGrid}
                 >
                   {profilePosts.map((post, i) => (
                     <ProfileCard post={post} key={`post-${i}`} />
@@ -139,13 +135,8 @@ export default function Profile({ onPageChange }) {
                   next={() => getCommunityUserProfileEvents(uid)}
                   hasMore={profileEventHasMore}
                   loader={<div className="w-full flex justify-center py-4"><PageLoader type="index" minHeight="50px" /></div>}
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-start',
-                    gap: '1.25rem',
-                    overflow: 'hidden'
-                  }}
+                  style={{}}
+                  className={styles.responsiveGrid}
                 >
                   {profileEvents.map((event, i) => (
                     <ProfileEventCard event={event} key={`event-${i}`} />

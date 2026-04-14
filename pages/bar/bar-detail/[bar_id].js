@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import BarRatingModal from '@/components/bar/modal/bar-rating-modal';
@@ -23,6 +23,7 @@ export default function Detail({ onPageChange }) {
   const [savedBars, setSavedBars] = useState({});
 
   const { bar_id } = router.query;
+  const interactingItems = useRef(new Set());
 
   // 使用 SWR 抓取詳情
   const { data: bar, error, isLoading } = useSWR(
@@ -44,8 +45,12 @@ export default function Detail({ onPageChange }) {
     const barId = bar.bar_id;
     const userId = auth.id;
 
+    if (interactingItems.current.has(`save-${barId}`)) return;
+    interactingItems.current.add(`save-${barId}`);
+
     if (!userId) {
       console.error('User ID is undefined or not set');
+      interactingItems.current.delete(`save-${barId}`);
       return;
     }
 
@@ -69,6 +74,8 @@ export default function Detail({ onPageChange }) {
       // 還原狀態
       setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
       toast.error('操作失敗，請稍後再試');
+    } finally {
+      interactingItems.current.delete(`save-${barId}`);
     }
   };
 

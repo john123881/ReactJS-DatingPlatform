@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePostContext } from '@/context/post-context';
 import { FaPhotoVideo } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
@@ -12,9 +12,7 @@ export default function CreateModalMobile() {
     setPostContent,
     handleFileChange,
     resetAndCloseModal,
-    handleFilePicker,
     handleFileUpload,
-    fileInputRef,
     handleKeyPress,
     createModalMobileRef,
     isUploading,
@@ -22,127 +20,152 @@ export default function CreateModalMobile() {
     cancelUpload,
   } = usePostContext();
 
+  const fileInputRef = useRef(null);
+  const handleFilePicker = () => fileInputRef.current?.click();
+
   const handlePostContentChange = (e) => {
     setPostContent(e.target.value);
   };
 
-  // 當選擇檔案時，建立預覽圖的網址。使用的是狀態連鎖更動的樣式 A狀態 -> B狀態
+  // 當選擇檔案時，建立預覽圖的網址
   useEffect(() => {
-    // 當沒有選中檔案時
     if (!selectedFile) {
       setPreviewUrl('');
       return;
     }
 
-    // 當有選中檔案時
-    // 透過URL.createObjectURL()得到預覽圖片的網址
     const objectUrl = URL.createObjectURL(selectedFile);
-    //console.log(objectUrl)
-    // 設定預覽圖片的網址
     setPreviewUrl(objectUrl);
 
-    // 當元件從真實DOM被移出時
     return () => {
-      // 註銷剛建立的ObjectURL(快取)
       URL.revokeObjectURL(objectUrl);
     };
   }, [selectedFile]);
-  // ^^^^^^^^^^^^^^ 這裡代表只有在selectedFile有變動(之後)才會執行
 
   return (
     <>
       <dialog
         id="create_modal_mobile"
         ref={createModalMobileRef}
-        className="modal sm:modal-middle max-w-full"
+        className="modal fixed inset-0 w-screen h-screen z-[1000] items-end justify-center"
+        style={{ zIndex: 1000 }}
       >
         <div
-          className="modal-box flex flex-col"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+          className="modal-box p-0 overflow-hidden flex flex-col w-full h-[92vh] rounded-t-3xl bg-black/80 backdrop-blur-xl border-none relative will-change-transform m-0"
         >
-          <p
-            className={`${styles['createModalListItemText']} font-bold text-lg mb-5 text-h5 flex justify-center`}
-          >
-            創建新貼文
-          </p>
+          {/* Header */}
+          <div className="pt-20 pb-4 px-6 border-b border-white/10 flex justify-center items-center relative bg-white/5">
+            <p className={`${styles['createModalListItemText']} font-bold text-xl tracking-[0.2em] text-neongreen uppercase`}>
+              {selectedFile ? 'POST DETAILS' : 'CREATE POST'}
+            </p>
+            <button
+              onClick={resetAndCloseModal}
+              className="btn btn-sm btn-circle bg-black/50 border-none absolute right-4 top-20 z-[110] text-white hover:text-neongreen"
+            >
+              <IoClose size={20} />
+            </button>
+          </div>
 
-          {!selectedFile && (
-            <>
-              <div className="flex-grow flex flex-col items-center justify-center ">
-                <FaPhotoVideo
-                  className={`${styles['createModalListItemIcon']} text-6xl mb-4`}
-                />
-
+          <div className="flex-grow overflow-y-auto px-6 pt-6 pb-32">
+            {!selectedFile ? (
+              <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <div className="w-24 h-24 rounded-full bg-neongreen/10 flex items-center justify-center mb-6 border border-neongreen/20 shadow-neon-sm">
+                  <FaPhotoVideo className="text-4xl text-neongreen" />
+                </div>
+                <p className="text-lg mb-8 text-white/70 font-light tracking-wide text-center">
+                  分享您的精彩瞬間
+                </p>
                 <button
                   onClick={handleFilePicker}
-                  htmlFor="photo-upload"
-                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 cursor-pointer flex justify-center`}
+                  className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none rounded-full px-12 shadow-neon font-bold text-lg h-14"
                 >
-                  從圖庫瀏覽
+                  從相簿選擇圖片
                 </button>
-                <input
-                  id="photo-upload"
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
               </div>
-            </>
-          )}
-          {selectedFile && (
-            <>
-              <div className="flex flex-col items-center">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-full max-h-full object-cover mb-4"
-                />
-                <textarea
-                  className="textarea textarea-ghost w-full h-32 resize-none my-3"
-                  placeholder="貼文內容"
-                  onChange={handlePostContentChange}
-                  onKeyDown={(e) =>
-                    // 使用 onKeyDown 並檢查是否按下 Enter 鍵
-                    handleKeyPress(e, () => handleFileUpload())
-                  }
-                />
-                <button
-                  className={`${styles['createModalListItemText']} btn bg-dark border-neongreen rounded-full text-neongreen hover:shadow-xl3 w-full ${isUploading ? 'loading' : ''}`}
-                  onClick={handleFileUpload}
-                  disabled={isUploading}
-                >
-                  {isUploading ? `上傳中 ${uploadProgress}%` : '分享'}
-                </button>
-
-                {/* 上傳進度條與取消按鈕 */}
-                {isUploading && (
-                  <div className="mt-4 w-full">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-white/50 font-medium">上傳中...</span>
-                      <button 
-                        onClick={cancelUpload}
-                        className="text-white/40 hover:text-white/90 transition-colors flex items-center gap-1 text-xs"
-                      >
-                        <IoClose size={14} /> 取消
-                      </button>
-                    </div>
-                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
-                      <div 
-                        className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_10px_rgba(160,255,31,0.5)]"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
-                    </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {/* Preview Image */}
+                <div className="w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 aspect-square relative group">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                     <button 
+                       onClick={handleFilePicker}
+                       className="btn btn-xs btn-ghost text-white/70 hover:text-neongreen bg-black/40 backdrop-blur-sm rounded-lg border-white/10"
+                     >
+                       更換圖片
+                     </button>
                   </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
+                </div>
 
-        <form method="dialog" className="modal-backdrop">
-          <button onClick={resetAndCloseModal}>close</button>
-        </form>
+                {/* Content Input */}
+                <div className="space-y-2">
+                  <label className="text-[10px] text-neongreen font-bold uppercase tracking-widest block ml-2 text-glow-neon">貼文內容</label>
+                  <textarea
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 min-h-[160px] focus:border-neongreen/50 focus:bg-white/10 transition-all text-white text-sm outline-none placeholder:text-white/20 resize-none shadow-inner"
+                    placeholder="在想什麼嗎？分享您的心情..."
+                    onChange={handlePostContentChange}
+                    onKeyDown={(e) =>
+                      handleKeyPress(e, () => handleFileUpload())
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer - Sticky Button or Progress */}
+          <div className="absolute bottom-0 left-0 w-full p-6 bg-black/80 backdrop-blur-xl border-t border-white/10 flex flex-col items-center min-h-[140px] justify-center">
+            {/* Hidden Input */}
+            <input
+              id="photo-upload"
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            {!isUploading ? (
+              <button
+                className="btn bg-neongreen hover:bg-neongreen/80 text-black border-none w-full rounded-2xl shadow-neon font-bold text-lg h-14 transition-all"
+                onClick={handleFileUpload}
+                disabled={!selectedFile}
+              >
+                立即發佈
+              </button>
+            ) : (
+              <div className="w-full space-y-4 animate-pulse">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="loading loading-spinner loading-xs text-neongreen"></span>
+                    <span className="text-sm text-neongreen font-bold uppercase tracking-widest text-glow-neon">
+                      {uploadProgress < 90 ? `貼文上傳中 ${uploadProgress}%` : 
+                       uploadProgress < 99 ? '正在同步至雲端...' : '正在發布精彩內容...'}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={cancelUpload}
+                    className="btn btn-xs btn-ghost text-white/40 hover:text-white/90 transition-colors uppercase font-bold tracking-tighter"
+                  >
+                    <IoClose size={14} /> 取消
+                  </button>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5 p-[1px]">
+                  <div 
+                    className="bg-neongreen h-full transition-all duration-300 shadow-[0_0_15px_rgba(160,255,31,0.6)] rounded-full"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-[10px] text-white/30 text-center uppercase tracking-widest">
+                  請稍後，正在為您珍藏精彩瞬間...
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </dialog>
     </>
   );

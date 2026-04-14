@@ -147,16 +147,16 @@ export default function ProfileInfo({ onReady }) {
             </div>
           </div>
           {/* Profile info */}
-          <div className="basis-8/12 flex flex-col justify-between item-center gap-2 w-full flex-grow">
-            <div className="flex items-center">
-              <div className="userId">
+          <div className="basis-8/12 flex flex-col sm:items-start items-center gap-4 w-full flex-grow text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="userId font-bold text-2xl tracking-wide">
                 {localUserInfo.username
                   ? localUserInfo.username
                   : localUserInfo.email
                     ? localUserInfo.email.split('@')[0]
                     : '載入中...'}
               </div>
-              <div className="flex mx-10">
+              <div className="flex">
                 {/* 確保個人頁面不顯示追蹤功能, 轉換 uid 從字符串到數字，以保持類型一致 */}
                 {userId !== 0 &&
                   userId !== null &&
@@ -164,7 +164,7 @@ export default function ProfileInfo({ onReady }) {
                   auth.id &&
                   parseInt(auth.id, 10) !== parseInt(uid, 10) && (
                     <button
-                      className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-neongreen"
+                      className="btn bg-dark border-white rounded-full text-white hover:shadow-xl3 hover:text-neongreen px-8"
                       onClick={() => {
                         handleFollowClick(uid);
                       }}
@@ -207,8 +207,8 @@ export default function ProfileInfo({ onReady }) {
               />
             </div>
 
-            <div className="flex items-center">
-              {localUserInfo.profile_content}
+            <div className="flex items-center sm:justify-start justify-center text-gray-400 text-sm italic">
+              {localUserInfo.profile_content || '尚未設定個人簡介'}
             </div>
           </div>
         </div>

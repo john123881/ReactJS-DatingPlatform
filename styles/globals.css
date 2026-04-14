@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 /* 隱藏捲軸但保留滾動功能 */
-.hide-scrollbar::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.hide-scrollbar {
+.hide-scrollbar,
+.no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

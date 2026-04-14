@@ -80,10 +80,10 @@ export const CommunityService = {
 
   updatePost: (data) => apiClient.put('/community/edit-post', data),
 
-  updatePostPhoto: (formData) => apiClient.post('/community/edit-post-photo', formData),
+  updatePostPhoto: (formData) => apiClient.put('/community/edit-post-photo', formData),
 
   updatePostPhotoWithProgress: (formData, onProgress) =>
-    uploadFile('/community/edit-post-photo', formData, onProgress),
+    uploadFile('/community/edit-post-photo', formData, onProgress, 'PUT'),
 
   deletePost: (postId) =>
     apiClient.delete('/community/delete-post', { body: { postId } }),
@@ -125,10 +125,10 @@ export const CommunityService = {
 
   updateEvent: (data) => apiClient.put('/community/edit-event', data),
 
-  updateEventPhoto: (formData) => apiClient.post('/community/edit-event-photo', formData),
+  updateEventPhoto: (formData) => apiClient.put('/community/edit-event-photo', formData),
 
   updateEventPhotoWithProgress: (formData, onProgress) =>
-    uploadFile('/community/edit-event-photo', formData, onProgress),
+    uploadFile('/community/edit-event-photo', formData, onProgress, 'PUT'),
 
   attendEvent: (userId, eventId) =>
     apiClient.post('/community/attend-event', { userId, eventId }),

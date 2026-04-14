@@ -7,7 +7,7 @@ export default function BarCollectCard({ bar, index, arrowHovered, onArrowHover,
   return (
     <div className="grid outline outline-1 outline-grayBorder z-10 rounded-xl my-2 w-[360px] sm:w-full grid-flow-row-dense grid-cols-1 grid-rows-1 gap-2 auto-rows-min sm:h-[200px] overflow-hidden">
       <div className="shadow-xl card sm:card-side bg-base-200 h-full">
-        <figure className="relative sm:w-[300px] h-[200px] sm:basis-1/3 overflow-hidden">
+        <figure className="relative sm:w-[300px] h-[200px] sm:basis-1/3 overflow-hidden flex-shrink-0 bg-gray-800">
           <Image
             src={getImageUrl(bar.img, 'bar')}
             className="object-cover"
@@ -15,11 +15,12 @@ export default function BarCollectCard({ bar, index, arrowHovered, onArrowHover,
             fill
             sizes="(max-width: 640px) 100vw, 300px"
             onError={(e) => handleImageError(e, 'bar')}
+            unoptimized={true}
           />
         </figure>
-        <div className="card-body h-[200px] relative pt-[20px] pb-[48px] sm:pe-[48px] sm:basis-2/3">
-          <div className="font-bold text-white text-h5 truncate pe-8">
-            {bar.bar_name || 'unknownBar'}
+        <div className="card-body h-[200px] relative pt-[20px] pb-[48px] sm:pe-[48px] sm:basis-2/3 min-w-0">
+          <div className="font-bold text-white text-h5 truncate flex-grow min-w-0">
+            {bar.bar_name}
           </div>
           
           <div className="flex gap-2 mb-2 min-h-6">

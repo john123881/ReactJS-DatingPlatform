@@ -1,52 +1,97 @@
-import MovieCard from '@/components/booking/card/movieCard';
-import MovieCardSkeleton from '@/components/booking/card/movieCardSkeleton';
 import { useRouter } from 'next/router';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import PageTitle from '@/components/page-title';
 import { BookingService } from '@/services/booking-service';
-
-// const mockData1 = [
-//   { movieName: '奧本海默' },
-//   { movieName: 'Movie 2' },
-//   { movieName: 'Movie 3' },
-//   { movieName: 'Movie 4' },
-//   { movieName: 'Movie 5' },
-//   { movieName: 'Movie 6' },
-//   { movieName: 'Movie 7' }, // 新增的卡片
-//   { movieName: 'Movie 8' }, // 新增的卡片
-//   { movieName: 'Movie 9' },
-//   { movieName: 'Movie 10' },
-//   { movieName: 'Movie 11' },
-//   { movieName: 'Movie 12' },
-// ];
+import { useAuth } from '@/context/auth-context';
+import MovieCard from '@/components/booking/card/movieCard';
+import MovieCardSkeleton from '@/components/booking/card/movieCardSkeleton';
+import MovieSidebar from '@/components/booking/movie-sidebar';
+import MovieBreadcrumbs from '@/components/booking/movie-breadcrumbs';
+import Loader from '@/components/ui/loader/loader';
 
 export default function Index({ onPageChange }) {
   const pageTitle = '電影探索';
   const router = useRouter();
+  const { auth } = useAuth();
+  
+  const genres = [
+    { id: 0, name: '全部' },
+    { id: 1, name: '劇情' },
+    { id: 2, name: '愛情' },
+    { id: 3, name: '喜劇' },
+    { id: 4, name: '動作' },
+    { id: 5, name: '動畫' },
+    { id: 6, name: '驚悚' },
+    { id: 7, name: '懸疑' },
+  ];
+
   useEffect(() => {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
   const [movieCards, setMovieCards] = useState([]);
-
+  const [savedMovies, setSavedMovies] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
-  //movie type下拉式選單
-  const handleTypeChange = (event) => {
-    const typeId = event.target.value; // 這裡獲得的將是如 "1", "2", 等的字符串
-    if (typeId) {
-      router.push(`/booking/movie-list/${typeId}`); // 使用 useRouter 來動態導航
+  const currentGenre = useMemo(() => {
+    const { movie_type_id } = router.query;
+    const genre = genres.find(g => String(g.id) === String(movie_type_id));
+    return genre ? genre.name : '';
+  }, [router.query]);
+
+  const checkMoviesStatus = useCallback(async (movieIds) => {
+    const userId = auth.id;
+    if (userId === 0 || !movieIds) return;
+
+    try {
+      const data = await BookingService.checkMovieStatus(userId, movieIds);
+      if (data && Array.isArray(data)) {
+        setSavedMovies((prevSavedMovies) => {
+          const newSavedMovies = { ...prevSavedMovies };
+          data.forEach((status) => {
+            newSavedMovies[status.movieId] = status.isSaved;
+          });
+          return newSavedMovies;
+        });
+      }
+    } catch (error) {
+      console.error('無法獲取電影狀態:', error);
     }
-  };
+  }, [auth.id]);
+
+  const getMovieListType = useCallback(async (movie_type_id) => {
+    if (!movie_type_id) return;
+    setIsLoading(true);
+
+    try {
+      const result = await BookingService.getMoviesByCategory(movie_type_id);
+      if (result && Array.isArray(result) && result.length > 0) {
+        const movieIds = result.map((movie) => movie.movie_id).join(',');
+        await checkMoviesStatus(movieIds);
+      }
+      setMovieCards(Array.isArray(result) ? result : []);
+    } catch (error) {
+      console.error('Failed to fetch movie list:', error);
+      setMovieCards([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [checkMoviesStatus]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      const { movie_type_id } = router.query;
+      getMovieListType(movie_type_id);
+    }
+  }, [router.isReady, router.query.movie_type_id, getMovieListType]);
 
   const handleSearchChange = async (e) => {
-    getSearchMovies(e.target.value);
-  };
-
-  const getSearchMovies = async (value) => {
+    const value = e.target.value;
     setSearchTerm(value);
 
     if (!value.trim()) {
@@ -55,305 +100,133 @@ export default function Index({ onPageChange }) {
       return;
     }
 
-    // 確保空字串不會觸發
-    if (value.trim()) {
-      try {
-        const data = await BookingService.searchMovies(value);
-        const { movie_type_id } = router.query;
-        // 根據目前的分類進行過濾
-        const filteredData = data.filter(
-          (movie) => String(movie.movie_type_id) === String(movie_type_id)
-        );
-        setSearchResults(filteredData);
-        setHasSearched(true);
-      } catch (error) {
-        console.error('Search error:', error);
-      } finally {
-        setIsLoading(false); // 結束加載
-      }
-    }
-  };
-
-  //   useEffect(() => {
-  //     getBookingMovieCard();
-  //   }, []);
-
-  // try動態路由
-  const getMovieListType = useCallback(async (movie_type_id) => {
-    if (!movie_type_id) return; // 確保 bar_type_id 存在
     setIsLoading(true);
-
     try {
-      const result = await BookingService.getMoviesByCategory(movie_type_id);
-      setMovieCards(Array.isArray(result) ? result : []);
+      const data = await BookingService.searchMovies(value);
+      const { movie_type_id } = router.query;
+      const filteredData = data.filter(
+        (movie) => String(movie.movie_type_id) === String(movie_type_id)
+      );
+      setSearchResults(filteredData);
+      setHasSearched(true);
     } catch (error) {
-      console.error('Failed to fetch movie list:', error);
-      setMovieCards([]);
+      console.error('Search error:', error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  // 動態路由成功
   useEffect(() => {
-    if (router.isReady) {
-      const { movie_type_id } = router.query;
-      getMovieListType(movie_type_id);
-    }
-  }, [router.isReady, router.query.movie_type_id, getMovieListType]);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
 
+      if (currentScrollY > lastScrollY && currentScrollY > 64) {
+        setShowNav(false);
+      } else {
+        setShowNav(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   return (
     <>
       <PageTitle pageTitle={pageTitle} />
-      {/* button */}
-      <div className="flex justify-center">
-        <div
-          role="tablist"
-          className="tabs tabs-boxed"
-          style={{ width: '200px' }}
-        >
-          <a
-            role="tab"
-            className="tab"
-            style={{
-              width: '100px',
-              transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-              transform: 'translateX(0px)',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateX(-5px)'; // 鼠标移入时左移5像素
-              e.target.style.backgroundColor = '#A0FF1F'; // 鼠标移入时改变颜色
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateX(0)'; // 鼠标移出时回到原始位置
-              e.target.style.backgroundColor = 'transparent'; // 鼠标移出时恢复原始颜色
-            }}
-          >
-            現正熱播
-          </a>
-          <a
-            role="tab"
-            className="tab"
-            style={{
-              width: '100px',
-              transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-              transform: 'translateX(0px)',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateX(5px)'; // 鼠标移入时左移5像素
-              e.target.style.backgroundColor = '#A0FF1F'; // 鼠标移入时改变颜色
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateX(0)'; // 鼠标移出时回到原始位置
-              e.target.style.backgroundColor = 'transparent'; // 鼠标移出时恢复原始颜色
-            }}
-            // style={{
-            //   width: '100px',
-            //   // backgroundColor: '#A0FF1F',
-            //   transition: 'transform 0.3s ease-in-out', // 添加过渡效果
-            //   ':hover': { transform: 'translateX(5px)' } // 悬停时向右移动5像素
-            // }}
-          >
-            即將上映
-          </a>
-        </div>
-      </div>
+      
+      <div className="flex flex-col lg:flex-row justify-center pt-28 px-4 lg:px-12 gap-10 max-w-[1700px] mx-auto min-h-screen">
+        {/* 1. 側邊導航 (Desktop) */}
+        <aside className="hidden lg:block w-[300px] shrink-0">
+          <div className="sticky top-28 glass-card-neon p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+            <MovieSidebar />
+          </div>
+        </aside>
 
-      <div className="sticky top-[64px] z-30 sm:static flex justify-center gap-8 py-4 px-4 mx-4 md:mx-auto max-w-7xl bg-black/60 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none sm:pt-10 sm:pb-10 transition-all duration-300">
-        {/* 分類搜索 */}
-        <select
-          className="select select-bordered w-36 lg:w-full max-w-xs bg--100 border-neongreen text-neongreen focus:border-neongreen "
-          onChange={handleTypeChange} // 為 select 元素添加 onChange 處理器
-          defaultValue=""
-        >
-          <option disabled value="">
-            電影分類
-          </option>
-          <option value="1">劇情</option>
-          <option value="2">愛情</option>
-          <option value="3">喜劇</option>
-          <option value="4">動作</option>
-          <option value="5">動畫</option>
-          <option value="6">驚悚</option>
-          <option value="7">懸疑</option>
-        </select>
+        {/* 2. 主要內容區 */}
+        <main className="flex-1 flex flex-col gap-6 w-full">
+          {/* Breadcrumbs */}
+          <MovieBreadcrumbs currentGenre={currentGenre} />
 
-        {/* 關鍵字搜索 */}
-        <label className="input input-bordered flex items-center gap-2 w-full max-w-md border-neongreen text-neongreen focus:border-neongreen">
-          <input
-            type="text"
-            className="grow"
-            placeholder="搜索電影"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="w-4 h-4 opacity-70"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </label>
-      </div>
+          {/* 標頭與搜尋行 */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-4">
+            <div className="order-2 md:order-1">
+              <h1 className="text-3xl lg:text-5xl font-bold text-white neon-text-green tracking-tight mb-2">
+                {currentGenre}
+              </h1>
+              <p className="text-white/40 text-sm tracking-widest uppercase">{currentGenre ? `${currentGenre} Movies` : 'Movie Explorer'}</p>
+            </div>
 
-      {/* 分類搜尋
-      <select className="select select-bordered w-full max-w-xs">
-        <option disabled selected>
-          想找哪類的電影
-        </option>
-        <option>劇情</option>
-        <option>愛情</option>
-        <option>動作</option>
-        <option>懸疑</option>
-        <option>動畫</option>
-        <option>動畫</option>
-      </select>
+            {/* 搜尋框 (Bar Style) */}
+            <div className="w-full md:w-auto order-1 md:order-2">
+              <label className="flex items-center gap-3 h-[50px] px-6 rounded-full border border-white/10 bg-white/5 hover:border-neongreen/50 text-white transition-all duration-300 w-full md:w-[400px] focus-within:border-neongreen focus-within:bg-white/10 shadow-inner group">
+                <input
+                  type="text"
+                  className="grow bg-transparent focus:outline-none placeholder:text-white/20 text-sm sm:text-base"
+                  placeholder={`在 ${currentGenre} 中搜尋...`}
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-5 h-5 opacity-40 text-neongreen group-hover:scale-110 transition-transform">
+                  <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
+                </svg>
+              </label>
+            </div>
+          </div>
 
-      關鍵字搜尋
-      <label className="input input-bordered flex items-center gap-2">
-        <input type="text" className="grow" placeholder="搜尋電影" />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="w-4 h-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </label> */}
-
-      {/* 電影列表 */}
-      {/* <div className="flex justify-center flex-wrap space-x-20 space-y-20">
-  {mockData1.map((movie, index) => (
-    <div
-      key={index}
-      className="card w-96 bg-base-100 shadow-xl"
-      style={{ width: '260px', height: '450px' }}
-      onMouseEnter={() => setHoveredIndex(index)}
-      onMouseLeave={() => setHoveredIndex(null)}
-    >
-      <figure>
-        <div className="card w-96 bg-base-100 shadow-xl">
-          <figure>
-            <img
-              src="https://upload.wikimedia.org/wikipedia/zh/7/7a/Oppenheimer_%28film%29_poster.jpg"
-              alt={movie.movieName} // 使用動態的 movieName
-              style={{
-                filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
-                transition: 'filter 0.3s',
-                opacity: hoveredIndex === index ? '0.7' : '1',
-              }}
-            />
-            {hoveredIndex === index && (
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
-              >
-                <div
-                  className="card-body"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
+          {/* 全域高級導航控制區 (Mobile Only Chips) */}
+          <div className={`lg:hidden sticky top-[64px] z-30 flex flex-col items-center w-full bg-black/40 backdrop-blur-xl border-b border-white/5 pb-2 transition-all duration-300 ${
+            showNav ? 'translate-y-0 opacity-100' : 'translate-y-[-100px] opacity-0 pointer-events-none'
+          }`}>
+            <div className="w-full px-2">
+              <div className="flex overflow-x-auto no-scrollbar gap-3 py-4 justify-start mask-fade-right px-2">
+                {genres.map((genre) => (
                   <button
-                    className="btn btn-outline"
-                    style={{
-                      width: '130px',
-                      height: '40px',
-                      marginBottom: '10px',
-                      borderRadius: '30px',
+                    key={genre.id}
+                    onClick={() => {
+                      if (genre.id === 0) {
+                        router.push('/booking/movie-list');
+                      } else {
+                        router.push(`/booking/movie-list/${genre.id}`);
+                      }
                     }}
+                    className={`flex-shrink-0 px-6 py-2 rounded-full text-xs font-bold tracking-wide transition-all duration-300 border ${
+                      (genre.id === 0 && !router.query.movie_type_id) || (router.query.movie_type_id == genre.id)
+                        ? 'bg-neongreen text-black border-neongreen shadow-neon-sm scale-105'
+                        : 'bg-white/5 text-white/50 border-white/10'
+                    }`}
                   >
-                    立即訂票
+                    {genre.name}
                   </button>
-                  <button
-                    className="btn btn-outline"
-                    style={{
-                      width: '130px',
-                      height: '40px',
-                      borderRadius: '30px',
-                    }}
-                  >
-                    電影資訊
-                  </button>
-                </div>
+                ))}
               </div>
+            </div>
+          </div>
+
+          {/* 電影列表網格 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 py-6 min-h-[600px] mb-20">
+            {isLoading ? (
+              Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} className="flex justify-center animate-pulse">
+                   <MovieCardSkeleton />
+                </div>
+              ))
+            ) : hasSearched && searchResults.length === 0 ? (
+              <div className="col-span-full py-40 text-center glass-card-neon rounded-3xl border border-white/5 bg-white/2">
+                <p className="text-white/40 text-lg">哎呀！在此分類中找不到相關電影，換個關鍵字試試？</p>
+              </div>
+            ) : (
+              (hasSearched ? searchResults : movieCards).map((movie, index) => (
+                <div key={movie.movie_id || index} className="flex justify-center animate-fadeInUp">
+                  <MovieCard movie={movie} isSaved={!!savedMovies[movie.movie_id]} />
+                </div>
+              ))
             )}
-          </figure>
-        </div>
-      </figure>
-      <div className="card-body">
-        <h2 className="card-title flex justify-start">
-          {movie.movieName}
-          <div
-            className="badge badge-secondary"
-            style={{
-              backgroundColor: 'grey',
-              // border: '1px solid #A0FF1F',
-              color: 'white',
-            }}
-          >
-            數位
           </div>
-          <div
-            className="badge badge-secondary"
-            style={{
-              backgroundColor: 'transparent',
-              border: '1px solid #A0FF1F',
-              color: '#A0FF1F',
-            }}
-          >
-            劇情
-          </div>
-        </h2>
+        </main>
       </div>
-    </div>
-  ))}
-</div> */}
-
-      <div 
-        className="flex flex-col items-center w-full min-h-screen pb-20 transition-colors duration-500 overflow-hidden"
-        style={{ 
-          background: 'radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000000 100%)',
-          backgroundAttachment: 'fixed',
-          marginTop: '-40px' 
-        }}
-      >
-        <div className="flex flex-wrap justify-center gap-6 lg:gap-10 mx-4 md:mx-auto max-w-7xl pt-10">
-          {isLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <MovieCardSkeleton key={i} />
-            ))
-          ) : hasSearched && searchResults.length === 0 ? (
-            <p className="text-white py-20 text-center w-full">未找到結果</p>
-          ) : (
-            (hasSearched ? searchResults : movieCards).map((movie, index) => (
-              <MovieCard movie={movie} key={movie.movie_id || index} isSaved={false} />
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* 分頁 */}
-      {/* <div className="join flex justify-center">
-        <button className="join-item btn">1</button>
-        <button className="join-item btn">2</button>
-        <button className="join-item btn">3</button>
-        <button className="join-item btn">4</button>
-      </div> */}
     </>
   );
 }

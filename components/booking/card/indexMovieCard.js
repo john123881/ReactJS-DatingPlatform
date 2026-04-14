@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { FaRegHeart } from 'react-icons/fa';
-import { FaHeart } from 'react-icons/fa6';
+import Link from 'next/link';
+import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 import { useAuth } from '@/context/auth-context';
 import { BookingService } from '@/services/booking-service';
 import { useCollect } from '@/context/use-collect';
@@ -95,129 +95,86 @@ export default function MovieCard({ movie, index, isSaved: initialSaved }) {
     <>
       <div
         key={index}
-        className={`card bg-base-100 shadow-xl relative h-[520px] sm:h-[550px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-neongreen/20 ${
+        className={`glass-card-neon w-full group overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(160,255,31,0.15)] transform-gpu hover:-translate-y-1 ${
           isSaved ? ' ring-1 ring-neongreen/30' : ''
         }`}
-        style={{ width: '100%' }}
+        style={{
+          width: '100%',
+          height: '460px',
+        }}
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <figure className="flex-shrink-0">
-          <div className="card w-full bg-base-100 shadow-xl overflow-hidden">
-            <figure className="relative">
-              <Image
+        <figure className="relative h-[320px] overflow-hidden">
+          <Link href={`/booking/movie-booking-detail/${movie.movie_id}`}>
+            <div className="relative w-full h-full cursor-pointer group-hover:scale-110 transition-transform duration-500 transform-gpu">
+              <img
                 src={getMovieImgSrc(movie.movie_img)}
-                alt={movie.title}
-                width={280}
-                height={400}
-                style={{
-                  width: '100%',
-                  aspectRatio: '28/40',
-                  objectFit: 'cover',
-                  filter: hoveredIndex === index ? 'brightness(70%)' : 'none',
-                  transition: 'filter 0.3s',
-                  opacity: hoveredIndex === index ? '0.7' : '1',
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  e.target.src = '/unavailable-image.jpg';
                 }}
+                alt={movie.title}
+                className="w-full h-full object-cover"
               />
-              {hoveredIndex === index && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center transition-all duration-300"
-                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
-                >
-                  <div
-                    className="card-body"
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <button
-                      className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
-                      style={{
-                        width: '130px',
-                        height: '40px',
-                        marginBottom: '10px',
-                        borderRadius: '30px',
-                      }}
-                      onClick={() => {
-                        router.push('/under-construction');
-                      }}
-                    >
-                      立即訂票
-                    </button>
-                    <button
-                      className="btn btn-outline border-neongreen text-white hover:bg-neongreen hover:text-black hover:border-neongreen transition-all duration-300"
-                      style={{
-                        width: '130px',
-                        height: '40px',
-                        borderRadius: '30px',
-                      }}
-                      onClick={() => {
-                        router.push(`/booking/movie-booking-detail/${movie.movie_id}`);
-                      }}
-                    >
-                      電影資訊
-                    </button>
-                  </div>
-                </div>
+            </div>
+          </Link>
+
+          {/* 收藏按鈕 - 書籤風格 */}
+          <div className="absolute top-3 right-3 z-10">
+            <div 
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                isSaved 
+                  ? 'bg-[#A0FF1F]/20 border border-[#A0FF1F]/50 shadow-[0_0_15px_rgba(160,255,31,0.3)]' 
+                  : 'bg-black/40 border border-white/20 hover:border-[#A0FF1F] hover:bg-[#A0FF1F]/10'
+              }`}
+              onClick={handleHeartClick}
+            >
+              {isSaved ? (
+                <FaBookmark
+                  className="text-[18px] transition-transform duration-300 active:scale-125 hover:scale-110"
+                  color="#A0FF1F"
+                />
+              ) : (
+                <FaRegBookmark
+                  className="text-[18px] text-white transition-transform duration-300 hover:scale-110 hover:text-[#A0FF1F]"
+                />
               )}
-            </figure>
+            </div>
           </div>
         </figure>
 
-        {/* 爱心图标 */}
-        <div
-          className="absolute top-2 right-2 cursor-pointer"
-          onClick={handleHeartClick}
-          style={{
-            backgroundColor: 'white', // 點擊更換顏色
-            borderRadius: '50%', // 圖形背景
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {isSaved ? (
-            <FaHeart
-              size={24}
-              color="#ff6b6b" // 填充颜色
-            />
-          ) : (
-            <FaRegHeart
-              size={24}
-              color="#000" // 默认颜色
-            />
-          )}
-        </div>
-
-        <div className="card-body p-4 flex flex-col justify-between overflow-hidden">
-          <div className="h-[3rem] flex items-center">
-            <h2 className="text-[1rem] font-bold line-clamp-2 leading-snug w-full">
-              {movie.title}
-            </h2>
+        <div className="movie-card-content p-4 flex flex-col h-[140px]">
+          <div className="text-[16px] lg:text-[18px] text-white font-bold truncate mb-2 group-hover:text-[#A0FF1F] transition-colors">
+            {movie.title}
           </div>
-          <div className="flex flex-wrap items-center gap-2 mt-auto">
-            <div
-              className="badge badge-secondary w-20"
-              style={{
-                backgroundColor: 'grey',
-                color: 'white',
-              }}
-            >
-              數位
+          
+          <div className="flex items-center gap-3 mb-4">
+            {/* 評分標籤 */}
+            <div className="flex px-2 py-0.5 rounded-full bg-[#A0FF1F]/10 justify-center items-center border border-[#A0FF1F]/30">
+              <span className="text-[12px] text-[#A0FF1F] font-bold mr-1">
+                {movie.movie_rating || movie.score || '0.0'}
+              </span>
+              <svg className="w-3 h-3 text-[#A0FF1F] fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
             </div>
-            <div
-              className="badge badge-secondary w-20"
-              style={{
-                backgroundColor: 'transparent',
-                ...getBadgeStyle(getMovieTypeName(movie.movie_type_id))
-              }}
-            >
+            <div className="flex items-center gap-1 text-white/50">
+              <span className="text-[12px]">台北市</span>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
+            <span className="text-[11px] text-white/60 font-medium tracking-wide uppercase">
               {getMovieTypeName(movie.movie_type_id)}
-            </div>
+            </span>
+            <Link
+              className="text-[11px] bg-[#A0FF1F] text-black font-bold px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(160,255,31,0.3)] hover:shadow-[0_0_25px_rgba(160,255,31,0.5)] hover:scale-105 transition-all duration-300"
+              href="/under-construction"
+            >
+              立即訂票
+            </Link>
           </div>
         </div>
       </div>

@@ -3,8 +3,8 @@ import { useAuth } from '@/context/auth-context';
 import { useCollect } from '@/context/use-collect';
 import { FaHeart } from 'react-icons/fa';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { usePostContext } from '@/context/post-context';
+import { getImageUrl } from '@/services/image-utils';
 
 export default function CollectList({
   i,
@@ -141,12 +141,10 @@ export default function CollectList({
           className="relative flex items-center space-x-3 rtl:space-x-reverse"
         >
           <div className="flex-shrink-0">
-            <Image
-              className="w-8 h-8 rounded-full"
-              src={data.img || '/unavailable-image.jpg'}
+            <img
+              className="w-8 h-8 rounded-full object-cover"
+              src={getImageUrl(data.img, data.item_type)}
               alt={data.img_name || 'No Image Available'}
-              width={32}
-              height={32}
             />
           </div>
           <div className="flex-1 min-w-0">
@@ -181,11 +179,11 @@ export default function CollectList({
         >
           <div className="  text-[14px] text-pretty ">
             {' '}
-            {data.content == 'null'
-              ? (data.content = 'null')
-              : data.content.length > 50
+            {data.content && data.content !== 'null'
+              ? data.content.length > 50
                 ? data.content.substring(0, 50) + '...'
-                : data.content}
+                : data.content
+              : ''}
           </div>
         </div>
       </li>

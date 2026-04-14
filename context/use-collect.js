@@ -8,6 +8,7 @@ export function CollectProvider({ children }) {
   const [movieV, setMovieV] = useState({});
   const [dropDownCollectOpen, setDropDownCollectOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [allCollectList, setAllCollectList] = useState([]);
 
   // 觸發重新整理收藏列表
   const refreshCollectList = () => {
@@ -47,6 +48,8 @@ export function CollectProvider({ children }) {
       setModalId,
       movieModalToggle,
       setMovieModalToggle,
+      allCollectList,
+      setAllCollectList,
     }),
     [
       bars,
@@ -57,6 +60,7 @@ export function CollectProvider({ children }) {
       p,
       modalId,
       movieModalToggle,
+      allCollectList,
     ],
   );
 

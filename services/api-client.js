@@ -187,14 +187,14 @@ export async function apiClient(endpoint, { body: rawBody, ...customConfig } = {
 /**
  * 檔案上傳器 (支援進度追蹤與取消)
  */
-export function uploadFile(endpoint, formData, onProgress) {
+export function uploadFile(endpoint, formData, onProgress, method = 'POST') {
   let abortFn;
   const promise = new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     abortFn = () => xhr.abort();
     const fullUrl = endpoint.startsWith('http') ? endpoint : `${API_SERVER}${endpoint}`;
 
-    xhr.open('POST', fullUrl);
+    xhr.open(method, fullUrl);
 
     // 取得認證資訊
     const storageKey = 'TD_auth';
