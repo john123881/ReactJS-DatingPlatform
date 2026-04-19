@@ -1,38 +1,24 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import TabBar from '@/components/bar/bar/tab-bar';
-// import Search from '@/components/bar/input/search';
-import BarTypeCardsMobile from '@/components/bar/card/bar-type-cards-mobile';
-import BarTypeCards from '@/components/bar/card/bar-type-cards-up';
-import BarTypeCards2 from '@/components/bar/card/bar-type-cards-down';
-import BarCardIndex from '@/components/bar/card/bar-card-index';
-import {
-  MdOutlineArrowBackIos,
-  MdOutlineArrowForwardIos,
-} from 'react-icons/md';
-import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
 import Loader from '@/components/ui/loader/loader';
-
+import BarLayout from '@/components/bar/layout/bar-layout';
+import BarCardIndex from '@/components/bar/card/bar-card-index';
+import BarIndexHero from '@/components/bar/section/bar-index-hero';
+import { MdOutlineArrowBackIos, MdOutlineArrowForwardIos } from 'react-icons/md';
 import { useAuth } from '@/context/auth-context';
 
 export default function Index({ onPageChange }) {
-  const { auth, setLoginModalToggle } = useAuth();
+  const { auth } = useAuth();
   const pageTitle = '酒吧探索';
   const router = useRouter();
-  useEffect(() => {
-    onPageChange(pageTitle);
-  }, [onPageChange, pageTitle]);
 
   const [randomBars, setRandomBars] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [barRender, setBarRender] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [savedBars, setSavedBars] = useState({});
-  const displayCount = 3; // Number of bars to display at once
+  const displayCount = 3;
 
-  // random bar
   const getBarListRandom = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -45,7 +31,6 @@ export default function Index({ onPageChange }) {
     }
   }, []);
 
-  // 檢查儲存狀態
   const checkBarsStatus = useCallback(
     async (barIds) => {
       const userId = auth.id;
@@ -77,26 +62,23 @@ export default function Index({ onPageChange }) {
     }
   }, [barIdsString, checkBarsStatus, auth.id]);
 
-  // next 3 random
   useEffect(() => {
+    onPageChange(pageTitle);
     getBarListRandom();
-  }, [barRender, getBarListRandom]);
+  }, [onPageChange, pageTitle, getBarListRandom]);
 
-  // 上一頁酒吧
   const prevBars = () => {
     setCurrentIndex(
       (prev) => (prev - displayCount + randomBars.length) % randomBars.length,
     );
   };
 
-  // 下一頁酒吧
   const nextBars = () => {
     setCurrentIndex(
       (prev) => (prev + displayCount) % randomBars.length,
     );
   };
 
-  // Calculate the bars to be displayed based on the current index
   const displayedBars = randomBars
     .slice(currentIndex, currentIndex + displayCount)
     .concat(
@@ -104,91 +86,69 @@ export default function Index({ onPageChange }) {
         0,
         Math.max(displayCount - (randomBars.length - currentIndex), 0),
       ),
-    );
+    ).slice(0, displayCount);
 
-  const initialTabs = [
-    { title: '酒吧地圖', path: '/under-construction', active: false },
-    { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/under-construction', active: false, isProtected: true },
-  ];
+  if (isLoading) return <Loader minHeight="100vh" text="正在探索驚喜酒吧..." />;
+
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <TabBar tabs={initialTabs} />
+    <BarLayout title={pageTitle}>
       <div className="container flex items-center justify-center w-full pt-24 mx-auto bar md:w-8/12">
-        <div className="flex flex-col bar-index-content">
-          {isLoading ? (
-            <Loader minHeight="100vh" text="正在探索驚喜酒吧..." />
-          ) : (
-            <>
-              <div className="mt-4 search-zone md:mt-12">
-                <div className="flex items-center justify-center font-bold text-center text-white text-h5 md:text-h1">
-                  今晚想去哪約會？
-                  <div className="hidden md:m-5 md:flex md:justify-center">
-                    {/* <Search /> */}
-                    <Link href={`/bar/bar-list/`}>
-                      <button className="btn btn-outline rounded-xl border-white bg-transparent hover:bg-[#A0FF1F] text-white">
-                        探索全部
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+        <div className="flex flex-col w-full">
+          {/* Hero Section Module */}
+          <BarIndexHero />
 
-              <div className="mb-10 bar-cards">
-                <div className="bar-type-card-mobile flex flex-col justify-center items-center mx-auto w-[340px] md:hidden">
-                  <BarTypeCardsMobile />
-                </div>
-                <div className="hidden md:flex md:justify-center md:items-center">
-                  <BarTypeCards />
-                  {/* <BarTypeCards />
-                  <BarTypeCards /> */}
-                </div>
-                <div className="hidden md:flex md:justify-center md:items-center">
-                  <BarTypeCards2 />
-                  {/* <BarTypeCards2 /> */}
-                </div>
-              </div>
+          <div className="text-[18px] md:text-[28px] text-white font-bold text-center mb-10 mt-12">
+            熱門酒吧 <span className="text-[#A0FF1F]">HOT BARS</span>
+          </div>
 
-              <div className="text-[18px] md:text-[28px] text-white font-bold text-center mb-4">
-                熱門酒吧
-              </div>
-              <div className="hidden player-wall md:flex md:justify-center md:items-center">
-                <div className="flex items-center justify-center gap-16">
-                  <button type="button" onClick={prevBars}>
-                    <MdOutlineArrowBackIos className="text-[#A0FF1F] text-[30px]" />
-                  </button>
-                  {displayedBars.map((randomBar) => (
+          <div className="hidden player-wall md:flex md:justify-center md:items-center pb-24">
+            <div className="flex items-center justify-center gap-16">
+              <button 
+                type="button" 
+                onClick={prevBars}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-[#A0FF1F] hover:bg-[#A0FF1F] hover:text-black transition-all"
+              >
+                <MdOutlineArrowBackIos className="ml-2" />
+              </button>
+              
+              <div className="grid grid-cols-3 gap-10">
+                {displayedBars.map((randomBar, index) => (
+                  <div key={randomBar.bar_id} className="animate-fadeInUp" style={{ animationDelay: `${index * 100}ms` }}>
                     <BarCardIndex
-                      key={randomBar.bar_id}
                       randomBar={randomBar}
                       savedBars={savedBars}
                       setSavedBars={setSavedBars}
                     />
-                  ))}
-                  <button type="button" onClick={nextBars}>
-                    <MdOutlineArrowForwardIos className="text-[#A0FF1F] text-[30px]" />
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center justify-center w-100 md:hidden">
-                <div className="gap-5 carousel rounded-box">
-                  <div className="gap-5 carousel-item">
-                    {displayedBars.slice(0, 2).map((randomBar) => (
-                      <BarCardIndex
-                      key={randomBar.bar_id}
-                      randomBar={randomBar}
-                      savedBars={savedBars}
-                      setSavedBars={setSavedBars}
-                    />
-                    ))}
                   </div>
-                </div>
+                ))}
               </div>
-            </>
-          )}
+
+              <button 
+                type="button" 
+                onClick={nextBars}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-[#A0FF1F] hover:bg-[#A0FF1F] hover:text-black transition-all"
+              >
+                <MdOutlineArrowForwardIos className="ml-1" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center w-100 md:hidden pb-12">
+            <div className="gap-5 carousel rounded-box">
+              <div className="gap-5 carousel-item">
+                {displayedBars.slice(0, 2).map((randomBar) => (
+                  <BarCardIndex
+                  key={randomBar.bar_id}
+                  randomBar={randomBar}
+                  savedBars={savedBars}
+                  setSavedBars={setSavedBars}
+                />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </BarLayout>
   );
 }

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { BarService } from '@/services/bar-service';
 import { useAuth } from '@/context/auth-context';
-import TabBar from '@/components/bar/bar/tab-bar';
+import BarLayout from '@/components/bar/layout/bar-layout';
 import BarBookingListCard from '@/components/bar/card/bar-booking-list-card';
 import { useRouter } from 'next/router';
-import PageTitle from '@/components/page-title';
 import Loader from '@/components/ui/loader/loader';
 
 export default function BarBookingList({ onPageChange }) {
@@ -71,17 +70,8 @@ export default function BarBookingList({ onPageChange }) {
   };
   // pagination end
 
-  const initialTabs = [
-    { title: '酒吧地圖', path: '/under-construction', active: false },
-    { title: '酒吧首頁', path: '/bar', active: false },
-    { title: '訂位紀錄', path: '/under-construction', active: true, isProtected: true },
-  ];
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="fixed z-40 justify-center w-full h-8 mx-auto top-16 bg-dark">
-        <TabBar tabs={initialTabs} />
-      </div>
+    <BarLayout title={pageTitle}>
 
       <div className="flex flex-row justify-center pt-28 h-screen">
         {/* 左留 2/12 空白 */}
@@ -134,6 +124,6 @@ export default function BarBookingList({ onPageChange }) {
         {/* 右留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
       </div>
-    </>
+    </BarLayout>
   );
 }

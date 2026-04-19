@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import TabBar from '@/components/bar/bar/tab-bar';
+import BarLayout from '@/components/bar/layout/bar-layout';
 import BarReviewCard from '@/components/bar/card/bar-review-card';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import { useRouter } from 'next/router';
-import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
 
 export default function BarRatingList({ onPageChange }) {
@@ -13,11 +12,6 @@ export default function BarRatingList({ onPageChange }) {
     onPageChange(pageTitle);
   }, [onPageChange, pageTitle]);
 
-  const initialTabs = [
-    { title: '酒吧地圖', path: '/under-construction', active: false },
-    { title: '酒吧首頁', path: '/bar', active: true },
-    { title: '訂位紀錄', path: '/under-construction', active: false, isProtected: true },
-  ];
   // const currentPage = '評論';
 
   const [ratings, setRatings] = useState([]);
@@ -51,11 +45,7 @@ export default function BarRatingList({ onPageChange }) {
   }, [getBarRating]);
 
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="fixed z-40 justify-center w-full h-8 mx-auto top-16 bg-dark">
-        <TabBar tabs={initialTabs} />
-      </div>
+    <BarLayout title={pageTitle}>
 
       <div className="flex flex-row justify-center h-screen gap-4 pt-28">
         {/* 左留 2/12 空白 */}
@@ -107,6 +97,6 @@ export default function BarRatingList({ onPageChange }) {
         {/* 右留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
       </div>
-    </>
+    </BarLayout>
   );
 }

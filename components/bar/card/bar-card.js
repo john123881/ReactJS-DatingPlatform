@@ -10,6 +10,10 @@ import { toast } from '@/lib/toast';
 import { useCollect } from '@/context/use-collect';
 
 const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
+  const { auth, setLoginModalToggle } = useAuth();
+  const { refreshCollectList, setAllCollectList } = useCollect();
+  const isSaved = !!savedBars?.[bar.bar_id];
+
   // save bar
   const interactingItems = useRef(new Set());
 
@@ -75,11 +79,6 @@ const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
       console.error('Error updating save status:', error);
       // 發生錯誤時還原所有狀態
       setSavedBars((prev) => ({ ...prev, [barId]: wasSaved }));
-      setAllCollectList((prev) =>
-        wasSaved
-          ? [...prev]
-          : prev.filter((item) => item.item_id != barId),
-      );
       toast.error('操作失敗，請稍後再試');
     } finally {
       interactingItems.current.delete(`save-${barId}`);
@@ -203,18 +202,15 @@ const BarCard = memo(({ bar, savedBars, setSavedBars, index = 0 }) => {
             <span className="text-[11px] lg:text-[14px] text-white/60 font-medium tracking-wide uppercase">
               {bar.bar_type_name}
             </span>
-            <Link
+            <button
               className="text-[11px] lg:text-[13px] bg-[#A0FF1F] text-black font-bold px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(160,255,31,0.3)] hover:shadow-[0_0_25px_rgba(160,255,31,0.5)] hover:scale-105 transition-all duration-300"
               onClick={(e) => {
-                if (auth.id === 0) {
-                  e.preventDefault();
-                  setLoginModalToggle(true);
-                }
+                e.preventDefault();
+                toast.error('未開通功能');
               }}
-              href={`/under-construction`}
             >
               立即訂位
-            </Link>
+            </button>
           </div>
         </div>
       </div>

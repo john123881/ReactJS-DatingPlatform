@@ -9,6 +9,7 @@ import PageTitle from '@/components/page-title';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
 import { BarService } from '@/services/bar-service';
+import BarLayout from '@/components/bar/layout/bar-layout';
 
 /**
  * 通用酒吧列表視圖組件
@@ -113,10 +114,11 @@ export default function BarListView({ category, title, loaderText = '正在探�
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
+
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="flex flex-col lg:flex-row justify-center pt-28 px-4 lg:px-12 gap-8 max-w-[1600px] mx-auto">
+    <BarLayout title={pageTitle}>
+
+      <div className="flex flex-col lg:flex-row justify-center pt-20 lg:pt-28 px-4 lg:px-12 gap-8 max-w-[1600px] mx-auto">
         {/* 側邊欄 */}
         <aside className="hidden lg:block w-[280px] shrink-0">
           <div className="sticky top-32 glass-card-neon p-6 rounded-[2.5rem] border border-white/10 shadow-[0_0_20px_rgba(160,255,31,0.05)]">
@@ -222,6 +224,6 @@ export default function BarListView({ category, title, loaderText = '正在探�
           )}
         </main>
       </div>
-    </>
+    </BarLayout>
   );
 }

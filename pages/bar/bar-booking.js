@@ -1,9 +1,9 @@
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Breadcrumbs from '@/components/bar/breadcrumbs/breadcrumbs';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import PageTitle from '@/components/page-title';
+import BarLayout from '@/components/bar/layout/bar-layout';
 
 import { useAuth } from '@/context/auth-context';
 import Loader from '@/components/ui/loader/loader';
@@ -44,10 +44,10 @@ export default function BarBooking({ onPageChange }) {
   if (auth.id === 0) {
     return null;
   }
+  
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
-      <div className="flex flex-row justify-center gap-4 pt-20">
+    <BarLayout title={pageTitle}>
+      <div className="flex flex-row justify-center gap-4 pt-28">
         {/* 左留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
 
@@ -142,16 +142,16 @@ export default function BarBooking({ onPageChange }) {
                     placeholder=""
                   ></textarea>
                 </div>
-                <div
-                  type="submit"
+                <button
+                  type="button"
                   className="btn w-[320px] bg-[#A0FF1F] text-black border-none rounded-[20px] hover:bg-[#A0FF1F]"
                   onClick={() =>
                     document.getElementById('booking-confirm-modal').showModal()
                   }
                 >
                   <span className="text-black text-h6">確認訂位</span>
-                  <BookingConfirmModal />
-                </div>
+                </button>
+                <BookingConfirmModal />
               </form>
             </div>
           </div>
@@ -169,6 +169,6 @@ export default function BarBooking({ onPageChange }) {
         {/* 右留 2/12 空白 */}
         <div className="w-1/12 md:w-2/12"></div>
       </div>
-    </>
+    </BarLayout>
   );
 }

@@ -51,6 +51,10 @@ const nextConfig = {
         hostname: 'localhost',
       },
       {
+        protocol: 'https',
+        hostname: 'damei17.com',
+      },
+      {
         protocol: 'http',
         hostname: '127.0.0.1',
       },

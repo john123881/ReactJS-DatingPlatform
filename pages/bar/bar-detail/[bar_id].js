@@ -9,11 +9,11 @@ import { IoMdStar } from 'react-icons/io';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import PageTitle from '@/components/page-title';
 import { BarService } from '@/services/bar-service';
 import { useCollect } from '@/context/use-collect';
 import Loader from '@/components/ui/loader/loader';
 import { toast } from '@/lib/toast';
+import BarLayout from '@/components/bar/layout/bar-layout';
 
 export default function Detail({ onPageChange }) {
   const pageTitle = '酒吧探索';
@@ -117,9 +117,9 @@ export default function Detail({ onPageChange }) {
 
   if (error) return <div className="pt-28 text-center text-white text-h3">載入失敗，請稍後再試</div>;
 
+
   return (
-    <>
-      <PageTitle pageTitle={pageTitle} />
+    <BarLayout title={pageTitle}>
       
       {/* 沉浸式背景圖層 - 使用酒吧照片作為模糊背景，營造氣氛 */}
       <div className="fixed inset-0 z-0">
@@ -301,6 +301,6 @@ export default function Detail({ onPageChange }) {
           )}
         </div>
       </div>
-    </>
+    </BarLayout>
   );
 }
