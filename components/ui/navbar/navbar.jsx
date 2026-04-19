@@ -244,6 +244,8 @@ export default function Header({ currentPageTitle, handlePageChange }) {
     }
   }, [userInfo.user_id]);
 
+
+
   // 全站通用：手機版捲動隱藏/顯示導覽列邏輯
   useEffect(() => {
     const handleScroll = () => {
